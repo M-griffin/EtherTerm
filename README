@@ -1,0 +1,65 @@
+EtherTerm Alpha 1 (c) 2014 Michael Griffin <mrmisticismo@hotmail.com>
+
+The program will compile in Windows(Codelite IDE) OSX, and Linux. It is 32 and 64 bit compatible.
+This is a full graphics program just like a game engine, it's not a console application.
+
+EtherTerm is a Telnet/SSH programing with CP437 encoding (ANSI) Graphics terminal 
+for connecting to Telnet BBS systems.
+
+EtherTerm supports the following Fonts:
+VGA-8x16 (CP437)
+MicroKnightPlus-8x16 (AMIGA)
+Mo'soul-8x16 (AMIGA)
+Pot Noodle-8x16 (AMIGA)
+Topaz Plus-8x16 (AMIGA)
+
+Etherterm will use Syncterm ESC sequences to switch font sets on the fly for displaying different ANSI and ASCII art screens.
+
+The options in the Dialing Directory are incomplete,  Add, Edit, Delete, About etc.. are still a WIP.
+
+To add new systems or remove, you must edit the dialingdirectory.xml file in a text editor.
+If you want to connect to SSH servers, you must supply your username, and password in the XML file.  There is no prompt to enter these when you connect at the moment.
+
+You can paste text. LEFT click, or CTRL V.  No copy or selection is implemented yet. 
+
+Some things not implemented yet:
+There are no transfer protocols at the moment.
+Some keyboard keys still need to be implemented like Keypad and F1 keys.  All others should work just fine including CTRL Keys.
+There is no scroll back buffer, this is also in the works. 
+
+Important..  When starting the program it will default to a 1400x800 window size for wide screen displays.
+
+You can toggle default Window sizes using ALT + ENTER.  This will toggle or cycle (3) different 
+pre-defined windows sizes then go to FULL Screen with full scaling.
+
+To compile the following libraries must be pre-installed:
+
+SDL2
+SDL2_Net
+Libssh (Requires OpenSSL, Zlib)
+
+Example Windows (Mwin32) linking:
+Libs: mingw32; SDL2main; SDL2; SDL2_net; libssh; libminizip
+
+Example Linux (G++) linking:
+libs: libSDL2, libSDL2_net, libssh
+
+Example OSX (Clang) linking:
+Must install Framework versions of SDL & NET along with Xcode for Cocoa Framework.
+libs: -Framework Cocoa -Framework SDL2 -Framework SDL2_net libssh
+
+Must compile with latest c++ environment flags.  -std=gnu++0x or -std=c++0x  you can also replace 0x with 11 on latest compilers.
+
+
+Required Screens and INI files are included in the "assets" subfolder,  You must make this a subfolder off of the root executable directory
+so the Executable will know where to find it's program files.
+
+For Example:
+
+C:\EtherTerm         ( Contains EXE )
+C:\EtherTerm\assets  ( Contains Fonts, Screens and xml, ini files )
+
+Acknowledgement and Thanks:
+- Dingo:  Telnet options and general terminal functionality
+- G00R00: Optimization ideas on scrolling pixels faster.
+- BOOK: (SDL Game Programming) For good ideas and techniques with Singletons and State Machines.
