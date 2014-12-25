@@ -17,8 +17,6 @@
     #include <SDL2/SDL_net.h>
 #endif
 
-#include <libssh/libssh.h>
-
 #include <cstdio>
 #include <cstring>
 #include <cerrno>
@@ -26,10 +24,7 @@
 
 /*
  * Start of SDL_Socket Dervived Class (TELNET)
- *
- *
  */
-
 
 /* send a string buffer over a TCP socket with error checking */
 /* returns 0 on any errors, length sent on success */
@@ -111,9 +106,7 @@ int SDL_Socket::pollSocket()
             //printf("\r\n 2 time diff: %i \r\n ",ttime2 - ttime);
             if (startBlinking && (ttime2 - ttime) > 400)
             {
-
                 //std::cout << "RenderCursorOffScreen = 0;" << std::endl;
-
                 TheTerm::Instance()->RenderCursorOffScreen(TheAnsiParser::Instance()->x_position-1, TheAnsiParser::Instance()->y_position-1);
                 TheTerm::Instance()->DrawTextureScreen();
                 --cursorBlink;
@@ -145,7 +138,6 @@ int SDL_Socket::pollSocket()
 
 bool SDL_Socket::onEnter()
 {
-
     std::cout << "SDL_Socket::onEnter()" << std::endl;
     IPaddress ip;
 

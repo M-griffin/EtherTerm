@@ -540,9 +540,6 @@ void AnsiParser::ansi_bg(char *data, int bg)
  */
 void AnsiParser::pipe2ansi(char* szString, int buffer)
 {
-
-    //std::cout << "\r\n*** pipe2ansi: " << std::endl;
-
     std::string::size_type  id1 = 0, test;    // Pipe Position
     char szTmp[3];         // Holds 1, 2nd digit of Pipe
 
@@ -808,7 +805,6 @@ void AnsiParser::ansiPrintf(std::string fileName)
 void AnsiParser::ansiparse(unsigned char *buff, int center_screen)
 {
     //std::cout << "\r\n*** Ansi Parser: " << buff << std::endl;
-
     std::string outchar;
     std::string output_screen; // Finished ANSI Screen
     std::string esc_sequence;
@@ -1061,7 +1057,6 @@ void AnsiParser::ansiparse(unsigned char *buff, int center_screen)
 
                 //screen_buff.esc_sequence += esc_sequence;
                 esc_sequence.clear();
-
                 break;
 
             case CURSOR_NEXT_LINE:
@@ -1222,6 +1217,7 @@ void AnsiParser::ansiparse(unsigned char *buff, int center_screen)
                     TheTerm::Instance()->currentFGColor = TheTerm::Instance()->grey;
                     TheTerm::Instance()->currentBGColor = TheTerm::Instance()->black;
                     //screen_buff.color_sequence += current_color;
+                    //std::cout << "\r\nESC[M\r\n" << std::endl;
                 }
                 else
                 {

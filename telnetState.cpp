@@ -67,6 +67,7 @@ void TelnetState::handleSession()
             std::cout << "Exception telnet_process_char: " << e.what() << std::endl;
         }
 
+        // Skip all NULL Bytes, returned on IAC characters.
         if (ch == '\0')
             continue;
 
@@ -530,7 +531,14 @@ unsigned char TelnetState::telnet_process_char(unsigned char c)
             break;
 
         // Find Command
-        case 1:
+        case 1:        
+            if (c == IAC)
+            {
+                // Restart on next character
+                // Double IAC = IAC.
+                std::cout << "\r\n Got double IAC!!\r\n" << std::endl;
+                return '\0';
+            }
             if (c != IAC)
             {
 
@@ -566,13 +574,7 @@ unsigned char TelnetState::telnet_process_char(unsigned char c)
                         break;
                 }
 
-            }
-            else
-            {
-                // Return state to normal Binary Mode was Sent.
-                printf("\r\n Got double #255 !!\r\n");
-                stage = 0;
-            }
+            }           
             break;
 
         // Find Option
@@ -580,7 +582,7 @@ unsigned char TelnetState::telnet_process_char(unsigned char c)
 
             stage = 0;
 
-            // CAtch if were getting Invalid Commands.
+            // Catch if were getting Invalid Commands.
             if (TELCMD_OK(cmd))
                 printf("\r\n [*****] [IAC][%i][%i] \r\n", cmd,c);
             else
