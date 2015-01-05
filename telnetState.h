@@ -100,7 +100,7 @@ extern const char *telcmds[];
 #define TELOPT_LINEMODE       34    // Linemode option
 #define TELOPT_XDISPLOC       35    // X Display Location
 #define TELOPT_OLD_ENVIRON    36    // Old - Environment variables
-#define TELOPT_AUTHENTICATION 37// Authenticate
+#define TELOPT_AUTHENTICATION 37    // Authenticate
 #define TELOPT_ENCRYPT        38    // Encryption option
 #define TELOPT_NEW_ENVIRON    39    // New - Environment variables
 #define TELOPT_TN3270E        40    // RFC2355 - TN3270 Enhancements

@@ -18,13 +18,8 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <algorithm> // Sort and Reverse
 
 #include <cstdio>
-#include <ctime>
-#include <cctype>
-#include <cstring>
-#include <cstdlib>
 
 const std::string MainMenuState::menuID = "MENU";
 
@@ -46,13 +41,6 @@ void MainMenuState::update()
     int ret = 0;
     if(!TheInputHandler::Instance()->isGlobalShutdown())
     {
-        // Handles User Input and Window Events.
-        //if(TheInputHandler::Instance()->update())
-        //{
-        // Pause before loading dialing directory.  no!
-        //inputSequence = TheInputHandler::Instance()->getInputSequence();
-        //std::cout << inputSequence << std::endl;
-        // EOF == Exit, otherwise dial selected system.
         ret = startDialDirectory();
         switch(ret)
         {
@@ -80,13 +68,9 @@ void MainMenuState::update()
                     TheTerm::Instance()->setCurrentFont(sysCon.font);
                     menuToSSH();
                 }
-                else
-                {
-                    // error, unknown protocol
-                }
+                break;
         }
         TheTerm::Instance()->setRenderReady(true);
-        //}
     }
     else
         TheTerm::Instance()->quit();
@@ -97,31 +81,15 @@ void MainMenuState::update()
 void MainMenuState::render()
 {
     std::cout << "MainMenuState::render()" << std::endl;
-    // Testing Term, and setup for inital menu / dialing directory.
-    /*
-    TheTerm::Instance()->ClearScreenSurface();
-    AnsiParser::Instance()->reset();
-
-    if (TheTerm::Instance()->running())
-    {
-        // Set default Font for Intro, and Dialing Directory.
-        TheTerm::Instance()->setCurrentFont("vga8x16.bmp");
-
-        // If the font changed, then load the new image.
-        if (TheTerm::Instance()->didFontChange())
-            TheTerm::Instance()->loadBitmapImage(TheTerm::Instance()->getCurrentFont());
-
-        mFunc.ansiPrintf("intro.ans");
-    }*/
     TheTerm::Instance()->setRenderReady(false);
 }
 
 bool MainMenuState::onEnter()
 {
     // Setup Defaults for Interface.
-    tTop = 1;
-    tBot = 1;
-    CURRENT_BAR = 0;
+    directoryTopMargin = 1;
+    directoryBottomMargin = 1;
+    LIGHTBAR_POSITION = 0;
     std::cout << "entering MainMenuState\n";
     // Set Render to Ready so we draw menu, Once it's drawn we toggle
     // This off, so it doesn't keep looping since it's not a game
@@ -152,19 +120,19 @@ void MainMenuState::setCallbacks(const std::vector<Callback>& callbacks)
 bool MainMenuState_INI::ddirectory_exists()
 {
     std::cout << "ddirectory_exists()" << std::endl;
-    iTop = 0;
-    iBot = 0;
+    TOP_MARGIN = 0;
+    BOTTOM_MARGIN = 0;
 #ifdef _WIN32
     std::string path = "assets\\";
 #else
     std::string path = "assets/";
 #endif
-    path += sININAME;
+    path += INI_NAME;
     FILE *stream;
     stream = fopen(path.c_str(),"rb+");
     if(stream == NULL)
     {
-        printf("Error unable to read msgtitle.ini, check permissions!");
+        printf("Error unable to read dialdirectory.ini, check permissions!");
         return false;
     }
     fclose(stream);
@@ -182,7 +150,7 @@ void MainMenuState_INI::ddirectory_create()
 #else
     std::string path = "assets/";
 #endif
-    path += sININAME;
+    path += INI_NAME;
     std::ofstream outStream2;
     outStream2.open(path.c_str(), std::ofstream::out | std::ofstream::trunc);
     if(!outStream2.is_open())
@@ -231,85 +199,85 @@ void MainMenuState_INI::ddirectory_check(std::string cfgdata)
     {
         ddirectory_chkpar(temp);
         id1 = atoi(temp.c_str());
-        iTop = id1;
+        TOP_MARGIN = id1;
     }
     else if(temp.find("set BOT ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
         id1 = atoi(temp.c_str());
-        iBot = id1;
+        BOTTOM_MARGIN = id1;
     }
     else if(temp.find("set THEME_NAME ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
-        sTHEME_NAME = temp;
+        THEME_NAME = temp;
     }
     else if(temp.find("set FONT_SET ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
-        sFONT_SET = temp;
+        FONT_SET = temp;
     }
     else if(temp.find("set ANSI_FILE ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
-        sANSI_FILE = temp;
+        ANSI_FILE = temp;
     }
     else if(temp.find("set MENU_PROMPT ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
-        sMENU_PROMPT = temp;
+        MENU_PROMPT_TEXT = temp;
     }
     else if(temp.find("set PAGENUM ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
-        sPAGENUM = temp;
+        PAGE_NUMBER = temp;
     }
     else if(temp.find("set PAGETOTAL ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
-        sPAGETOTAL = temp;
+        PAGE_TOTAL = temp;
     }
     else if(temp.find("set MOREMSG_ON ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
-        sMOREMSG_ON = temp;
+        MORE_MESSAGE_ON = temp;
     }
     else if(temp.find("set MOREMSG_WORD_ON ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
-        sMOREMSG_WORD_ON = temp;
+        MORE_MESSAGE_TEXT_ON = temp;
     }
     else if(temp.find("set MOREMSG_OFF ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
-        sMOREMSG_OFF = temp;
+        MORE_MESSAGE_OFF = temp;
     }
     else if(temp.find("set MOREMSG_WORD_OFF ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
-        sMOREMSG_WORD_OFF = temp;
+        MORE_MESSAGE_TEXT_OFF = temp;
     }
     else if(temp.find("set TEXT_COLOR ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
-        sTEXT_COLOR = temp;
+        TEXT_COLOR = temp;
     }
     else if(temp.find("set MAX_AREAS ", 0) != std::string::npos)
     {
         ddirectory_chkpar(temp);
-        sMAX_AREAS = temp;
+        MAX_SYSTEMS = temp;
     }
 }
 
 /**
  * Read / Parse INI File
  */
-int MainMenuState_INI::ddirectory_parse(int idx)
+int MainMenuState_INI::ddirectory_parse(int index)
 {
     //std::cout << "ddirectory_parse()" << std::endl;
     if(!ddirectory_exists())
     {
-        printf("Error unable to parse msgtitle.ini, check permissions!");
+        printf("Error unable to parse dialdirectory.ini, check permissions!");
     }
     //ddirectory_create();
     char name[1024]  = {0};
@@ -320,10 +288,10 @@ int MainMenuState_INI::ddirectory_parse(int idx)
 #else
     std::string path = "assets/";
 #endif
-    // Set for Theme, check idx number for Themeing,.
-    sprintf(name, "%s%s",path.c_str(),sININAME);
-    sprintf(name2,"%s%s%i.ini",path.c_str(),sININAME,idx);
-    if(idx != 0) strcpy(name,name2);
+    // Set for Theme, check index number for Themeing,.
+    sprintf(name, "%s%s",path.c_str(),INI_NAME);
+    sprintf(name2,"%s%s%i.ini",path.c_str(),INI_NAME,index);
+    if(index != 0) strcpy(name,name2);
     // Check if Theme Exists, if not return FALSE.
     FILE *stream;
     stream = fopen(name,"rb+");
@@ -346,14 +314,12 @@ int MainMenuState_INI::ddirectory_parse(int idx)
     for(;;)
     {
         std::getline(inStream,cfgdata,'\n');
-
         ddirectory_check(cfgdata);
         if(inStream.eof()) break;
     }
     inStream.close();
     return TRUE;
 }
-
 
 /**
  * Reads in Ansi file into Buffer Only
@@ -370,7 +336,7 @@ void MainMenuState::readinAnsi(std::string FileName, std::string &buff)
     path += ".ans";
     FILE *fp;
     std::string::size_type id1 = 0;
-    int c = 0;
+    int sequence = 0;
     if((fp = fopen(path.c_str(), "r+")) ==  NULL)
     {
         std::cout << "ANSI not found: " << path << std::endl;
@@ -378,11 +344,11 @@ void MainMenuState::readinAnsi(std::string FileName, std::string &buff)
     }
     do
     {
-        c = getc(fp);
-        if(c != EOF)
-            buff += (char)c;
+        sequence = getc(fp);
+        if(sequence != EOF)
+            buff += (char)sequence;
     }
-    while(c != EOF);
+    while(sequence != EOF);
     fclose(fp);
 }
 
@@ -392,10 +358,10 @@ void MainMenuState::readinAnsi(std::string FileName, std::string &buff)
 void MainMenuState::parseHeader(std::string FileName)
 {
     std::cout << "parseHeader()" << std::endl;
-    std::cout << "sFONT_SET: " << sFONT_SET << std::endl;
+    std::cout << "sFONT_SET: " << FONT_SET << std::endl;
 
     // Set the font type for the menu being displayed.
-    TheTerm::Instance()->setCurrentFont(sFONT_SET);
+    TheTerm::Instance()->setCurrentFont(FONT_SET);
 
     // Test if font changed, if so, then re-load it.
     if(TheTerm::Instance()->didFontChange())
@@ -403,7 +369,6 @@ void MainMenuState::parseHeader(std::string FileName)
 
     TheAnsiParser::Instance()->reset();
     MenuFunction::ansiPrintf(FileName);
-    //TheAnsiParser::Instance()->pipe2ansi( const_cast<char *>( buff.c_str() ));
 }
 
 /**
@@ -411,27 +376,24 @@ void MainMenuState::parseHeader(std::string FileName)
  */
 void MainMenuState::setupList()
 {
-    //std::cout << "setupList()" << std::endl;
-    sprintf(sININAME,"%s",(char *)"dialdirectory.ini");
+    sprintf(INI_NAME,"%s",(char *)"dialdirectory.ini");
     ddirectory_parse();
-    tTop = iTop;
-    tBot = iBot;
+    directoryTopMargin = TOP_MARGIN;
+    directoryBottomMargin = BOTTOM_MARGIN;
 }
 
 /**
  * DialDirectory - Change ANSI Template Theme
  */
-int MainMenuState::changeTheme(int idx)
+int MainMenuState::changeTheme(int index)
 {
-    //std::cout << "changeTheme()" << std::endl;
-    // Check What Theme user has selected.
-    if(ddirectory_parse(idx) == FALSE)
+    if(ddirectory_parse(index) == FALSE)
     {
         // Theme Doesn't Exist.
         return FALSE;
     }
-    mLink.Top = iTop;
-    mLink.Bot = iBot;
+    _linkList.topMargin = TOP_MARGIN;
+    _linkList.bottomMargin = BOTTOM_MARGIN;
     return TRUE;
 }
 
@@ -443,34 +405,29 @@ int MainMenuState::changeTheme(int idx)
  */
 std::vector< list_bar > MainMenuState::buildDialList()
 {
-    //std::cout << "buildDialList()" << std::endl;
-    list_bar                 tbar;
+    list_bar                 _lightbar;
     std::vector<list_bar>    result;
 
-    int c = 0;
-    std::string temp3 = "";
+    int sequence = 0;
+    std::string stringBuilder = "";
 
-    FILE *inStream;
-    long  idx = 1;
-    long  i   = 0;
-    char  MCI[3]= {0};
-    char  temp2[100]= {0};
-    int   space  = 0;
-    int   foundr = FALSE;
-    int   foundl = FALSE;
-    std::string ans  = "";
-    std::string ans1 = "";
-    std::string ans2 = "";
-    std::string ans3 = "";
-    std::string ans4 = "";
+    FILE              *inStream;
+    long  index       = 1;
+    char  mciCode[3]  = {0};
+    char  temp2[100]  = {0};
+    int   padding     = 0;
+    int   isRightPadding = FALSE;
+    int   isLeftPadding  = FALSE;
+
+    std::string currnetScreen  = "";
+    std::string ansiScreen1 = "";
+    std::string ansiScreen2 = "";
+
     // Prefetch ansi lightbar themes
     // These ansi are used as the light bars to be displayed,
-    // We rotate between 4 ansi lightbars.
-    //
-    // 1. Unread Messages
-    // 2. New Messages
-    // 3. Current Selection of Unread
-    // 4. Current Selection of New
+    // We rotate between 2 ansi lightbars.
+    // 1. Unselected Systems
+    // 4. Current System Selected
     //
     // We cache array with all four choices so we can
     // easily switch between them in the listing.
@@ -485,13 +442,13 @@ std::vector< list_bar > MainMenuState::buildDialList()
         std::cout << "unable to read " <<  "ddirectorymid1.ans" << std::endl;
         return result;
     }
-    while(c != EOF)
+    while(sequence != EOF)
     {
-        c = getc(inStream);
-        if(c != EOF) ans1 += c;
+        sequence = getc(inStream);
+        if(sequence != EOF) ansiScreen1 += sequence;
     }
     fclose(inStream);
-    c = '\0';
+    sequence = '\0';
 
 #ifdef _WIN32
     path = "assets\\";
@@ -504,203 +461,202 @@ std::vector< list_bar > MainMenuState::buildDialList()
         std::cout << "unable to read " <<  "ddirectorymid2.ans" << std::endl;
         return result;
     }
-    while(c != EOF)
+    while(sequence != EOF)
     {
-        c = getc(inStream);
-        if(c != EOF) ans2 += c;
+        sequence = getc(inStream);
+        if(sequence != EOF) ansiScreen2 += sequence;
     }
     fclose(inStream);
 
-    unsigned long max_titles = 0;
-    unsigned long num_titles = 0;
-    max_titles = systemConnection.size();
+    unsigned long maxSystems    = 0;
+    unsigned long currentSystem = 0;
+    maxSystems = systemConnection.size();
     std::cout << "systemConnection.size(): " << systemConnection.size() << std::endl;
 
-    while(num_titles < max_titles)
+    int counter = 0;
+    while(currentSystem < maxSystems)
     {
-        if(num_titles == max_titles) break;
-        temp3.erase();
-        for(int icnt = 0; icnt < 2; icnt++)
+        if(currentSystem == maxSystems) break;
+        stringBuilder.erase();
+        for(int ansiCount = 0; ansiCount < 2; ansiCount++)
         {
-            switch(icnt)
+            switch(ansiCount)
             {
                 case 0:
-                    ans = ans2;
+                    currnetScreen = ansiScreen2;
                     break; // Display HighLight None.  ON
 
                 case 1:
-                    ans = ans1;
+                    currnetScreen = ansiScreen1;
                     break; // Dispaly Lowlight None    OFF
 
                 default:
                     break;
             }
-            i = 0;
-            c = 0;
-            // Parse MCI Codes per each light bar ansi file
+            counter = 0;
+            sequence = 0;
+            // Parse mciCode Codes per each light bar ansi file
             do
             {
-                memset(&MCI,0,sizeof(MCI));
-                c = ans[i];
-                if(c == '\0') break;
-                // Check for Spacing MCI Code
-                switch(c)
+                memset(&mciCode,0,sizeof(mciCode));
+                sequence = currnetScreen[counter];
+                if(sequence == '\0') break;
+                // Check for Spacing mciCode Code
+                switch(sequence)
                 {
                     case '{' : // Left Justify
-                        MCI[0] = ans[++i];
-                        MCI[1] = ans[++i];
-                        space = atoi(MCI);
-                        if(space != 0)
+                        mciCode[0] = currnetScreen[++counter];
+                        mciCode[1] = currnetScreen[++counter];
+                        padding = atoi(mciCode);
+                        if(padding != 0)
                         {
-                            foundl = TRUE;
+                            isLeftPadding = TRUE;
                         }
                         else
                         {
-                            temp3 += c;
-                            temp3 += MCI;
+                            stringBuilder += sequence;
+                            stringBuilder += mciCode;
                         }
                         break;
 
                     case '}' : // Right Justify
-                        MCI[0] = ans[++i];
-                        MCI[1] = ans[++i];
-                        space = atoi(MCI);
-                        if(space != 0)
+                        mciCode[0] = currnetScreen[++counter];
+                        mciCode[1] = currnetScreen[++counter];
+                        padding = atoi(mciCode);
+                        if(padding != 0)
                         {
-                            foundr = TRUE;
+                            isRightPadding = TRUE;
                         }
                         else
                         {
-                            temp3 += c;
-                            temp3 += MCI;
+                            stringBuilder += sequence;
+                            stringBuilder += mciCode;
                         }
                         break;
 
                     case '|' : // Pipe Codes
-                        MCI[0] = ans[++i];
-                        MCI[1] = ans[++i];
-                        if(strcmp(MCI,"##") == 0)
+                        mciCode[0] = currnetScreen[++counter];
+                        mciCode[1] = currnetScreen[++counter];
+                        if(strcmp(mciCode,"##") == 0)
                         {
-                            sprintf(temp2,"%lu", num_titles+1);
-                            if(foundl)
+                            sprintf(temp2,"%lu", currentSystem+1);
+                            if(isLeftPadding)
                             {
-                                MenuFunction::leftSpacing(temp2,space);
-                                foundl = FALSE;
+                                MenuFunction::leftSpacing(temp2,padding);
+                                isLeftPadding = FALSE;
                             }
-                            else if(foundr)
+                            else if(isRightPadding)
                             {
-                                MenuFunction::rightSpacing(temp2,space);
-                                foundr = FALSE;
+                                MenuFunction::rightSpacing(temp2,padding);
+                                isRightPadding = FALSE;
                             }
-                            // Not using New/False, set Default.
-                            tbar.isnew = FALSE;
-                            temp3 += temp2;
+                            stringBuilder += temp2;
                         }
-                        else if(strcmp(MCI,"NA") == 0)
+                        else if(strcmp(mciCode,"NA") == 0)
                         {
-                            sprintf(temp2,"%s",systemConnection[num_titles].name.c_str());
-                            if(foundl)
+                            sprintf(temp2,"%s",systemConnection[currentSystem].name.c_str());
+                            if(isLeftPadding)
                             {
-                                MenuFunction::leftSpacing(temp2,space);
-                                foundl = FALSE;
+                                MenuFunction::leftSpacing(temp2,padding);
+                                isLeftPadding = FALSE;
                             }
-                            else if(foundr)
+                            else if(isRightPadding)
                             {
-                                MenuFunction::rightSpacing(temp2,space);
-                                foundr = FALSE;
+                                MenuFunction::rightSpacing(temp2,padding);
+                                isRightPadding = FALSE;
                             }
-                            temp3 += temp2;
+                            stringBuilder += temp2;
                         }
-                        else if(strcmp(MCI,"FO") == 0)
+                        else if(strcmp(mciCode,"FO") == 0)
                         {
                             // FIXME Temp - Translate Filename to Description
                             // Will add to the xml once it's ready.
-                            if(systemConnection[num_titles].font == "vga8x16.bmp")
+                            if(systemConnection[currentSystem].font == "vga8x16.bmp")
                                 sprintf(temp2,"%s",(char *)"IBM-PC CP437 VGA 8x16");
-                            else if(systemConnection[num_titles].font == "topazPlus-8x16.bmp")
+                            else if(systemConnection[currentSystem].font == "topazPlus-8x16.bmp")
                                 sprintf(temp2,"%s",(char *)"AMIGA Topaz+ 1200 8x16");
 
-                            //sprintf(temp2,"%s",systemConnection[num_titles].font.c_str());
-                            if(foundl)
+                            //sprintf(temp2,"%s",systemConnection[currentSystem].font.c_str());
+                            if(isLeftPadding)
                             {
-                                MenuFunction::leftSpacing(temp2,space);
-                                foundl = FALSE;
+                                MenuFunction::leftSpacing(temp2,padding);
+                                isLeftPadding = FALSE;
                             }
-                            else if(foundr)
+                            else if(isRightPadding)
                             {
-                                MenuFunction::rightSpacing(temp2,space);
-                                foundr = FALSE;
+                                MenuFunction::rightSpacing(temp2,padding);
+                                isRightPadding = FALSE;
                             }
-                            temp3 += temp2;
+                            stringBuilder += temp2;
                         }
-                        else if(strcmp(MCI,"PO") == 0)
+                        else if(strcmp(mciCode,"PO") == 0)
                         {
-                            sprintf(temp2,"%i",systemConnection[num_titles].port);
-                            if(foundl)
+                            sprintf(temp2,"%i",systemConnection[currentSystem].port);
+                            if(isLeftPadding)
                             {
-                                MenuFunction::leftSpacing(temp2,space);
-                                foundl = FALSE;
+                                MenuFunction::leftSpacing(temp2,padding);
+                                isLeftPadding = FALSE;
                             }
-                            else if(foundr)
+                            else if(isRightPadding)
                             {
-                                MenuFunction::rightSpacing(temp2,space);
-                                foundr = FALSE;
+                                MenuFunction::rightSpacing(temp2,padding);
+                                isRightPadding = FALSE;
                             }
-                            temp3 += temp2;
+                            stringBuilder += temp2;
                         }
-                        else if(strcmp(MCI,"PR") == 0)
+                        else if(strcmp(mciCode,"PR") == 0)
                         {
-                            sprintf(temp2,"%s",systemConnection[num_titles].protocol.c_str());
-                            if(foundl)
+                            sprintf(temp2,"%s",systemConnection[currentSystem].protocol.c_str());
+                            if(isLeftPadding)
                             {
-                                MenuFunction::leftSpacing(temp2,space);
-                                foundl = FALSE;
+                                MenuFunction::leftSpacing(temp2,padding);
+                                isLeftPadding = FALSE;
                             }
-                            else if(foundr)
+                            else if(isRightPadding)
                             {
-                                MenuFunction::rightSpacing(temp2,space);
-                                foundr = FALSE;
+                                MenuFunction::rightSpacing(temp2,padding);
+                                isRightPadding = FALSE;
                             }
-                            temp3 += temp2;
+                            stringBuilder += temp2;
                         }
                         else
                         {
-                            temp3 += c;
-                            temp3 += MCI;
+                            stringBuilder += sequence;
+                            stringBuilder += mciCode;
                         }
                         break;
 
                     case '\n' :
-                        //  temp3 += '\r';
+                        //  stringBuilder += '\r';
                         break;
 
                     default :
-                        temp3 += c;
+                        stringBuilder += sequence;
                         break;
                 }
-                ++i;
+                ++counter;
             }
-            while(c != '\0');
+            while(sequence != '\0');
 
-            temp3 += "\r";
-            switch(icnt)
+            stringBuilder += "\r";
+            switch(ansiCount)
             {
                 case 0:
-                    tbar . ansi_2 = temp3;
+                    _lightbar.ansiString2 = stringBuilder;
                     break; // Display HighLight None.  ON
                 case 1:
-                    tbar . ansi_1 = temp3;
+                    _lightbar.ansiString1 = stringBuilder;
                     break; // Dispaly Lowlight None    OFF
 
                 default:
                     break;
             }
-            temp3.erase();
+            stringBuilder.erase();
         } // End of (4) Look for each string.
-        result . push_back(tbar);
-        temp3.erase();
-        ++num_titles;
-        ++idx;
+        result.push_back(_lightbar);
+        stringBuilder.erase();
+        ++currentSystem;
+        ++index;
     }
     return result;
 }
@@ -813,22 +769,17 @@ void MainMenuState::createDialDirectory()
  */
 int MainMenuState::startDialDirectory()
 {
-    //std::cout << "startDialDirectory()" << std::endl;
-    mLink.initList(sTEXT_COLOR, 1);
-    int  CurrentPage  = 0;
-    int  bSize        = 0;
+    int  currentPage  = 0;
     int  boxsize      = 0;
 //    bool more         = FALSE;
 //    bool showmore     = FALSE;
 
     // Reading in dialdirectory.ini values.
     setupList();
-    std::cout << "ANSI File: "<< sANSI_FILE << std::endl;
+    std::cout << "ANSI File: "<< ANSI_FILE << std::endl;
 
-    bSize = tBot - tTop;
-    ++bSize;
-    mLink.Top = tTop;
-    mLink.Bot = tBot;
+    _linkList.topMargin = directoryTopMargin;
+    _linkList.bottomMargin = directoryBottomMargin;
 
     // Build Title Scan into Vector List
     std::vector<list_bar> result;
@@ -846,9 +797,9 @@ int MainMenuState::startDialDirectory()
     }
     result = buildDialList();
     // populate list with vector class
-    mLink.GetVector(result);
+    _linkList.getVectorList(result);
 
-    std::string _output;
+    std::string outputBuffer;
     char outBuffer[1024]= {0};
     char mString[10]= {0};
     char rBuffer[1024]= {0};
@@ -856,21 +807,21 @@ int MainMenuState::startDialDirectory()
     std::string tmp;
     std::string::size_type id1 = 0;
     // To Start out, keep this static lateron for next call.
-    CURRENT_BAR = 0;
+    LIGHTBAR_POSITION = 0;
 
     // Loop Lightbar Interface.
     do
     {
-        parseHeader(sANSI_FILE);
+        parseHeader(ANSI_FILE);
         // Jump to Current Page
-        boxsize = mLink.Bot - mLink.Top;
-        CurrentPage = CURRENT_BAR / boxsize;
+        boxsize = _linkList.bottomMargin - _linkList.topMargin;
+        currentPage = LIGHTBAR_POSITION / boxsize;
 
         //  Make sure we have areas.
         if(result.size() > 0)
         {
-            //std::cout << "box_start_vector(CurrentPage, CURRENT_BAR);" << std::endl;
-            mLink.box_start_vector(CurrentPage, CURRENT_BAR);
+            //std::cout << "box_start_vector(currentPage, LIGHTBAR_POSITION);" << std::endl;
+            _linkList.drawVectorList(currentPage, LIGHTBAR_POSITION);
         }
         else
         {
@@ -879,28 +830,28 @@ int MainMenuState::startDialDirectory()
             return EOF;
         }
 
-        mLink.Tot = result.size();
+        _linkList.totalLines = result.size();
         do
         {
-            _output.erase();
-            _output = "|16"; // Clear Color Bleeding, reset background to black.
+            outputBuffer.erase();
+            outputBuffer = "|16"; // Clear Color Bleeding, reset background to black.
 
             // Show Current/Total Pages in Dialing Directory
-            sprintf(outBuffer,"%s%.3d",(char *)sPAGENUM.c_str(),mLink.Page+1);
-            _output += outBuffer;
-            sprintf(outBuffer,"%s%.3d",(char *)sPAGETOTAL.c_str(),mLink.TotPages);
-            _output += outBuffer;
+            sprintf(outBuffer,"%s%.3d",(char *)PAGE_NUMBER.c_str(),_linkList.currentPage+1);
+            outputBuffer += outBuffer;
+            sprintf(outBuffer,"%s%.3d",(char *)PAGE_TOTAL.c_str(),_linkList.totalPages);
+            outputBuffer += outBuffer;
 
             // # of Systems in Dialing Directory
-            sprintf(outBuffer,"%s%.3d",(char *)sMAX_AREAS.c_str(),mLink.Tot);
-            _output += outBuffer;
-            MenuFunction::pipe2ansi((char *)_output.c_str());
+            sprintf(outBuffer,"%s%.3d",(char *)MAX_SYSTEMS.c_str(),_linkList.totalLines);
+            outputBuffer += outBuffer;
+            MenuFunction::pipe2ansi((char *)outputBuffer.c_str());
 
-            mFunc._curmenu.clear();
-            mFunc._curmenu = sMENU_PROMPT;
+            _menuFunction._curmenu.clear();
+            _menuFunction._curmenu = MENU_PROMPT_TEXT;
 JMPINPUT1:
-            mFunc.menu_readin();
-            mFunc.menu_proc(mString, CURRENT_BAR);
+            _menuFunction.menu_readin();
+            _menuFunction.menu_proc(mString, LIGHTBAR_POSITION);
             //std::cout << "mString: " << mString << std::endl;
 
             ch = mString[1];
@@ -910,29 +861,29 @@ JMPINPUT1:
                 switch(toupper(ch))
                 {
                     case 'N': // Multi Area Newscan, skip to next area.
-                        mLink.dispose_list();
+                        _linkList.clearVectorList();
                         std::vector<list_bar>() . swap(result); // Free Vector Up.
                         return -2;
 
                     case 'U': // Page Up
-                        if(CurrentPage != 0)
+                        if(currentPage != 0)
                         {
-                            --CurrentPage;
+                            --currentPage;
                             // reset Bar to first Listing on each Page.
-                            CURRENT_BAR = CurrentPage * boxsize;
-                            mLink.box_start_vector(CurrentPage,CURRENT_BAR);
+                            LIGHTBAR_POSITION = currentPage * boxsize;
+                            _linkList.drawVectorList(currentPage,LIGHTBAR_POSITION);
                         }
                         else
                             goto JMPINPUT1;
                         break;
 
                     case 'D': // Page Down
-                        if(CurrentPage+1 != mLink.TotPages)
+                        if(currentPage+1 != _linkList.totalPages)
                         {
-                            ++CurrentPage;
+                            ++currentPage;
                             // reset Bar to first Listing on each Page.
-                            CURRENT_BAR = CurrentPage * boxsize;
-                            mLink.box_start_vector(CurrentPage,CURRENT_BAR);
+                            LIGHTBAR_POSITION = currentPage * boxsize;
+                            _linkList.drawVectorList(currentPage,LIGHTBAR_POSITION);
                         }
                         else
                             goto JMPINPUT1;
@@ -940,114 +891,89 @@ JMPINPUT1:
 
                         // hit ENTER
                     case 'E': // Selected Current System to Dial
-                        mLink.dispose_list();
+                        _linkList.clearVectorList();
                         std::vector<list_bar>() . swap(result); // Free Vector Up.
                         // Pass the selected system to the TERM Instance so we can
                         // Pull it inside the TelnetState.
-                        TheTerm::Instance()->setSystemConnection(systemConnection[CURRENT_BAR]);
-                        return CURRENT_BAR;
+                        TheTerm::Instance()->setSystemConnection(systemConnection[LIGHTBAR_POSITION]);
+                        return LIGHTBAR_POSITION;
 
                     case '+': // Next Message - Move Down
 
-                        if(CURRENT_BAR+1 >= mLink.listing.size() || mLink.listing.size() == 0)
+                        if(LIGHTBAR_POSITION+1 >= _linkList.listing.size() || _linkList.listing.size() == 0)
                             goto JMPINPUT1;
                         //std::cout << "Move to next bar." << std::endl;
-                        ++CURRENT_BAR;
+                        ++LIGHTBAR_POSITION;
                         //Calculate if we go down, ++Current Area, are we on next page or not.
                         // Becasue 0 Based, need to add +1
                         // Test if we moved to next page.
-                        if((signed)CURRENT_BAR+1 < (boxsize*(CurrentPage+1))+1)
+                        if((signed)LIGHTBAR_POSITION+1 < (boxsize*(currentPage+1))+1)
                         {
-                            // Still on Same Page
-                            if(mLink.listing[CURRENT_BAR-1].isnew)
-                            {
-                                // Lowlight Current, then Highlight Next.
-                                sprintf(rBuffer, "\x1b[%i;%iH|16%s", mLink.current_selection, 1, (char *)mLink.listing[CURRENT_BAR-1].ansi_3.c_str());
-                            }
-                            else
-                            {
-                                // Lowlight Current, then Highlight Next.
-                                sprintf(rBuffer, "\x1b[%i;%iH|16%s", mLink.current_selection, 1, (char *)mLink.listing[CURRENT_BAR-1].ansi_1.c_str());
-                            }
-                            _output += rBuffer;
-                            mLink.current_selection += 1;
-                            if(mLink.listing[CURRENT_BAR].isnew)
-                            {
-                                sprintf(rBuffer, "\x1b[%i;%iH|16%s", mLink.current_selection, 1, (char *)mLink.listing[CURRENT_BAR].ansi_4.c_str());
-                            }
-                            else
-                            {
-                                sprintf(rBuffer, "\x1b[%i;%iH|16%s", mLink.current_selection, 1, (char *)mLink.listing[CURRENT_BAR].ansi_2.c_str());
-                            }
-                            _output += rBuffer;
-                            MenuFunction::pipe2ansi((char *)_output.c_str());
-                            _output.erase();
+                            // Lowlight Current, then Highlight Next.
+                            sprintf(rBuffer, "\x1b[%i;%iH|16%s",
+                                _linkList.currentSelection, 1, (char *)_linkList.listing[LIGHTBAR_POSITION-1].ansiString1.c_str());
+
+                            outputBuffer += rBuffer;
+                            _linkList.currentSelection += 1;
+
+                            sprintf(rBuffer, "\x1b[%i;%iH|16%s",
+                                _linkList.currentSelection, 1, (char *)_linkList.listing[LIGHTBAR_POSITION].ansiString2.c_str());
+
+                            outputBuffer += rBuffer;
+                            MenuFunction::pipe2ansi((char *)outputBuffer.c_str());
+                            outputBuffer.erase();
                             goto JMPINPUT1; //Not moving down a page.
                         }
                         else
                         {
                             // Move to next Page!
-                            ++CurrentPage;
-                            mLink.box_start_vector(CurrentPage,CURRENT_BAR);
+                            ++currentPage;
+                            _linkList.drawVectorList(currentPage,LIGHTBAR_POSITION);
                             break;
                         }
                     case '-': // Previous Messasge - Move Up
 
                         // Skipping to JMPINPUT bypasses redraws, much faster!
-                        if(CURRENT_BAR > 0 && mLink.listing.size() != 0)
-                            --CURRENT_BAR;
+                        if(LIGHTBAR_POSITION > 0 && _linkList.listing.size() != 0)
+                            --LIGHTBAR_POSITION;
                         else
                             goto JMPINPUT1;
 
                         //Calculate if we go down, --Current Area, are we on next page or not.
                         // Becasue 0 Based, need to add +1
                         // Test if we moved to next page.
-                        if((signed)CURRENT_BAR+1 > (boxsize*(CurrentPage)))
+                        if((signed)LIGHTBAR_POSITION+1 > (boxsize*(currentPage)))
                         {
                             // Still on Same Page
                             // Lowlight Current, then Highlight Next.
-                            if(mLink.listing[CURRENT_BAR+1].isnew)
-                            {
-                                sprintf(rBuffer, "\x1b[%i;%iH|16%s", mLink.current_selection, 1, (char *)mLink.listing[CURRENT_BAR+1].ansi_3.c_str());
-                            }
-                            else
-                            {
-                                sprintf(rBuffer, "\x1b[%i;%iH|16%s", mLink.current_selection, 1, (char *)mLink.listing[CURRENT_BAR+1].ansi_1.c_str());
-                            }
-                            _output = rBuffer;
-                            mLink.current_selection -= 1;
-                            if(mLink.listing[CURRENT_BAR].isnew)
-                            {
-                                sprintf(rBuffer, "\x1b[%i;%iH|16%s", mLink.current_selection, 1, (char *)mLink.listing[CURRENT_BAR].ansi_4.c_str());
-                            }
-                            else
-                            {
-                                sprintf(rBuffer, "\x1b[%i;%iH|16%s", mLink.current_selection, 1, (char *)mLink.listing[CURRENT_BAR].ansi_2.c_str());
-                            }
-                            _output += rBuffer;
-                            MenuFunction::pipe2ansi((char *)_output.c_str());
-                            _output.erase();
+                            sprintf(rBuffer, "\x1b[%i;%iH|16%s", _linkList.currentSelection, 1, (char *)_linkList.listing[LIGHTBAR_POSITION+1].ansiString1.c_str());
+                            outputBuffer = rBuffer;
+                            _linkList.currentSelection -= 1;
+
+                            sprintf(rBuffer, "\x1b[%i;%iH|16%s", _linkList.currentSelection, 1, (char *)_linkList.listing[LIGHTBAR_POSITION].ansiString2.c_str());
+                            outputBuffer += rBuffer;
+                            MenuFunction::pipe2ansi((char *)outputBuffer.c_str());
+                            outputBuffer.erase();
                             goto JMPINPUT1; //Not moving down a page.
                         }
                         else
                         {
                             // Move to next Page!
-                            --CurrentPage;
-                            mLink.box_start_vector(CurrentPage,CURRENT_BAR);
+                            --currentPage;
+                            _linkList.drawVectorList(currentPage,LIGHTBAR_POSITION);
                         }
                         break;
 
                     case 'Q': // Quit Received, Hard Exit.
-                        mLink.dispose_list();
+                        _linkList.clearVectorList();
                         std::vector<list_bar>() . swap(result); // Free Vector Up.
                         return EOF;
 
                     case '?': // Directory Help
-
-//                    ansiPrintf(sANSI_HELP); // Display Ansi Help file,
+  //                    ansiPrintf(sANSI_HELP); // Display Ansi Help file,
                         //getkey(true);
-                        parseHeader(sANSI_FILE); // Redisplay Display Ansi
-                        mLink.box_start_vector(CurrentPage,CURRENT_BAR);
+                        parseHeader(ANSI_FILE); // Redisplay Display Ansi
+                        _linkList.drawVectorList(currentPage,LIGHTBAR_POSITION);
                         break;
 
                     case 'A': // About
@@ -1060,21 +986,21 @@ JMPINPUT1:
                         // If Global Exit, return right away.
                         if(TheInputHandler::Instance()->isGlobalShutdown())
                         {
-                            mLink.dispose_list();
+                            _linkList.clearVectorList();
                             std::vector<list_bar>() . swap(result); // Free Vector Up.
                             return EOF;
                         }
                         parseHeader((char *)"et2.ans"); // Redisplay Display Ansi
-                        mLink.box_start_vector(CurrentPage,CURRENT_BAR);
+                        _linkList.drawVectorList(currentPage,LIGHTBAR_POSITION);
                         break;
                         // Pass through, any functionaly that should
                         // Be handeled in Reader.
                         // to the Message Reader. ie post ,reply, delete...
                     default :
-                        mLink.dispose_list();
+                        _linkList.clearVectorList();
                         std::vector<list_bar>() . swap(result); // Free Vector Up.
                         // Don't exit, just return with pass through command.
-                        //CURRENT_BAR = EOF;
+                        //LIGHTBAR_POSITION = EOF;
                         return (char)toupper(ch);
                 }
             }

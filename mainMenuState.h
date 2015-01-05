@@ -16,25 +16,25 @@
 
 typedef struct MainMenuState_INI
 {
-    char INIPATH[255];
-    char sININAME[255];
-    int  iTop;
-    int  iBot;
-    std::string sPAGENUM;
-    std::string sPAGETOTAL;
-    std::string sMOREMSG_ON;
-    std::string sMOREMSG_WORD_ON;
-    std::string sMOREMSG_OFF;
-    std::string sMOREMSG_WORD_OFF;
-    std::string sTEXT_COLOR;
-    std::string sTEXT_HILIGHT;
-    std::string sMAX_AREAS;
-    std::string sFONT_SET;
+    char INI_PATH[255];
+    char INI_NAME[255];
+    int  TOP_MARGIN;
+    int  BOTTOM_MARGIN;
+    std::string PAGE_NUMBER;
+    std::string PAGE_TOTAL;
+    std::string MORE_MESSAGE_ON;
+    std::string MORE_MESSAGE_TEXT_ON;
+    std::string MORE_MESSAGE_OFF;
+    std::string MORE_MESSAGE_TEXT_OFF;
+    std::string TEXT_COLOR;
+    std::string TEXT_COLOR_HILIGHT;
+    std::string MAX_SYSTEMS;
+    std::string FONT_SET;
     // Theme
-    std::string sANSI_FILE;
-    std::string sANSI_HELP;
-    std::string sTHEME_NAME;
-    std::string sMENU_PROMPT;
+    std::string ANSI_FILE;
+    std::string ANSI_HELP_FILE;
+    std::string THEME_NAME;
+    std::string MENU_PROMPT_TEXT;
     // Message Read .ini File
     bool ddirectory_exists();
     void ddirectory_create();
@@ -72,19 +72,19 @@ private:
     std::string inputSequence;
     static const std::string menuID;
 
-    // MenuFunc
-    LinkList      mLink;
-    MenuFunction  mFunc;
-    MenuRec      *menur2;
-    CommandRec   *cmdr2;
+    // Class Types for use
+    LinkList      _linkList;
+    MenuFunction  _menuFunction;
+    MenuRec      *_menuRecord;
+    CommandRec   *_commandRecord;
 
-    int  noc;           // Number of Commands in Loaded Menu
-    int  System_Alive;  // System Exit
+    int  numberOfCommands; // Number of Commands in Loaded Menu
+    int  systemActive;     // System Exit
 
-    // Title Scan
-    unsigned long CURRENT_BAR;
-    int tTop;
-    int tBot;
+    // Dialing Directory
+    unsigned long LIGHTBAR_POSITION;
+    int directoryTopMargin;
+    int directoryBottomMargin;
 
     std::vector<TheTerm::SystemConnection> systemConnection;
     std::vector<list_bar> buildDialList();
