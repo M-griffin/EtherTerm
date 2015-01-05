@@ -7,19 +7,21 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-
-#ifdef _WIN32
-    #include <SDL.h>
+#ifdef TARGET_OS_MAC
+#include <SDL.h>
+#include <SDL_net.h>
+#elif _WIN32
+#include <SDL.h>
+#include <SDL_net.h>
 #else
-    #include <SDL2/SDL.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #endif
 
 // Temp
 #define NUM_LINES 25
 
-
 //Definitions for the TELNET protocol.
-
 #define    IAC     255        // interpret as command:
 #define    DONT    254        // you are not to use option
 #define    DO      253        // please, you use option
@@ -40,11 +42,11 @@
 #define    ABORT   238        // Abort process
 #define    SUSP    237        // Suspend process
 #define    xEOF    236        // End of file: EOF is already used...
-
-#define SYNCH    242          // for telfunc calls
+#define    SYNCH   242        // for telfunc calls
 
 #ifdef TELCMDS
-const char *telcmds[] = {
+const char *telcmds[] =
+{
     "EOF", "SUSP", "ABORT", "EOR",
     "SE", "NOP", "DMARK", "BRK", "IP", "AO", "AYT", "EC",
     "EL", "GA", "SB", "WILL", "WONT", "DO", "DONT", "IAC", 0
@@ -56,7 +58,7 @@ extern const char *telcmds[];
 #define    TELCMD_FIRST  xEOF
 #define    TELCMD_LAST      IAC
 #define    TELCMD_OK(x)  ((unsigned int)(x) <= TELCMD_LAST && \
-                       (unsigned int)(x) >= TELCMD_FIRST)
+                          (unsigned int)(x) >= TELCMD_FIRST)
 
 #define    TELCMD(x)      telcmds[(x)-TELCMD_FIRST]
 
@@ -107,16 +109,25 @@ extern const char *telcmds[];
 #define TELOPT_KERMIT         47    // RFC2840 - Kermit
 #define TELOPT_EXOPL         255    // extended-options-list
 
+// MUD WIP
+#define TELOPT_MSDP           69    // used to send mud server data
+#define TELOPT_MSSP           70    // used to send mud server information
+#define TELOPT_MCCP_1         85    // MUD zlib stream compression Version 1
+#define TELOPT_MCCP_2         86    // MUD zlib stream compression Version 2 RFC1950.
+#define TELOPT_MSP            90    // used to toggle Mud Sound Protocol
+#define TELOPT_MXP            91    // used to toggle Mud Extention Protocol
 
 #define TELOPT_FIRST    TELOPT_BINARY
 #define TELOPT_LAST     TELOPT_KERMIT
+
 #define TELOPT_OK(x)    ((unsigned int)(x) <= TELOPT_LAST)
 #define TELOPT(x)       telopts[(x)-TELOPT_FIRST]
 
-#define NTELOPTS    (1+TELOPT_LAST)
+#define NTELOPTS        (1+TELOPT_LAST)
 
 #ifdef TELOPTS
-const char *telopts[NTELOPTS+1] = {
+const char *telopts[NTELOPTS+1] =
+{
     "BINARY", "ECHO", "RCP", "SUPPRESS GO AHEAD", "NAME",
     "STATUS", "TIMING MARK", "RCTE", "NAOL", "NAOP",
     "NAOCRD", "NAOHTS", "NAOHTD", "NAOFFD", "NAOVTS",
@@ -201,15 +212,16 @@ const char *telopts[NTELOPTS+1] = {
 // list of names if SLC_NAMES is not defined.
 
 #define    SLC_NAMELIST    "0", "SYNCH", "BRK", "IP", "AO", "AYT", "EOR",    \
-             "ABORT", "EOF", "SUSP", "EC", "EL", "EW", "RP",    \
-             "LNEXT", "XON", "XOFF", "FORW1", "FORW2",    \
-             "MCL", "MCR", "MCWL", "MCWR", "MCBOL",        \
-             "MCEOL", "INSRT", "OVER", "ECR", "EWR",        \
-             "EBOL", "EEOL",                    \
-             0
+    "ABORT", "EOF", "SUSP", "EC", "EL", "EW", "RP",    \
+    "LNEXT", "XON", "XOFF", "FORW1", "FORW2",    \
+    "MCL", "MCR", "MCWL", "MCWR", "MCBOL",        \
+    "MCEOL", "INSRT", "OVER", "ECR", "EWR",        \
+    "EBOL", "EEOL",                    \
+    0
 
 #ifdef    SLC_NAMES
-char *slc_names[] = {
+char *slc_names[] =
+{
     SLC_NAMELIST
 };
 #else
@@ -272,7 +284,8 @@ extern char *slc_names[];
 #define    AUTHTYPE_TEST          99
 
 #ifdef    AUTH_NAMES
-const char *authtype_names[] = {
+const char *authtype_names[] =
+{
     "NULL", "KERBEROS_V4", "KERBEROS_V5", "SPX", "MINK", NULL, "SRA",
     0
 };
@@ -301,12 +314,14 @@ extern const char *authtype_names[];
 #define    ENCTYPE_CNT          3
 
 #ifdef    ENCRYPT_NAMES
-const char *encrypt_names[] = {
+const char *encrypt_names[] =
+{
     "IS", "SUPPORT", "REPLY", "START", "END",
     "REQUEST-START", "REQUEST-END", "ENC-KEYID", "DEC-KEYID",
     0
 };
-const char *enctype_names[] = {
+const char *enctype_names[] =
+{
     "ANY", "DES_CFB64",  "DES_OFB64",
     0
 };
@@ -336,6 +351,7 @@ class TelnetState : public MenuState
 {
 public:
 
+    TelnetState();
     virtual ~TelnetState() {}
 
     virtual void update();
@@ -344,7 +360,10 @@ public:
     virtual bool onEnter();
     virtual bool onExit();
 
-    virtual std::string getStateID() const { return telnetID; }
+    virtual std::string getStateID() const
+    {
+        return telnetID;
+    }
 
 private:
 
@@ -354,8 +373,8 @@ private:
     // Gobal Option State for Telnet Options Parsing.
     int stage;
     int cmd;
-    char binary_mode;
-    char did_SGA, did_TERM, did_NAWS, did_BIN, did_ECHO;
+    bool isSGA,  isBIN, isECHO;
+    bool didSGA, didTERM, didNAWS, didBIN, didECHO;
     unsigned char opt;
 
     // Telnet Protocol Functions.

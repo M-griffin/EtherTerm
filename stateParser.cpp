@@ -5,7 +5,6 @@
 // $LastChangedBy$
 
 #include "stateParser.h"
-//#include "TextureManager.h"
 #include "terminal.h"
 #include "termObjectFactory.h"
 
@@ -69,7 +68,6 @@ bool StateParser::parseState(const char *stateFile, string stateID, vector<TermO
 
     // now parse the objects
     parseObjects(pObjectRoot, pObjects);
-
     return true;
 }
 
@@ -80,10 +78,8 @@ void StateParser::parseTextures(TiXmlElement* pStateRoot, std::vector<std::strin
     {
         string filenameAttribute = e->Attribute("filename");
         string idAttribute = e->Attribute("ID");
-
         pTextureIDs->push_back(idAttribute); // push the id into the list
-
-   //     TheTextureManager::Instance()->load(filenameAttribute, idAttribute, TheGame::Instance()->getRenderer());
+        //     TheTextureManager::Instance()->load(filenameAttribute, idAttribute, TheGame::Instance()->getRenderer());
     }
 }
 
@@ -101,10 +97,9 @@ void StateParser::parseObjects(TiXmlElement *pStateRoot, std::vector<TermObject 
         e->Attribute("numFrames", &numFrames);
         e->Attribute("callbackID", &callbackID);
         e->Attribute("animSpeed", &animSpeed);
-
         textureID = e->Attribute("textureID");
         //int x, int y, int width, int height, std::string textureID, int numFrames, void()
-         TermObject* pTermObject = TheTermObjectFactory::Instance()->create(e->Attribute("type"));
+        TermObject* pTermObject = TheTermObjectFactory::Instance()->create(e->Attribute("type"));
 //        pTermObject->load(std::unique_ptr<LoaderParams>(new LoaderParams(x, y, width, height, textureID, numFrames, callbackID, animSpeed)));
         pObjects->push_back(pTermObject);
     }

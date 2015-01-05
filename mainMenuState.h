@@ -14,13 +14,10 @@
 #include "linkList.h"
 #include "menuFunction.h"
 
-
 typedef struct MainMenuState_INI
 {
-
     char INIPATH[255];
     char sININAME[255];
-
     int  iTop;
     int  iBot;
     std::string sPAGENUM;
@@ -33,13 +30,11 @@ typedef struct MainMenuState_INI
     std::string sTEXT_HILIGHT;
     std::string sMAX_AREAS;
     std::string sFONT_SET;
-
     // Theme
     std::string sANSI_FILE;
     std::string sANSI_HELP;
     std::string sTHEME_NAME;
     std::string sMENU_PROMPT;
-
     // Message Read .ini File
     bool ddirectory_exists();
     void ddirectory_create();
@@ -48,7 +43,6 @@ typedef struct MainMenuState_INI
     int  ddirectory_parse(int idx=0);
 
 } MainMenuState_INI;
-
 
 /*
  * This Class Holds a connection to the MenuState -> SocketState -> Term
@@ -59,19 +53,18 @@ class MainMenuState : public MenuState, MainMenuState_INI
 public:
 
     virtual ~MainMenuState() {}
-
     virtual void update();
     virtual void render();
-
     virtual bool onEnter();
     virtual bool onExit();
-
-    virtual std::string getStateID() const { return menuID; }
+    virtual std::string getStateID() const
+    {
+        return menuID;
+    }
 
 private:
 
     virtual void setCallbacks(const std::vector<Callback>& callbacks);
-
     // call back functions for menu items
     static void menuToTelnet();
     static void menuToSSH();
@@ -104,7 +97,6 @@ private:
     bool  readDialDirectory();
     void  createDialDirectory();
     int   startDialDirectory();
-
     // Term
     std::vector<TermObject*> termObjects;
 };

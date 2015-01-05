@@ -9,11 +9,11 @@
 #include "mainMenuState.h"
 
 #ifdef TARGET_OS_MAC
-    #include <SDL.h>
+#include <SDL.h>
 #elif _WIN32
-    #include <SDL.h>
+#include <SDL.h>
 #else
-    #include <SDL2/SDL.h>
+#include <SDL2/SDL.h>
 #endif
 
 #include <iostream>
@@ -25,37 +25,37 @@ using namespace std;
 Term* Term::globalInstance = 0;
 
 Term::Term():
-globalWindow(0),
-globalRenderer(0),
-tmpSurface(0),       // Char Cell
-cursorOnSurface(0),  // Char Cell for the cursor.
-cursorOffSurface(0), // Char Cell for the cursor.
-screenSurface(0),    // Internal Screen Buffer
-bottomSurface(0),
-chachedSurface(0),  // Cached Font CharacterSet
-globalTexture(0),   // Texture for User Screen
-globalTermStateMachine(0),
-surfaceWidth(0),
-surfaceHeight(0),
-windowWidth(0),
-windowHeight(0),
-isChangingState(false),
-isRunning(false),
-isRenderReady(0)
+    globalWindow(0),
+    globalRenderer(0),
+    tmpSurface(0),       // Char Cell
+    cursorOnSurface(0),  // Char Cell for the cursor.
+    cursorOffSurface(0), // Char Cell for the cursor.
+    screenSurface(0),    // Internal Screen Buffer
+    bottomSurface(0),
+    chachedSurface(0),  // Cached Font CharacterSet
+    globalTexture(0),   // Texture for User Screen
+    globalTermStateMachine(0),
+    surfaceWidth(0),
+    surfaceHeight(0),
+    windowWidth(0),
+    windowHeight(0),
+    isChangingState(false),
+    isRunning(false),
+    isRenderReady(0)
 
 {
     // Initalize Color Masks.
-    #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-        redMask   = 0xff000000;
-        greenMask = 0x00ff0000;
-        blueMask  = 0x0000ff00;
-        alphaMask = 0x000000ff;
-    #else
-        redMask   = 0x000000ff;
-        greenMask = 0x0000ff00;
-        blueMask  = 0x00ff0000;
-        alphaMask = 0xff000000;
-    #endif
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    redMask   = 0xff000000;
+    greenMask = 0x00ff0000;
+    blueMask  = 0x0000ff00;
+    alphaMask = 0x000000ff;
+#else
+    redMask   = 0x000000ff;
+    greenMask = 0x0000ff00;
+    blueMask  = 0x00ff0000;
+    alphaMask = 0xff000000;
+#endif
 
     black        = {   0,   0,   0 };
     blue         = {   0,   0, 171 };
@@ -92,7 +92,6 @@ isRenderReady(0)
     clearSystemConnection();
     currentFont = "vga8x16.bmp";
     previousFont = "vga8x16.bmp";
-
 }
 
 Term::~Term()
@@ -106,11 +105,9 @@ Term::~Term()
 bool Term::init(const char* title, int swidth, int sheight, int wwidth, int wheight)
 {
     int flags = 0;
-
     // store the Term width and height
     surfaceWidth = swidth;
     surfaceHeight = sheight;
-
     windowWidth = wwidth;
     windowHeight = wheight;
 
@@ -121,7 +118,6 @@ bool Term::init(const char* title, int swidth, int sheight, int wwidth, int whei
     if(SDL_Init(SDL_INIT_VIDEO) == 0)
     {
         std::cout << "SDL init success" << std::endl;
-
         /* initialize SDL_net */
         if(SDLNet_Init()==-1)
         {
@@ -132,48 +128,44 @@ bool Term::init(const char* title, int swidth, int sheight, int wwidth, int whei
         {
             std::cout << "SDLNet_Init success" << std::endl;
         }
-
         /*
          * 0 = disable vsync
          * 1 = enable vsync
          */
-        if( !SDL_SetHint( SDL_HINT_RENDER_VSYNC, "0" ) )
+        if(!SDL_SetHint(SDL_HINT_RENDER_VSYNC, "0"))
         {
             std::cout << "Warning: VSync not enabled!\n";
         }
-
         /*
          * 0 or nearest = nearest pixel sampling
          * 1 or linear  = linear filtering       (supported by OpenGL and Direct3D)
-          * 2 or best    = anisotropic filtering  (supported by Direct3D)
+         * 2 or best    = anisotropic filtering  (supported by Direct3D)
          */
-        if( !SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2") )
+        if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2"))
         {
             std::cout << "Warning: Linear texture filtering not enabled!\n";
         }
-
         /*
          * 0 disable 3D acceleration
          * 1 enable 3D acceleration, using the default renderer
          * X enable 3D acceleration, using X where X is one of the valid rendering drivers. (e.g. "direct3d", "opengl", etc.)
          */
-        if( !SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "1") )
+        if(!SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "1"))
         {
             std::cout << "Warning: Framebuffer Acceleration not enabled!\n";
         }
 
         // init the window
         globalWindow = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, flags);
-
         if(globalWindow != 0) // window init success
         {
             std::cout << "window creation success\n";
-            globalRenderer = SDL_CreateRenderer(globalWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE );
+            globalRenderer = SDL_CreateRenderer(globalWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
             if(globalRenderer != 0) // renderer init success
             {
                 cout << "renderer creation success\n";
-                SDL_SetRenderDrawColor( globalRenderer, 0x00, 0x00, 0x00, 0xFF );
+                SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
             }
             else
             {
@@ -192,21 +184,16 @@ bool Term::init(const char* title, int swidth, int sheight, int wwidth, int whei
         std::cout << "SDL init fail\n";
         return false; // SDL init fail
     }
-
     // add some sound effects - TODO move to better place
     /*
     TheSoundManager::Instance()->load("assets/ElectroRock.ogg", "music1", SOUND_MUSIC);
     TheSoundManager::Instance()->load("assets/boom.wav", "explode", SOUND_SFX);
-
     TheSoundManager::Instance()->playMusic("music1", -1);
     */
-
     //TheInputHandler::Instance()->initialiseJoysticks();
-
     // start the menu state, Move this to After Surfaces are loaded.
     //globalTermStateMachine = new TermStateMachine();
     //globalTermStateMachine->changeState(new MainMenuState());
-
     isRunning = true; // everything inited successfully, start the main loop
     return true;
 }
@@ -231,10 +218,8 @@ void Term::handleEvents()
 void Term::clean()
 {
     cout << "cleaning Term\n";
-
     // Clear Surfaces and Textures.
-    Close();
-
+    close();
     // Shutdown SDL_Sockets.
     SDLNet_Quit();
 
@@ -246,7 +231,6 @@ void Term::clean()
     vector<std::string>().swap(globalFontFiles);
 
     globalTermStateMachine->clean();
-
     globalTermStateMachine = 0;
     delete globalTermStateMachine;
 
@@ -262,7 +246,6 @@ void Term::clean()
  */
 bool Term::loadBitmapImageFromPak()
 {
-
     /*
     // useful things from zlib/unzip.h
     unzFile            zip;
@@ -271,7 +254,6 @@ bool Term::loadBitmapImageFromPak()
     int                result;
 
     SDL_RWops        *rw;
-
 
     zip = unzOpen( "data.zip" );
     if ( zip == NULL ) {
@@ -327,16 +309,14 @@ bool Term::loadBitmapImageFromPak()
     */
 
     return chachedSurface != NULL;
+}
 
- }
-
-
- /**
- * Loads the Bitmap Font Image
- * Default fonts are White on Black, inital setup for 32 cols by 8 rows
- * of Characters Cells at 9x16.
- */
-bool Term::loadBitmapImage( std::string path )
+/**
+* Loads the Bitmap Font Image
+* Default fonts are White on Black, inital setup for 32 cols by 8 rows
+* of Characters Cells at 9x16.
+*/
+bool Term::loadBitmapImage(std::string path)
 {
     //Load image at specified path
 #ifdef _WIN32
@@ -346,12 +326,11 @@ bool Term::loadBitmapImage( std::string path )
 #endif
     realPath += path;
     chachedSurface = SDL_LoadBMP(realPath.c_str());
-    if (!chachedSurface)
+    if(!chachedSurface)
     {
         std::cout << "Unable to SDL_LoadBMP: " << SDL_GetError() << std::endl;
         return false;
     }
-
     previousFont = currentFont;
     return chachedSurface != NULL;
 }
@@ -360,16 +339,16 @@ bool Term::loadBitmapImage( std::string path )
 /**
  * Initalize the Render, Loads the Fonts and Create the Surfaces.
  */
-bool Term::InitSurfaceTextures()
+bool Term::initSurfaceTextures()
 {
     //Initialization flag
     bool success = true;
 
     // Setup the Surface we will plot each character cell to.
     screenSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, surfaceWidth, surfaceHeight, 32,
-                               redMask, greenMask, blueMask, alphaMask);
+                                         redMask, greenMask, blueMask, alphaMask);
 
-    screenSurface = SDL_ConvertSurfaceFormat( screenSurface, SDL_PIXELFORMAT_ARGB8888, 0 );
+    screenSurface = SDL_ConvertSurfaceFormat(screenSurface, SDL_PIXELFORMAT_ARGB8888, 0);
 
     // Fill the Surface with Black to initalize it.
     SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0, 0, 0));
@@ -377,44 +356,42 @@ bool Term::InitSurfaceTextures()
 
     // Setup Temp Surface that the size of each Character Cell.
     tmpSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, CHAR_WIDTH, CHAR_HEIGHT, 32,
-                               redMask, greenMask, blueMask, alphaMask);
+                                      redMask, greenMask, blueMask, alphaMask);
     if(!tmpSurface)
     {
         std::cout << "tmpSurface - CreateRGBSurface failed: " <<  SDL_GetError() << std::endl;
         success = false;
     }
-
-    tmpSurface = SDL_ConvertSurfaceFormat( tmpSurface, SDL_PIXELFORMAT_ARGB8888, 0 );
+    tmpSurface = SDL_ConvertSurfaceFormat(tmpSurface, SDL_PIXELFORMAT_ARGB8888, 0);
 
     // Setup Cursor Surface that the size of a Character Cell.
     // Holds the original Char when we overwrite it with an blinking cursor.
     cursorOnSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, CHAR_WIDTH, CHAR_HEIGHT, 32,
-                               redMask, greenMask, blueMask, alphaMask);
+                                           redMask, greenMask, blueMask, alphaMask);
     if(!cursorOnSurface)
     {
         std::cout << "cursorOnSurface - CreateRGBSurface failed: " << SDL_GetError() << std::endl;
         success = false;
     }
-
-    cursorOnSurface = SDL_ConvertSurfaceFormat( cursorOnSurface, SDL_PIXELFORMAT_ARGB8888, 0 );
+    cursorOnSurface = SDL_ConvertSurfaceFormat(cursorOnSurface, SDL_PIXELFORMAT_ARGB8888, 0);
 
     // Setup Cursor Surface that the size of a Character Cell.
     // Holds the original Char when we overwrite it with an blinking cursor.
     cursorOffSurface = SDL_CreateRGBSurface(SDL_SWSURFACE, CHAR_WIDTH, CHAR_HEIGHT, 32,
-                               redMask, greenMask, blueMask, alphaMask);
+                                            redMask, greenMask, blueMask, alphaMask);
     if(!cursorOffSurface)
     {
         std::cout << "cursorOffSurface - CreateRGBSurface failed: " <<  SDL_GetError() << std::endl;
         success = false;
     }
 
-    cursorOffSurface = SDL_ConvertSurfaceFormat( cursorOffSurface, SDL_PIXELFORMAT_ARGB8888, 0 );
+    cursorOffSurface = SDL_ConvertSurfaceFormat(cursorOffSurface, SDL_PIXELFORMAT_ARGB8888, 0);
 
     // Setup the Surface we will plot each character cell to.
     bottomSurface = SDL_CreateRGBSurface(SDL_SWSURFACE,screenSurface->w, CHAR_HEIGHT, 32,
-                               redMask, greenMask, blueMask, alphaMask);
+                                         redMask, greenMask, blueMask, alphaMask);
 
-    bottomSurface = SDL_ConvertSurfaceFormat( bottomSurface, SDL_PIXELFORMAT_ARGB8888, 0 );
+    bottomSurface = SDL_ConvertSurfaceFormat(bottomSurface, SDL_PIXELFORMAT_ARGB8888, 0);
 
     // Fill the Surface with Black to initalize it.
     SDL_FillRect(bottomSurface, NULL, SDL_MapRGB(bottomSurface->format, 0, 0, 0));
@@ -422,53 +399,45 @@ bool Term::InitSurfaceTextures()
     // start the menu state
     globalTermStateMachine = new TermStateMachine();
     globalTermStateMachine->changeState(new MainMenuState());
-
     return success;
 }
 
 //
-void Term::Close()
+void Term::close()
 {
-
     // Clear Cached Surface.
-    SDL_FreeSurface( chachedSurface );   // Bitmap      -> Fonts
-    SDL_FreeSurface( screenSurface );    // Screen    -> Texture
-    SDL_FreeSurface( tmpSurface );       // Char Cell -> Screen
-    SDL_FreeSurface( cursorOnSurface );  // Cursor On Character Cell
-    SDL_FreeSurface( cursorOffSurface ); // Cursor Off Character Cell
-    SDL_FreeSurface( bottomSurface );    // Bottom Line of Scrolling Region.
-
+    SDL_FreeSurface(chachedSurface);     // Bitmap      -> Fonts
+    SDL_FreeSurface(screenSurface);      // Screen    -> Texture
+    SDL_FreeSurface(tmpSurface);         // Char Cell -> Screen
+    SDL_FreeSurface(cursorOnSurface);    // Cursor On Character Cell
+    SDL_FreeSurface(cursorOffSurface);   // Cursor Off Character Cell
+    SDL_FreeSurface(bottomSurface);      // Bottom Line of Scrolling Region.
     //Free texture if it exists
-    SDL_DestroyTexture( globalTexture );
-
+    SDL_DestroyTexture(globalTexture);
 }
 
 /*
  * Overides the Scrolling region of the screen
  */
-void Term::SetScrollRegion(int top, int bot)
+void Term::setScrollRegion(int top, int bot)
 {
-    if (top == 0 && bot == 0)
+    if(top == 0 && bot == 0)
         scrollRegionActive = FALSE;
     else
         scrollRegionActive = TRUE;
-
     topMargin = top;
     botMargin = bot;
-
     //printf("\r\nScroll Region TOP: %i, BOT: %i",top, bot);
 }
 
 /*
  * Scroll a specific set region of the screen only
  */
-void Term::ScrollRegionUp ()
+void Term::scrollRegionUp()
 {
-
     //SDL_Rect pick, pick2, pick3;
     SDL_Rect pick3;
-
-/*
+    /*
     // Source, Grab One Row Down Though Bottom
     pick.x = 0;
     pick.y = CHAR_HEIGHT * (topMargin);
@@ -481,8 +450,7 @@ void Term::ScrollRegionUp ()
     pick2.y = CHAR_HEIGHT * (topMargin-1);
     pick2.w = surfaceWidth;
     pick2.h = CHAR_HEIGHT * (botMargin - topMargin);
-    */
-
+        */
     // Clear Out last line after Scrolling up.
     pick3.x = 0;
     pick3.y = CHAR_HEIGHT * (botMargin-1);
@@ -503,31 +471,30 @@ void Term::ScrollRegionUp ()
     // Start from One line below the Top Margin.
     pNewPos += screenSurface->w * (CHAR_HEIGHT * topMargin) * bpp;
 
-    if (SDL_MUSTLOCK (screenSurface))
+    if(SDL_MUSTLOCK(screenSurface))
     {
-        if (SDL_LockSurface (screenSurface) < 0)
+        if(SDL_LockSurface(screenSurface) < 0)
             return;
     }
 
     // Move the Entire Screen Up a 1 Row of Characters.
     memmove(pTopPos, pNewPos, (screenSurface->w * (CHAR_HEIGHT * (botMargin - topMargin))) * bpp);
 
-    if (SDL_MUSTLOCK (screenSurface))
-        SDL_UnlockSurface (screenSurface);
+    if(SDL_MUSTLOCK(screenSurface))
+        SDL_UnlockSurface(screenSurface);
 
     // Clear out very last line
     SDL_FillRect(screenSurface, &pick3, SDL_MapRGB(screenSurface->format, 0, 0, 0));
 
     // If first Time, Crete Texture.
-    if (!globalTexture)
+    if(!globalTexture)
     {
-        globalTexture = SDL_CreateTexture( globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h );
-        SDL_SetTextureBlendMode( globalTexture, SDL_BLENDMODE_BLEND );
+        globalTexture = SDL_CreateTexture(globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
 
     //SDL_UpdateTexture(globalTexture, &pick2, screenSurface->pixels, screenSurface->pitch);
     SDL_UpdateTexture(globalTexture, NULL, screenSurface->pixels, screenSurface->pitch);
-
 }
 
 
@@ -535,11 +502,11 @@ void Term::ScrollRegionUp ()
  * Clips out the Top Row of the Screen,
  * Then Moves Entire Screen Up one Row to Scroll it.
  */
-void Term::ScrollScreenUp ()
+void Term::scrollScreenUp()
 {
-    if (scrollRegionActive)
+    if(scrollRegionActive)
     {
-        ScrollRegionUp();
+        scrollRegionUp();
         return;
     }
 
@@ -550,46 +517,44 @@ void Term::ScrollScreenUp ()
     // Move position to start of 2nd Line, Then copying greater line down to previous.
     pNewPos += (screenSurface->w * CHAR_HEIGHT) * bpp;
 
-    if (SDL_MUSTLOCK (screenSurface))
+    if(SDL_MUSTLOCK(screenSurface))
     {
-        if (SDL_LockSurface (screenSurface) < 0)
+        if(SDL_LockSurface(screenSurface) < 0)
             return;
     }
 
     // Move the Entire Screen Up a 1 Row of Characters.
     memmove(pOldPos, pNewPos, (screenSurface->w * (screenSurface->h - CHAR_HEIGHT)) * bpp);
 
-    if (SDL_MUSTLOCK (screenSurface))
-        SDL_UnlockSurface (screenSurface);
+    if(SDL_MUSTLOCK(screenSurface))
+        SDL_UnlockSurface(screenSurface);
 
-    if (!globalTexture)
+    if(!globalTexture)
     {
-        globalTexture = SDL_CreateTexture( globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h );
-        SDL_SetTextureBlendMode( globalTexture, SDL_BLENDMODE_BLEND );
+        globalTexture = SDL_CreateTexture(globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
 
     // Write Scrolled screen to Texture.
     SDL_UpdateTexture(globalTexture, NULL, screenSurface->pixels, screenSurface->pitch);
 }
 
-
-
 /**
  * Clears the Surface Back Buffer, and Global Texture
  * Renderes the Screen Blank for new set of data.
  */
-void Term::ClearScreenSurface()
+void Term::clearScreenSurface()
 {
     SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0, 0, 0));
 
-    if (!globalTexture)
+    if(!globalTexture)
     {
         std::cout << "ClearScreenSurface() - Creating globalTexture" << std::endl;
-        globalTexture = SDL_CreateTexture( globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h );
+        globalTexture = SDL_CreateTexture(globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h);
     }
 
     SDL_UpdateTexture(globalTexture, NULL, screenSurface->pixels, screenSurface->pitch);
-    SDL_RenderClear( globalRenderer );
+    SDL_RenderClear(globalRenderer);
 }
 
 
@@ -597,22 +562,19 @@ void Term::ClearScreenSurface()
  * Fill entire lines with space and black foregroud/Background
  * Updates super fast now!! oh yea!!
  */
-void Term::RenderClearLineScreen(int y, int start, int end)
+void Term::renderClearLineScreen(int y, int start, int end)
 {
     // Save Current color so we can switch back to it.
     SDL_Color originalGB = currentBGColor;
 
     // Clear out entire line.
-    for (int i = start; i < end; i++)
+    for(int i = start; i < end; i++)
     {
-        DrawChar(i, y, 32);
-        RenderCharScreen(i, y);
+        drawChar(i, y, 32);
+        renderCharScreen(i, y);
     }
-
     currentBGColor = originalGB;
 }
-
-
 
 /**
  * Bascially Plots each Char to Texture
@@ -620,16 +582,15 @@ void Term::RenderClearLineScreen(int y, int start, int end)
  * So were only writting the currnet lines to the scrren
  * And now redrawing the entire screen or since char at a time.
  */
-void Term::RenderBottomScreen()
+void Term::renderBottomScreen()
 {
-
-    SDL_Rect pick; SDL_Rect rect;
-
+    SDL_Rect pick;
+    SDL_Rect rect;
     pick.w = screenSurface->w;
     pick.h = CHAR_HEIGHT;
     pick.x = 0;
 
-    if (scrollRegionActive)
+    if(scrollRegionActive)
         pick.y = CHAR_HEIGHT * (botMargin-1);
     else
         pick.y = CHAR_HEIGHT * 24;
@@ -643,31 +604,27 @@ void Term::RenderBottomScreen()
     rect.h = bottomSurface->h;
     rect.x = 0;
 
-    if (scrollRegionActive)
+    if(scrollRegionActive)
         rect.y = CHAR_HEIGHT * (botMargin-1);
     else
         rect.y = CHAR_HEIGHT * 24;
 
     SDL_FillRect(bottomSurface, NULL, SDL_MapRGB(bottomSurface->format, 0, 0, 0));
     SDL_BlitSurface(screenSurface ,&pick, bottomSurface, NULL);
-
-    if (!globalTexture)
+    if(!globalTexture)
     {
         std::cout << "RenderBottomScreen() - Creating globalTexture" << std::endl;
-        globalTexture = SDL_CreateTexture( globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h );
-        SDL_SetTextureBlendMode( globalTexture, SDL_BLENDMODE_BLEND );
+        globalTexture = SDL_CreateTexture(globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
-
     SDL_UpdateTexture(globalTexture, &rect, bottomSurface->pixels, bottomSurface->pitch);
 }
-
-
 
 /**
  * Bascially Plots each Char to Texture
  * Updates super fast now!! oh yea!!
  */
-void Term::RenderScreen()
+void Term::renderScreen()
 {
     SDL_Rect pick;
 
@@ -676,13 +633,12 @@ void Term::RenderScreen()
     pick.w = surfaceWidth;
     pick.h = surfaceHeight; // - 80;
 
-    if (!globalTexture)
+    if(!globalTexture)
     {
         std::cout << "RenderScreen() - Creating globalTexture" << std::endl;
-        globalTexture = SDL_CreateTexture( globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h );
-        SDL_SetTextureBlendMode( globalTexture, SDL_BLENDMODE_BLEND );
+        globalTexture = SDL_CreateTexture(globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
-
     SDL_UpdateTexture(globalTexture, &pick, screenSurface->pixels, screenSurface->pitch);
 }
 
@@ -691,7 +647,7 @@ void Term::RenderScreen()
  * Bascially Plots each Char to Texture
  * Updates super fast now!! oh yea!!
  */
-void Term::RenderCharScreen(int x, int y)
+void Term::renderCharScreen(int x, int y)
 {
     SDL_Rect rect;
 
@@ -701,22 +657,20 @@ void Term::RenderCharScreen(int x, int y)
     rect.x = x * CHAR_WIDTH;
     rect.y = y * CHAR_HEIGHT;
 
-    if (!globalTexture)
+    if(!globalTexture)
     {
         std::cout << "RenderCharScreen() - Creating globalTexture" << std::endl;
-        globalTexture = SDL_CreateTexture( globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h );
-        SDL_SetTextureBlendMode( globalTexture, SDL_BLENDMODE_BLEND );
+        globalTexture = SDL_CreateTexture(globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
-
     SDL_UpdateTexture(globalTexture, &rect, screenSurface->pixels, screenSurface->pitch);
-
 }
 
 /**
  * Bascially Plots each Char to Texture
  * Updates super fast now!! oh yea!!
  */
-void Term::RenderCursorOnScreen(int x, int y)
+void Term::renderCursorOnScreen(int x, int y)
 {
     SDL_Rect rect;
 
@@ -726,13 +680,12 @@ void Term::RenderCursorOnScreen(int x, int y)
     rect.x = x * CHAR_WIDTH;
     rect.y = y * CHAR_HEIGHT;
 
-    if (!globalTexture)
+    if(!globalTexture)
     {
         std::cout << "RenderCursorOnScreen() - Creating globalTexture" << std::endl;
-        globalTexture = SDL_CreateTexture( globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h );
-        SDL_SetTextureBlendMode( globalTexture, SDL_BLENDMODE_BLEND );
+        globalTexture = SDL_CreateTexture(globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
-
     SDL_UpdateTexture(globalTexture, &rect, cursorOnSurface->pixels, cursorOnSurface->pitch);
 }
 
@@ -740,7 +693,7 @@ void Term::RenderCursorOnScreen(int x, int y)
  * Bascially Plots each Char to Texture
  * Updates super fast now!! oh yea!!
  */
-void Term::RenderCursorOffScreen(int x, int y)
+void Term::renderCursorOffScreen(int x, int y)
 {
     SDL_Rect rect;
 
@@ -750,13 +703,12 @@ void Term::RenderCursorOffScreen(int x, int y)
     rect.x = x * CHAR_WIDTH;
     rect.y = y * CHAR_HEIGHT;
 
-    if (!globalTexture)
+    if(!globalTexture)
     {
         std::cout << "RenderCursorOffScreen() - Creating globalTexture" << std::endl;
-        globalTexture = SDL_CreateTexture( globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h );
-        SDL_SetTextureBlendMode( globalTexture, SDL_BLENDMODE_BLEND );
+        globalTexture = SDL_CreateTexture(globalRenderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, screenSurface->w, screenSurface->h);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
-
     SDL_UpdateTexture(globalTexture, &rect, cursorOffSurface->pixels, cursorOffSurface->pitch);
 }
 
@@ -764,7 +716,7 @@ void Term::RenderCursorOffScreen(int x, int y)
  * Transfers the Buffer to a Texture and
  * Renderes the Screen
  */
-void Term::DrawTextureScreen()
+void Term::drawTextureScreen()
 {
     SDL_Rect rect;
 
@@ -777,14 +729,13 @@ void Term::DrawTextureScreen()
     rect.w = 640;
     rect.h = 400;
     rect.x = 0,
-    rect.y = 0;
+         rect.y = 0;
 
     // Destination
     displayRect.w = screenWidth;
     displayRect.h = screenHeight;
     displayRect.x = 0;
     displayRect.y = 0;
-
     SDL_RenderCopy(globalRenderer, globalTexture, &rect, &displayRect);
     SDL_RenderPresent(globalRenderer);
 }
@@ -793,19 +744,19 @@ void Term::DrawTextureScreen()
  * Clears the Renderer Screen for Fresh Redraw.
  * Renderes the Screen
  */
-void Term::ClearScreen()
+void Term::clearScreen()
 {
     //Clear screen
-    SDL_SetRenderDrawColor( globalRenderer, 0x00, 0x00, 0x00, 0xFF );
-    SDL_RenderClear( globalRenderer );
-    SDL_RenderPresent( globalRenderer );
+    SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
+    SDL_RenderClear(globalRenderer);
+    SDL_RenderPresent(globalRenderer);
 }
 
 /**
  * Compares (2) SDL Colors to determine if they are the same
  * Without conversions.
  */
-int Term::CompareSDL_Colors(SDL_Color &src, SDL_Color &dest)
+int Term::compareSDL_Colors(SDL_Color &src, SDL_Color &dest)
 {
     return (src.r == dest.r && src.g == dest.g && src.b == dest.b);
 }
@@ -813,32 +764,30 @@ int Term::CompareSDL_Colors(SDL_Color &src, SDL_Color &dest)
 /**
  * Replace Foreground and Backgroud colors per character cell by pixel.
  */
-void Term::ReplaceColor (SDL_Surface *src, Uint32 foreground, Uint32 background)
+void Term::replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 background)
 {
+    static Uint32 fgColor = SDL_MapRGB(src->format, 255, 255, 255);  // White
+    static Uint32 bgColor = SDL_MapRGB(src->format, 0,   0,   0);    // Black
 
-    static Uint32 fgColor = SDL_MapRGB (src->format, 255, 255, 255); // White
-    static Uint32 bgColor = SDL_MapRGB (src->format, 0,   0,   0);   // Black
-
-    if (fgColor == foreground && bgColor == background)
+    if(fgColor == foreground && bgColor == background)
         return;
 
     int bpp = src->format->BytesPerPixel;
     Uint8 *p = (Uint8 *)src->pixels + 0 * src->pitch + 0 * bpp;
 
-    if (SDL_MUSTLOCK (src))
+    if(SDL_MUSTLOCK(src))
     {
-        if (SDL_LockSurface (src) < 0)
+        if(SDL_LockSurface(src) < 0)
             return;
     }
 
-    for (int x = 0; x < src->w; x ++)
+    for(int x = 0; x < src->w; x ++)
     {
-        for (int y = 0; y < src->h; y ++)
+        for(int y = 0; y < src->h; y ++)
         {
-            if (*(Uint32 *) p == fgColor)
+            if(*(Uint32 *) p == fgColor)
                 *(Uint32 *) p = foreground;
-            else
-            if (*(Uint32 *) p == bgColor)
+            else if(*(Uint32 *) p == bgColor)
                 *(Uint32 *) p = background;
 
             // Incriment 4 bits. (BPP)
@@ -847,21 +796,19 @@ void Term::ReplaceColor (SDL_Surface *src, Uint32 foreground, Uint32 background)
             // Update Pixel Color as long as it's not already the current
             // Color of the Bitmap Image
             //if (GetPixel (src, x, y) == fgColor && foreground != fgColor)
-                //PutPixel (src, x, y, foreground);
+            //PutPixel (src, x, y, foreground);
             //else if (GetPixel (src, x, y) == bgcolor && background !=  bgcolor)
-                //PutPixel (src, x, y, background);
+            //PutPixel (src, x, y, background);
         }
     }
-
-    if (SDL_MUSTLOCK (src))
-        SDL_UnlockSurface (src);
-
+    if(SDL_MUSTLOCK(src))
+        SDL_UnlockSurface(src);
 }
 
 /**
  * Draws a Char Cell to x/y loction on screen surface.
  */
-void Term::SetupCursorChar(int X, int Y)
+void Term::setupCursorChar(int X, int Y)
 {
     SDL_Rect pick, area, cursor, cursor2;
     int asciicode = '_';
@@ -870,7 +817,6 @@ void Term::SetupCursorChar(int X, int Y)
     // 32 Cols by 8 Rows.
     pick.x = (asciicode % 32) * CHAR_WIDTH;
     pick.y = round(asciicode / 32) * CHAR_HEIGHT;
-
     pick.w = CHAR_WIDTH;
     pick.h = CHAR_HEIGHT;
 
@@ -885,7 +831,6 @@ void Term::SetupCursorChar(int X, int Y)
     // So we clip it, and lower it
     // After we get the oringal Character block
     // then draw the cursor on top of it.
-
     cursor.x = 0;
     cursor.y = 13;
     cursor.w = CHAR_WIDTH;
@@ -911,7 +856,7 @@ void Term::SetupCursorChar(int X, int Y)
 /**
  * Draws a Char Cell to x/y loction on screen surface.
  */
-void Term::DrawChar(int X, int Y, int asciicode)
+void Term::drawChar(int X, int Y, int asciicode)
 {
     SDL_Rect pick, area;
 
@@ -933,10 +878,9 @@ void Term::DrawChar(int X, int Y, int asciicode)
     SDL_FillRect(tmpSurface, NULL, SDL_MapRGB(tmpSurface->format, 0, 0, 0));
     SDL_BlitSurface(chachedSurface,&pick,tmpSurface,NULL);
 
-    ReplaceColor (tmpSurface,
-            SDL_MapRGB (tmpSurface->format, currentFGColor.r, currentFGColor.g, currentFGColor.b),
-            SDL_MapRGB (tmpSurface->format, currentBGColor.r, currentBGColor.g, currentBGColor.b));
-
+    replaceColor(tmpSurface,
+                 SDL_MapRGB(tmpSurface->format, currentFGColor.r, currentFGColor.g, currentFGColor.b),
+                 SDL_MapRGB(tmpSurface->format, currentBGColor.r, currentBGColor.g, currentBGColor.b));
 
     // Write to Back Buffer for Scrolling the Screen.
     SDL_BlitSurface(tmpSurface,NULL,screenSurface,&area);
@@ -948,7 +892,7 @@ void Term::DrawChar(int X, int Y, int asciicode)
  * NOTE Add scrolling if hits bottom of page,
  * But this will most likely be done in the ANSI Parser.
  */
-void Term::DrawString(int X, int Y, char text[])
+void Term::drawString(int X, int Y, char text[])
 {
     SDL_Rect area;
 
@@ -958,17 +902,17 @@ void Term::DrawString(int X, int Y, char text[])
     area.y = Y;
 
     //Per la lunghezza della stringa
-    for (i=0; i < (signed)strlen(text); i++)
+    for(i=0; i < (signed)strlen(text); i++)
     {
         asciiCode = std::char_traits<char>().to_int_type(text[i]);
 
         // 9x16 Dimension
-        DrawChar(area.x / CHAR_WIDTH, area.y / CHAR_HEIGHT, asciiCode);
+        drawChar(area.x / CHAR_WIDTH, area.y / CHAR_HEIGHT, asciiCode);
         area.x=area.x+CHAR_WIDTH;
-
-        if (area.x >= surfaceWidth-5)
+        if(area.x >= surfaceWidth-5)
         {
-            area.x = 0; area.y += CHAR_HEIGHT;
+            area.x = 0;
+            area.y += CHAR_HEIGHT;
         }
     }
 }
@@ -978,7 +922,7 @@ void Term::DrawString(int X, int Y, char text[])
  * If String is longer then screen will wrap to next line.
  * Mainly for testing all characters loaded from Bitmap Image.
  */
-void Term::DrawCharSet(int X, int Y)
+void Term::drawCharSet(int X, int Y)
 {
     SDL_Rect area;
 
@@ -988,24 +932,23 @@ void Term::DrawCharSet(int X, int Y)
     area.y = Y * CHAR_HEIGHT;
 
     // Loop through Each Char in Bitmap.
-    for (i=1; i < 255; i++)
+    for(i=1; i < 255; i++)
     {
         asciicode = i; //std::char_traits<char>().to_int_type(text[i]);
-        if (asciicode == 0 )
+        if(asciicode == 0)
         {
             break;
         }
 
         // 9x16 Dimensions.
-        DrawChar(area.x / CHAR_WIDTH, area.y / CHAR_HEIGHT, asciicode);
+        drawChar(area.x / CHAR_WIDTH, area.y / CHAR_HEIGHT, asciicode);
         area.x = area.x + CHAR_WIDTH;
 
         // Wrap
-        if (area.x >= surfaceWidth-5)
+        if(area.x >= surfaceWidth-5)
         {
             area.x = 0;
             area.y += CHAR_HEIGHT;
         }
     }
 }
-

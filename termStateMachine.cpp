@@ -12,9 +12,7 @@ void TermStateMachine::clean()
     if(!TermStates.empty())
     {
         TermStates.back()->onExit();
-
         delete TermStates.back();
-
         TermStates.clear();
     }
 }
@@ -48,7 +46,6 @@ void TermStateMachine::popState()
         TermStates.back()->onExit();
         TermStates.pop_back();
     }
-
     TermStates.back()->resume();
 }
 
@@ -60,7 +57,6 @@ void TermStateMachine::changeState(TermState *theState)
         {
             return; // do nothing
         }
-
         TermStates.back()->onExit();
         TermStates.pop_back();
     }

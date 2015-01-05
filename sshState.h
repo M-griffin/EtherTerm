@@ -7,11 +7,12 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-
-#ifdef _WIN32
-    #include <SDL.h>
+#ifdef TARGET_OS_MAC
+#include <SDL_net.h>
+#elif _WIN32
+#include <SDL_net.h>
 #else
-    #include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #endif
 
 // Temp
@@ -26,33 +27,28 @@
  * Telnet Class handles Telopt Negoation
  * Parsing Socket Data and Sending Through to Ansi Parser.
  */
-
-
 class SSHState : public MenuState
 {
 public:
 
     virtual ~SSHState() {}
-
     virtual void update();
     virtual void render();
-
     virtual bool onEnter();
     virtual bool onExit();
 
-    virtual std::string getStateID() const { return sshID; }
+    virtual std::string getStateID() const
+    {
+        return sshID;
+    }
 
 private:
 
-
     void handleSession();
-
 
     // Virtual Classes.
     static const std::string sshID;
-
     virtual void setCallbacks(const std::vector<Callback>& callbacks);
-
     std::string inputSequence;
     bool shutdown;
 

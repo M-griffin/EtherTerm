@@ -12,14 +12,17 @@
 #include "socketState.h"
 #include "inputHandler.h"
 
-#ifdef _WIN32
-    #include <SDL.h>
-    #include <SDL_net.h>
-#else
-    #include <SDL2/SDL.h>
-    #include <SDL2/SDL_net.h>
+#ifdef TARGET_OS_MAC
+#include <SDL.h>
+#include <SDL_net.h>
+#elif _WIN32
+#include <windows.h>
+#include <SDL.h>
+#include <SDL_net.h>
+#else // LINUX
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #endif
-
 #include <libssh/libssh.h>
 
 #include <cstdio>

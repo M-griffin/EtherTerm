@@ -10,19 +10,21 @@
 
 #include "terminal.h"
 
-#ifdef _WIN32
-    #include <SDL.h>
-    #include <SDL_net.h>
+#ifdef TARGET_OS_MAC
+#include <SDL.h>
+#include <SDL_net.h>
+#elif _WIN32
+#include <SDL.h>
+#include <SDL_net.h>
 #else
-    #include <SDL2/SDL.h>
-    #include <SDL2/SDL_net.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #endif
 
 #include <libssh/libssh.h>
 
 #include <iostream>
 #include <string>
-
 
 /*
  * Virtual Class Container for Common access to different
@@ -33,7 +35,6 @@ class SocketState
 public:
 
     virtual ~SocketState() {}
-
     virtual int sendSocket(unsigned char *message, Uint32 len) = 0;
     virtual int recvSocket(char *message)= 0;
     virtual int pollSocket() = 0;
@@ -49,10 +50,12 @@ class SDL_Socket : public SocketState
 public:
 
     SDL_Socket(std::string _host, int _port) : sock(0), set(0)
-        { host = _host; port = _port; }
+    {
+        host = _host;
+        port = _port;
+    }
 
     virtual ~SDL_Socket() { }
-
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
     virtual int pollSocket();
@@ -64,7 +67,6 @@ private:
     int cursorBlink;
     int startBlinking;
     time_t ttime, ttime2;
-
     std::string host;
     int port;
     TCPsocket sock;
@@ -80,25 +82,29 @@ class SSH_Socket : public SocketState
 public:
 
     SSH_Socket(std::string _host, int _port, std::string _user, std::string _pass) : sshChannel(0), session(0)
-        { host = _host; port = _port; sshUser = _user; password = _pass; }
+    {
+        host = _host;
+        port = _port;
+        sshUser = _user;
+        password = _pass;
+    }
 
     virtual  ~SSH_Socket() {}
-
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
     virtual int pollSocket();
     virtual bool onEnter();
     virtual bool onExit();
 
-
     // Specific Functions for SSH
     int show_remote_processes();
     int verify_knownhost();
-
     int authenticate_console();
     int authenticate_kbdint();
-
-    void error() { std::cout << "Authentication failed: " << ssh_get_error(session) << std::endl; }
+    void error()
+    {
+        std::cout << "Authentication failed: " << ssh_get_error(session) << std::endl;
+    }
 
 
 private:
@@ -122,7 +128,6 @@ private:
  * Handle IMCP for Ping / Traceroutes.
  *
  */
-
 
 #ifndef _WIN32
 
@@ -168,7 +173,8 @@ typedef unsigned long ULONG,*PULONG;
 #endif
 
 // The IP header
-struct __attribute__((packed)) IPHeader {
+struct __attribute__((packed)) IPHeader
+{
     BYTE h_len:4;           // Length of the header in dwords
     BYTE version:4;         // Version of IP
     BYTE tos;               // Type of service
@@ -183,7 +189,8 @@ struct __attribute__((packed)) IPHeader {
 };
 
 // ICMP header
-struct __attribute__((packed)) ICMPHeader {
+struct __attribute__((packed)) ICMPHeader
+{
     BYTE type;          // ICMP packet type
     BYTE code;          // Type sub code
     USHORT checksum;
@@ -209,10 +216,12 @@ class ICMP_Socket : public SocketState
 public:
 
     ICMP_Socket(std::string _host, int _port) : sock(0), set(0)
-        { host = _host; port = _port; }
+    {
+        host = _host;
+        port = _port;
+    }
 
     virtual ~ICMP_Socket() { }
-
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
     virtual int pollSocket();

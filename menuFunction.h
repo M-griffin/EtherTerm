@@ -121,7 +121,27 @@ public:
     // Menu Command Processing
     void menu_docmd(CommandRec *cmdr);
 
-};
+    // Menu System IO
+    // ----------------------------------------------------------------------
+    // reset global variables when making new conenctions or changeing states.
 
+    static void rightSpacing(char *str, int space);
+    static void leftSpacing(char *str, int space);
+    static void mask(char *str);
+    static void inputfield(char *text, int &len);
+
+
+    static int  getkey();
+    static void getline(char *line,        // Returns Input into Line
+                 int   length,      // Max Input Length of String
+                 char *leadoff,     // Data to Display in Default String {Optional}
+                 int   hid,         // If input is Echomail as hidden    {Optional}
+                 char *chlist);     // Valid Input Char List             {Optional}
+
+    static void ansi_fg(char *data, int fg);
+    static void ansi_bg(char *data, int bg);
+    static void pipe2ansi(char* szString, int buffer=true);
+    static void ansiPrintf(std::string fileName);
+};
 
 # endif

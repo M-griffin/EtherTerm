@@ -29,7 +29,6 @@ typedef struct list_bar
 
 } list_bar;
 
-
 typedef struct LineRec
 {
     std::string data;      // Main Data String
@@ -54,7 +53,6 @@ typedef struct LinkList
 public:
 
     unsigned long CURRENT_AREA;
-
     // Main List for Holding All Data
     LineRec *head;
     LineRec *current_node;
@@ -76,17 +74,14 @@ public:
     int quote;
     int arealist;
     int pgRows;
-
     int headerrows;
     int current_selection; // Current Line in Box of Selection.
-
     int PAGE_SCROLL;
     int CLEAR_BOX;
 
     // Quote and Title Scans
     char LoColor[10];
     char HiColor[10];
-
     // Message Reader
     char TEXT_COLOR[10];
     char QUOTE_COLOR[10];
@@ -98,10 +93,8 @@ public:
 
     void initList(std::string, int alist);
     void GetVector(std::vector<list_bar> listb);
-
     void dispose();
     void dispose_list();
-
     void box_start_vector(unsigned long page, unsigned long list);
 
 } LinkList;

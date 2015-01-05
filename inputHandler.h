@@ -7,13 +7,16 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include <iostream>
-
-#ifdef _WIN32
-    #include <SDL.h>
-#else
-    #include <SDL2/SDL.h>
+#ifdef TARGET_OS_MAC
+#include <SDL.h>
+#elif _WIN32
+#include <windows.h>
+#include <SDL.h>
+#else // LINUX
+#include <SDL2/SDL.h>
 #endif
+
+#include <iostream>
 
 # define CTRLA           0x01
 # define CTRLB           0x02
@@ -42,34 +45,53 @@
 # define CTRLY           0x19
 # define CTRLZ           0x1a
 
-
 class InputHandler
 {
 public:
-
     static InputHandler* Instance()
     {
         if(globalInstance == 0)
         {
             globalInstance = new InputHandler();
         }
-
         return globalInstance;
+    }
+
+    // Release And Clear the Singleton
+    static void ReleaseInstance()
+    {
+        if(globalInstance != 0)
+        {
+            delete globalInstance;
+            globalInstance = 0;
+        }
+        return;
     }
 
     // keyboard events, True if Data Available.
     bool update();
-    void reset()   { inputSequence.erase(); }
+    void reset()
+    {
+        inputSequence.erase();
+    }
 
-    std::string getInputSequence() const { return inputSequence; }
-    bool isGlobalShutdown() const { return globalShutdown; }
-
+    std::string getInputSequence() const
+    {
+        return inputSequence;
+    }
+    bool isGlobalShutdown() const
+    {
+        return globalShutdown;
+    }
     // mouse events
     //bool getMouseButtonState(int buttonNumber) const;
 
 private:
 
-    void setInputSequence(std::string sequence) { inputSequence = sequence; }
+    void setInputSequence(std::string sequence)
+    {
+        inputSequence = sequence;
+    }
 
     bool globalShutdown;
     bool fullScreen;
@@ -79,20 +101,21 @@ private:
 
     InputHandler();
     ~InputHandler();
-
     InputHandler(const InputHandler&);
     InputHandler& operator=(const InputHandler&);
 
     // singleton
     static InputHandler* globalInstance;
 
-    const unsigned char CTRLKEYTABLE[26] = {
-    CTRLA, CTRLB, CTRLC, CTRLD, CTRLE,
-    CTRLF, CTRLG, CTRLH, CTRLI, CTRLJ,
-    CTRLK, CTRLL, CTRLM, CTRLN, CTRLO,
-    CTRLP, CTRLQ, CTRLR, CTRLS, CTRLT,
-    CTRLU, CTRLV, CTRLW, CTRLX, CTRLY,
-    CTRLZ };
+    const unsigned char CTRLKEYTABLE[26] =
+    {
+        CTRLA, CTRLB, CTRLC, CTRLD, CTRLE,
+        CTRLF, CTRLG, CTRLH, CTRLI, CTRLJ,
+        CTRLK, CTRLL, CTRLM, CTRLN, CTRLO,
+        CTRLP, CTRLQ, CTRLR, CTRLS, CTRLT,
+        CTRLU, CTRLV, CTRLW, CTRLX, CTRLY,
+        CTRLZ
+    };
 };
 typedef InputHandler TheInputHandler;
 

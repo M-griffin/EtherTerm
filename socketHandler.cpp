@@ -34,10 +34,10 @@ int SocketHandler::update()
 {
     //std::cout << "SocketHandler::update() active: " << active << std::endl;
     int ret;
-    if (active)
+    if(active)
     {
         ret = socket->pollSocket();
-        if (ret == -1)
+        if(ret == -1)
         {
             // Shutdown Socket.
             socket->onExit();
@@ -54,13 +54,13 @@ int SocketHandler::update()
 bool SocketHandler::initTelnet(std::string host, int port)
 {
     std::cout << "SocketHandler::initTelnet" << std::endl;
-    if (!active)
+    if(!active)
     {
         try
         {
             socketType = "TELNET";
             socket = new SDL_Socket(host, port);
-            if (socket->onEnter())
+            if(socket->onEnter())
             {
                 active = true;
                 std::cout << "SocketHandler::initTelnet active = true" << std::endl;
@@ -72,7 +72,7 @@ bool SocketHandler::initTelnet(std::string host, int port)
                 return false;
             }
         }
-        catch (std::exception& e)
+        catch(std::exception& e)
         {
             std::cerr << "exception new SDL_Socket: " << e.what() << '\n';
             return false;
@@ -85,13 +85,13 @@ bool SocketHandler::initTelnet(std::string host, int port)
 
 bool SocketHandler::initSSH(std::string host, int port, std::string username, std::string password)
 {
-    if (!active)
+    if(!active)
     {
         try
         {
             socketType = "SSH";
             socket = new SSH_Socket(host, port, username, password);
-            if (socket->onEnter())
+            if(socket->onEnter())
             {
                 std::cout << "SocketHandler::initSSH active = true" << std::endl;
                 active = true;
@@ -103,7 +103,7 @@ bool SocketHandler::initSSH(std::string host, int port, std::string username, st
                 return false;
             }
         }
-        catch (std::exception& e)
+        catch(std::exception& e)
         {
             std::cerr << "exception new SSH_Socket: " << e.what() << '\n';
             return false;
@@ -125,7 +125,7 @@ void SocketHandler::reset()
         active = false;
         socketType.erase();
     }
-    catch (std::exception& e)
+    catch(std::exception& e)
     {
         std::cerr << "exception caught: " << e.what() << '\n';
     }

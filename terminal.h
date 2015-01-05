@@ -1,5 +1,5 @@
 #ifndef __TERM_H_
-#define    __TERM_H_
+#define __TERM_H_
 
 // EtherTerm SVN: $Id$
 // Source: $HeadURL$
@@ -7,10 +7,12 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#ifdef _WIN32
-    #include <SDL.h>
+#ifdef TARGET_OS_MAC
+#include <SDL.h>
+#elif _WIN32
+#include <SDL.h>
 #else
-    #include <SDL2/SDL.h>
+#include <SDL2/SDL.h>
 #endif
 
 #include "termStateMachine.h"
@@ -31,16 +33,35 @@ public:
         return globalInstance;
     }
 
-    bool init(const char* title, int swidth, int sheight, int wwidth,  int wheight);
+    // Release And Clear the Singleton
+    static void ReleaseInstance()
+    {
+        if(globalInstance != 0)
+        {
+            delete globalInstance;
+            globalInstance = 0;
+        }
+        return;
+    }
 
+    bool init(const char* title, int swidth, int sheight, int wwidth,  int wheight);
     void render();
     void update();
     void handleEvents();
     void clean();
 
-    SDL_Renderer*     getRenderer() const { return globalRenderer; }
-    SDL_Window*       getWindow()   const { return globalWindow; }
-    TermStateMachine* getStateMachine()   { return globalTermStateMachine; }
+    SDL_Renderer* getRenderer() const
+    {
+        return globalRenderer;
+    }
+    SDL_Window* getWindow()   const
+    {
+        return globalWindow;
+    }
+    TermStateMachine* getStateMachine()
+    {
+        return globalTermStateMachine;
+    }
 
     // Holds current connection
     typedef struct SystemConnection
@@ -55,7 +76,10 @@ public:
     } SystemConnection;
 
 
-    SystemConnection getSystemConnection() const { return systemConnection; }
+    SystemConnection getSystemConnection() const
+    {
+        return systemConnection;
+    }
     void setSystemConnection(SystemConnection _systemConnection)
     {
         systemConnection = _systemConnection;
@@ -71,51 +95,93 @@ public:
         systemConnection.font.erase();
     }
 
-    bool running() { return isRunning; }
-    void quit() {isRunning = false; }
+    bool running()
+    {
+        return isRunning;
+    }
+    void quit()
+    {
+        isRunning = false;
+    }
 
-    int getSurfaceWidth() const { return surfaceWidth; }
-    int getSurfaceHeight() const { return surfaceHeight; }
+    int getSurfaceWidth() const
+    {
+        return surfaceWidth;
+    }
+    int getSurfaceHeight() const
+    {
+        return surfaceHeight;
+    }
 
-    int getWindowWidth() const { return windowWidth; }
-    int getWindowHeight() const { return windowHeight; }
+    int getWindowWidth() const
+    {
+        return windowWidth;
+    }
+    int getWindowHeight() const
+    {
+        return windowHeight;
+    }
 
-    bool changingState() { return isChangingState; }
-    void changingState(bool cs) { isChangingState = cs; }
+    bool changingState()
+    {
+        return isChangingState;
+    }
+    void changingState(bool cs)
+    {
+        isChangingState = cs;
+    }
 
-    void setRenderReady(bool rr) { isRenderReady = rr; }
-    bool getRenderReady() const { return isRenderReady; }
+    void setRenderReady(bool rr)
+    {
+        isRenderReady = rr;
+    }
+    bool getRenderReady() const
+    {
+        return isRenderReady;
+    }
 
-    void setCurrentFont(std::string font) { currentFont = font; }
-    std::string getCurrentFont() const { return currentFont; }
+    void setCurrentFont(std::string font)
+    {
+        currentFont = font;
+    }
+    std::string getCurrentFont() const
+    {
+        return currentFont;
+    }
 
-    bool didFontChange() const { return (currentFont != previousFont); }
+    bool didFontChange() const
+    {
+        return (currentFont != previousFont);
+    }
 
     // Now for Rendering Code
     bool loadBitmapImageFromPak();
-    bool loadBitmapImage( std::string path );
-    bool InitSurfaceTextures();
-    void Close();
-    void SetScrollRegion(int top, int bot);
-    void ScrollRegionUp ();
-    void ScrollScreenUp ();
-    void ClearScreenSurface();
-    void RenderClearLineScreen(int y, int start, int end);
-    void RenderBottomScreen();
-    void RenderScreen();
-    void RenderCharScreen(int x, int y);
-    void RenderCursorOnScreen(int x, int y);
-    void RenderCursorOffScreen(int x, int y);
-    void DrawTextureScreen();
-    void ClearScreen();
-    int  CompareSDL_Colors(SDL_Color &src, SDL_Color &dest);
-    void ReplaceColor (SDL_Surface *src, Uint32 foreground, Uint32 background);
-    void SetupCursorChar(int X, int Y);
-    void DrawChar(int X, int Y, int asciicode);
-    void DrawString(int X, int Y, char text[]);
-    void DrawCharSet(int X, int Y);
+    bool loadBitmapImage(std::string path);
+    bool initSurfaceTextures();
+    void close();
+    void setScrollRegion(int top, int bot);
+    void scrollRegionUp();
+    void scrollScreenUp();
+    void clearScreenSurface();
+    void renderClearLineScreen(int y, int start, int end);
+    void renderBottomScreen();
+    void renderScreen();
+    void renderCharScreen(int x, int y);
+    void renderCursorOnScreen(int x, int y);
+    void renderCursorOffScreen(int x, int y);
+    void drawTextureScreen();
+    void clearScreen();
+    int  compareSDL_Colors(SDL_Color &src, SDL_Color &dest);
+    void replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 background);
+    void setupCursorChar(int X, int Y);
+    void drawChar(int X, int Y, int asciicode);
+    void drawString(int X, int Y, char text[]);
+    void drawCharSet(int X, int Y);
 
-    std::vector<std::string> getFontFiles() { return globalFontFiles; }
+    std::vector<std::string> getFontFiles()
+    {
+        return globalFontFiles;
+    }
 
     // Matched Colors with Pablo Draw.
     SDL_Color black;
@@ -160,11 +226,8 @@ private:
     SDL_Surface*   screenSurface;    // Internal Screen Buffer
     SDL_Surface*   bottomSurface;
     SDL_Surface*   chachedSurface;  // Cached Font CharacterSet
-
     SDL_Texture*   globalTexture;   // Texture for User Screen
-
     TermStateMachine* globalTermStateMachine;
-
     Uint32 redMask, greenMask, blueMask, alphaMask;
 
     int surfaceWidth;
