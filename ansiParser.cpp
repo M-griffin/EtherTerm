@@ -174,7 +174,7 @@ void AnsiParser::textInput(std::string buffer)
                 }
                 else
                 {
-                    TheTerm::Instance()->renderBottomScreen();    // Surface to Texture of Bottom Row.
+                    TheTerm::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
                     TheTerm::Instance()->drawTextureScreen();    // Testure to Screen
                     TheTerm::Instance()->scrollScreenUp();       // Scroll up for next line.
                     if(!TheTerm::Instance()->scrollRegionActive)

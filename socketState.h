@@ -63,10 +63,7 @@ public:
     virtual bool onExit();
 
 private:
-
-    int cursorBlink;
-    int startBlinking;
-    time_t ttime, ttime2;
+    
     std::string host;
     int port;
     TCPsocket sock;

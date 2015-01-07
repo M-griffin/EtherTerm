@@ -76,13 +76,16 @@ int SSH_Socket::pollSocket()
     if(sshChannel && ssh_channel_is_open(sshChannel) && ssh_channel_poll(sshChannel,0) > 0)
     {
         numready = 1;
+        /* // Move to Socket Handler 1 spot for both connections!
         ttime = SDL_GetTicks();
         startBlinking = false;
         cursorBlink = 0;
+        */
     }
     else
     {
         numready = 0;
+        /*
         startBlinking = true;
         //std::cout << "numready = 0;" << std::endl;
         // Setup Timer for Blinking Cursor
@@ -115,7 +118,7 @@ int SSH_Socket::pollSocket()
                 ++cursorBlink;
                 ttime = SDL_GetTicks();
             }
-        }
+        } */
     }
     if(ssh_channel_poll(sshChannel,0) < 0)
         TheSocketHandler::Instance()->setActive(false);

@@ -60,6 +60,10 @@ void SSHState::handleSession()
     // If available, push Data through ANSI Pasrser then Screen.
     if(output.size() > 0)
     {
+        // Parse Ansi
+        TheSequenceParser::Instance()->processSequence(output);
+
+        /*
         // Turn off Cursor Before rendering new screen.
         TheTerm::Instance()->renderCursorOffScreen(TheAnsiParser::Instance()->x_position-1,
                 TheAnsiParser::Instance()->y_position-1);
@@ -78,13 +82,13 @@ void SSHState::handleSession()
         TheTerm::Instance()->renderCursorOnScreen(TheAnsiParser::Instance()->x_position-1,
                 TheAnsiParser::Instance()->y_position-1);
 
-        output.erase();
-
         // Write out final screen.
         TheTerm::Instance()->drawTextureScreen();
 
         // Now disable Renderer.
         TheTerm::Instance()->setRenderReady(false); // Enable Rendering of new screen.
+        */
+        output.erase();
     }
 }
 

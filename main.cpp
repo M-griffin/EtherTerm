@@ -91,7 +91,11 @@ void readinAnsi(std::string FileName, std::string &buff)
 int main(int argc, char* argv[])
 {
     // Initalize Renderer and Window with default sizes.
-    if(TheTerm::Instance()->init("EtherTerm v1.0.0a", 680, 480, 1440, 800))
+    // We define 680 instead of 640 becasue we clip the extract off
+    // in Screen->Texure.  We do this becasue when Texture filtering is used
+    // Pixels on the last line tend to bleed from bledning. This clips off the
+    // Bleeding Leaving a nice screen.
+    if(TheTerm::Instance()->init("EtherTerm v1.0.0a", 680, 480, 1280, 800, 8, 16))
     {
         // Setup the Surfaces
         if(TheTerm::Instance()->initSurfaceTextures())

@@ -41,7 +41,7 @@ void TelnetState::handleSession()
     char msgBuffer[8193]= {'\0'};
     //std::string newstring;
     //std::string::size_type id1;
-
+   
     // Escape parsing
     //static std::string esc_sequence;
     //static bool more_params = false;
@@ -88,20 +88,26 @@ void TelnetState::handleSession()
     // If available, push Data through ANSI Pasrser then Screen.
     if(output.size() > 0)
     {
-        // Turn off Cursor Before rendering new screen.
-        TheTerm::Instance()->renderCursorOffScreen(TheAnsiParser::Instance()->x_position-1,
-                TheAnsiParser::Instance()->y_position-1);
         // Parse Ansi
-        //TheSequenceParser::Instance()->processSequence(output);
+        TheSequenceParser::Instance()->processSequence(output);
+
+        /*
+         // Turn off Cursor Before rendering new screen.
+        TheTerm::Instance()->renderCursorOffScreen(TheAnsiParser::Instance()->x_position-1,
+        TheAnsiParser::Instance()->y_position-1);
+
+        // Parse Ansi
         TheSequenceParser::Instance()->processSequence(output);
 
         // Setup cursor in current x/y position Cursor.
         TheTerm::Instance()->setupCursorChar(TheAnsiParser::Instance()->x_position-1,
                                              TheAnsiParser::Instance()->y_position-1);
+
         TheTerm::Instance()->renderCursorOnScreen(TheAnsiParser::Instance()->x_position-1,
-                TheAnsiParser::Instance()->y_position-1);
+                                              TheAnsiParser::Instance()->y_position-1);
         TheTerm::Instance()->drawTextureScreen();
-    }
+        */
+    }    
     output.erase();
 }
 

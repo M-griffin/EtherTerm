@@ -29,7 +29,6 @@ public:
             globalInstance = new Term();
             return globalInstance;
         }
-
         return globalInstance;
     }
 
@@ -44,7 +43,12 @@ public:
         return;
     }
 
-    bool init(const char* title, int swidth, int sheight, int wwidth,  int wheight);
+    // Pass Starting Screen and Font Values.
+    bool init(const char* title,
+            int swidth, int sheight,
+            int wwidth, int wheight,
+            int fwidth, int fheight);
+
     void render();
     void update();
     void handleEvents();
@@ -75,7 +79,6 @@ public:
         std::string font;
     } SystemConnection;
 
-
     SystemConnection getSystemConnection() const
     {
         return systemConnection;
@@ -103,7 +106,6 @@ public:
     {
         isRunning = false;
     }
-
     int getSurfaceWidth() const
     {
         return surfaceWidth;
@@ -112,7 +114,6 @@ public:
     {
         return surfaceHeight;
     }
-
     int getWindowWidth() const
     {
         return windowWidth;
@@ -121,7 +122,6 @@ public:
     {
         return windowHeight;
     }
-
     bool changingState()
     {
         return isChangingState;
@@ -130,7 +130,6 @@ public:
     {
         isChangingState = cs;
     }
-
     void setRenderReady(bool rr)
     {
         isRenderReady = rr;
@@ -139,7 +138,6 @@ public:
     {
         return isRenderReady;
     }
-
     void setCurrentFont(std::string font)
     {
         currentFont = font;
@@ -148,7 +146,6 @@ public:
     {
         return currentFont;
     }
-
     bool didFontChange() const
     {
         return (currentFont != previousFont);
@@ -227,6 +224,7 @@ private:
     SDL_Surface*   bottomSurface;
     SDL_Surface*   chachedSurface;  // Cached Font CharacterSet
     SDL_Texture*   globalTexture;   // Texture for User Screen
+
     TermStateMachine* globalTermStateMachine;
     Uint32 redMask, greenMask, blueMask, alphaMask;
 
@@ -238,8 +236,8 @@ private:
     SDL_Rect displayRect;
     SDL_Rect rectBackground;
 
-    int  CHAR_WIDTH;
-    int  CHAR_HEIGHT;
+    int  characterWidth;
+    int  characterHeight;
 
     bool isChangingState;
     bool isRunning;
@@ -250,7 +248,6 @@ private:
 
     Term();
     ~Term();
-
     Term(const Term&);
     Term& operator=(const Term&);
 };

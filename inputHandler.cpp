@@ -16,13 +16,10 @@ InputHandler::InputHandler() :
     globalShutdown(false),
     fullScreen(false),
     fullScreenWindowSize(0)
-
 { }
 
 InputHandler::~InputHandler()
-
 { }
-
 
 bool InputHandler::update()
 {
@@ -145,8 +142,14 @@ bool InputHandler::update()
             // If not Full Screen Then Toggle to Next Mode.
             if(!fullScreen)
             {
+                // Texture Filtering OFF.
+                // FullScreen Desktop fits the window to the desktop size,
+                // This throws off the pixels.  Using the resolution switch
+                // so that 640, or 1280 is made to full screen fixes this
+                // properly without needing to do any fancy recalculations
                 fullScreen = true; // Can be Full Screen or Full Screen Desktop.
-                SDL_SetWindowFullscreen(TheTerm::Instance()->getWindow(), SDL_WINDOW_FULLSCREEN_DESKTOP);
+                SDL_SetWindowFullscreen(TheTerm::Instance()->getWindow(),
+                    SDL_WINDOW_FULLSCREEN); // _DESKTOP);
                 fullScreenWindowSize = 0;
                 TheTerm::Instance()->drawTextureScreen();
                 return false;
@@ -155,24 +158,31 @@ bool InputHandler::update()
             {
                 // Set Full Screen Window.
                 SDL_SetWindowFullscreen(TheTerm::Instance()->getWindow(), 0);
+
                 //Toggle Between Window Sizes.
                 switch(fullScreenWindowSize)
                 {
+                    // Texture Filtering OFF.
+                    // These (2) Resolutions work perfect for 8x16 fonts
+                    // When the screen is resized the pixels are doubled
+                    // properly without needing to do any fancy recalculations
+                    // to make Shaded blocks or fonts look better!
                     case 0:
                         SDL_SetWindowSize(TheTerm::Instance()->getWindow(), 640, 400);
                         ++fullScreenWindowSize;
                         break;
 
                     case 1:
-                        SDL_SetWindowSize(TheTerm::Instance()->getWindow(), 800, 520);
+                        SDL_SetWindowSize(TheTerm::Instance()->getWindow(), 1280, 800);
                         ++fullScreenWindowSize;
                         break;
 
+                    /*
                     case 2:
                         SDL_SetWindowSize(TheTerm::Instance()->getWindow(), 1440, 800);
                         ++fullScreenWindowSize;
                         fullScreen = false;
-                        break;
+                        break;*/
                 }
                 TheTerm::Instance()->drawTextureScreen();
                 return false;

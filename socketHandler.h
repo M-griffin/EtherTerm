@@ -68,6 +68,11 @@ public:
 
 private:
 
+    // Handle Blicking Cursor
+    bool cursorBlink;
+    bool startBlinking;
+    time_t ttime, ttime2;
+
     SocketState *socket;
     bool active;
     std::string socketType;

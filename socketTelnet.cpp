@@ -6,6 +6,7 @@
 // $LastChangedBy$
 
 #include "socketState.h"
+#include "socketHandler.h"
 #include "inputHandler.h"
 #include "ansiParser.h"
 
@@ -74,21 +75,24 @@ int SDL_Socket::pollSocket()
     if(numready == -1)
     {
         std::cout << "SDLNet_CheckSockets: " << SDLNet_GetError() << std::endl;
+        TheSocketHandler::Instance()->setActive(false);
         return numready;
     }
 
     if(numready && SDLNet_SocketReady(sock) == TRUE)
     {
         numready = 1;
+        /* // Move to Socket Handler, 1 place both all sockets.
         ttime = SDL_GetTicks();
         startBlinking = false;
         cursorBlink = 0;
+        */
     }
     else
     {
         numready = 0;
+        /*
         startBlinking = true;
-        //std::cout << "numready = 0;" << std::endl;
         // Setup Timer for Blinking Cursor
         // Initial State = On, then Switch to off in next loop.
         if(cursorBlink % 2 == 0)
@@ -118,7 +122,7 @@ int SDL_Socket::pollSocket()
                 ++cursorBlink;
                 ttime = SDL_GetTicks();
             }
-        }
+        }*/
     }
     return numready;
 }
