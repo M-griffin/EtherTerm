@@ -155,7 +155,7 @@ void AnsiParser::textInput(std::string buffer)
             // Check here if we need to scroll the screen up 1 row.
             if(y_position > NUM_LINES ||
                     (TheTerm::Instance()->scrollRegionActive &&
-                     y_position > TheTerm::Instance()->botMargin))
+                     y_position > TheTerm::Instance()->bottomMargin))
             {
                 // If we cleared the screen and hit bottom row, then
                 // The very first time we want to spit out the entire screen
@@ -169,7 +169,7 @@ void AnsiParser::textInput(std::string buffer)
                     if(!TheTerm::Instance()->scrollRegionActive)
                         y_position = NUM_LINES;
                     else
-                        y_position = TheTerm::Instance()->botMargin;
+                        y_position = TheTerm::Instance()->bottomMargin;
                     cleared_the_screen = false;
                 }
                 else
@@ -180,7 +180,7 @@ void AnsiParser::textInput(std::string buffer)
                     if(!TheTerm::Instance()->scrollRegionActive)
                         y_position = NUM_LINES;
                     else
-                        y_position = TheTerm::Instance()->botMargin;
+                        y_position = TheTerm::Instance()->bottomMargin;
                 }
             }
             //printf("\r\n xpos %i, ypos %i \r\n",x_position, y_position);
@@ -214,7 +214,7 @@ void AnsiParser::textInput(std::string buffer)
             // Check here if we need to scroll the screen.
             if(y_position > NUM_LINES ||
                     (TheTerm::Instance()->scrollRegionActive &&
-                     y_position > TheTerm::Instance()->botMargin))
+                     y_position > TheTerm::Instance()->bottomMargin))
             {
                 // If we cleared the screen and hit bottom row, then
                 // The very first time we want to spit out the entire screen
@@ -227,7 +227,7 @@ void AnsiParser::textInput(std::string buffer)
                     if(!TheTerm::Instance()->scrollRegionActive)
                         y_position = NUM_LINES;
                     else
-                        y_position = TheTerm::Instance()->botMargin;
+                        y_position = TheTerm::Instance()->bottomMargin;
                     cleared_the_screen = false;
                 }
                 else
@@ -241,7 +241,7 @@ void AnsiParser::textInput(std::string buffer)
                     if(!TheTerm::Instance()->scrollRegionActive)
                         y_position = NUM_LINES;
                     else
-                        y_position = TheTerm::Instance()->botMargin;
+                        y_position = TheTerm::Instance()->bottomMargin;
                 }
             }
             continue;
@@ -267,7 +267,7 @@ void AnsiParser::textInput(std::string buffer)
         // This last check is for normal text being pushed to the screen,
         // NO CR/LR so check if we gone past the bottom margin of the screen.
         if(y_position > NUM_LINES || (TheTerm::Instance()->scrollRegionActive &&
-                                      y_position >= TheTerm::Instance()->botMargin &&
+                                      y_position >= TheTerm::Instance()->bottomMargin &&
                                       x_position > characters_per_line))
         {
             // If we cleared the screen and hit bottom row, then
@@ -277,12 +277,12 @@ void AnsiParser::textInput(std::string buffer)
                 // test if scrollign region is active and were drawing in it.
                 if(TheTerm::Instance()->scrollRegionActive &&
                         y_position >= TheTerm::Instance()->topMargin &&
-                        y_position <= TheTerm::Instance()->botMargin)
+                        y_position <= TheTerm::Instance()->bottomMargin)
                 {
                     TheTerm::Instance()->renderScreen();       // Surface to Texture
                     TheTerm::Instance()->drawTextureScreen();  // Draw Texture to Screen
                     TheTerm::Instance()->scrollScreenUp();     // Scroll the surface up
-                    y_position = TheTerm::Instance()->botMargin;
+                    y_position = TheTerm::Instance()->bottomMargin;
                     cleared_the_screen = false;
                     // Reset to begining of line.
                     if(x_position > characters_per_line)
@@ -305,7 +305,7 @@ void AnsiParser::textInput(std::string buffer)
                 // test if scrollign region is active and were drawing in it.
                 if(TheTerm::Instance()->scrollRegionActive &&
                         y_position >= TheTerm::Instance()->topMargin &&
-                        y_position <= TheTerm::Instance()->botMargin)
+                        y_position <= TheTerm::Instance()->bottomMargin)
                 {
                     TheTerm::Instance()->renderBottomScreen();    // Surface to Texture of Bottom Row.
                     TheTerm::Instance()->drawTextureScreen();    // Testure to Screen
@@ -313,7 +313,7 @@ void AnsiParser::textInput(std::string buffer)
                     // Reset to begining of line.
                     if(x_position > characters_per_line)
                         x_position = 1;
-                    y_position = TheTerm::Instance()->botMargin;
+                    y_position = TheTerm::Instance()->bottomMargin;
                 }
                 else if(y_position > NUM_LINES)
                 {

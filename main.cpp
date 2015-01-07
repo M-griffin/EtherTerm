@@ -1,6 +1,6 @@
 
 /*
- *  EtherTerm (c) 2014 Michael Griffin <mrmisticismo@hotmail.com>
+ *  EtherTerm (c) 2014-2015 Michael Griffin <mrmisticismo@hotmail.com>
  *  A full Telnet / SSH emulated terminal in SDL 2.0
  *  With with CP437 Character set and ANSI Graphic Support.
  *

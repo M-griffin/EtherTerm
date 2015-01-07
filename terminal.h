@@ -164,13 +164,13 @@ public:
     void renderBottomScreen();
     void renderScreen();
     void renderCharScreen(int x, int y);
-    void renderCursorOnScreen(int x, int y);
-    void renderCursorOffScreen(int x, int y);
+    void renderCursorOnScreen();
+    void renderCursorOffScreen();
     void drawTextureScreen();
     void clearScreen();
     int  compareSDL_Colors(SDL_Color &src, SDL_Color &dest);
     void replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 background);
-    void setupCursorChar(int X, int Y);
+    void setupCursorChar();
     void drawChar(int X, int Y, int asciicode);
     void drawString(int X, int Y, char text[]);
     void drawCharSet(int X, int Y);
@@ -205,7 +205,7 @@ public:
     // Scrolling Region
     int scrollRegionActive;
     int topMargin;
-    int botMargin;
+    int bottomMargin;
 
 private:
 
@@ -238,6 +238,8 @@ private:
 
     int  characterWidth;
     int  characterHeight;
+    int  cursorXPosition;
+    int  cursorYPosition;
 
     bool isChangingState;
     bool isRunning;

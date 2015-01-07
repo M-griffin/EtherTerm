@@ -69,7 +69,7 @@ public:
 private:
 
     // Handle Blicking Cursor
-    bool cursorBlink;
+    int  cursorBlink;
     bool startBlinking;
     time_t ttime, ttime2;
 

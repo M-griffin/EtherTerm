@@ -35,16 +35,10 @@ TelnetState::TelnetState() :
 
 void TelnetState::handleSession()
 {
-    //std::string ansiret;
     std::string output;
     int len = 0;
     char msgBuffer[8193]= {'\0'};
-    //std::string newstring;
-    //std::string::size_type id1;
-   
-    // Escape parsing
-    //static std::string esc_sequence;
-    //static bool more_params = false;
+
     unsigned char c, ch;
 
     // Get Socket Data From Server

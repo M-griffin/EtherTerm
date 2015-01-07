@@ -43,11 +43,53 @@ int SocketHandler::update()
             socket->onExit();
             active = false;
         }
+        else if (ret == 0) // No Data!
+        {
+            // When no data is received, this is when we want to show the cursor!
+            // Setup cursor in current x/y position Cursor.
+            TheTerm::Instance()->setupCursorChar();
+
+            startBlinking = true;
+            // Setup Timer for Blinking Cursor
+            // Initial State = On, then Switch to off in next loop.
+            if(cursorBlink % 2 == 0)
+            {
+                ttime2 = SDL_GetTicks();
+                if(startBlinking && (ttime2 - ttime) > 400)
+                {
+                    TheTerm::Instance()->renderCursorOffScreen();
+                    TheTerm::Instance()->drawTextureScreen();
+                    --cursorBlink;
+                    ttime = SDL_GetTicks();
+                }
+            }
+            else
+            {
+                ttime2 = SDL_GetTicks();
+                if(startBlinking && (ttime2 - ttime) > 400)
+                {
+                    TheTerm::Instance()->renderCursorOnScreen();
+                    TheTerm::Instance()->drawTextureScreen();
+                    ++cursorBlink;
+                    ttime = SDL_GetTicks();
+                }
+            }
+        }
+        else
+        {
+            // We got data, turn off the cursor!
+            ttime = SDL_GetTicks();
+            startBlinking = false;
+            cursorBlink = 0;
+            TheTerm::Instance()->renderCursorOffScreen();
+            TheTerm::Instance()->drawTextureScreen();
+        }
     }
     else
-        ret = -1;
-
-    //Check for disconnection here, if so deactiveate socket and clean()
+    {
+        // Inactive Connection
+        ret = -1;        
+    }
     return ret;
 }
 
