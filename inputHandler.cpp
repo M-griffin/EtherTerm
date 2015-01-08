@@ -16,464 +16,352 @@ InputHandler::InputHandler() :
     globalShutdown(false),
     fullScreen(false),
     fullScreenWindowSize(0)
-{ }
+{
+    SDL_StartTextInput();
+}
 
 InputHandler::~InputHandler()
-{ }
+{
+    SDL_StopTextInput();
+}
 
 bool InputHandler::update()
 {
     SDL_Event event;
+    std::string sequence;
+
 
     //Handle events on queue
     while(SDL_PollEvent(&event) != 0)
     {
         //User requests quit
-        if(event.type == SDL_QUIT)
+        switch (event.type)
         {
-            return false;
-        }
-        //If a mouse button was pressed
-        if(event.type == SDL_MOUSEBUTTONDOWN)
-        {
-            //If the left mouse button was pressed Paste Text.
-            if(event.button.button == SDL_BUTTON_RIGHT)
-            {
-                SDL_StartTextInput();
-                inputText = SDL_GetClipboardText();
-                // Some input filtering
-                std::string::size_type id1 = 0;
-                while(1)
-                {   // Replace \r\n with \r
-                    id1 = inputText.find("\r\n", 0);
-                    if(id1 != std::string::npos)
-                    {
-                        inputText.erase(id1+1,1);
-                    }
-                    else
-                        break;
-                }
-
-                while(1)
-                {   // Replace Tabs with (4) Spaces.
-                    id1 = inputText.find("\t", 0);
-                    if(id1 != std::string::npos)
-                    {
-                        inputText.replace(id1,1,"    ");
-                    }
-                    else
-                        break;
-                }
-
-                while(1)
-                {   // Change \n to \r
-                    id1 = inputText.find("\n", 0);
-                    if(id1 != std::string::npos)
-                    {
-                        inputText[id1] = '\r';
-                    }
-                    else
-                        break;
-                }
-
-                setInputSequence(inputText);
-                SDL_StopTextInput();
+            case SDL_TEXTINPUT:
+                setInputSequence(event.text.text);
                 return true;
-            }
-        }
-        // Check for CTRL Key Sequences
-        else if(event.type == SDL_KEYDOWN && event.key.keysym.mod & KMOD_CTRL)
-        {
-            //Handle copy
-            if(event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL)
-            {
-                SDL_StartTextInput();
-                inputText = SDL_SetClipboardText(inputText.c_str());
-                SDL_StopTextInput();
+
+            case SDL_QUIT:
                 return false;
-            }
-            //Handle paste
-            else if(event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL)
-            {
-                SDL_StartTextInput();
-                inputText = SDL_GetClipboardText();
-                // Some input filtering
-                std::string::size_type id1 = 0;
-                while(1)
+
+            case SDL_MOUSEBUTTONDOWN:
+                //If the left mouse button was pressed Paste Text.
+                if(event.button.button == SDL_BUTTON_RIGHT)
                 {
-                    id1 = inputText.find("\r\n", 0);
-                    if(id1 != std::string::npos)
-                    {
-                        inputText.erase(id1+1,1);
-                    }
-                    else
-                        break;
-                }
-                while(1)
-                {
-                    id1 = inputText.find("    ", 0);
-                    if(id1 != std::string::npos)
-                    {
-                        inputText.replace(id1,1,"    ");
-                    }
-                    else
-                        break;
-                }
-                while(1)
-                {
-                    id1 = inputText.find("\n", 0);
-                    if(id1 != std::string::npos)
-                    {
-                        inputText[id1] = '\r';
-                    }
-                    else
-                        break;
-                }
-                setInputSequence(inputText);
-                SDL_StopTextInput();
-                return true;
-            }
-        }
-        // Handle Screen Resizing ALT Keys.
-        else if(event.type == SDL_KEYDOWN &&
-                event.key.keysym.sym == SDLK_RETURN &&
-                event.key.keysym.mod & KMOD_ALT)
-        {
-            // If not Full Screen Then Toggle to Next Mode.
-            if(!fullScreen)
-            {
-                // Texture Filtering OFF.
-                // FullScreen Desktop fits the window to the desktop size,
-                // This throws off the pixels.  Using the resolution switch
-                // so that 640, or 1280 is made to full screen fixes this
-                // properly without needing to do any fancy recalculations
-                fullScreen = true; // Can be Full Screen or Full Screen Desktop.
-                SDL_SetWindowFullscreen(TheTerm::Instance()->getWindow(),
-                    SDL_WINDOW_FULLSCREEN); // _DESKTOP);
-                fullScreenWindowSize = 0;
-                TheTerm::Instance()->drawTextureScreen();
-                return false;
-            }
-            else
-            {
-                // Set Full Screen Window.
-                SDL_SetWindowFullscreen(TheTerm::Instance()->getWindow(), 0);
-
-                //Toggle Between Window Sizes.
-                switch(fullScreenWindowSize)
-                {
-                    // Texture Filtering OFF.
-                    // These (2) Resolutions work perfect for 8x16 fonts
-                    // When the screen is resized the pixels are doubled
-                    // properly without needing to do any fancy recalculations
-                    // to make Shaded blocks or fonts look better!
-                    case 0:
-                        SDL_SetWindowSize(TheTerm::Instance()->getWindow(), 640, 400);
-                        ++fullScreenWindowSize;
-                        break;
-
-                    case 1:
-                        SDL_SetWindowSize(TheTerm::Instance()->getWindow(), 1280, 800);
-                        ++fullScreenWindowSize;
-                        break;
-
-                    /*
-                    case 2:
-                        SDL_SetWindowSize(TheTerm::Instance()->getWindow(), 1440, 800);
-                        ++fullScreenWindowSize;
-                        fullScreen = false;
-                        break;*/
-                }
-                TheTerm::Instance()->drawTextureScreen();
-                return false;
-            }
-        }
-        // Catch Remaining Key Events.
-        if(event.type == SDL_KEYDOWN)
-        {
-            // Grab the Current Key Symbol.
-            char ch = static_cast<char>(event.key.keysym.sym);
-            std::string sequence;
-            sequence = ch;
-
-            // Check for Keys that need Special ESC Sequences Sent.
-            switch(event.key.keysym.sym)
-            {
-                case SDLK_ESCAPE: // Passthrough as int (27)
-                    setInputSequence(sequence.c_str());
-                    return true;
-                case SDLK_LEFT:
-                    setInputSequence("\x1b[D");
-                    return true;
-                case SDLK_RIGHT:
-                    setInputSequence("\x1b[C");
-                    return true;
-                case SDLK_UP:
-                    setInputSequence("\x1b[A");
-                    return true;
-                case SDLK_DOWN:
-                    setInputSequence("\x1b[B");
-                    return true;
-                case SDLK_RETURN:
-                    setInputSequence("\r");
-                    return true;
-                case SDLK_BACKSPACE:
-                    setInputSequence("\x08");
-                    return true;
-                case SDLK_DELETE:
-                    setInputSequence("\x7f");
-                    return true;
-                case SDLK_TAB:
-                    setInputSequence("    ");
-                    return true;
-                case SDLK_INSERT:   // insert
-                    setInputSequence("\x1b[@");
-                    return true;
-                case SDLK_HOME:     // home
-                    setInputSequence("\x1b[H");
-                    return true;
-                case SDLK_END:      // end
-                    setInputSequence("\x1b[K");
-                    return true;
-                case SDLK_PAGEUP:   // page up
-                    setInputSequence("\x1b[V");
-                    return true;
-                case SDLK_PAGEDOWN: // page down
-                    setInputSequence("\x1b[U");
-                    return true;
-
-                    // Check for Special Characters
-                    // If one of these is found, then we will
-                    // Pass right through to the bottom
-                    // Where we can check for Modifier or use oringal value.
-                case SDLK_SEMICOLON:  //';' colon
-                case SDLK_LEFTBRACKET: //'[' left bracket
-                case SDLK_RIGHTBRACKET: //']' right bracket
-                case SDLK_EQUALS:  //'=' equals sign
-                case SDLK_SLASH: // '/' forward slash
-                case SDLK_BACKSLASH: //'\' backslash
-                case SDLK_QUOTE: // ''' quote
-                case SDLK_BACKQUOTE: //'`' grave
-                case SDLK_COMMA: // ',' comma
-                case SDLK_MINUS: // '-' minus sign
-                case SDLK_PERIOD: // '.' period
-                    // If we get here, then we know it's
-                    // One of these keys, Check if shift Modifier.
-                    if(event.key.keysym.mod & KMOD_SHIFT || event.key.keysym.mod & KMOD_CAPS)
-                    {
-                        switch(event.key.keysym.sym)
+                    SDL_StartTextInput();
+                    inputText = SDL_GetClipboardText();
+                    // Some input filtering
+                    std::string::size_type id1 = 0;
+                    while(1)
+                    {   // Replace \r\n with \r
+                        id1 = inputText.find("\r\n", 0);
+                        if(id1 != std::string::npos)
                         {
-                            case SDLK_SEMICOLON:  //':' colon
-                                ch = ':';
-                                break;
-                            case SDLK_LEFTBRACKET: //'[' left bracket
-                                ch = '{';
-                                break;
-                            case SDLK_RIGHTBRACKET: //']' right bracket
-                                ch = '}';
-                                break;
-                            case SDLK_EQUALS:  //'=' equals sign
-                                ch = '+';
-                                break;
-                            case SDLK_SLASH: // '/' forward slash
-                                ch = '?';
-                                break;
-                            case SDLK_BACKSLASH: //'\' backslash
-                                ch = '|';
-                                break;
-                            case SDLK_QUOTE: // ''' quote
-                                ch = '"';
-                                break;
-                            case SDLK_BACKQUOTE: //'`' grave
-                                ch = '~';
-                                break;
-                            case SDLK_COMMA: // ',' comma
-                                ch = '<';
-                                break;
-                            case SDLK_MINUS: // '-' minus sign
-                                ch = '_';
-                                break;
-                            case SDLK_PERIOD: // '.' period
-                                ch = '>';
+                            inputText.erase(id1+1,1);
                         }
+                        else break;
                     }
-                    // Send Keys Either Original or Modified.
-                    sequence = ch;
-                    setInputSequence(sequence.c_str());
+                    while(1)
+                    {   // Replace Tabs with (4) Spaces.
+                        id1 = inputText.find("\t", 0);
+                        if(id1 != std::string::npos)
+                        {
+                            inputText.replace(id1,1,"    ");
+                        }
+                        else break;
+                    }
+                    while(1)
+                    {   // Change \n to \r
+                        id1 = inputText.find("\n", 0);
+                        if(id1 != std::string::npos)
+                        {
+                            inputText[id1] = '\r';
+                        }
+                        else break;
+                    }
+                    setInputSequence(inputText);
                     return true;
-            }
+                }
+                break;
 
-            // Now start normal key processing, Space, Letters and Numbers.
-            // Also Checking Shift Modifiers.
-            if(event.key.keysym.sym == (Uint16)' ')
-            {
-                //Append the character
-                setInputSequence(sequence.c_str());
-                return true;
-                //printf("\r\nInput: %c - %i\r\n", ch, ch);
-            }
-            //If the key is a number
-            else if((event.key.keysym.sym >= (Uint16)'0') && (event.key.keysym.sym <= (Uint16)'9'))
-            {
-                // Handle Shift Number Keys
-                if(event.key.keysym.mod & KMOD_SHIFT || event.key.keysym.mod & KMOD_CAPS)
+            case SDL_KEYDOWN:
+                // Start with CTRL and ALT Keys combo's.
+                if (event.key.keysym.mod & KMOD_CTRL)
                 {
-                    switch(ch)
+                    switch (event.key.keysym.sym)
                     {
-                        case 48: // 0
-                            ch = 41; // )
+                        //Handle copy
+                        case SDLK_c:
+                            if (SDL_GetModState() & KMOD_CTRL)
+                            {
+                                inputText =
+                                    SDL_SetClipboardText(inputText.c_str());
+                                return false;
+                            }
                             break;
-                        case 49: // 1
-                            ch = 33; // !
+
+                        //Handle paste
+                        case SDLK_v:
+                            if (SDL_GetModState() & KMOD_CTRL)
+                            {
+                                inputText = SDL_GetClipboardText();
+                                // Some input filtering
+                                std::string::size_type id1 = 0;
+                                while(1)
+                                {
+                                    id1 = inputText.find("\r\n", 0);
+                                    if(id1 != std::string::npos)
+                                    {
+                                        inputText.erase(id1+1,1);
+                                    }
+                                    else
+                                        break;
+                                }
+                                while(1)
+                                {
+                                    id1 = inputText.find("    ", 0);
+                                    if(id1 != std::string::npos)
+                                    {
+                                        inputText.replace(id1,1,"    ");
+                                    }
+                                    else
+                                        break;
+                                }
+                                while(1)
+                                {
+                                    // Windows.
+                                    id1 = inputText.find("\n", 0);
+                                    if(id1 != std::string::npos)
+                                    {
+                                        inputText[id1] = '\r';
+                                    }
+                                    else
+                                        break;
+                                }
+                                setInputSequence(inputText);
+                                return true;
+                            }
                             break;
-                        case 50: // 2
-                            ch = 64; // @ ..
+
+                        default:
+                            // CTRL Keys have lowercase letters -
+                            // translate CTRL Key combo and
+                            // Grab the Current Key Symbol.
+                            char ch = static_cast<char>(event.key.keysym.sym);
+                            sequence = ch;
+                            if((event.key.keysym.sym >= (Uint16)'a') &&
+                                (event.key.keysym.sym <= (Uint16)'z'))
+                            {
+                                // Translate Letter to CTRL Letter value
+                                ch = CTRLKEYTABLE[ch-97];
+                                sequence = ch;
+                                //Append the character
+                                setInputSequence(sequence.c_str());
+                                return true;
+                            }
                             break;
-                        case 51: // 3
-                            ch = 35;
+
+                    } // End Switch
+                } // END CTRL
+
+                else if (event.key.keysym.mod & KMOD_ALT)
+                {
+                    switch (event.key.keysym.sym)
+                    {
+                        case SDLK_RETURN:
+                            // If not Full Screen Then Toggle to Next Mode.
+                            if(!fullScreen)
+                            {
+                                // Texture Filtering OFF.
+                                // FullScreen Desktop fits the window to the desktop size,
+                                // This throws off the pixels.  Using the resolution switch
+                                // so that 640, or 1280 is made to full screen fixes this
+                                // properly without needing to do any fancy recalculations
+                                fullScreen = true; // Can be Full Screen or Full Screen Desktop.
+                                SDL_SetWindowFullscreen(TheTerm::Instance()->getWindow(),
+                                    SDL_WINDOW_FULLSCREEN); // _DESKTOP);
+                                fullScreenWindowSize = 0;
+                                TheTerm::Instance()->drawTextureScreen();
+                                return false;
+                            }
+                            else
+                            {
+                                // Set Full Screen Window.
+                                SDL_SetWindowFullscreen(TheTerm::Instance()->getWindow(), 0);
+
+                                //Toggle Between Window Sizes.
+                                switch(fullScreenWindowSize)
+                                {
+                                    // Texture Filtering OFF.
+                                    // These (2) Resolutions work perfect for 8x16 fonts
+                                    // When the screen is resized the pixels are doubled
+                                    // properly without needing to do any fancy recalculations
+                                    // to make Shaded blocks or fonts look better!
+                                    case 0:
+                                        SDL_SetWindowSize(TheTerm::Instance()->getWindow(), 640, 400);
+                                        ++fullScreenWindowSize;
+                                        break;
+
+                                    case 1:
+                                        SDL_SetWindowSize(TheTerm::Instance()->getWindow(), 1280, 800);
+                                        ++fullScreenWindowSize;
+                                        fullScreen = false;
+                                        break;
+                                }
+                                TheTerm::Instance()->drawTextureScreen();
+                                return false;
+                            }
                             break;
-                        case 52: // 4
-                            ch = 36;
-                            break;
-                        case 53: // 5
-                            ch = 37;
-                            break;
-                        case 54: // 6
-                            ch = 94;
-                            break;
-                        case 55: // 7
-                            ch = 38;
-                            break;
-                        case 56: // 8
-                            ch = 42;
-                            break;
-                        case 57: // 9
-                            ch = 40;
-                            break;
+
                         default:
                             break;
-
                     }
-                }
-                //Append the character
-                sequence = ch;
-                setInputSequence(sequence.c_str());
-                return true;
-                //printf("\r\n Input: %c - %i\r\n", ch, ch);
-            }
-            //If the key is a lowercase letter
-            else if((event.key.keysym.sym >= (Uint16)'a') && (event.key.keysym.sym <= (Uint16)'z'))
-            {
-                if(event.key.keysym.mod & KMOD_SHIFT || event.key.keysym.mod & KMOD_CAPS)
-                {
-                    ch = toupper(ch);
-                    sequence = ch;
-                    setInputSequence(sequence.c_str());
-                    return true;
-                    //printf("\r\n Input: KMOD_SHIFT %c - %i\r\n", ch, ch);
-                }
-                else if(event.key.keysym.mod & KMOD_CTRL)
-                {
-                    // Translate Letter to CTRL Letter.
-                    ch = CTRLKEYTABLE[ch-97];
-                    sequence = ch;
-                    //Append the character
-                    setInputSequence(sequence.c_str());
-                    return true;
-                    //printf("\r\n Input: KMOD_CTRL %c - %i\r\n", ch, ch);
-                }
-                else if(event.key.keysym.mod & KMOD_ALT)
-                {
-                    // Nothing Stuff ALT Keys.
-                    //printf("\r\n Input KMOD_ALT: %c - %i\r\n", ch, ch);
-                }
+                } // End ALT
+
+                // Get remaining function keys not handled on TextInput()
+                // Then Translate to ESC Sequences for Telnet.
                 else
                 {
-                    //Append the character
-                    setInputSequence(sequence.c_str());
-                    return true;
-                    //printf("\r\n Input: %c - %i\r\n", ch, ch);
+                    switch(event.key.keysym.sym)
+                    {
+                        case SDLK_ESCAPE:
+                            setInputSequence("\x1b");
+                            return true;
+
+                        // Add Toggle for Hardware Keys ESC0A etc..
+                        case SDLK_UP:
+                            setInputSequence("\x1b[A");
+                            return true;
+                        case SDLK_DOWN:
+                            setInputSequence("\x1b[B");
+                            return true;
+                        case SDLK_RIGHT:
+                            setInputSequence("\x1b[C");
+                            return true;
+                        case SDLK_LEFT:
+                            setInputSequence("\x1b[D");
+                            return true;
+                        case SDLK_RETURN:
+                            setInputSequence("\r");
+                            return true;
+
+                        // Add Swap for BS and DEL (Win vs Nix Terms)
+                        case SDLK_BACKSPACE:
+                            setInputSequence("\x08");
+                            return true;
+                        case SDLK_DELETE:
+                            setInputSequence("\x7f");
+                            return true;
+                        case SDLK_TAB:
+                            setInputSequence("    ");
+                            return true;
+
+                        // Add Swap for Number Sequences for Nix terms.
+                        case SDLK_INSERT:   // insert
+                            setInputSequence("\x1b[@");
+                            return true;
+                        case SDLK_HOME:     // home
+                            setInputSequence("\x1b[H");
+                            return true;
+                        case SDLK_END:      // end
+                            setInputSequence("\x1b[K");
+                            return true;
+                        case SDLK_PAGEUP:   // page up
+                            setInputSequence("\x1b[V");
+                            return true;
+                        case SDLK_PAGEDOWN: // page down
+                            setInputSequence("\x1b[U");
+                            return true;
+
+                        default:
+                            break;
+                    }
                 }
-            }
-        }
-        // If no Keypress check now for Window Events.
-        else if(event.type == SDL_WINDOWEVENT)
-        {
-            switch(event.window.event)
-            {
-                    //
-                    //case SDL_WINDOWEVENT_SHOWN:
-                    //      SDL_Log("Window %d shown", event.window.windowID);
-                    //      break;
-                    //  case SDL_WINDOWEVENT_HIDDEN:
-                    //      SDL_Log("Window %d hidden", event.window.windowID);
-                    //      break;
-                    //  case SDL_WINDOWEVENT_EXPOSED:
-                    //      SDL_Log("Window %d exposed", event.window.windowID);
-                    //      break;
-                    //  case SDL_WINDOWEVENT_MOVED:
-                    //      SDL_Log("Window %d moved to %d,%d",
-                    //              event.window.windowID, event.window.data1,
-                    //              event.window.data2);
-                    //      break;
-                    //
+                break;            
 
-                case SDL_WINDOWEVENT_SHOWN:
-                    SDL_Log("Window %d shown", event.window.windowID);
-                    TheTerm::Instance()->drawTextureScreen();
-                    break;
+            // If no Keypress check now for Window Events.
+            case SDL_WINDOWEVENT:
+                switch(event.window.event)
+                {
+                //
+                //case SDL_WINDOWEVENT_SHOWN:
+                //      SDL_Log("Window %d shown", event.window.windowID);
+                //      break;
+                //  case SDL_WINDOWEVENT_HIDDEN:
+                //      SDL_Log("Window %d hidden", event.window.windowID);
+                //      break;
+                //  case SDL_WINDOWEVENT_EXPOSED:
+                //      SDL_Log("Window %d exposed", event.window.windowID);
+                //      break;
 
-                case SDL_WINDOWEVENT_RESIZED:
-                    SDL_Log("Window %d resized to %dx%d",
-                            event.window.windowID, event.window.data1,
-                            event.window.data2);
+                  case SDL_WINDOWEVENT_MOVED:
+                      SDL_Log("Window %d moved to %d,%d",
+                              event.window.windowID, event.window.data1,
+                              event.window.data2);
+                      TheTerm::Instance()->drawTextureScreen();
+                      break;
 
-                    TheTerm::Instance()->drawTextureScreen();
-                    return false;
 
-                    //case SDL_WINDOWEVENT_MINIMIZED:
-                    //  SDL_Log("Window %d minimized", event.window.windowID);
-                    //  break;
+                    case SDL_WINDOWEVENT_SHOWN:
+                        SDL_Log("Window %d shown", event.window.windowID);
+                        TheTerm::Instance()->drawTextureScreen();
+                        break;
 
-                case SDL_WINDOWEVENT_MAXIMIZED:
-                    SDL_Log("Window %d maximized", event.window.windowID);
-                    TheTerm::Instance()->drawTextureScreen();
-                    return false;
+                    case SDL_WINDOWEVENT_RESIZED:
+                        SDL_Log("Window %d resized to %dx%d",
+                                event.window.windowID, event.window.data1,
+                                event.window.data2);
 
-                case SDL_WINDOWEVENT_RESTORED:
-                    SDL_Log("Window %d restored", event.window.windowID);
-                    TheTerm::Instance()->drawTextureScreen();
-                    return false;
+                        TheTerm::Instance()->drawTextureScreen();
+                        return false;
 
-                case SDL_WINDOWEVENT_CLOSE:
-                    //TheTerm::Instance()->quit();
-                    globalShutdown = true;
-                    SDL_Log("Window %d closed", event.window.windowID);
-                    return false;
+                //  case SDL_WINDOWEVENT_MINIMIZED:
+                //      SDL_Log("Window %d minimized", event.window.windowID);
+                //      break;
 
-                    //  case SDL_WINDOWEVENT_ENTER:
-                    //      SDL_Log("Mouse entered window %d",
-                    //              event.window.windowID);
-                    //      break;
-                    /// case SDL_WINDOWEVENT_LEAVE:
-                    //      SDL_Log("Mouse left window %d", event.window.windowID);
-                    //      break;
-                    //  case SDL_WINDOWEVENT_FOCUS_GAINED:
-                    //      SDL_Log("Window %d gained keyboard focus",
-                    //              event.window.windowID);
-                    //      break;
-                    //  case SDL_WINDOWEVENT_FOCUS_LOST:
-                    //      SDL_Log("Window %d lost keyboard focus",
-                    //              event.window.windowID);
-                    //      break;
-                    //
-                    //  default:
-                    //      SDL_Log("Window %d got unknown event %d",
-                    //              event.window.windowID, event.window.event);
-                    //      break;
-            }
-        }
-    }
-    // No inputs of Events.
+                    case SDL_WINDOWEVENT_MAXIMIZED:
+                        SDL_Log("Window %d maximized", event.window.windowID);
+                        TheTerm::Instance()->drawTextureScreen();
+                        return false;
+
+                    case SDL_WINDOWEVENT_RESTORED:
+                        SDL_Log("Window %d restored", event.window.windowID);
+                        TheTerm::Instance()->drawTextureScreen();
+                        return false;
+
+                    case SDL_WINDOWEVENT_CLOSE:
+                        globalShutdown = true;
+                        SDL_Log("Window %d closed", event.window.windowID);
+                        return false;
+
+                //  case SDL_WINDOWEVENT_ENTER:
+                //      SDL_Log("Mouse entered window %d",
+                //              event.window.windowID);
+                //      break;
+                /// case SDL_WINDOWEVENT_LEAVE:
+                //      SDL_Log("Mouse left window %d", event.window.windowID);
+                //      break;
+                //  case SDL_WINDOWEVENT_FOCUS_GAINED:
+                //      SDL_Log("Window %d gained keyboard focus",
+                //              event.window.windowID);
+                //      break;
+                //  case SDL_WINDOWEVENT_FOCUS_LOST:
+                //      SDL_Log("Window %d lost keyboard focus",
+                //              event.window.windowID);
+                //      break;
+                //
+                //  default:
+                //      SDL_Log("Window %d got unknown event %d",
+                //              event.window.windowID, event.window.event);
+                //      break;
+
+                    default:
+                        break;
+
+                }// End of Switch
+                break;
+        } // End Switch event.type
+    }// End While
     return false;
 }
+            

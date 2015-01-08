@@ -1,7 +1,7 @@
 
 /*
  *  EtherTerm (c) 2014-2015 Michael Griffin <mrmisticismo@hotmail.com>
- *  A full Telnet / SSH emulated terminal in SDL 2.0
+ *  A full Telnet / SSH emulated terminal clinet in SDL 2.0
  *  With with CP437 Character set and ANSI Graphic Support.
  *
  *  Linker Options: -mwindows to remove Console Debug Window.
@@ -134,16 +134,12 @@ int main(int argc, char* argv[])
             {
                 std::cout << "Error Loading Font " << SDL_GetError() << "\n";
                 SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                                         "Closed Session",
-                                         "User has closed the program.",
-                                         NULL);
+                    "Closed Session", "User has closed the program.", NULL);
                 return -1;
             }
             std::cout << "Term init failure 1. " << SDL_GetError() << "\n";
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                                     "Closed Session",
-                                     "User has closed the program.",
-                                     NULL);
+                "Closed Session", "User has closed the program.", NULL);
             return -1;
         }
     }
@@ -151,16 +147,12 @@ int main(int argc, char* argv[])
     {
         std::cout << "Term init failure 2. " << SDL_GetError() << "\n";
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                                 "Closed Session",
-                                 "User has closed the program.",
-                                 NULL);
+            "Closed Session", "User has closed the program.", NULL);
         return -1;
     }
     std::cout << "Term closing...\n";
     TheTerm::Instance()->clean();
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                             "Closed Session",
-                             "User has closed the program.",
-                             NULL);
+        "Closed Session", "User has closed the program.", NULL);
     return 0;
 }

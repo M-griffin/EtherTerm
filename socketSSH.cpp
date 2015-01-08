@@ -76,49 +76,10 @@ int SSH_Socket::pollSocket()
     if(sshChannel && ssh_channel_is_open(sshChannel) && ssh_channel_poll(sshChannel,0) > 0)
     {
         numready = 1;
-        /* // Move to Socket Handler 1 spot for both connections!
-        ttime = SDL_GetTicks();
-        startBlinking = false;
-        cursorBlink = 0;
-        */
     }
     else
     {
         numready = 0;
-        /*
-        startBlinking = true;
-        //std::cout << "numready = 0;" << std::endl;
-        // Setup Timer for Blinking Cursor
-        // Initial State = On, then Switch to off in next loop.
-        if(cursorBlink % 2 == 0)
-        {
-            ttime2 = SDL_GetTicks();
-            //std::cout << "cursorBlink % 2 " << std::endl;
-
-            //printf("\r\n 2 time diff: %i \r\n ",ttime2 - ttime);
-            if(startBlinking && (ttime2 - ttime) > 400)
-            {
-                //std::cout << "renderCursorOffScreen = 0;" << std::endl;
-                TheTerm::Instance()->renderCursorOffScreen(TheAnsiParser::Instance()->x_position-1, TheAnsiParser::Instance()->y_position-1);
-                TheTerm::Instance()->drawTextureScreen();
-                --cursorBlink;
-                ttime = SDL_GetTicks();
-            }
-        }
-        else
-        {
-            //std::cout << "ELSE !cursorBlink % 2 " << std::endl;
-            ttime2 = SDL_GetTicks();
-            //printf("\r\n 1 time diff: %i \r\n ",ttime2 - ttime);
-            if(startBlinking && (ttime2 - ttime) > 400)
-            {
-                //std::cout << "renderCursorOnScreen" << std::endl;
-                TheTerm::Instance()->renderCursorOnScreen(TheAnsiParser::Instance()->x_position-1, TheAnsiParser::Instance()->y_position-1);
-                TheTerm::Instance()->drawTextureScreen();
-                ++cursorBlink;
-                ttime = SDL_GetTicks();
-            }
-        } */
     }
     if(ssh_channel_poll(sshChannel,0) < 0)
         TheSocketHandler::Instance()->setActive(false);
@@ -135,9 +96,7 @@ bool SSH_Socket::onEnter()
     if(session == NULL)
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                                 "Closed Session",
-                                 "User has closed the program.",
-                                 NULL);
+            "Closed Session", "User has closed the program.", NULL);
         onExit();
         return false;
     }
@@ -164,11 +123,9 @@ bool SSH_Socket::onEnter()
     if(rc != SSH_OK)
     {
         fprintf(stderr, "\r\n SSH Error connecting to %s: %s \r\n",
-                host.c_str(), ssh_get_error(session));
+            host.c_str(), ssh_get_error(session));
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                                 "Closed Session",
-                                 "User has closed the program.",
-                                 NULL);
+            "Closed Session", "User has closed the program.", NULL);
         onExit();
         return false;
     }
@@ -177,12 +134,12 @@ bool SSH_Socket::onEnter()
     rc = verify_knownhost();
     if(rc < 0)
     {
-        fprintf(stderr, "\r\n SSH Error, Can't Validate Host Server to %s: %s - %i \r\n",
+        fprintf(stderr,
+                "\r\nCan't Validate Host Server to %s: %s - %i \r\n",
                 host.c_str(), ssh_get_error(session), rc);
+
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                                 "Closed Session",
-                                 "User has closed the program.",
-                                 NULL);
+            "Closed Session", "User has closed the program.", NULL);
         onExit();
         return false;
     }
@@ -201,8 +158,9 @@ bool SSH_Socket::onEnter()
     sshChannel = ssh_channel_new(session);
     if(sshChannel == NULL)
     {
-        printf("\r\n SSH Error, Setup Channel for Socket Communications %s: %s - %i \r\n",
-               host.c_str(), ssh_get_error(session), rc);
+        printf(
+            "\r\nSetup Channel for Socket Communications %s: %s - %i \r\n",
+            host.c_str(), ssh_get_error(session), rc);
         onExit();
         return false;
     }
@@ -211,8 +169,9 @@ bool SSH_Socket::onEnter()
     rc = ssh_channel_open_session(sshChannel);
     if(rc != SSH_OK)
     {
-        printf("\r\n SSH Error, Open Channel for Socket Communications %s: %s - %i \r\n",
-               host.c_str(), ssh_get_error(session), rc);
+        printf(
+            "\r\nOpen Channel for Socket Communications %s: %s - %i \r\n",
+            host.c_str(), ssh_get_error(session), rc);
         ssh_channel_free(sshChannel);
         onExit();
         return false;
@@ -235,8 +194,9 @@ bool SSH_Socket::onEnter()
     // Only After the Shell has been initalized.
     if(ssh_channel_request_pty_size(sshChannel,"ansi",80,25))
     {
-        printf("\r\n SSH Error, Request for PTY term and size failed. %s: %s - %i \r\n",
-               host.c_str(), ssh_get_error(session), rc);
+        printf(
+            "\r\nRequest for PTY term and size failed. %s: %s - %i \r\n",
+            host.c_str(), ssh_get_error(session), rc);
 
         // Not an error to exit the program on.
         //return 0;
@@ -245,21 +205,12 @@ bool SSH_Socket::onEnter()
     // Now reqeust a shell with the pty to get read/write
     if(ssh_channel_request_shell(sshChannel))
     {
-        printf("\r\n SSH Error, Request for shell on channel failed. %s: %s - %i \r\n",
-               host.c_str(), ssh_get_error(session), rc);
+        printf(
+            "\r\nRequest for shell on channel failed. %s: %s - %i \r\n",
+            host.c_str(), ssh_get_error(session), rc);
         onExit();
         return false;
     }
-
-    // Set the term and pty size of the terminal.
-    //if(ssh_channel_request_env(sshChannel,"LANG","en.us_CP437"))
-    //{
-    //    printf(" *** Requesting request_env : %s\n",ssh_get_error(session));
-    //return 0;
-    //}
-
-    // Send echo commands for CP437
-    //sendSocket((unsigned char *)"\033[%@\033(U",7);
     return true;
 }
 
@@ -335,7 +286,6 @@ int SSH_Socket::verify_knownhost()
     size_t state, hlen;
     unsigned char *hash = NULL;
     char *hexa;
-    //char buf[10]={0};
 
     state = ssh_is_server_known(session);
     ssh_key srv_pubkey;
@@ -346,8 +296,7 @@ int SSH_Socket::verify_knownhost()
     {
         return -1;
     }
-
-    //hlen = ssh_get_pubkey_hash(session, &hash);
+   
     rc = ssh_get_publickey_hash(srv_pubkey, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen);
     ssh_key_free(srv_pubkey);
     if(rc < 0)
@@ -483,7 +432,7 @@ int SSH_Socket::authenticate_console()
     rc = ssh_userauth_none(session, NULL);
     switch(rc)
     {
-        case SSH_AUTH_ERROR:   //some serious error happened during authentication
+        case SSH_AUTH_ERROR:   //some error happened during authentication
             printf("\r\n ssh_userauth_none SSH_AUTH_ERROR! \r\n");
             error();
             return rc;
@@ -493,7 +442,9 @@ int SSH_Socket::authenticate_console()
         case SSH_AUTH_SUCCESS: //you are now authenticated
             printf("\r\n ssh_userauth_none SSH_AUTH_SUCCESS! \r\n");
             break;
-        case SSH_AUTH_PARTIAL: //some key matched but you still have to provide an other mean of authentication (like a password).
+        case SSH_AUTH_PARTIAL:
+            //some key matched but you still have
+            //to provide an other mean of authentication (like a password).
             printf("\r\n ssh_userauth_none SSH_AUTH_PARTIAL! \r\n");
             break;
     }
@@ -518,7 +469,9 @@ int SSH_Socket::authenticate_console()
                 case SSH_AUTH_SUCCESS: //you are now authenticated
                     printf("\r\n SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_SUCCESS! \r\n");
                     break;
-                case SSH_AUTH_PARTIAL: //some key matched but you still have to provide an other mean of authentication (like a password).
+                case SSH_AUTH_PARTIAL:
+                    // some key matched but you still have
+                    // to provide an other mean of authentication (like a password).
                     printf("\r\n SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_PARTIAL! \r\n");
                     break;
             }

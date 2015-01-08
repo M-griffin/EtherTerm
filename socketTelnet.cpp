@@ -82,47 +82,10 @@ int SDL_Socket::pollSocket()
     if(numready && SDLNet_SocketReady(sock) == TRUE)
     {
         numready = 1;
-        /* // Move to Socket Handler, 1 place both all sockets.
-        ttime = SDL_GetTicks();
-        startBlinking = false;
-        cursorBlink = 0;
-        */
     }
     else
     {
         numready = 0;
-        /*
-        startBlinking = true;
-        // Setup Timer for Blinking Cursor
-        // Initial State = On, then Switch to off in next loop.
-        if(cursorBlink % 2 == 0)
-        {
-            ttime2 = SDL_GetTicks();
-            //std::cout << "cursorBlink % 2 " << std::endl;
-            //printf("\r\n 2 time diff: %i \r\n ",ttime2 - ttime);
-            if(startBlinking && (ttime2 - ttime) > 400)
-            {
-                //std::cout << "renderCursorOffScreen = 0;" << std::endl;
-                TheTerm::Instance()->renderCursorOffScreen(TheAnsiParser::Instance()->x_position-1, TheAnsiParser::Instance()->y_position-1);
-                TheTerm::Instance()->drawTextureScreen();
-                --cursorBlink;
-                ttime = SDL_GetTicks();
-            }
-        }
-        else
-        {
-            //std::cout << "ELSE !cursorBlink % 2 " << std::endl;
-            ttime2 = SDL_GetTicks();
-            //printf("\r\n 1 time diff: %i \r\n ",ttime2 - ttime);
-            if(startBlinking && (ttime2 - ttime) > 400)
-            {
-                //std::cout << "renderCursorOnScreen" << std::endl;
-                TheTerm::Instance()->renderCursorOnScreen(TheAnsiParser::Instance()->x_position-1, TheAnsiParser::Instance()->y_position-1);
-                TheTerm::Instance()->drawTextureScreen();
-                ++cursorBlink;
-                ttime = SDL_GetTicks();
-            }
-        }*/
     }
     return numready;
 }
