@@ -89,6 +89,9 @@ AnsiParser::AnsiParser() :
     cleared_the_screen(false)
 { }
 
+AnsiParser::~AnsiParser()
+{ std::cout << "AnsiParser Released" << std::endl; }
+
 /*
  * Reset AnsiParser Sepcific Class Attributes
  */

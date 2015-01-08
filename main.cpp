@@ -16,7 +16,11 @@
 #include "socketState.h"
 #include "telnetState.h"
 #include "terminal.h"
+// Needed for Clean Shutdown
 #include "ansiParser.h"
+#include "sequenceParser.h"
+#include "inputHandler.h"
+#include "socketHandler.h"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -86,10 +90,32 @@ void readinAnsi(std::string FileName, std::string &buff)
 }
 
 /*
+ * Shutdown Procedures
+ */
+void cleanup()
+{
+    // Clearnup Surfaces and Textures
+    TheTerm::Instance()->clean();
+
+    //Release Instances
+    TheAnsiParser::ReleaseInstance();
+    TheSequenceParser::ReleaseInstance();
+    TheSocketHandler::ReleaseInstance();
+    TheInputHandler::ReleaseInstance();
+    TheTerm::ReleaseInstance();
+    std::cout << "Shutdown complete." << std::endl;
+    // Pause to check for messages
+    //char ch;
+    //std::cin.get(ch);
+}
+/*
  *  Main Program Entrance
  */
 int main(int argc, char* argv[])
 {
+    // Run cleanup on exit of program
+    atexit(cleanup);
+
     // Initalize Renderer and Window with default sizes.
     // We define 680 instead of 640 becasue we clip the extract off
     // in Screen->Texure.  We do this becasue when Texture filtering is used
@@ -107,7 +133,7 @@ int main(int argc, char* argv[])
                 std::cout << "Term init success!\n";
                 // Display intro ANSI Screen
                 TheTerm::Instance()->clearScreenSurface();
-                AnsiParser::Instance()->reset();
+                TheAnsiParser::Instance()->reset();
 
                 while(TheTerm::Instance()->running())
                 {
@@ -128,7 +154,7 @@ int main(int argc, char* argv[])
                     {
                         TheTerm::Instance()->render();
                     }
-                }
+                }                
             }
             else
             {
@@ -137,22 +163,25 @@ int main(int argc, char* argv[])
                     "Closed Session", "User has closed the program.", NULL);
                 return -1;
             }
-            std::cout << "Term init failure 1. " << SDL_GetError() << "\n";
+        }
+        else
+        {
+            std::cout << "Term init failure 2. " << SDL_GetError() << "\n";
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                "Closed Session", "User has closed the program.", NULL);
-            return -1;
+                "Closed Session", "Terminal Error on Init 2.", NULL);
+        return -1;
         }
     }
     else
     {
-        std::cout << "Term init failure 2. " << SDL_GetError() << "\n";
+        std::cout << "Term init failure 1. " << SDL_GetError() << "\n";
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-            "Closed Session", "User has closed the program.", NULL);
+            "Closed Session", "Terminal Error on Init 1.", NULL);
         return -1;
     }
-    std::cout << "Term closing...\n";
-    TheTerm::Instance()->clean();
+    
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
         "Closed Session", "User has closed the program.", NULL);
+
     return 0;
 }

@@ -51,7 +51,6 @@ public:
 
     void render();
     void update();
-    void handleEvents();
     void clean();
 
     SDL_Renderer* getRenderer() const
@@ -152,10 +151,10 @@ public:
     }
 
     // Now for Rendering Code
+    void freeSurfaceTextures();
     bool loadBitmapImageFromPak();
     bool loadBitmapImage(std::string path);
     bool initSurfaceTextures();
-    void close();
     void setScrollRegion(int top, int bot);
     void scrollRegionUp();
     void scrollScreenUp();

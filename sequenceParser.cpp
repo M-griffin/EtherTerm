@@ -46,7 +46,7 @@ SequenceParser::SequenceParser() :
 SequenceParser::~SequenceParser()
 {
     std::vector<int>().swap(params); // Clear
-    std::cout << "SequencePasser Destructor" << std::endl;
+    std::cout << "SequenceParser Released" << std::endl;
 }
 
 /*

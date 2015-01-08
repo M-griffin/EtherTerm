@@ -23,6 +23,7 @@ InputHandler::InputHandler() :
 InputHandler::~InputHandler()
 {
     SDL_StopTextInput();
+    std::cout << "InputHandler Released" << std::endl;
 }
 
 bool InputHandler::update()
@@ -188,7 +189,6 @@ bool InputHandler::update()
                             {
                                 // Set Full Screen Window.
                                 SDL_SetWindowFullscreen(TheTerm::Instance()->getWindow(), 0);
-
                                 //Toggle Between Window Sizes.
                                 switch(fullScreenWindowSize)
                                 {
@@ -294,13 +294,12 @@ bool InputHandler::update()
                 //      SDL_Log("Window %d exposed", event.window.windowID);
                 //      break;
 
-                  case SDL_WINDOWEVENT_MOVED:
-                      SDL_Log("Window %d moved to %d,%d",
-                              event.window.windowID, event.window.data1,
-                              event.window.data2);
-                      TheTerm::Instance()->drawTextureScreen();
-                      break;
-
+                    case SDL_WINDOWEVENT_MOVED:
+                        SDL_Log("Window %d moved to %d,%d",
+                            event.window.windowID, event.window.data1,
+                            event.window.data2);
+                        TheTerm::Instance()->drawTextureScreen();
+                        break;
 
                     case SDL_WINDOWEVENT_SHOWN:
                         SDL_Log("Window %d shown", event.window.windowID);
@@ -311,9 +310,8 @@ bool InputHandler::update()
                         SDL_Log("Window %d resized to %dx%d",
                                 event.window.windowID, event.window.data1,
                                 event.window.data2);
-
                         TheTerm::Instance()->drawTextureScreen();
-                        return false;
+                        break;
 
                 //  case SDL_WINDOWEVENT_MINIMIZED:
                 //      SDL_Log("Window %d minimized", event.window.windowID);
@@ -322,17 +320,17 @@ bool InputHandler::update()
                     case SDL_WINDOWEVENT_MAXIMIZED:
                         SDL_Log("Window %d maximized", event.window.windowID);
                         TheTerm::Instance()->drawTextureScreen();
-                        return false;
+                        break;
 
                     case SDL_WINDOWEVENT_RESTORED:
                         SDL_Log("Window %d restored", event.window.windowID);
                         TheTerm::Instance()->drawTextureScreen();
-                        return false;
+                        break;
 
                     case SDL_WINDOWEVENT_CLOSE:
                         globalShutdown = true;
                         SDL_Log("Window %d closed", event.window.windowID);
-                        return false;
+                        break;
 
                 //  case SDL_WINDOWEVENT_ENTER:
                 //      SDL_Log("Mouse entered window %d",

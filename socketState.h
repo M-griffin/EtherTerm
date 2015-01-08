@@ -34,7 +34,8 @@ class SocketState
 {
 public:
 
-    virtual ~SocketState() {}
+    virtual ~SocketState()
+        { std::cout << "Shutting Down SocketState" << std::endl; }
     virtual int sendSocket(unsigned char *message, Uint32 len) = 0;
     virtual int recvSocket(char *message)= 0;
     virtual int pollSocket() = 0;
@@ -55,7 +56,8 @@ public:
         port = _port;
     }
 
-    virtual ~SDL_Socket() { }
+    virtual ~SDL_Socket()
+         { std::cout << "Shutting Down SDL_SocketState" << std::endl; }
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
     virtual int pollSocket();
@@ -86,7 +88,8 @@ public:
         password = _pass;
     }
 
-    virtual  ~SSH_Socket() {}
+    virtual  ~SSH_Socket()
+        { std::cout << "Shutting Down SSH_SocketState" << std::endl; }
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
     virtual int pollSocket();

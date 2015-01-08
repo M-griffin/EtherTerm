@@ -52,7 +52,8 @@ class MainMenuState : public MenuState, MainMenuState_INI
 {
 public:
 
-    virtual ~MainMenuState() {}
+    virtual ~MainMenuState()
+        { std::cout << "Shutting Down MainMenuState" << std::endl;}
     virtual void update();
     virtual void render();
     virtual bool onEnter();

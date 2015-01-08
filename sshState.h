@@ -31,7 +31,8 @@ class SSHState : public MenuState
 {
 public:
 
-    virtual ~SSHState() {}
+    virtual ~SSHState()
+        { std::cout << "Shutting Down SSHState" << std::endl; }
     virtual void update();
     virtual void render();
     virtual bool onEnter();

@@ -17,7 +17,7 @@ SocketHandler::SocketHandler() : active(false)
 { }
 
 SocketHandler::~SocketHandler()
-{ }
+{ std::cout << "SocketHandler Released" << std::endl; }
 
 
 int SocketHandler::send(unsigned char *buf, Uint32 len)

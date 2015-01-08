@@ -7,6 +7,7 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
+#include <iostream>
 #include <vector>
 #include "termState.h"
 
@@ -15,7 +16,7 @@ class TermStateMachine
 public:
 
     TermStateMachine() {}
-    ~TermStateMachine() {}
+    ~TermStateMachine() { std::cout << "TermStateMachine Released" << std::endl; }
     void update();
     void render();
     void pushState(TermState* theState);
