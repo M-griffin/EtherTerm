@@ -260,7 +260,6 @@ void Terminal::freeSurfaceTextures()
         std::cout << "Destroy SDL Renderer" << std::endl;
         SDL_DestroyRenderer(globalRenderer);
     }
-
     if (chachedSurface)
     {
         std::cout << "SDL_FreeSurface chachedSurface" << std::endl;
@@ -480,7 +479,7 @@ bool Terminal::initSurfaceTextures()
 
     // Fill the Surface with Black to initalize it.
     SDL_FillRect(bottomSurface, NULL,
-                 SDL_MapRGB(bottomSurface->format, 0, 0, 0));
+        SDL_MapRGB(bottomSurface->format, 0, 0, 0));
 
     // start the menu state
     globalTermStateMachine = new TermStateMachine();
@@ -534,27 +533,28 @@ void Terminal::scrollRegionUp()
 
     // Move the Entire Screen Up a 1 Row of Characters.
     memmove(pixelTopPos, pixelNewPos,
-            (screenSurface->w *
-             (characterHeight * (bottomMargin - topMargin))) * bpp);
+        (screenSurface->w *
+        (characterHeight * (bottomMargin - topMargin))) * bpp);
 
     if(SDL_MUSTLOCK(screenSurface))
         SDL_UnlockSurface(screenSurface);
 
     // Clear out very last line
     SDL_FillRect(screenSurface, &area,
-                 SDL_MapRGB(screenSurface->format, 0, 0, 0));
+        SDL_MapRGB(screenSurface->format, 0, 0, 0));
 
     // If first Time, Crete Texture.
     if(!globalTexture)
     {
-        globalTexture = SDL_CreateTexture(globalRenderer,
-                                          SDL_PIXELFORMAT_ARGB8888,
-                                          SDL_TEXTUREACCESS_STREAMING,
-                                          screenSurface->w, screenSurface->h);
+        globalTexture =
+            SDL_CreateTexture(globalRenderer,
+                SDL_PIXELFORMAT_ARGB8888,
+                SDL_TEXTUREACCESS_STREAMING,
+                screenSurface->w, screenSurface->h);
         SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
     }
     SDL_UpdateTexture(globalTexture, NULL,
-                      screenSurface->pixels, screenSurface->pitch);
+        screenSurface->pixels, screenSurface->pitch);
 }
 
 
@@ -595,14 +595,14 @@ void Terminal::scrollScreenUp()
     {
         globalTexture =
             SDL_CreateTexture(globalRenderer,
-                              SDL_PIXELFORMAT_ARGB8888,
-                              SDL_TEXTUREACCESS_STREAMING,
-                              screenSurface->w, screenSurface->h);
+                SDL_PIXELFORMAT_ARGB8888,
+                SDL_TEXTUREACCESS_STREAMING,
+                screenSurface->w, screenSurface->h);
         SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
     }
     // Write Scrolled screen to Texture.
     SDL_UpdateTexture(globalTexture, NULL,
-                      screenSurface->pixels, screenSurface->pitch);
+        screenSurface->pixels, screenSurface->pitch);
 }
 
 /**
@@ -619,12 +619,12 @@ void Terminal::clearScreenSurface()
         std::cout << "ClearScreenSurface() - globalTexture" << std::endl;
         globalTexture =
             SDL_CreateTexture(globalRenderer,
-                              SDL_PIXELFORMAT_ARGB8888,
-                              SDL_TEXTUREACCESS_STREAMING,
-                              screenSurface->w, screenSurface->h);
+                SDL_PIXELFORMAT_ARGB8888,
+                SDL_TEXTUREACCESS_STREAMING,
+                screenSurface->w, screenSurface->h);
     }
     SDL_UpdateTexture(globalTexture, NULL,
-                      screenSurface->pixels, screenSurface->pitch);
+        screenSurface->pixels, screenSurface->pitch);
     SDL_RenderClear(globalRenderer);
 }
 
@@ -648,10 +648,10 @@ void Terminal::renderClearLineScreen(int y, int start, int end)
 }
 
 /**
- * Bascially Plots each Char to Texture
- * Updates super fast now!! oh yea!!
- * So were only writting the currnet lines to the scrren
- * And now redrawing the entire screen or since char at a time.
+ * Bascially Plots each Char to a Texture
+ * Updates super fast now!!
+ * So were only writting the to the bottom line of the screen only
+ * And not redrawing the entire screen each time
  */
 void Terminal::renderBottomScreen()
 {
@@ -660,8 +660,8 @@ void Terminal::renderBottomScreen()
 
     if(!bottomSurface)
     {
-        std::cout << "bottomSurface - CreateRGBSurface failed: "
-                  << SDL_GetError() << std::endl;
+        std::cout << "bottomSurface - CreateRGBSurface failed: " <<
+            SDL_GetError() << std::endl;
     }
 
     pick.w = screenSurface->w;
@@ -688,13 +688,13 @@ void Terminal::renderBottomScreen()
         std::cout << "RenderBottomScreen() - globalTexture" << std::endl;
         globalTexture =
             SDL_CreateTexture(globalRenderer,
-                              SDL_PIXELFORMAT_ARGB8888,
-                              SDL_TEXTUREACCESS_STREAMING,
-                              screenSurface->w, screenSurface->h);
+                SDL_PIXELFORMAT_ARGB8888,
+                SDL_TEXTUREACCESS_STREAMING,
+                screenSurface->w, screenSurface->h);
         SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
     }
     SDL_UpdateTexture(globalTexture, &rect,
-                      bottomSurface->pixels, bottomSurface->pitch);
+        bottomSurface->pixels, bottomSurface->pitch);
 }
 
 /**
@@ -714,13 +714,13 @@ void Terminal::renderScreen()
         std::cout << "RenderScreen() - Creating globalTexture" << std::endl;
         globalTexture =
             SDL_CreateTexture(globalRenderer,
-                              SDL_PIXELFORMAT_ARGB8888,
-                              SDL_TEXTUREACCESS_STREAMING,
-                              screenSurface->w, screenSurface->h);
+                SDL_PIXELFORMAT_ARGB8888,
+                SDL_TEXTUREACCESS_STREAMING,
+                screenSurface->w, screenSurface->h);
         SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
     }
     SDL_UpdateTexture(globalTexture, &pick,
-                      screenSurface->pixels, screenSurface->pitch);
+        screenSurface->pixels, screenSurface->pitch);
 }
 
 /**
@@ -731,7 +731,6 @@ void Terminal::renderCharScreen(int x, int y)
 {
     SDL_Rect rect;
 
-    // Size of Each Char 8x16
     rect.w = tmpSurface->w;
     rect.h = tmpSurface->h;
     rect.x = x * characterWidth;
@@ -742,13 +741,13 @@ void Terminal::renderCharScreen(int x, int y)
         std::cout << "RenderCharScreen() - globalTexture" << std::endl;
         globalTexture =
             SDL_CreateTexture(globalRenderer,
-                              SDL_PIXELFORMAT_ARGB8888,
-                              SDL_TEXTUREACCESS_STREAMING,
-                              screenSurface->w, screenSurface->h);
+                SDL_PIXELFORMAT_ARGB8888,
+                SDL_TEXTUREACCESS_STREAMING,
+                screenSurface->w, screenSurface->h);
         SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
     }
     SDL_UpdateTexture(globalTexture, &rect,
-                      screenSurface->pixels, screenSurface->pitch);
+        screenSurface->pixels, screenSurface->pitch);
 }
 
 /**
@@ -761,7 +760,7 @@ void Terminal::renderCursorOnScreen()
 
     // Check if the position has changed, if so, then skip!
     if(cursorXPosition != TheAnsiParser::Instance()->x_position-1 ||
-            cursorYPosition != TheAnsiParser::Instance()->y_position-1)
+        cursorYPosition != TheAnsiParser::Instance()->y_position-1)
     {
         return;
     }
@@ -777,13 +776,13 @@ void Terminal::renderCursorOnScreen()
         std::cout << "RenderCursorOnScreen() - globalTexture" << std::endl;
         globalTexture =
             SDL_CreateTexture(globalRenderer,
-                              SDL_PIXELFORMAT_ARGB8888,
-                              SDL_TEXTUREACCESS_STREAMING,
-                              screenSurface->w, screenSurface->h);
+                SDL_PIXELFORMAT_ARGB8888,
+                SDL_TEXTUREACCESS_STREAMING,
+                screenSurface->w, screenSurface->h);
         SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
     }
     SDL_UpdateTexture(globalTexture, &rect,
-                      cursorOnSurface->pixels, cursorOnSurface->pitch);
+        cursorOnSurface->pixels, cursorOnSurface->pitch);
 }
 
 /**
@@ -796,7 +795,7 @@ void Terminal::renderCursorOffScreen()
 
     // Check if the position has changed, if so, then skip!
     if(cursorXPosition != TheAnsiParser::Instance()->x_position-1 ||
-            cursorYPosition != TheAnsiParser::Instance()->y_position-1)
+        cursorYPosition != TheAnsiParser::Instance()->y_position-1)
     {
         return;
     }
@@ -812,13 +811,13 @@ void Terminal::renderCursorOffScreen()
         std::cout << "RenderCursorOffScreen() - globalTexture" << std::endl;
         globalTexture =
             SDL_CreateTexture(globalRenderer,
-                              SDL_PIXELFORMAT_ARGB8888,
-                              SDL_TEXTUREACCESS_STREAMING,
-                              screenSurface->w, screenSurface->h);
+                SDL_PIXELFORMAT_ARGB8888,
+                SDL_TEXTUREACCESS_STREAMING,
+                screenSurface->w, screenSurface->h);
         SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
     }
     SDL_UpdateTexture(globalTexture, &rect,
-                      cursorOffSurface->pixels, cursorOffSurface->pitch);
+        cursorOffSurface->pixels, cursorOffSurface->pitch);
 }
 
 /**
@@ -1017,10 +1016,10 @@ void Terminal::drawChar(int X, int Y, int asciicode)
     SDL_BlitSurface(chachedSurface,&pick,tmpSurface,NULL);
 
     replaceColor(tmpSurface,
-                 SDL_MapRGB(tmpSurface->format, currentFGColor.r,
-                            currentFGColor.g, currentFGColor.b),
-                 SDL_MapRGB(tmpSurface->format, currentBGColor.r,
-                            currentBGColor.g, currentBGColor.b));
+        SDL_MapRGB(tmpSurface->format, currentFGColor.r,
+            currentFGColor.g, currentFGColor.b),
+        SDL_MapRGB(tmpSurface->format, currentBGColor.r,
+            currentBGColor.g, currentBGColor.b));
 
     // Write to Back Buffer for Scrolling the Screen.
     SDL_BlitSurface(tmpSurface,NULL,screenSurface,&area);

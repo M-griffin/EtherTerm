@@ -76,8 +76,8 @@ private:
     // Class Types for use
     LinkList      _linkList;
     MenuFunction  _menuFunction;
-    MenuRec      *_menuRecord;
-    CommandRec   *_commandRecord;
+    MenuRecord      *_menuRecord;
+    CommandRecord   *_commandRecord;
 
     int  numberOfCommands; // Number of Commands in Loaded Menu
     int  systemActive;     // System Exit

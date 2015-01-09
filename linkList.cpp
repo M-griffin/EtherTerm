@@ -120,5 +120,5 @@ void LinkList::drawVectorList(unsigned long page, unsigned long list)
     // Write out Box.
     sprintf(capture, "\x1b[%i;%iH", currentRow+topMargin-1, 1);
     stringBuilder += capture;
-    MenuFunction::pipe2ansi((char *)stringBuilder.c_str());
+    MenuFunction::sequenceToAnsi((char *)stringBuilder.c_str());
 }

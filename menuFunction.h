@@ -9,48 +9,39 @@
 
 #include <string>
 
-typedef struct MenuRec
+typedef struct MenuRecord
 {
     std::string MenuName;     // menu name
     std::string Directive;    // normal menu text file
     std::string MenuPrompt;   // menu prompt
-    std::string Acs;          // access requirements
-    std::string Password;     // password required
+    bool        Lightbar;     // Lightbar Menu?
 
-    uint16_t  ForceInput;     // 0 user defaults, 1 Hotkeys 1 ENTER
-    uint16_t  ForceHelpLevel; // 0 user defaults, 1 force display, 0 force expert
-    bool      Lightbar;       // Lightbar Menu?
+} MenuRecord;
 
-} MenuRec;
-
-typedef struct CommandRec
+typedef struct CommandRecord
 {
     std::string  LDesc;       // command description
     std::string  SDesc;       // command string
     std::string  CKeys;       // command execution keys
-    std::string  Acs;         // access requirements
     std::string  CmdKeys;     // command keys
     std::string  MString;     // command data
-    bool         SText;       // Is this a Scroll Test Comamnd
-    uint16_t     STLen;       // Length of Scroll Text
     bool         LBarCmd;     // Is This a Lighbar Cmd
     std::string  HiString;    // Highlighed
     std::string  LoString;    // Unhighlighted
     uint16_t     Xcoord;      // Lightbar X coord
     uint16_t     Ycoord;      // Lightbar Y coord
 
-} CommandRec;
+} CommandRecord;
 
 
 class MenuFunction
 {
-
 protected:
-    MenuRec    *menur2;
-    CommandRec *cmdr2;
 
-    int  noc;           // Number of Commands in Loaded Menu
-    int  System_Alive;  // System Exit
+    MenuRecord     *menuRecord;
+    CommandRecord  *commandRecord;
+    int  numCommands;     // Number of Commands in Loaded Menu
+    bool isSystemActive;  // System Exit
 
 public:
 
@@ -61,87 +52,77 @@ public:
     std::string _gosub;    // GoSub Menu.
 
     // Menu Lightbar Variables
-    short xx;        // Holds X Coord
-    short yy;        // Holds Y Coord
-    short iNoc;      // Holds Lightbar # of choices
-    short sNoc;      // Holds Scroll Text # of choices
-    short choice;    // Holds Currect Lightbar #
+    short xPosition;               // Holds X Coord
+    short yPosition;               // Holds Y Coord
+    short numLightbarCommand;      // Holds Lightbar # of choices
+    short choice;                  // Holds Currect Lightbar #
 
-    short  *execnum;
-    short  *execnum2;
-    short  *execnum3;
+    short  *commandIndex;
+    short  *commandIndexLightbar;
 
     unsigned long cntEscCmds;
 
-    int c, cc;
-    bool  EscHit;   // Is Input key Escaped char, or Normal Key
-    char  outBuff[1024];      // Holds Formatted Lightbar Data
-    std::string output;       // Buffer for writing all lightbars at the same time
-    short sRand;        // Randmise Text Scrollies
-    pthread_t ahThread;
-    bool      tScroll;
-    int       executed;       // Test's for hot keys commands excuted, if non pass through loop
-    // This is so scrolling isn't killed with invalid menu input!
-    int exe;
+    int  sequence, secondSequence;
+    bool isEscapeSequence;       // Is Input key Escaped char, or Normal Key
+    char outBuff[1024];          // Holds Formatted Lightbar Data
+    std::string output;          // Buffer for writing all lightbars at the same time
 
-    uint32_t CURRENT_AREA;    // Lightbar Starting Position for Interfaces.
+    int commandsExecuted;        // Test's for hot keys commands excuted, if non pass through loop
+    int firstCommandsExecuted;   // If we executed all FIRSTCMD and nothing is left then return
+
+    int currentSystem;           // Lightbar Starting Position for Interfaces.
     // This needs access from ie Title Scan Class.
 
     MenuFunction();
     ~MenuFunction();
 
     // Below here are Menu Processing Functions
-    bool _loadnew;
+    bool isLoadNewMenu;
 
-    // New Menu Text File Parsing
-    void chkparse(std::string &temp);
+    void dataParseHelper(std::string &temp);
+    // Command Data Functions
 
-    int  mnuparse(std::string cfgdata);
-    int  menu_read(std::string MenuName);
+    void commandsParse(std::string cfgdata, int idx);
+    int  commandsExist(std::string MenuName, int idx);
+    int  commandsCount(std::string MenuName);
+    int  commandsReadData(std::string MenuName, int idx);
 
-    void cmdparse(std::string cfgdata, int idx);
-    int  cmdexist(std::string MenuName, int idx);
-    int  cnt_cmds(std::string MenuName);
-    int  cmds_read(std::string MenuName, int idx);
-
+    // Menu Data Functions
+    int  menuParseData(std::string cfgdata);
+    int  menuReadData(std::string MenuName);
 
     // Read in / Load Menu and Commands
-    void insert_cmdr();
-    void menu_reset();
-    int  menu_exists();
-    void menu_readin();
-    void menu_cmds(char *inPut);
+    void menuReadCommands();
+    void menuReload();
+    int  menuExists();
+    void menuStart();
+    void menuClearObjects();
 
-    void menu_clear();
-
-    void display_menu(bool forcelevel= false);
-    void menu_bars(char *inPut);
-    void menu_proc(char *mString, uint32_t area=0);
+    void menuLightBars(char *inPut);
+    void menuProcess(char *mString, uint32_t area=0);
 
     // Menu Command Processing
-    void menu_docmd(CommandRec *cmdr);
+    void menuDoCommands(CommandRecord *cmdr);
 
     // Menu System IO
     // ----------------------------------------------------------------------
-    // reset global variables when making new conenctions or changeing states.
-
     static void rightSpacing(char *str, int space);
     static void leftSpacing(char *str, int space);
-    static void mask(char *str);
-    static void inputfield(char *text, int &len);
+    static void maskInput(char *str);
+    static void inputField(char *text, int &len);
 
 
-    static int  getkey();
-    static void getline(char *line,        // Returns Input into Line
+    static int  getKey();
+    static void getLine(char *line, // Returns Input into Line
                  int   length,      // Max Input Length of String
                  char *leadoff,     // Data to Display in Default String {Optional}
                  int   hid,         // If input is Echomail as hidden    {Optional}
                  char *chlist);     // Valid Input Char List             {Optional}
 
-    static void ansi_fg(char *data, int fg);
-    static void ansi_bg(char *data, int bg);
-    static void pipe2ansi(char* szString, int buffer=true);
-    static void ansiPrintf(std::string fileName);
+    static void ansiForegroundColor(char *data, int fg);
+    static void ansiBackgroundColor(char *data, int bg);
+    static void sequenceToAnsi(char* szString, int buffer=true);
+    static void displayAnsiFile(std::string fileName);
 };
 
 # endif

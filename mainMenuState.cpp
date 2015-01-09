@@ -50,7 +50,7 @@ void MainMenuState::update()
                 if(TheTerminal::Instance()->didFontChange())
                     TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
 
-                MenuFunction::ansiPrintf("outro.ans");
+                MenuFunction::displayAnsiFile("outro.ans");
                 SDL_Delay(1500);
                 TheTerminal::Instance()->setRenderReady(false);
                 TheTerminal::Instance()->quit();
@@ -368,7 +368,7 @@ void MainMenuState::parseHeader(std::string FileName)
         TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
 
     TheAnsiParser::Instance()->reset();
-    MenuFunction::ansiPrintf(FileName);
+    MenuFunction::displayAnsiFile(FileName);
 }
 
 /**
@@ -845,13 +845,13 @@ int MainMenuState::startDialDirectory()
             // # of Systems in Dialing Directory
             sprintf(outBuffer,"%s%.3d",(char *)MAX_SYSTEMS.c_str(),_linkList.totalLines);
             outputBuffer += outBuffer;
-            MenuFunction::pipe2ansi((char *)outputBuffer.c_str());
+            MenuFunction::sequenceToAnsi((char *)outputBuffer.c_str());
 
             _menuFunction._curmenu.clear();
             _menuFunction._curmenu = MENU_PROMPT_TEXT;
 JMPINPUT1:
-            _menuFunction.menu_readin();
-            _menuFunction.menu_proc(mString, LIGHTBAR_POSITION);
+            _menuFunction.menuStart();
+            _menuFunction.menuProcess(mString, LIGHTBAR_POSITION);
             //std::cout << "mString: " << mString << std::endl;
 
             ch = mString[1];
@@ -920,7 +920,7 @@ JMPINPUT1:
                                 _linkList.currentSelection, 1, (char *)_linkList.listing[LIGHTBAR_POSITION].ansiString2.c_str());
 
                             outputBuffer += rBuffer;
-                            MenuFunction::pipe2ansi((char *)outputBuffer.c_str());
+                            MenuFunction::sequenceToAnsi((char *)outputBuffer.c_str());
                             outputBuffer.erase();
                             goto JMPINPUT1; //Not moving down a page.
                         }
@@ -952,7 +952,7 @@ JMPINPUT1:
 
                             sprintf(rBuffer, "\x1b[%i;%iH|16%s", _linkList.currentSelection, 1, (char *)_linkList.listing[LIGHTBAR_POSITION].ansiString2.c_str());
                             outputBuffer += rBuffer;
-                            MenuFunction::pipe2ansi((char *)outputBuffer.c_str());
+                            MenuFunction::sequenceToAnsi((char *)outputBuffer.c_str());
                             outputBuffer.erase();
                             goto JMPINPUT1; //Not moving down a page.
                         }
@@ -980,9 +980,9 @@ JMPINPUT1:
                         parseHeader((char *)"about.ans"); // Redisplay Display Ansi
                         // Wait for input:
                         //std::cout << "Menu_Bars Input Loop" << std::endl;
-                        MenuFunction::getkey();
+                        MenuFunction::getKey();
                         parseHeader((char *)"about2.ans"); // Redisplay Display Ansi
-                        MenuFunction::getkey();
+                        MenuFunction::getKey();
                         // If Global Exit, return right away.
                         if(TheInputHandler::Instance()->isGlobalShutdown())
                         {
