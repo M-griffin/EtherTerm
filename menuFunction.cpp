@@ -748,13 +748,11 @@ void MenuFunction::display_menu(bool forcelevel)
  */
 void MenuFunction::menu_bars(char *inPut)
 {
-
     //std::cout << "MenuFunction::menu_bars" << std::endl;
-
     // Handle Input Strings
     std::string inputSequence;
 
-    std::vector< list_bar > lbar;
+    std::vector<list_bar> lightbar;
     std::string::size_type id1 = 0;
 
     // If no Menu Commands Return! / Add fallback menu lateron!!
@@ -912,7 +910,6 @@ void MenuFunction::menu_bars(char *inPut)
                 ++cntEscCmds;
             }
         }
-
         // Return if we executed all comamnds as FRISTCMD!
         if (exe == noc)
         {
@@ -939,7 +936,6 @@ void MenuFunction::menu_bars(char *inPut)
         xx = 1;
         yy = cmdr2[execnum[0]].Ycoord;
     }
-
     //std::cout << "iNoc: " << iNoc << std::endl;
 
     std::string sMenu = _curmenu;
@@ -949,7 +945,6 @@ void MenuFunction::menu_bars(char *inPut)
         if (iNoc > 0)
         {
             //std::cout << "lightbars" << std::endl;
-
             // Setup of Remaining Lightbars in Low highlight Form
             for (int rep = 0; rep != iNoc; rep++)
             {
@@ -1022,19 +1017,21 @@ void MenuFunction::menu_bars(char *inPut)
         //std::cout << "Menu_Bars Input received: " << inputSequence << std::endl;
         c = inputSequence[0];
 
-        //std::cout << "inputSequence!:  c: " << (int)c << std::endl;
-
         // Check here for Arrow Key / Escaped Input was Received
         if ((int)c == 27)
         {
             //std::cout << "ESC RECEIVED" << std::endl;
-            cc = inputSequence[2];
-
-            if (cc == '0')
+            if (inputSequence.size() > 1)
             {
-                cc = inputSequence[3];
+                cc = inputSequence[2];
+                // Handle Hardware Input Sequences
+                if (cc == '0')
+                {
+                    cc = inputSequence[3];
+                }
             }
-
+            else
+                cc = '\0';
             EscHit = true;
         }
         else
@@ -1059,7 +1056,7 @@ void MenuFunction::menu_bars(char *inPut)
                 // ESC Commands in Menu might overide lightbars.
                 for (int ckey = 0; ckey != (signed)cntEscCmds; ckey++)
                 {
-                    if (inputSequence[2] == '\0' || inputSequence[2] == ' ')
+                    if (cc == '\0') // Stright ESC Key
                     {
                         if (cmdr2[execnum3[ckey]].CKeys == "ESC")
                         {

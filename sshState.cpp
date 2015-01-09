@@ -60,34 +60,8 @@ void SSHState::handleSession()
     // If available, push Data through ANSI Pasrser then Screen.
     if(output.size() > 0)
     {
-        // Parse Ansi
-        TheSequenceParser::Instance()->processSequence(output);
-
-        /*
-        // Turn off Cursor Before rendering new screen.
-        TheTerm::Instance()->renderCursorOffScreen(TheAnsiParser::Instance()->x_position-1,
-                TheAnsiParser::Instance()->y_position-1);
-
-        // Enable Renderer.
-        TheTerm::Instance()->setRenderReady(true); // Enable Rendering of new screen.
-
-        // Parse Ansi
-        //std::cout << output << std::flush;
-        TheSequenceParser::Instance()->processSequence(output);
-
-        // Setup cursor in current x/y position Cursor.
-        TheTerm::Instance()->setupCursorChar(TheAnsiParser::Instance()->x_position-1,
-                                             TheAnsiParser::Instance()->y_position-1);
-
-        TheTerm::Instance()->renderCursorOnScreen(TheAnsiParser::Instance()->x_position-1,
-                TheAnsiParser::Instance()->y_position-1);
-
-        // Write out final screen.
-        TheTerm::Instance()->drawTextureScreen();
-
-        // Now disable Renderer.
-        TheTerm::Instance()->setRenderReady(false); // Enable Rendering of new screen.
-        */
+        // Parse Incoming Screen Data
+        TheSequenceParser::Instance()->processSequence(output);       
         output.erase();
     }
 }
@@ -105,7 +79,7 @@ void SSHState::update()
     if(shutdown || TheInputHandler::Instance()->isGlobalShutdown())
     {
         std::cout << "SSHState::shutdown - changeState(new MainMenuState()" << std::endl;
-        TheTerm::Instance()->getStateMachine()->changeState(new MainMenuState());
+        TheTerminal::Instance()->getStateMachine()->changeState(new MainMenuState());
         shutdown = false;
         return;
     }
@@ -172,7 +146,7 @@ void SSHState::render()
 {
     //std::cout << "SSHState::render()" << std::endl;
     // Turns off the Rendering Loop when not being used.
-    TheTerm::Instance()->setRenderReady(false);
+    TheTerminal::Instance()->setRenderReady(false);
 
     // Testing Term, and setup for inital menu / dialing directory.
     //TheTerm::Instance()->ClearScreenSurface();
@@ -197,7 +171,7 @@ void SSHState::render()
 
 bool SSHState::onEnter()
 {
-    TheTerm::Instance()->setRenderReady(true);
+    TheTerminal::Instance()->setRenderReady(true);
     std::cout << "entering SSHState\n";
     shutdown = false;
 
@@ -226,16 +200,16 @@ bool SSHState::onEnter()
     //char host[255]= {"htc.zapto.org"};
     //char host[255]= {"darksorrow.us"};
 
-    TheTerm::SystemConnection sysconn;
-    sysconn = TheTerm::Instance()->getSystemConnection();
+    TheTerminal::SystemConnection sysconn;
+    sysconn = TheTerminal::Instance()->getSystemConnection();
 
     if(TheSocketHandler::Instance()->initSSH(sysconn.ip, sysconn.port, sysconn.login, sysconn.password))
     {
-        TheTerm::Instance()->clearScreenSurface();
+        TheTerminal::Instance()->clearScreenSurface();
         std::cout << "SSH Initalized, Now Connecting to " << sysconn.name << "... " << std::endl;
-        TheTerm::Instance()->drawString(0,16*2,(char *)"Connecting...");
-        TheTerm::Instance()->renderScreen();
-        TheTerm::Instance()->drawTextureScreen();
+        TheTerminal::Instance()->drawString(0,16*2,(char *)"Connecting...");
+        TheTerminal::Instance()->renderScreen();
+        TheTerminal::Instance()->drawTextureScreen();
         SDL_Delay(500);
     }
     else
@@ -247,8 +221,8 @@ bool SSHState::onEnter()
 
     std::cout << "Connection Successful. " << std::endl;
     // Clear Renderer and Ansi Parser for Fresh Connection.
-    TheTerm::Instance()->clearScreenSurface();
-    TheTerm::Instance()->renderScreen();
+    TheTerminal::Instance()->clearScreenSurface();
+    TheTerminal::Instance()->renderScreen();
     TheAnsiParser::Instance()->reset();
 
     /*

@@ -87,7 +87,7 @@ private:
     int directoryTopMargin;
     int directoryBottomMargin;
 
-    std::vector<TheTerm::SystemConnection> systemConnection;
+    std::vector<TheTerminal::SystemConnection> systemConnection;
     std::vector<list_bar> buildDialList();
 
     void  readinAnsi(std::string FileName, std::string &buff);

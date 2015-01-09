@@ -179,16 +179,16 @@ bool InputHandler::update()
                                 // so that 640, or 1280 is made to full screen fixes this
                                 // properly without needing to do any fancy recalculations
                                 fullScreen = true; // Can be Full Screen or Full Screen Desktop.
-                                SDL_SetWindowFullscreen(TheTerm::Instance()->getWindow(),
+                                SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(),
                                     SDL_WINDOW_FULLSCREEN); // _DESKTOP);
                                 fullScreenWindowSize = 0;
-                                TheTerm::Instance()->drawTextureScreen();
+                                TheTerminal::Instance()->drawTextureScreen();
                                 return false;
                             }
                             else
                             {
                                 // Set Full Screen Window.
-                                SDL_SetWindowFullscreen(TheTerm::Instance()->getWindow(), 0);
+                                SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(), 0);
                                 //Toggle Between Window Sizes.
                                 switch(fullScreenWindowSize)
                                 {
@@ -198,17 +198,17 @@ bool InputHandler::update()
                                     // properly without needing to do any fancy recalculations
                                     // to make Shaded blocks or fonts look better!
                                     case 0:
-                                        SDL_SetWindowSize(TheTerm::Instance()->getWindow(), 640, 400);
+                                        SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
                                         ++fullScreenWindowSize;
                                         break;
 
                                     case 1:
-                                        SDL_SetWindowSize(TheTerm::Instance()->getWindow(), 1280, 800);
+                                        SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 1280, 800);
                                         ++fullScreenWindowSize;
                                         fullScreen = false;
                                         break;
                                 }
-                                TheTerm::Instance()->drawTextureScreen();
+                                TheTerminal::Instance()->drawTextureScreen();
                                 return false;
                             }
                             break;
@@ -298,19 +298,19 @@ bool InputHandler::update()
                         SDL_Log("Window %d moved to %d,%d",
                             event.window.windowID, event.window.data1,
                             event.window.data2);
-                        TheTerm::Instance()->drawTextureScreen();
+                        TheTerminal::Instance()->drawTextureScreen();
                         break;
 
                     case SDL_WINDOWEVENT_SHOWN:
                         SDL_Log("Window %d shown", event.window.windowID);
-                        TheTerm::Instance()->drawTextureScreen();
+                        TheTerminal::Instance()->drawTextureScreen();
                         break;
 
                     case SDL_WINDOWEVENT_RESIZED:
                         SDL_Log("Window %d resized to %dx%d",
                                 event.window.windowID, event.window.data1,
                                 event.window.data2);
-                        TheTerm::Instance()->drawTextureScreen();
+                        TheTerminal::Instance()->drawTextureScreen();
                         break;
 
                 //  case SDL_WINDOWEVENT_MINIMIZED:
@@ -319,12 +319,12 @@ bool InputHandler::update()
 
                     case SDL_WINDOWEVENT_MAXIMIZED:
                         SDL_Log("Window %d maximized", event.window.windowID);
-                        TheTerm::Instance()->drawTextureScreen();
+                        TheTerminal::Instance()->drawTextureScreen();
                         break;
 
                     case SDL_WINDOWEVENT_RESTORED:
                         SDL_Log("Window %d restored", event.window.windowID);
-                        TheTerm::Instance()->drawTextureScreen();
+                        TheTerminal::Instance()->drawTextureScreen();
                         break;
 
                     case SDL_WINDOWEVENT_CLOSE:

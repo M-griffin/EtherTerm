@@ -47,7 +47,7 @@ int SocketHandler::update()
         {
             // When no data is received, this is when we want to show the cursor!
             // Setup cursor in current x/y position Cursor.
-            TheTerm::Instance()->setupCursorChar();
+            TheTerminal::Instance()->setupCursorChar();
 
             startBlinking = true;
             // Setup Timer for Blinking Cursor
@@ -57,8 +57,8 @@ int SocketHandler::update()
                 ttime2 = SDL_GetTicks();
                 if(startBlinking && (ttime2 - ttime) > 400)
                 {
-                    TheTerm::Instance()->renderCursorOffScreen();
-                    TheTerm::Instance()->drawTextureScreen();
+                    TheTerminal::Instance()->renderCursorOffScreen();
+                    TheTerminal::Instance()->drawTextureScreen();
                     --cursorBlink;
                     ttime = SDL_GetTicks();
                 }
@@ -68,8 +68,8 @@ int SocketHandler::update()
                 ttime2 = SDL_GetTicks();
                 if(startBlinking && (ttime2 - ttime) > 400)
                 {
-                    TheTerm::Instance()->renderCursorOnScreen();
-                    TheTerm::Instance()->drawTextureScreen();
+                    TheTerminal::Instance()->renderCursorOnScreen();
+                    TheTerminal::Instance()->drawTextureScreen();
                     ++cursorBlink;
                     ttime = SDL_GetTicks();
                 }
@@ -81,8 +81,8 @@ int SocketHandler::update()
             ttime = SDL_GetTicks();
             startBlinking = false;
             cursorBlink = 0;
-            TheTerm::Instance()->renderCursorOffScreen();
-            TheTerm::Instance()->drawTextureScreen();
+            TheTerminal::Instance()->renderCursorOffScreen();
+            TheTerminal::Instance()->drawTextureScreen();
         }
     }
     else

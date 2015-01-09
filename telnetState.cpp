@@ -57,11 +57,22 @@ void TelnetState::handleSession()
     for(int i = 0; i < len; i++)
     {
         c = msgBuffer[i];
-        //std::cout << c << std::flush;
+
+        // for debugging server output, mainly esc seqeucens
+        // and output that might mess up screens when needed.
+        /*
+        if (c == '\r')
+            std::cout << "^r" << std::flush;
+        else if (c == '\n')
+            std::cout << "^n" << std::flush;
+        else if (c == '\0')
+            std::cout << "^0" << std::flush;
+        else
+            std::cout << c << std::flush;
+        */
         try
         {
             // Run the Telnet Options Parser
-            // Check for IAC Sequences.
             ch = telnet_process_char(c);
         }
         catch(std::exception& e)
@@ -72,7 +83,6 @@ void TelnetState::handleSession()
         // Skip all NULL Bytes, returned on IAC characters.
         if(ch == '\0')
         {
-            //more_params = false;
             continue;
         }
         // Append to buffer
@@ -82,25 +92,8 @@ void TelnetState::handleSession()
     // If available, push Data through ANSI Pasrser then Screen.
     if(output.size() > 0)
     {
-        // Parse Ansi
+        // Parse Incoming Screen Data
         TheSequenceParser::Instance()->processSequence(output);
-
-        /*
-         // Turn off Cursor Before rendering new screen.
-        TheTerm::Instance()->renderCursorOffScreen(TheAnsiParser::Instance()->x_position-1,
-        TheAnsiParser::Instance()->y_position-1);
-
-        // Parse Ansi
-        TheSequenceParser::Instance()->processSequence(output);
-
-        // Setup cursor in current x/y position Cursor.
-        TheTerm::Instance()->setupCursorChar(TheAnsiParser::Instance()->x_position-1,
-                                             TheAnsiParser::Instance()->y_position-1);
-
-        TheTerm::Instance()->renderCursorOnScreen(TheAnsiParser::Instance()->x_position-1,
-                                              TheAnsiParser::Instance()->y_position-1);
-        TheTerm::Instance()->drawTextureScreen();
-        */
     }    
     output.erase();
 }
@@ -119,7 +112,7 @@ void TelnetState::update()
     if(shutdown || TheInputHandler::Instance()->isGlobalShutdown())
     {
         std::cout << "TelnetState::shutdown - changeState(new MainMenuState()" << std::endl;
-        TheTerm::Instance()->getStateMachine()->changeState(new MainMenuState());
+        TheTerminal::Instance()->getStateMachine()->changeState(new MainMenuState());
         shutdown = false;
         return;
     }
@@ -189,12 +182,12 @@ void TelnetState::update()
 void TelnetState::render()
 {
     // Turns off the Rendering Loop when not being used.
-    TheTerm::Instance()->setRenderReady(false);
+    TheTerminal::Instance()->setRenderReady(false);
 }
 
 bool TelnetState::onEnter()
 {
-    TheTerm::Instance()->setRenderReady(true);
+    TheTerminal::Instance()->setRenderReady(true);
     std::cout << "entering TelnetState\n";
     shutdown = false;
     //char host[255]= {"entropybbs.co.nz"};
@@ -221,8 +214,8 @@ bool TelnetState::onEnter()
     //char host[255]= {"htc.zapto.org"};
     //char host[255]= {"darksorrow.us"};
 
-    TheTerm::SystemConnection sysconn;
-    sysconn = TheTerm::Instance()->getSystemConnection();
+    TheTerminal::SystemConnection sysconn;
+    sysconn = TheTerminal::Instance()->getSystemConnection();
     if(!TheSocketHandler::Instance()->initTelnet(sysconn.ip,sysconn.port))
     {
         std::cout << "Error Connecting!" << std::endl;
@@ -231,9 +224,9 @@ bool TelnetState::onEnter()
 
     std::cout << "Connection Successful. " << std::endl;
     // Clear Renderer and Ansi Parser for Fresh Connection.
-    TheTerm::Instance()->clearScreenSurface();
-    TheTerm::Instance()->renderScreen();
-    TheTerm::Instance()->drawTextureScreen();
+    TheTerminal::Instance()->clearScreenSurface();
+    TheTerminal::Instance()->renderScreen();
+    TheTerminal::Instance()->drawTextureScreen();
     TheAnsiParser::Instance()->reset();
     return true;
 }
@@ -405,7 +398,11 @@ unsigned char TelnetState::telnet_process_char(unsigned char c)
             {
                 // Restart on next character
                 // Double IAC = IAC.
+                // Telnet states binary mode, double IAC mean pass through
+                // Char 255.  But this doesn't equal any text in ExtASCII
+                // So we going to stuff it.
                 std::cout << "\r\n Got double IAC!!\r\n" << std::endl;
+                stage = 0;
                 return '\0';
             }
             if(c != IAC)
@@ -660,3 +657,4 @@ unsigned char TelnetState::telnet_process_char(unsigned char c)
     }
     return '\0';
 }
+

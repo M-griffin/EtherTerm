@@ -31,13 +31,13 @@ typedef struct CommandRec
     std::string  Acs;         // access requirements
     std::string  CmdKeys;     // command keys
     std::string  MString;     // command data
-    bool  SText;              // Is this a Scroll Test Comamnd
-    uint16_t STLen;           // Length of Scroll Text
-    bool  LBarCmd;            // Is This a Lighbar Cmd
+    bool         SText;       // Is this a Scroll Test Comamnd
+    uint16_t     STLen;       // Length of Scroll Text
+    bool         LBarCmd;     // Is This a Lighbar Cmd
     std::string  HiString;    // Highlighed
     std::string  LoString;    // Unhighlighted
-    uint16_t Xcoord;          // Lightbar X coord
-    uint16_t Ycoord;          // Lightbar Y coord
+    uint16_t     Xcoord;      // Lightbar X coord
+    uint16_t     Ycoord;      // Lightbar Y coord
 
 } CommandRec;
 

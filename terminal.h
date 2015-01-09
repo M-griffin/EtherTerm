@@ -18,15 +18,15 @@
 #include "termStateMachine.h"
 #include <vector>
 
-class Term
+class Terminal
 {
 public:
 
-    static Term* Instance()
+    static Terminal* Instance()
     {
         if(globalInstance == 0)
         {
-            globalInstance = new Term();
+            globalInstance = new Terminal();
             return globalInstance;
         }
         return globalInstance;
@@ -244,15 +244,15 @@ private:
     bool isRunning;
     bool isRenderReady;
 
-    static Term* globalInstance;
+    static Terminal* globalInstance;
     std::vector<std::string> globalFontFiles;
 
-    Term();
-    ~Term();
-    Term(const Term&);
-    Term& operator=(const Term&);
+    Terminal();
+    ~Terminal();
+    Terminal(const Terminal&);
+    Terminal& operator=(const Terminal&);
 };
 
-typedef Term TheTerm;
+typedef Terminal TheTerminal;
 
 #endif

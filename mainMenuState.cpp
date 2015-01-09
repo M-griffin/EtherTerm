@@ -26,18 +26,18 @@ const std::string MainMenuState::menuID = "MENU";
 // Callbacks
 void MainMenuState::menuToTelnet()
 {
-    TheTerm::Instance()->getStateMachine()->changeState(new TelnetState());
+    TheTerminal::Instance()->getStateMachine()->changeState(new TelnetState());
 }
 
 void MainMenuState::menuToSSH()
 {
-    TheTerm::Instance()->getStateMachine()->changeState(new SSHState());
+    TheTerminal::Instance()->getStateMachine()->changeState(new SSHState());
 }
 // end callbacks
 
 void MainMenuState::update()
 {
-    TheTerm::SystemConnection sysCon;
+    TheTerminal::SystemConnection sysCon;
     int ret = 0;
     if(!TheInputHandler::Instance()->isGlobalShutdown())
     {
@@ -46,34 +46,34 @@ void MainMenuState::update()
         {
             case EOF:
                 // default.
-                TheTerm::Instance()->setCurrentFont("vga8x16.bmp");
-                if(TheTerm::Instance()->didFontChange())
-                    TheTerm::Instance()->loadBitmapImage(TheTerm::Instance()->getCurrentFont());
+                TheTerminal::Instance()->setCurrentFont("vga8x16.bmp");
+                if(TheTerminal::Instance()->didFontChange())
+                    TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
 
                 MenuFunction::ansiPrintf("outro.ans");
                 SDL_Delay(1500);
-                TheTerm::Instance()->setRenderReady(false);
-                TheTerm::Instance()->quit();
+                TheTerminal::Instance()->setRenderReady(false);
+                TheTerminal::Instance()->quit();
                 break;
 
             default:
-                sysCon = TheTerm::Instance()->getSystemConnection();
+                sysCon = TheTerminal::Instance()->getSystemConnection();
                 if(sysCon.protocol == "TELNET")
                 {
-                    TheTerm::Instance()->setCurrentFont(sysCon.font);
+                    TheTerminal::Instance()->setCurrentFont(sysCon.font);
                     menuToTelnet();
                 }
                 else if(sysCon.protocol == "SSH")
                 {
-                    TheTerm::Instance()->setCurrentFont(sysCon.font);
+                    TheTerminal::Instance()->setCurrentFont(sysCon.font);
                     menuToSSH();
                 }
                 break;
         }
-        TheTerm::Instance()->setRenderReady(true);
+        TheTerminal::Instance()->setRenderReady(true);
     }
     else
-        TheTerm::Instance()->quit();
+        TheTerminal::Instance()->quit();
     // Delay in Menu Loop for Input, for CPU Usage.
     SDL_Delay(10);
 }
@@ -81,7 +81,7 @@ void MainMenuState::update()
 void MainMenuState::render()
 {
     std::cout << "MainMenuState::render()" << std::endl;
-    TheTerm::Instance()->setRenderReady(false);
+    TheTerminal::Instance()->setRenderReady(false);
 }
 
 bool MainMenuState::onEnter()
@@ -94,7 +94,7 @@ bool MainMenuState::onEnter()
     // Set Render to Ready so we draw menu, Once it's drawn we toggle
     // This off, so it doesn't keep looping since it's not a game
     // with animation, this saves cpu usage.
-    TheTerm::Instance()->setRenderReady(true);
+    TheTerminal::Instance()->setRenderReady(true);
     return true;
 }
 
@@ -104,7 +104,7 @@ bool MainMenuState::onExit()
     TheInputHandler::Instance()->reset();
     // Clear Dialing directory
     systemConnection.clear();
-    std::vector<TheTerm::SystemConnection>().swap(systemConnection);
+    std::vector<TheTerminal::SystemConnection>().swap(systemConnection);
     std::cout << "exiting MainMenuState\n";
     return true;
 }
@@ -361,11 +361,11 @@ void MainMenuState::parseHeader(std::string FileName)
     std::cout << "sFONT_SET: " << FONT_SET << std::endl;
 
     // Set the font type for the menu being displayed.
-    TheTerm::Instance()->setCurrentFont(FONT_SET);
+    TheTerminal::Instance()->setCurrentFont(FONT_SET);
 
     // Test if font changed, if so, then re-load it.
-    if(TheTerm::Instance()->didFontChange())
-        TheTerm::Instance()->loadBitmapImage(TheTerm::Instance()->getCurrentFont());
+    if(TheTerminal::Instance()->didFontChange())
+        TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
 
     TheAnsiParser::Instance()->reset();
     MenuFunction::ansiPrintf(FileName);
@@ -663,7 +663,7 @@ std::vector< list_bar > MainMenuState::buildDialList()
 
 bool MainMenuState::readDialDirectory()
 {
-    TheTerm::SystemConnection sysconn;
+    TheTerminal::SystemConnection sysconn;
 #ifdef _WIN32
     std::string path = "assets\\dialdirectory.xml";
 #else
@@ -679,7 +679,7 @@ bool MainMenuState::readDialDirectory()
     if(systemConnection.size() >0)
     {
         systemConnection.clear();
-        std::vector<TheTerm::SystemConnection>().swap(systemConnection);
+        std::vector<TheTerminal::SystemConnection>().swap(systemConnection);
     }
     // block: EtherTerm
     {
@@ -895,7 +895,7 @@ JMPINPUT1:
                         std::vector<list_bar>() . swap(result); // Free Vector Up.
                         // Pass the selected system to the TERM Instance so we can
                         // Pull it inside the TelnetState.
-                        TheTerm::Instance()->setSystemConnection(systemConnection[LIGHTBAR_POSITION]);
+                        TheTerminal::Instance()->setSystemConnection(systemConnection[LIGHTBAR_POSITION]);
                         return LIGHTBAR_POSITION;
 
                     case '+': // Next Message - Move Down

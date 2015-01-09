@@ -819,10 +819,10 @@ void SequenceParser::validateSequence()
     if (sequenceBuilder == "\x1b[0;0 D")
     {
         std::cout << "switch to CP437 Font" << std::endl;
-        TheTerm::Instance()->setCurrentFont("vga8x16.bmp");
-        if (TheTerm::Instance()->didFontChange())
-            TheTerm::Instance()->loadBitmapImage(
-                TheTerm::Instance()->getCurrentFont());
+        TheTerminal::Instance()->setCurrentFont("vga8x16.bmp");
+        if (TheTerminal::Instance()->didFontChange())
+            TheTerminal::Instance()->loadBitmapImage(
+                TheTerminal::Instance()->getCurrentFont());
 
         std::cout << "sequenceBuilder.erase();" << std::endl;
     //    sequenceBuilder.erase();
@@ -834,10 +834,10 @@ void SequenceParser::validateSequence()
     if (sequenceBuilder == "\x1b[0;37 D")
     {
         std::cout << "switch to Pot-Noodle Font" << std::endl;
-        TheTerm::Instance()->setCurrentFont("potNoodle-8x16.bmp");
-        if (TheTerm::Instance()->didFontChange())
-            TheTerm::Instance()->loadBitmapImage(
-                TheTerm::Instance()->getCurrentFont());
+        TheTerminal::Instance()->setCurrentFont("potNoodle-8x16.bmp");
+        if (TheTerminal::Instance()->didFontChange())
+            TheTerminal::Instance()->loadBitmapImage(
+                TheTerminal::Instance()->getCurrentFont());
     //    sequenceBuilder.erase();
     //    sequenceState = SEQ_NORMAL; // Reset to passthrough
     //    return;
@@ -847,10 +847,10 @@ void SequenceParser::validateSequence()
     if (sequenceBuilder == "\x1b[0;38 D")
     {
         std::cout << "switch to mO'sOul Font" << std::endl;
-        TheTerm::Instance()->setCurrentFont("mo'soul-8x16.bmp");
-        if (TheTerm::Instance()->didFontChange())
-            TheTerm::Instance()->loadBitmapImage(
-                TheTerm::Instance()->getCurrentFont());
+        TheTerminal::Instance()->setCurrentFont("mo'soul-8x16.bmp");
+        if (TheTerminal::Instance()->didFontChange())
+            TheTerminal::Instance()->loadBitmapImage(
+                TheTerminal::Instance()->getCurrentFont());
     //    sequenceBuilder.erase();
     //    sequenceState = SEQ_NORMAL; // Reset to passthrough
     //    return;
@@ -860,10 +860,10 @@ void SequenceParser::validateSequence()
     if (sequenceBuilder == "\x1b[0;39 D")
     {
         std::cout << "switch to Micro-Knight+ Font" << std::endl;
-        TheTerm::Instance()->setCurrentFont("microKnightPlus-8x16.bmp");
-        if (TheTerm::Instance()->didFontChange())
-            TheTerm::Instance()->loadBitmapImage(
-                TheTerm::Instance()->getCurrentFont());
+        TheTerminal::Instance()->setCurrentFont("microKnightPlus-8x16.bmp");
+        if (TheTerminal::Instance()->didFontChange())
+            TheTerminal::Instance()->loadBitmapImage(
+                TheTerminal::Instance()->getCurrentFont());
     //    sequenceBuilder.erase();
     //    sequenceState = SEQ_NORMAL; // Reset to passthrough
     //    return;
@@ -873,10 +873,10 @@ void SequenceParser::validateSequence()
     if (sequenceBuilder == "\x1b[0;40 D")
     {
         std::cout << "switch to Topaz+ Font" << std::endl;
-        TheTerm::Instance()->setCurrentFont("topazPlus-8x16.bmp");
-        if (TheTerm::Instance()->didFontChange())
-            TheTerm::Instance()->loadBitmapImage(
-                TheTerm::Instance()->getCurrentFont());
+        TheTerminal::Instance()->setCurrentFont("topazPlus-8x16.bmp");
+        if (TheTerminal::Instance()->didFontChange())
+            TheTerminal::Instance()->loadBitmapImage(
+                TheTerminal::Instance()->getCurrentFont());
     //    sequenceBuilder.erase();
     //    sequenceState = SEQ_NORMAL; // Reset to passthrough
     //    return;
@@ -1269,8 +1269,8 @@ void SequenceParser::processSequence(std::string inputString)
     }
 
     // Display final screen.
-    TheTerm::Instance()->renderScreen();
-    TheTerm::Instance()->drawTextureScreen();
+    TheTerminal::Instance()->renderScreen();
+    TheTerminal::Instance()->drawTextureScreen();
 }
 
 // Test Cases for Class.

@@ -95,18 +95,18 @@ void readinAnsi(std::string FileName, std::string &buff)
 void cleanup()
 {
     // Clearnup Surfaces and Textures
-    TheTerm::Instance()->clean();
+    TheTerminal::Instance()->clean();
 
     //Release Instances
     TheAnsiParser::ReleaseInstance();
     TheSequenceParser::ReleaseInstance();
     TheSocketHandler::ReleaseInstance();
     TheInputHandler::ReleaseInstance();
-    TheTerm::ReleaseInstance();
+    TheTerminal::ReleaseInstance();
     std::cout << "Shutdown complete." << std::endl;
     // Pause to check for messages
-    //char ch;
-    //std::cin.get(ch);
+    char ch;
+    std::cin.get(ch);
 }
 /*
  *  Main Program Entrance
@@ -121,38 +121,38 @@ int main(int argc, char* argv[])
     // in Screen->Texure.  We do this becasue when Texture filtering is used
     // Pixels on the last line tend to bleed from bledning. This clips off the
     // Bleeding Leaving a nice screen.
-    if(TheTerm::Instance()->init("EtherTerm v1.0.0a", 680, 480, 1280, 800, 8, 16))
+    if(TheTerminal::Instance()->init("EtherTerm v1.0.0a", 680, 480, 1280, 800, 8, 16))
     {
         // Setup the Surfaces
-        if(TheTerm::Instance()->initSurfaceTextures())
+        if(TheTerminal::Instance()->initSurfaceTextures())
         {
             std::cout << "Surface & Textures Initalized. " << std::endl;
             // Load Font Texture to Surface
-            if(TheTerm::Instance()->loadBitmapImage(TheTerm::Instance()->getCurrentFont()))
+            if(TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont()))
             {
                 std::cout << "Term init success!\n";
                 // Display intro ANSI Screen
-                TheTerm::Instance()->clearScreenSurface();
+                TheTerminal::Instance()->clearScreenSurface();
                 TheAnsiParser::Instance()->reset();
 
-                while(TheTerm::Instance()->running())
+                while(TheTerminal::Instance()->running())
                 {
                     //frameStart = SDL_GetTicks();
                     // If the font changed, then load the new image.
-                    if(TheTerm::Instance()->didFontChange())
-                        TheTerm::Instance()->loadBitmapImage(TheTerm::Instance()->getCurrentFont());
+                    if(TheTerminal::Instance()->didFontChange())
+                        TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
 
                     // Main Loop
-                    TheTerm::Instance()->update();
+                    TheTerminal::Instance()->update();
 
                     // Not a FPS, check for Rendering Flag.
                     // Save CPU usage, only switch this on when
                     // We have data to draw to the screen, once
                     // Everything is drawn, then toggle this off
                     // And only check Events and Input.
-                    if(TheTerm::Instance()->getRenderReady())
+                    if(TheTerminal::Instance()->getRenderReady())
                     {
-                        TheTerm::Instance()->render();
+                        TheTerminal::Instance()->render();
                     }
                 }                
             }
