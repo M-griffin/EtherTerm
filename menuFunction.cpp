@@ -8,6 +8,7 @@
 # include "inputHandler.h"
 # include "sequenceParser.h"
 # include "linkList.h"
+//# include "ansiParser.h" // Screen Buffer Testing
 
 # include <cstdio>
 # include <cstdlib>
@@ -300,7 +301,6 @@ int MenuFunction::commandsExist(std::string MenuName, int idx)
 
     return ret;
 }
-
 
 /*
  * Right now this loops through the menu too many times! haha
@@ -725,6 +725,10 @@ void MenuFunction::menuLightBars(char *inPut)
 
         //std::cout << "Menu_Bars Input received: " << inputSequence << std::endl;
         sequence = inputSequence[0];
+
+       // Testing Screen Buffer.
+       //TheAnsiParser::Instance()->clearScreenBuffer();
+       //TheAnsiParser::Instance()->getScreenBufferText();
 
         // Check here for Arrow Key / Escaped Input was Received
         if ((int)sequence == 27)

@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
                     if(TheTerminal::Instance()->getRenderReady())
                     {
                         TheTerminal::Instance()->render();
-                    }
+                    }                    
                 }                
             }
             else

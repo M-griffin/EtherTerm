@@ -7,6 +7,14 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
+#ifdef TARGET_OS_MAC
+#include <SDL.h>
+#elif _WIN32
+#include <SDL.h>
+#else
+#include <SDL2/SDL.h>
+#endif
+
 #include <stdint.h>
 #include <string>
 #include <vector>
@@ -35,7 +43,29 @@ public:
         return;
     }
 
+    // Holds Screen Buffer Structure
+    // We want each character as a strin for multi-byte UTF8 characters.
+    struct myScreen
+    {
+        myScreen();
+        myScreen(std::string sequence, SDL_Color fg, SDL_Color bg);
+        std::string characterSequence;
+        SDL_Color foreground;
+        SDL_Color background;
+    };
+
+    // Screen Array.
+    myScreen sequenceBuffer;
+    std::vector<myScreen> screenBuffer;
+
+    // Function for populating the Screen Buffer
+    void setScreenBuffer(std::string mySequence);
+    void scrollScreenBuffer();
+    void clearScreenBuffer();
+    void getScreenBufferText();
+
     const  char ESC   = '\x1b';
+    // This needs to be passed from TheTerminal instance eventually
     const  int  TERM_HEIGHT = 25; // Temp
     const  int  TERM_WIDTH  = 80; // Temp
 
@@ -66,8 +96,10 @@ public:
 #define SET_GRAPHICS_MODE     'm'
 #define ANSI_DETECTION        'n'   // ESC[6n
 #define SET_KEYBOARD_STRINGS  'p'
-    /*
-    ESC [ 7 ; col h 	Enables line wrapping at column position. If col (1-based) is absent, wrap at column 80.
+
+    /* Extra Notes.
+    ESC [ 7 ; col h Enables line wrapping at column position. If col (1-based)
+     *  is absent, wrap at column 80.
     ESC [ 7 l 	Disables line wrapping. Lines wraps at the end of screen buffer.
     ESC [ 25 h 	Show text cursor.
     ESC [ 25 l 	Hide text cursor.

@@ -16,62 +16,81 @@
 
 using namespace std;
 
-/*
-typedef struct myscreen
+
+// Screen Buffer Vector Constructors
+AnsiParser::myScreen::myScreen()
 {
-    std::string esc_sequence;
-    std::string color_sequence;
-    unsigned char c;
-    int x_pos;
-    int y_pos;
+    characterSequence = "";
+}
 
-} myscreen;
-
-myscreen screen_buff;
-std::vector < myscreen > ansi_screen_buffer;
-*/
+AnsiParser::myScreen::myScreen(std::string sequence, SDL_Color fg, SDL_Color bg)
+: characterSequence(sequence), foreground(fg), background(bg) { }
 
 
 /**
- * handle screen buffer
- * This function Insert Char a string position,
- * If position doesn't exist yet, it allocate
- * or Pad until we read the position.
- *
-void screenbuffer(unsigned char c)
+ * handle screen buffer, Keeps track of all data
+ * Poltted through the Ansi Parser so we can pull
+ * Text and or redraw screens at anytime.
+ */    
+void AnsiParser::setScreenBuffer(std::string mySequence)
 {
-
     // Keep track of the lonest line in buffer for Centering screen.
-    if (x_position > max_x_position)
-        max_x_position = x_position;
+    // NOT IN USE CURRENTLY
+    //if (x_position > max_x_position)
+    //    max_x_position = x_position;
 
-    screen_buff.c = c;
-    screen_buff.x_pos = x_position;
-    screen_buff.y_pos = y_position;
+    sequenceBuffer.characterSequence = mySequence;
+    sequenceBuffer.foreground = TheTerminal::Instance()->currentFGColor;
+    sequenceBuffer.background = TheTerminal::Instance()->currentBGColor;
 
-     // Move Cursor to next position after character insert.
-    if (x_position > characters_per_line)
-    {
-        // Move to next line
-        x_position = 1;
-        ++y_position;
-    }
-    else
-    {
-        ++x_position;
-    }
+    // Setup current position in the screen buffer. 1 based for 0 based.
+    position = ((y_position-1) * characters_per_line) + (x_position-1);
 
-    ansi_screen_buffer.push_back(screen_buff);
+    // Add Sequence to Screen Buffer
+    screenBuffer.at(position) = sequenceBuffer;
 
     // Clear for next sequences.
-    screen_buff.c = '\0';
-    screen_buff.x_pos = 1;
-    screen_buff.y_pos = 1;
-    screen_buff.color_sequence.erase();
-    screen_buff.esc_sequence.erase();
+    sequenceBuffer.characterSequence.erase();
+}
+
+void AnsiParser::scrollScreenBuffer()
+{
+    // This remove the top line to scroll the screen up
+    // And follow the SDL Surface!  lateron add history for scroll back.
+    screenBuffer.erase(
+        screenBuffer.begin(), screenBuffer.begin() + characters_per_line);
+
+    // Readd The last Line back to the buffer.
+    screenBuffer.resize( TERM_HEIGHT * TERM_WIDTH );
+
+ //   for (auto it = screenBuffer.end() - characters_per_line; it != screenBuffer.end(); it++)
+ //       it->characterSequence.erase();
+
+/*
+    screenBuffer.clear (
+        screenBuffer.end() - characters_per_line, screenBuffer.end());*/
 
 }
-*/
+
+void AnsiParser::clearScreenBuffer()
+{
+    // Allocate the Size
+    screenBuffer.clear();
+    screenBuffer.resize( TERM_HEIGHT * TERM_WIDTH );
+}
+
+// Debug to console.
+void AnsiParser::getScreenBufferText()
+{
+    //std::cout << "* getScreenBufferText" << std::endl; // Start Fresh line.
+    for (auto &it : screenBuffer)
+    {
+        if (it.characterSequence != "")
+            std::cout << it.characterSequence << std::flush;
+        else
+            std::cout << " " << std::flush;
+    }
+}
 
 AnsiParser* AnsiParser::globalInstance = 0;
 
@@ -87,10 +106,18 @@ AnsiParser::AnsiParser() :
     prev_color_attribute(0),
     line_wrapped(false),
     cleared_the_screen(false)
-{ }
+{
+    //Set the default size of the vector screen buffer
+    //Thne Fill each element with defaults
+    screenBuffer.reserve( TERM_HEIGHT * TERM_WIDTH );
+    screenBuffer.resize( TERM_HEIGHT * TERM_WIDTH );
+}
 
 AnsiParser::~AnsiParser()
-{ std::cout << "AnsiParser Released" << std::endl; }
+{
+    std::cout << "AnsiParser Released" << std::endl;
+    std::vector<myScreen>().swap(screenBuffer); // Clear
+}
 
 /*
  * Reset AnsiParser Sepcific Class Attributes
@@ -115,10 +142,6 @@ void AnsiParser::reset()
 void AnsiParser::textInput(std::string buffer)
 {
     //std::cout << "TextInput:" << buffer << std::endl;
-    // Reset Each run.
-    position                   = 0;
-    max_x_position             = 0;
-    characters_per_line        = 80;
 
     // Char Sequence for Parsing.
     unsigned char sequence     = 0;
@@ -330,7 +353,15 @@ void AnsiParser::textInput(std::string buffer)
         //printf(" \r\n XY: %i,%i ",x_position, y_position);
         // Render Char Screen Position 0 Based from 1 Based.
         TheTerminal::Instance()->drawChar(x_position-1, y_position-1, sequence);        // Char to Surface
-        //TheTerm::Instance()->RenderCharScreen(x_position-1, y_position-1);   // Surface to Texture
+
+        // Add to Screen Buffer, Right now were testing unsigned characters,
+        // This will be updates to std::string[0] for ascii characer
+        // with extra checking for unicode soon!
+        std::string tempSequence;   // Just temp for now.
+        tempSequence = (signed)sequence;
+        setScreenBuffer(tempSequence);
+        tempSequence.erase();
+
         // After draining Character send Cursor to Next Position forward.
         ++x_position;
     }
@@ -1441,11 +1472,6 @@ void AnsiParser::sequenceResetAndResponses()
  */
 void AnsiParser::sequenceInput(std::vector<int> sequenceParameters)
 {
-    // Reset Each run.
-    position                   = 0;
-    characters_per_line        = 80;
-    max_x_position             = 0;
-
     // Grab Parameterized Control Sequence.
     parameters.swap(sequenceParameters);
 
