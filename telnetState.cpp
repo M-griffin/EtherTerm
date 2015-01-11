@@ -14,6 +14,7 @@
 #include "socketHandler.h"
 
 #include <cstdio>
+#include <fstream>
 
 const std::string TelnetState::telnetID = "TELNET";
 
@@ -52,6 +53,12 @@ void TelnetState::handleSession()
     // Else No Data just return
     else if(len == 0)
         return;
+
+// Debugging, write all data received to file
+//    std::fstream sout;
+//    sout.open( "screen.ans", ios::out | ios::app );
+//    sout << msgBuffer << std::flush;
+//    sout.close();
 
     // Loop through data for IAC Telnet Commands
     for(int i = 0; i < len; i++)

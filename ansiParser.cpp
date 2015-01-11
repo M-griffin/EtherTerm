@@ -62,14 +62,6 @@ void AnsiParser::scrollScreenBuffer()
 
     // Readd The last Line back to the buffer.
     screenBuffer.resize( TERM_HEIGHT * TERM_WIDTH );
-
- //   for (auto it = screenBuffer.end() - characters_per_line; it != screenBuffer.end(); it++)
- //       it->characterSequence.erase();
-
-/*
-    screenBuffer.clear (
-        screenBuffer.end() - characters_per_line, screenBuffer.end());*/
-
 }
 
 void AnsiParser::clearScreenBuffer()
@@ -150,11 +142,17 @@ void AnsiParser::textInput(std::string buffer)
     TheTerminal::Instance()->setRenderReady(true);
 
     // Loop text and parse screen formatting.
-    std::string::iterator it;
-    for(it = buffer.begin(); it != buffer.end(); ++it)
+    unsigned char nextSequence;
+    for(std::string::size_type i = 0; i < buffer.size(); i++)
     {
         // Grab the Sequence translate to unsigned char.
-        sequence = *it;
+        sequence = buffer[i];
+        nextSequence = '\0';
+
+        // Grab the next character in sequnce to test for
+        // CRLF combinations.
+        if (i+1 < buffer.size())
+            nextSequence = buffer[i+1];
 
         // Back Spoce
         if(sequence == '\b')
@@ -164,11 +162,18 @@ void AnsiParser::textInput(std::string buffer)
             continue;
         }
         // Handle New Line in ANSI Files properly.
-        if(sequence == '\r' && (*it+1) == '\n')
+        if(sequence == '\r' && nextSequence == '\n')
         {
-            //printf("CRLF");
-            // Char Buffer, move to next position.
-            ++*it; // Incriment past \n (2) char combo.
+            // std::cout << std::endl << "CRLF xpos: " << x_position << std::endl;
+            // Stupid fix for expected behavior.  If were on col 81
+            // And we get a newline, then were suppose to wrap to next line
+            // But also move down a second line!
+            if (x_position == 81)
+            {
+                ++y_position;
+            }
+
+            ++i; // Incriment past \n (2) char combo.
             x_position = 1;
             ++y_position;
 
@@ -212,9 +217,17 @@ void AnsiParser::textInput(std::string buffer)
             //printf("\r\n xpos %i, ypos %i \r\n",x_position, y_position);
             continue;
         }
-        if(sequence == '\r')
+        else if(sequence == '\r')
         {
-            //printf("CR");
+            // std::cout << std::endl << "CR xpos: " << x_position << std::endl;
+            // Stupid fix for expected behavior.  If were on col 81
+            // And we get a newline, then were suppose to wrap to next line
+            // But also move down a second line!
+            if (x_position == 81)
+            {
+                ++y_position;
+            }
+
             x_position = 1;
             // Doesn't seem to be needed anymore
             if(!line_wrapped)
@@ -226,6 +239,15 @@ void AnsiParser::textInput(std::string buffer)
         }
         else if(sequence == '\n')
         {
+            // std::cout << std::endl << "LF xpos: " << x_position << std::endl;
+            // Stupid fix for expected behavior.  If were on col 81
+            // And we get a newline, then were suppose to wrap to next line
+            // But also move down a second line!
+            if (x_position == 81)
+            {
+                ++y_position;
+            }
+
             //printf("LF");
             // Set position 0, casue next check incriments to 1.
             x_position = 1;
@@ -272,6 +294,7 @@ void AnsiParser::textInput(std::string buffer)
             }
             continue;
         }
+
         // Check for X_Position past colums in current line
         if(x_position > characters_per_line)
         {

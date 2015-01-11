@@ -96,6 +96,7 @@ private:
     bool globalShutdown;
     bool fullScreen;
     int fullScreenWindowSize;
+    bool mouseTriggered;
     std::string inputSequence; // Keyboard Input
     std::string inputText;     // Copy/Paste Input
 

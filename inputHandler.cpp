@@ -15,7 +15,8 @@ InputHandler* InputHandler::globalInstance = 0;
 InputHandler::InputHandler() :
     globalShutdown(false),
     fullScreen(false),
-    fullScreenWindowSize(0)
+    fullScreenWindowSize(0),
+    mouseTriggered(false)
 {
     SDL_StartTextInput();
 }
@@ -30,7 +31,12 @@ bool InputHandler::update()
 {
     SDL_Event event;
     std::string sequence;
+    
+    int mousePressXPosition;
+    int mousePressYPosition;
 
+    int mouseReleaseXPosition;
+    int mouseReleaseYPosition;
 
     //Handle events on queue
     while(SDL_PollEvent(&event) != 0)
@@ -45,8 +51,30 @@ bool InputHandler::update()
             case SDL_QUIT:
                 return false;
 
+            // Mouse Release and Motion Left is how to select text.
+            case SDL_MOUSEBUTTONUP:
+                //If the left mouse button was released
+                if( event.button.button == SDL_BUTTON_LEFT )
+                {
+                    //Get the mouse offsets
+                    mouseReleaseXPosition = event.button.x;
+                    mouseReleaseYPosition = event.button.y;
+                    std::cout << "Mouse released at: " << mouseReleaseXPosition << ","
+                        << mouseReleaseYPosition << std::endl;
+                }
+
+            case SDL_MOUSEMOTION:
+               if( event.button.button == SDL_BUTTON_LEFT )
+               {
+                    std::cout << "Mouse moved by: "
+                        << event.motion.xrel << ", " << event.motion.yrel
+                        << " : "
+                        << event.motion.x << "," << event.motion.y
+                        << std::endl;
+               }
+
             case SDL_MOUSEBUTTONDOWN:
-                //If the left mouse button was pressed Paste Text.
+                //If the Right mouse button was pressed Paste Text.
                 if(event.button.button == SDL_BUTTON_RIGHT)
                 {
                     SDL_StartTextInput();

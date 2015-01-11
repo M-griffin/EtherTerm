@@ -65,10 +65,12 @@ int unicodeFontSet = FALSE;
  */
 void readinAnsi(std::string FileName, std::string &buff)
 {
+
+    std::string path;
 #ifdef _WIN32
-    std::string path = "assets\\";
+//    std::string path = "assets\\";
 #else
-    std::string path = "assets/";
+//    std::string path = "assets/";
 #endif
     path += FileName;
     FILE *fp;
@@ -105,8 +107,8 @@ void cleanup()
     TheTerminal::ReleaseInstance();
     std::cout << "Shutdown complete." << std::endl;
     // Pause to check for messages
-    char ch;
-    std::cin.get(ch);
+    //char ch;
+    //std::cin.get(ch);
 }
 /*
  *  Main Program Entrance
@@ -115,6 +117,8 @@ int main(int argc, char* argv[])
 {
     // Run cleanup on exit of program
     atexit(cleanup);
+
+    std::string temp;
 
     // Initalize Renderer and Window with default sizes.
     // We define 680 instead of 640 becasue we clip the extract off
@@ -142,6 +146,11 @@ int main(int argc, char* argv[])
                     if(TheTerminal::Instance()->didFontChange())
                         TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
 
+                    // Test Ansi Screens
+                    //readinAnsi("test.ans",temp);
+                    //TheSequenceParser::Instance()->processSequence(temp);
+                    //break;
+
                     // Main Loop
                     TheTerminal::Instance()->update();
 
@@ -153,7 +162,7 @@ int main(int argc, char* argv[])
                     if(TheTerminal::Instance()->getRenderReady())
                     {
                         TheTerminal::Instance()->render();
-                    }                    
+                    }
                 }                
             }
             else
