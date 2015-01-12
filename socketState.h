@@ -35,7 +35,9 @@ class SocketState
 public:
 
     virtual ~SocketState()
-        { std::cout << "Shutting Down SocketState" << std::endl; }
+    {
+        std::cout << "Shutting Down SocketState" << std::endl;
+    }
     virtual int sendSocket(unsigned char *message, Uint32 len) = 0;
     virtual int recvSocket(char *message)= 0;
     virtual int pollSocket() = 0;
@@ -50,14 +52,18 @@ class SDL_Socket : public SocketState
 {
 public:
 
-    SDL_Socket(std::string _host, int _port) : sock(0), set(0)
+    SDL_Socket(std::string _host, int _port) :
+        sock(0),
+        set(0)
     {
         host = _host;
         port = _port;
     }
 
     virtual ~SDL_Socket()
-         { std::cout << "Shutting Down SDL_SocketState" << std::endl; }
+    {
+        std::cout << "Shutting Down SDL_SocketState" << std::endl;
+    }
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
     virtual int pollSocket();
@@ -65,10 +71,53 @@ public:
     virtual bool onExit();
 
 private:
-    
+
     std::string host;
     int port;
     TCPsocket sock;
+    SDLNet_SocketSet set;
+
+};
+
+/*
+ * Class for TCP FTP Sockets
+ */
+class FTP_Socket : public SocketState
+{
+public:
+
+    FTP_Socket(std::string _host, int _port, std::string _user, std::string _pass) :
+        controlSocket(0),
+        listenSocket(0),
+        dataSocket(0),
+        set(0)
+    {
+        host = _host;
+        port = _port;
+        userId = _user;
+        password = _pass;
+    }
+
+    virtual ~FTP_Socket()
+    {
+        std::cout << "Shutting Down FTP SDL_SocketState" << std::endl;
+    }
+    virtual int sendSocket(unsigned char *message, Uint32 len);
+    virtual int recvSocket(char *message);
+    virtual int pollSocket();
+    virtual bool onEnter();
+    virtual bool onExit();
+
+private:
+
+    std::string host;
+    int port;
+    std::string userId;
+    std::string password;
+
+    TCPsocket controlSocket;
+    TCPsocket listenSocket;
+    TCPsocket dataSocket;
     SDLNet_SocketSet set;
 
 };
@@ -84,12 +133,14 @@ public:
     {
         host = _host;
         port = _port;
-        sshUser = _user;
+        userId = _user;
         password = _pass;
     }
 
     virtual  ~SSH_Socket()
-        { std::cout << "Shutting Down SSH_SocketState" << std::endl; }
+    {
+        std::cout << "Shutting Down SSH_SocketState" << std::endl;
+    }
     virtual int sendSocket(unsigned char *message, Uint32 len);
     virtual int recvSocket(char *message);
     virtual int pollSocket();
@@ -118,7 +169,7 @@ private:
 
     std::string host;
     int port;
-    std::string sshUser;
+    std::string userId;
     std::string password;
 
 };

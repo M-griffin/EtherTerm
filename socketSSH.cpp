@@ -116,7 +116,7 @@ bool SSH_Socket::onEnter()
     ssh_options_set(session, SSH_OPTIONS_SSH2, &allow);
     ssh_options_set(session, SSH_OPTIONS_TIMEOUT, &timeout);
     ssh_options_set(session, SSH_OPTIONS_PORT, &port);
-    ssh_options_set(session, SSH_OPTIONS_USER, sshUser.c_str());
+    ssh_options_set(session, SSH_OPTIONS_USER, userId.c_str());
 
     // SSH Connect
     rc = ssh_connect(session);

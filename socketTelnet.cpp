@@ -134,7 +134,7 @@ bool SDL_Socket::onExit()
     std::cout << "SDL_Socket::onExit()" << std::endl;
     if(TheInputHandler::Instance()->isGlobalShutdown())
         SDLNet_TCP_Close(sock);
-
+    SDLNet_FreeSocketSet(set);
     return true;
 }
 
