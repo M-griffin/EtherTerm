@@ -16,7 +16,11 @@ InputHandler::InputHandler() :
     globalShutdown(false),
     fullScreen(false),
     fullScreenWindowSize(0),
-    mouseTriggered(false)
+    isMouseSelection(false),
+    mouseSourceXPosition(0),
+    mouseSourceYPosition(0),
+    mouseReleaseXPosition(0),
+    mouseReleaseYPosition(0)
 {
     SDL_StartTextInput();
 }
@@ -31,12 +35,6 @@ bool InputHandler::update()
 {
     SDL_Event event;
     std::string sequence;
-    
-    int mousePressXPosition;
-    int mousePressYPosition;
-
-    int mouseReleaseXPosition;
-    int mouseReleaseYPosition;
 
     //Handle events on queue
     while(SDL_PollEvent(&event) != 0)
@@ -44,6 +42,86 @@ bool InputHandler::update()
         //User requests quit
         switch (event.type)
         {
+
+            // If no Keypress check now for Window Events.
+            case SDL_WINDOWEVENT:
+                switch(event.window.event)
+                {
+                //
+                //case SDL_WINDOWEVENT_SHOWN:
+                //      SDL_Log("Window %d shown", event.window.windowID);
+                //      break;
+                //  case SDL_WINDOWEVENT_HIDDEN:
+                //      SDL_Log("Window %d hidden", event.window.windowID);
+                //      break;
+                //  case SDL_WINDOWEVENT_EXPOSED:
+                //      SDL_Log("Window %d exposed", event.window.windowID);
+                //      break;
+
+                    case SDL_WINDOWEVENT_MOVED:
+                        SDL_Log("Window %d moved to %d,%d",
+                            event.window.windowID, event.window.data1,
+                            event.window.data2);
+                        TheTerminal::Instance()->drawTextureScreen();
+                        break;
+
+                    case SDL_WINDOWEVENT_SHOWN:
+                        SDL_Log("Window %d shown", event.window.windowID);
+                        TheTerminal::Instance()->drawTextureScreen();
+                        break;
+
+                    case SDL_WINDOWEVENT_RESIZED:
+                        SDL_Log("Window %d resized to %dx%d",
+                                event.window.windowID, event.window.data1,
+                                event.window.data2);
+                        TheTerminal::Instance()->drawTextureScreen();
+                        break;
+
+                //  case SDL_WINDOWEVENT_MINIMIZED:
+                //      SDL_Log("Window %d minimized", event.window.windowID);
+                //      break;
+
+                    case SDL_WINDOWEVENT_MAXIMIZED:
+                        SDL_Log("Window %d maximized", event.window.windowID);
+                        TheTerminal::Instance()->drawTextureScreen();
+                        break;
+
+                    case SDL_WINDOWEVENT_RESTORED:
+                        SDL_Log("Window %d restored", event.window.windowID);
+                        TheTerminal::Instance()->drawTextureScreen();
+                        break;
+
+                    case SDL_WINDOWEVENT_CLOSE:
+                        globalShutdown = true;
+                        SDL_Log("Window %d closed", event.window.windowID);
+                        break;
+
+                    case SDL_WINDOWEVENT_ENTER:
+                        isMouseSelection = false;
+                        SDL_Log("Mouse entered window %d",
+                            event.window.windowID);
+                        break;
+                /// case SDL_WINDOWEVENT_LEAVE:
+                //      SDL_Log("Mouse left window %d", event.window.windowID);
+                //      break;
+                    case SDL_WINDOWEVENT_FOCUS_GAINED:
+                      SDL_Log("Window %d gained keyboard focus",
+                              event.window.windowID);
+
+                      break;
+                    case SDL_WINDOWEVENT_FOCUS_LOST:
+                      SDL_Log("Window %d lost keyboard focus",
+                              event.window.windowID);
+                      break;
+                //
+                //  default:
+                //      SDL_Log("Window %d got unknown event %d",
+                //              event.window.windowID, event.window.event);
+                //      break;
+
+                }// End of Switch
+                break;
+
             case SDL_TEXTINPUT:
                 setInputSequence(event.text.text);
                 return true;
@@ -56,6 +134,8 @@ bool InputHandler::update()
                 //If the left mouse button was released
                 if( event.button.button == SDL_BUTTON_LEFT )
                 {
+                    isMouseSelection = false;
+
                     //Get the mouse offsets
                     mouseReleaseXPosition = event.button.x;
                     mouseReleaseYPosition = event.button.y;
@@ -63,17 +143,43 @@ bool InputHandler::update()
                         << mouseReleaseYPosition << std::endl;
                 }
 
+                SDL_Log("SDL_MOUSEBUTTONUP %d shown", event.button.button);
+                break;
+
             case SDL_MOUSEMOTION:
-               if( event.button.button == SDL_BUTTON_LEFT )
-               {
+                if( event.button.button == SDL_BUTTON_LEFT
+                    && isMouseSelection)
+                {
                     std::cout << "Mouse moved by: "
                         << event.motion.xrel << ", " << event.motion.yrel
                         << " : "
                         << event.motion.x << "," << event.motion.y
                         << std::endl;
-               }
+
+                    // Process the Mouse Position from the Origin
+                    // To Highligh the selected screen segment.
+                    TheTerminal::Instance()->renderSelectionScreen(
+                        event.motion.x, event.motion.y);
+
+                }
+                break;
 
             case SDL_MOUSEBUTTONDOWN:
+
+                if( event.button.button == SDL_BUTTON_LEFT )
+                {
+                    isMouseSelection = true;
+
+                    //Get the mouse offsets
+                    mouseSourceXPosition = event.button.x;
+                    mouseSourceYPosition = event.button.y;
+                    std::cout << "Mouse pressed at: " << mouseSourceXPosition << ","
+                        << mouseSourceYPosition << std::endl;
+
+                    SDL_Log("SDL_MOUSEBUTTONDOWN %d shown", event.button.button);
+                    break;
+                }
+                
                 //If the Right mouse button was pressed Paste Text.
                 if(event.button.button == SDL_BUTTON_RIGHT)
                 {
@@ -305,87 +411,11 @@ bool InputHandler::update()
                             break;
                     }
                 }
-                break;            
-
-            // If no Keypress check now for Window Events.
-            case SDL_WINDOWEVENT:
-                switch(event.window.event)
-                {
-                //
-                //case SDL_WINDOWEVENT_SHOWN:
-                //      SDL_Log("Window %d shown", event.window.windowID);
-                //      break;
-                //  case SDL_WINDOWEVENT_HIDDEN:
-                //      SDL_Log("Window %d hidden", event.window.windowID);
-                //      break;
-                //  case SDL_WINDOWEVENT_EXPOSED:
-                //      SDL_Log("Window %d exposed", event.window.windowID);
-                //      break;
-
-                    case SDL_WINDOWEVENT_MOVED:
-                        SDL_Log("Window %d moved to %d,%d",
-                            event.window.windowID, event.window.data1,
-                            event.window.data2);
-                        TheTerminal::Instance()->drawTextureScreen();
-                        break;
-
-                    case SDL_WINDOWEVENT_SHOWN:
-                        SDL_Log("Window %d shown", event.window.windowID);
-                        TheTerminal::Instance()->drawTextureScreen();
-                        break;
-
-                    case SDL_WINDOWEVENT_RESIZED:
-                        SDL_Log("Window %d resized to %dx%d",
-                                event.window.windowID, event.window.data1,
-                                event.window.data2);
-                        TheTerminal::Instance()->drawTextureScreen();
-                        break;
-
-                //  case SDL_WINDOWEVENT_MINIMIZED:
-                //      SDL_Log("Window %d minimized", event.window.windowID);
-                //      break;
-
-                    case SDL_WINDOWEVENT_MAXIMIZED:
-                        SDL_Log("Window %d maximized", event.window.windowID);
-                        TheTerminal::Instance()->drawTextureScreen();
-                        break;
-
-                    case SDL_WINDOWEVENT_RESTORED:
-                        SDL_Log("Window %d restored", event.window.windowID);
-                        TheTerminal::Instance()->drawTextureScreen();
-                        break;
-
-                    case SDL_WINDOWEVENT_CLOSE:
-                        globalShutdown = true;
-                        SDL_Log("Window %d closed", event.window.windowID);
-                        break;
-
-                //  case SDL_WINDOWEVENT_ENTER:
-                //      SDL_Log("Mouse entered window %d",
-                //              event.window.windowID);
-                //      break;
-                /// case SDL_WINDOWEVENT_LEAVE:
-                //      SDL_Log("Mouse left window %d", event.window.windowID);
-                //      break;
-                //  case SDL_WINDOWEVENT_FOCUS_GAINED:
-                //      SDL_Log("Window %d gained keyboard focus",
-                //              event.window.windowID);
-                //      break;
-                //  case SDL_WINDOWEVENT_FOCUS_LOST:
-                //      SDL_Log("Window %d lost keyboard focus",
-                //              event.window.windowID);
-                //      break;
-                //
-                //  default:
-                //      SDL_Log("Window %d got unknown event %d",
-                //              event.window.windowID, event.window.event);
-                //      break;
-
-                    default:
-                        break;
-
-                }// End of Switch
                 break;
+
+            default:
+                break;
+
         } // End Switch event.type
     }// End While
     return false;

@@ -151,6 +151,10 @@ public:
     }
 
     // Now for Rendering Code
+
+    // Working on Texture overlay for selection!
+    void renderSelectionScreen(int x, int y);
+
     void freeSurfaceTextures();
     bool loadBitmapImageFromPak();
     bool loadBitmapImage(std::string path);
@@ -216,13 +220,15 @@ private:
     SDL_Renderer*  globalRenderer;
 
     //Loaded Surface
-    SDL_Surface*   tmpSurface;       // Char Cell
-    SDL_Surface*   cursorOnSurface;  // Char Cell for the cursor.
-    SDL_Surface*   cursorOffSurface; // Char Cell for the cursor.
-    SDL_Surface*   screenSurface;    // Internal Screen Buffer
+    SDL_Surface*   tmpSurface;        // Char Cell
+    SDL_Surface*   cursorOnSurface;   // Char Cell for the cursor.
+    SDL_Surface*   cursorOffSurface;  // Char Cell for the cursor.
+    SDL_Surface*   screenSurface;     // Internal Screen Buffer
     SDL_Surface*   bottomSurface;
-    SDL_Surface*   chachedSurface;  // Cached Font CharacterSet
-    SDL_Texture*   globalTexture;   // Texture for User Screen
+    SDL_Surface*   chachedSurface;    // Cached Font CharacterSet
+    SDL_Texture*   globalTexture;     // Texture for User Screen
+
+    SDL_Texture*   selectionTexture;  // WIP
 
     TermStateMachine* globalTermStateMachine;
     Uint32 redMask, greenMask, blueMask, alphaMask;

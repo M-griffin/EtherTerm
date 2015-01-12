@@ -813,6 +813,7 @@ int MainMenuState::startDialDirectory()
     do
     {
         parseHeader(ANSI_FILE);
+
         // Jump to Current Page
         boxsize = _linkList.bottomMargin - _linkList.topMargin;
         currentPage = LIGHTBAR_POSITION / boxsize;

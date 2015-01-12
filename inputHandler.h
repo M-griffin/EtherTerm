@@ -83,8 +83,16 @@ public:
     {
         return globalShutdown;
     }
+
     // mouse events
-    //bool getMouseButtonState(int buttonNumber) const;
+    int getMouseSourceXPosition() const
+    {
+        return mouseSourceXPosition;
+    }
+    int getMouseSourceYPosition() const
+    {
+        return mouseSourceYPosition;
+    }
 
 private:
 
@@ -96,7 +104,12 @@ private:
     bool globalShutdown;
     bool fullScreen;
     int fullScreenWindowSize;
-    bool mouseTriggered;
+    bool isMouseSelection;
+    int mouseSourceXPosition;
+    int mouseSourceYPosition;
+    int mouseReleaseXPosition;
+    int mouseReleaseYPosition;
+
     std::string inputSequence; // Keyboard Input
     std::string inputText;     // Copy/Paste Input
 

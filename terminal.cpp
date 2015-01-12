@@ -8,6 +8,7 @@
 #include "ansiParser.h"
 #include "termObjectFactory.h"
 #include "mainMenuState.h"
+#include "inputHandler.h"
 
 #ifdef TARGET_OS_MAC
 #include <SDL.h>
@@ -241,6 +242,113 @@ void Terminal::clean()
 }
 
 /*
+ * On selected mouse movement area! We want to overlay a blended texture
+ * To give the affect of highlighting without having to resort to
+ * for grabbing screen buffer text.and redrawing it character by character
+ * This should in effect give fast updates to the screen with mouse movement.
+*/
+void Terminal::renderSelectionScreen(int x, int y)
+{
+
+    // Redraw screen so we don't increate intensitity
+    SDL_Rect rectorig;
+    int screenWidth, screenHeight;
+    SDL_GetRendererOutputSize(globalRenderer,&screenWidth,&screenHeight);
+
+    // We clip off botom 80, so that we get proper 8x16
+    // Display without Extra pixel borders around the screen,
+    // Texture Filter results in Pixel Bleeding.
+    rectorig.w = surfaceWidth  - 40; // 680 - 640 = 40
+    rectorig.h = surfaceHeight - 80; // 480 - 400 = 80
+    rectorig.x = 0,
+    rectorig.y = 0;
+
+    // Destination
+    displayRect.w = screenWidth;
+    displayRect.h = screenHeight;
+    displayRect.x = 0;
+    displayRect.y = 0;
+
+    SDL_RenderCopy(globalRenderer, globalTexture, &rectorig, &displayRect);
+
+    // Next create a texture to overlay for highlighting
+    if(!selectionTexture)
+    {
+        std::cout << "RenderCharScreen() - globalTexture" << std::endl;
+        selectionTexture =
+            SDL_CreateTexture(globalRenderer,
+                SDL_PIXELFORMAT_ARGB8888,
+                SDL_TEXTUREACCESS_TARGET,
+                screenSurface->w, screenSurface->h);
+        SDL_SetTextureBlendMode(selectionTexture, SDL_BLENDMODE_ADD);
+
+        // Set Render Target to the Texture.
+        SDL_SetRenderTarget(globalRenderer, selectionTexture);
+        SDL_RenderClear(globalRenderer);
+
+        // Fill new texture with Cyan Highlight.
+        SDL_SetRenderDrawColor(globalRenderer, 0, 100 , 100, 255);
+
+        // Can test filling to RECT to speed this up after it's working!
+        SDL_RenderFillRect(globalRenderer, NULL);
+
+        //Reset back to Global Render, then push update over current texture
+        SDL_SetRenderTarget(globalRenderer, NULL);
+    }
+    
+
+    // We need to Translate the Screen Width and Height and translate to
+    // get actual size of the Characters to snap everyone correctly.
+    int charWidth, charHeight;
+    charHeight = screenHeight / 25;
+    charHeight += screenHeight % 25;
+    charWidth = screenWidth / 80;
+    charWidth += screenWidth % 80;
+
+    // First we need to convert the current Screen size to 640x400
+    // So we can calcuate the actual pixel size of each resized character cell.
+
+    SDL_Rect rect;
+
+    // We clip off botom 80, so that we get proper 8x16
+    // Display without Extra pixel borders around the screen,
+    // Texture Filter results in Pixel Bleeding.
+
+    int sourceX = TheInputHandler::Instance()->getMouseSourceXPosition();
+    int sourceY = TheInputHandler::Instance()->getMouseSourceYPosition();
+
+    // This is the source position that we Xy     = Source
+    //                                      []
+    // are starting our rect box at.          xy  = Motion
+
+    // We'll need to snap this to the nearest char height and width.
+    rect.x = sourceX,
+    rect.y = sourceY;
+
+    // Width and height are calcuated by the different from source
+    // Well need to round these values to the width and height of a character!
+    // Also need to swap source for the lowest value so we can select both
+    // above and behind the starting points.
+
+    rect.w = (x - sourceX);
+    rect.h = (y - sourceY);
+
+    // Destination
+    displayRect.w = screenWidth;
+    displayRect.h = screenHeight;
+    displayRect.x = 0;
+    displayRect.y = 0;
+
+    SDL_RenderCopy(globalRenderer, selectionTexture, NULL, &rect);
+
+    // Reset dont need it?
+    //SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
+    SDL_RenderPresent(globalRenderer);
+
+}
+
+
+/*
  * Free all Surfaces and Textures
  * Seems we have to do this from a private member
  * Otherwise the program loses the pointers.
@@ -290,6 +398,11 @@ void Terminal::freeSurfaceTextures()
     {
         std::cout << "SDL_DestroyTexture globalTexture" << std::endl;
         SDL_DestroyTexture(globalTexture);
+    }
+    if(selectionTexture)
+    {
+        std::cout << "SDL_DestroyTexture selectionTexture" << std::endl;
+        SDL_DestroyTexture(selectionTexture);
     }
 
 }
@@ -514,10 +627,8 @@ void Terminal::scrollRegionUp()
     area.h = characterHeight;
 
     int bpp = screenSurface->format->BytesPerPixel;
-    Uint8 *pixelNewPos =
-        (Uint8 *)screenSurface->pixels + 0 * screenSurface->pitch + 0 * bpp;
-    Uint8 *pixelTopPos =
-        (Uint8 *)screenSurface->pixels + 0 * screenSurface->pitch + 0 * bpp;
+    Uint8 *pixelNewPos = (Uint8 *)screenSurface->pixels;
+    Uint8 *pixelTopPos = (Uint8 *)screenSurface->pixels;
 
     // Move position to start
     pixelTopPos += screenSurface->w * (characterHeight * (topMargin -1)) * bpp;
@@ -551,7 +662,7 @@ void Terminal::scrollRegionUp()
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
     SDL_UpdateTexture(globalTexture, NULL,
         screenSurface->pixels, screenSurface->pitch);
@@ -598,7 +709,7 @@ void Terminal::scrollScreenUp()
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
     // Write Scrolled screen to Texture.
     SDL_UpdateTexture(globalTexture, NULL,
@@ -691,7 +802,7 @@ void Terminal::renderBottomScreen()
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
     SDL_UpdateTexture(globalTexture, &rect,
         bottomSurface->pixels, bottomSurface->pitch);
@@ -717,7 +828,7 @@ void Terminal::renderScreen()
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
     SDL_UpdateTexture(globalTexture, &pick,
         screenSurface->pixels, screenSurface->pitch);
@@ -744,7 +855,7 @@ void Terminal::renderCharScreen(int x, int y)
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
     SDL_UpdateTexture(globalTexture, &rect,
         screenSurface->pixels, screenSurface->pitch);
@@ -779,7 +890,7 @@ void Terminal::renderCursorOnScreen()
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
     SDL_UpdateTexture(globalTexture, &rect,
         cursorOnSurface->pixels, cursorOnSurface->pitch);
@@ -814,7 +925,7 @@ void Terminal::renderCursorOffScreen()
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_NONE);
+        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
     }
     SDL_UpdateTexture(globalTexture, &rect,
         cursorOffSurface->pixels, cursorOffSurface->pitch);
@@ -836,13 +947,14 @@ void Terminal::drawTextureScreen()
     rect.w = surfaceWidth  - 40; // 680 - 640 = 40
     rect.h = surfaceHeight - 80; // 480 - 400 = 80
     rect.x = 0,
-         rect.y = 0;
+    rect.y = 0;
 
     // Destination
     displayRect.w = screenWidth;
     displayRect.h = screenHeight;
     displayRect.x = 0;
     displayRect.y = 0;
+
     SDL_RenderCopy(globalRenderer, globalTexture, &rect, &displayRect);
     SDL_RenderPresent(globalRenderer);
 }

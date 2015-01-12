@@ -824,7 +824,7 @@ void SequenceParser::validateSequence()
             TheTerminal::Instance()->loadBitmapImage(
                 TheTerminal::Instance()->getCurrentFont());
 
-        std::cout << "sequenceBuilder.erase();" << std::endl;
+        //std::cout << "sequenceBuilder.erase();" << std::endl;
     //    sequenceBuilder.erase();
     //    sequenceState = SEQ_NORMAL; // Reset to passthrough
     //    return;
