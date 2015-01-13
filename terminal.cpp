@@ -253,7 +253,6 @@ void Terminal::clean()
  */
 void Terminal::renderSelectionScreen(int x, int y)
 {
-
     // Redraw screen so we don't increase lighting intensitity
     // As the selection keeps redrawing!  Cool effect though!!
     SDL_Rect rectorig;
@@ -292,8 +291,8 @@ void Terminal::renderSelectionScreen(int x, int y)
     SDL_SetRenderTarget(globalRenderer, selectionTexture);
     SDL_RenderClear(globalRenderer);
 
-    // Fill new texture with Cyan Highlight.
-    SDL_SetRenderDrawColor(globalRenderer, 0, 100 , 100, 255);
+    // Fill new texture with Dark Cyan Highlight.
+    SDL_SetRenderDrawColor(globalRenderer, 0, 50 , 50, 255);
 
     // Can test filling to RECT to speed this up after it's working!
     SDL_RenderFillRect(globalRenderer, NULL);
@@ -301,8 +300,8 @@ void Terminal::renderSelectionScreen(int x, int y)
     //Reset back to Global Render, then push update over current texture
     SDL_SetRenderTarget(globalRenderer, NULL);
 
-    // We need to Translate the Screen Width and Height and translate to
-    // get actual size of the Characters to snap everyone correctly.
+    // We need to Translate the Screen Width vs Rows and Width to
+    // get actual the grid size of the Characters to snap everything correctly.
     int charWidth, charHeight;
     charHeight = screenHeight / 25;
     charHeight += screenHeight % 25;
@@ -329,6 +328,9 @@ void Terminal::renderSelectionScreen(int x, int y)
     // Moving up on the top most region, and down on the bottom most region.
 
     // First determine the smallest of source and current plot positions
+    // We want to make the Lowest Values our starting point so we either
+    // use source or motions depending where the mouse is for top left.
+
     // This is the Top Region
     if (sourceX < x)
     {
@@ -356,7 +358,7 @@ void Terminal::renderSelectionScreen(int x, int y)
         rect.y -= rect.y % charHeight;
     }
 
-    // Width and height are calcuated by the different from source
+    // Width and height are calcuated by the different from motion to source
     // Well need to round these values to the width and height of a character!
     // Also need to swap source for the lowest value so we can select both
     // above and behind the starting points.
@@ -382,17 +384,25 @@ void Terminal::renderSelectionScreen(int x, int y)
     else
     {
         // Bottom -> Stationary ->> OK!
-        rect.h = ((sourceY -= sourceY % charWidth)) - (rect.y);
+        rect.h = ((sourceY -= sourceY % charHeight)) - (rect.y);
     }
 
+    // Draw First Highlight Overlay
+    SDL_RenderCopy(globalRenderer, selectionTexture, NULL, &rect);
+
+    // 2 Pixel expanded shaded border (I like it!)
+    rect.x -= 4;
+    rect.y -= 4;
+    rect.w += 8;
+    rect.h += 8;
+
+    // Draw Border Overlay
     SDL_RenderCopy(globalRenderer, selectionTexture, NULL, &rect);
 
     // Reset dont need it?
     //SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderPresent(globalRenderer);
-
 }
-
 
 /*
  * Free all Surfaces and Textures
