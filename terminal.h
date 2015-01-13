@@ -169,6 +169,7 @@ public:
     void renderCharScreen(int x, int y);
     void renderCursorOnScreen();
     void renderCursorOffScreen();
+    void drawGamaTextureScreen();
     void drawTextureScreen();
     void clearScreen();
     int  compareSDL_Colors(SDL_Color &src, SDL_Color &dest);

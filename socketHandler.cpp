@@ -8,6 +8,7 @@
 #include "socketHandler.h"
 #include "socketState.h"
 #include "terminal.h"
+#include "inputHandler.h"
 #include <iostream>
 #include <exception>
 
@@ -33,6 +34,12 @@ int SocketHandler::recv(char *message)
 int SocketHandler::update()
 {
     //std::cout << "SocketHandler::update() active: " << active << std::endl;
+
+    // If were in the middle of selecting text,
+    // hold all incoming data untill were finished.
+    if (TheInputHandler::Instance()->isMouseSelection())
+        return 0;
+
     int ret;
     if(active)
     {

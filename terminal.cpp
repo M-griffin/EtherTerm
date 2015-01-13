@@ -175,7 +175,6 @@ bool Terminal::init(const char* title,
             globalRenderer =
                 SDL_CreateRenderer(globalWindow, -1, SDL_RENDERER_ACCELERATED |
                                    SDL_RENDERER_TARGETTEXTURE);
-
             if(globalRenderer != 0) // renderer init success
             {
                 cout << "renderer creation success\n";
@@ -186,6 +185,11 @@ bool Terminal::init(const char* title,
                 std::cout << "renderer init fail\n";
                 return false; // renderer init fail
             }
+
+            // Increate the scaling to smooth without filtering.
+            // Doesn't smooth anything!
+            //SDL_RenderSetLogicalSize(globalRenderer,640*2,400*2);
+            //SDL_RenderSetScale(globalRenderer, 0, 0);
         }
         else
         {
@@ -244,13 +248,14 @@ void Terminal::clean()
 /*
  * On selected mouse movement area! We want to overlay a blended texture
  * To give the affect of highlighting without having to resort to
- * for grabbing screen buffer text.and redrawing it character by character
+ * grabbing screen buffer text.and redrawing it character by character
  * This should in effect give fast updates to the screen with mouse movement.
-*/
+ */
 void Terminal::renderSelectionScreen(int x, int y)
 {
 
-    // Redraw screen so we don't increate intensitity
+    // Redraw screen so we don't increase lighting intensitity
+    // As the selection keeps redrawing!  Cool effect though!!
     SDL_Rect rectorig;
     int screenWidth, screenHeight;
     SDL_GetRendererOutputSize(globalRenderer,&screenWidth,&screenHeight);
@@ -280,22 +285,21 @@ void Terminal::renderSelectionScreen(int x, int y)
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_TARGET,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(selectionTexture, SDL_BLENDMODE_ADD);
-
-        // Set Render Target to the Texture.
-        SDL_SetRenderTarget(globalRenderer, selectionTexture);
-        SDL_RenderClear(globalRenderer);
-
-        // Fill new texture with Cyan Highlight.
-        SDL_SetRenderDrawColor(globalRenderer, 0, 100 , 100, 255);
-
-        // Can test filling to RECT to speed this up after it's working!
-        SDL_RenderFillRect(globalRenderer, NULL);
-
-        //Reset back to Global Render, then push update over current texture
-        SDL_SetRenderTarget(globalRenderer, NULL);
+        SDL_SetTextureBlendMode(selectionTexture, SDL_BLENDMODE_ADD);       
     }
-    
+
+    // Set Render Target to the Texture.
+    SDL_SetRenderTarget(globalRenderer, selectionTexture);
+    SDL_RenderClear(globalRenderer);
+
+    // Fill new texture with Cyan Highlight.
+    SDL_SetRenderDrawColor(globalRenderer, 0, 100 , 100, 255);
+
+    // Can test filling to RECT to speed this up after it's working!
+    SDL_RenderFillRect(globalRenderer, NULL);
+
+    //Reset back to Global Render, then push update over current texture
+    SDL_SetRenderTarget(globalRenderer, NULL);
 
     // We need to Translate the Screen Width and Height and translate to
     // get actual size of the Characters to snap everyone correctly.
@@ -321,23 +325,65 @@ void Terminal::renderSelectionScreen(int x, int y)
     //                                      []
     // are starting our rect box at.          xy  = Motion
 
-    // We'll need to snap this to the nearest char height and width.
-    rect.x = sourceX,
-    rect.y = sourceY;
+    // Next We'll need to snap this to the nearest char height and width.
+    // Moving up on the top most region, and down on the bottom most region.
+
+    // First determine the smallest of source and current plot positions
+    // This is the Top Region
+    if (sourceX < x)
+    {
+        // TOP Stationary -> Right ->> OK!
+        rect.x = sourceX;
+        rect.x -= rect.x % charWidth; // Snap to Left.
+    }
+    else
+    {
+        // Top -> Left ->> OK!
+        rect.x = x;
+        rect.x -= rect.x % charWidth;
+    }
+
+    if (sourceY < y)
+    {
+        // Top Stationary ->> OK!
+        rect.y = sourceY;
+        rect.y -= rect.y % charHeight; // Snap to Top
+    }
+    else
+    {
+        // Top -> Up ->> OK!
+        rect.y = y;
+        rect.y -= rect.y % charHeight;
+    }
 
     // Width and height are calcuated by the different from source
     // Well need to round these values to the width and height of a character!
     // Also need to swap source for the lowest value so we can select both
     // above and behind the starting points.
 
-    rect.w = (x - sourceX);
-    rect.h = (y - sourceY);
-
-    // Destination
-    displayRect.w = screenWidth;
-    displayRect.h = screenHeight;
-    displayRect.x = 0;
-    displayRect.y = 0;
+    // This is the bottom Region
+    if (sourceX < x)
+    {
+        // Bottom Width RIGHT ->> OK!
+        rect.w = charWidth +
+            ((x -= (x % charWidth)) - (sourceX -= sourceX % charWidth));
+    }
+    else
+    {
+        // Bottom Stationary ->> OK!
+        rect.w = ((sourceX -= sourceX % charWidth)) - (rect.x);
+    }
+    if (sourceY < y)
+    {
+        // Bottom -> Down ->> OK!
+        rect.h = charHeight +
+            ((y -= (y % charHeight)) - (sourceY -= sourceY % charHeight));
+    }
+    else
+    {
+        // Bottom -> Stationary ->> OK!
+        rect.h = ((sourceY -= sourceY % charWidth)) - (rect.y);
+    }
 
     SDL_RenderCopy(globalRenderer, selectionTexture, NULL, &rect);
 
@@ -368,6 +414,7 @@ void Terminal::freeSurfaceTextures()
         std::cout << "Destroy SDL Renderer" << std::endl;
         SDL_DestroyRenderer(globalRenderer);
     }
+
     if (chachedSurface)
     {
         std::cout << "SDL_FreeSurface chachedSurface" << std::endl;
@@ -931,6 +978,50 @@ void Terminal::renderCursorOffScreen()
         cursorOffSurface->pixels, cursorOffSurface->pitch);
 }
 
+/*
+ * This is a proof of concept that will brighten
+ * Screen displayed after Texturefiltering is applied
+ * since texture filtering slightly dims colors to leave
+ * a blurred feeling
+ */
+void Terminal::drawGamaTextureScreen()
+{
+
+    // Next create a texture to overlay for highlighting
+    if(!selectionTexture)
+    {
+        std::cout << "drawGamaTextureScreen() - globalTexture" << std::endl;
+        selectionTexture =
+            SDL_CreateTexture(globalRenderer,
+                SDL_PIXELFORMAT_ARGB8888,
+                SDL_TEXTUREACCESS_TARGET,
+                screenSurface->w, screenSurface->h);
+        SDL_SetTextureBlendMode(selectionTexture, SDL_BLENDMODE_MOD);
+    }
+
+    // Set Render Target to the Texture.
+    SDL_SetRenderTarget(globalRenderer, selectionTexture);
+    SDL_RenderClear(globalRenderer);
+
+    // Fill new texture with Cyan Highlight.
+    SDL_SetRenderDrawColor(globalRenderer, 255 , 255 , 255,  1);
+
+    // Can test filling to RECT to speed this up after it's working!
+    SDL_RenderFillRect(globalRenderer, NULL);
+
+    //Reset back to Global Render, then push update over current texture
+    SDL_SetRenderTarget(globalRenderer, NULL);
+
+
+    SDL_RenderCopy(globalRenderer, selectionTexture, NULL, NULL);
+
+    // Reset dont need it?
+    //SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
+    SDL_RenderPresent(globalRenderer);
+
+}
+
+
 /**
  * Transfers the Buffer to a Texture and
  * Renderes the Screen
@@ -957,6 +1048,9 @@ void Terminal::drawTextureScreen()
 
     SDL_RenderCopy(globalRenderer, globalTexture, &rect, &displayRect);
     SDL_RenderPresent(globalRenderer);
+
+    // Testing only for increasing brightness!
+    //drawGamaTextureScreen();
 }
 
 /**

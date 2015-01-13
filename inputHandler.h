@@ -84,6 +84,11 @@ public:
         return globalShutdown;
     }
 
+    bool isMouseSelection() const
+    {
+        return _isMouseSelection;
+    }
+
     // mouse events
     int getMouseSourceXPosition() const
     {
@@ -104,7 +109,7 @@ private:
     bool globalShutdown;
     bool fullScreen;
     int fullScreenWindowSize;
-    bool isMouseSelection;
+    bool _isMouseSelection;
     int mouseSourceXPosition;
     int mouseSourceYPosition;
     int mouseReleaseXPosition;

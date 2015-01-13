@@ -16,7 +16,7 @@ InputHandler::InputHandler() :
     globalShutdown(false),
     fullScreen(false),
     fullScreenWindowSize(0),
-    isMouseSelection(false),
+    _isMouseSelection(false),
     mouseSourceXPosition(0),
     mouseSourceYPosition(0),
     mouseReleaseXPosition(0),
@@ -97,7 +97,6 @@ bool InputHandler::update()
                         break;
 
                     case SDL_WINDOWEVENT_ENTER:
-                        isMouseSelection = false;
                         SDL_Log("Mouse entered window %d",
                             event.window.windowID);
                         break;
@@ -134,7 +133,7 @@ bool InputHandler::update()
                 //If the left mouse button was released
                 if( event.button.button == SDL_BUTTON_LEFT )
                 {
-                    isMouseSelection = false;
+                    _isMouseSelection = false;
 
                     //Get the mouse offsets
                     mouseReleaseXPosition = event.button.x;
@@ -148,14 +147,15 @@ bool InputHandler::update()
 
             case SDL_MOUSEMOTION:
                 if( event.button.button == SDL_BUTTON_LEFT
-                    && isMouseSelection)
+                    && _isMouseSelection)
                 {
+                    /* debugging
                     std::cout << "Mouse moved by: "
                         << event.motion.xrel << ", " << event.motion.yrel
                         << " : "
                         << event.motion.x << "," << event.motion.y
                         << std::endl;
-
+                    */
                     // Process the Mouse Position from the Origin
                     // To Highligh the selected screen segment.
                     TheTerminal::Instance()->renderSelectionScreen(
@@ -168,7 +168,7 @@ bool InputHandler::update()
 
                 if( event.button.button == SDL_BUTTON_LEFT )
                 {
-                    isMouseSelection = true;
+                    _isMouseSelection = true;
 
                     //Get the mouse offsets
                     mouseSourceXPosition = event.button.x;
@@ -181,6 +181,7 @@ bool InputHandler::update()
                 }
                 
                 //If the Right mouse button was pressed Paste Text.
+                /* Disable while testing!
                 if(event.button.button == SDL_BUTTON_RIGHT)
                 {
                     SDL_StartTextInput();
@@ -216,7 +217,7 @@ bool InputHandler::update()
                     }
                     setInputSequence(inputText);
                     return true;
-                }
+                }*/
                 break;
 
             case SDL_KEYDOWN:
