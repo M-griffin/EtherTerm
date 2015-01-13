@@ -181,8 +181,7 @@ bool InputHandler::update()
                 }
                 
                 //If the Right mouse button was pressed Paste Text.
-                /* Disable while testing!
-                if(event.button.button == SDL_BUTTON_RIGHT)
+                else if(event.button.button == SDL_BUTTON_RIGHT)
                 {
                     SDL_StartTextInput();
                     inputText = SDL_GetClipboardText();
@@ -217,7 +216,7 @@ bool InputHandler::update()
                     }
                     setInputSequence(inputText);
                     return true;
-                }*/
+                }
                 break;
 
             case SDL_KEYDOWN:
@@ -255,7 +254,7 @@ bool InputHandler::update()
                                 }
                                 while(1)
                                 {
-                                    id1 = inputText.find("    ", 0);
+                                    id1 = inputText.find("\t", 0);
                                     if(id1 != std::string::npos)
                                     {
                                         inputText.replace(id1,1,"    ");
