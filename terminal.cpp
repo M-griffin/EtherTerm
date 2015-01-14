@@ -1434,6 +1434,12 @@ void Terminal::replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 backgrou
  */
 void Terminal::setupCursorChar()
 {
+    /// FIXME Note: this does not handling screen
+    // Scrolling where the cursor is in the same place
+    // Ie message editor scroll up on top line.  This needs to be reworked.
+    // So that we refrash proper after new incoming data, but the proper place
+    // to add is a bit tricky.
+
     // Check if the position has changed.
     if(cursorXPosition != TheAnsiParser::Instance()->x_position-1 ||
             cursorYPosition != TheAnsiParser::Instance()->y_position-1)
@@ -1441,6 +1447,8 @@ void Terminal::setupCursorChar()
         cursorXPosition = TheAnsiParser::Instance()->x_position-1;
         cursorYPosition = TheAnsiParser::Instance()->y_position-1;
     }
+    else
+        return;
 
     SDL_Rect pick, area;
 
