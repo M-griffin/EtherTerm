@@ -107,7 +107,7 @@ private:
     }
 
     bool globalShutdown;
-    bool fullScreen;
+    bool isWindowMode;
     int fullScreenWindowSize;
     bool _isMouseSelection;
     int mouseSourceXPosition;

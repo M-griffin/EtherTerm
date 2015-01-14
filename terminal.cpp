@@ -124,84 +124,100 @@ bool Terminal::init(const char* title,
 
     // attempt to initialise SDL
     //if(SDL_Init(SDL_INIT_EVERYTHING) == 0)
-    if(SDL_Init(SDL_INIT_VIDEO) == 0)
+    if(SDL_Init(SDL_INIT_VIDEO) != 0)
     {
-        std::cout << "SDL init success" << std::endl;
-        /* initialize SDL_net */
-        if(SDLNet_Init()==-1)
-        {
-            std::cout << "SDLNet_Init: " << SDLNet_GetError() << std::endl;
-            return false;
-        }
-        else
-        {
-            std::cout << "SDLNet_Init success" << std::endl;
-        }
-        /*
-         * 0 = disable vsync
-         * 1 = enable vsync
-         */
-        if(!SDL_SetHint(SDL_HINT_RENDER_VSYNC, "0"))
-        {
-            std::cout << "Warning: VSync not enabled!\n";
-        }
-        /*
-         * 0 or nearest = nearest pixel sampling
-         * 1 or linear  = linear filtering       (supported by OpenGL and Direct3D)
-         * 2 or best    = anisotropic filtering  (supported by Direct3D)
-         */
-        if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"))
-        {
-            std::cout << "Warning: Linear texture filtering not enabled!\n";
-        }
-        /*
-         * 0 disable 3D acceleration
-         * 1 enable 3D acceleration, using the default renderer
-         * X enable 3D acceleration, using X where X is one of the valid
-         *  rendering drivers. (e.g. "direct3d", "opengl", etc.)
-         */
-        if(!SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "1"))
-        {
-            std::cout << "Warning: Framebuffer Acceleration not enabled!\n";
-        }
-
-        // init the window
-        globalWindow =
-            SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
-                             SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, flags);
-        if(globalWindow != 0) // window init success
-        {
-            std::cout << "window creation success\n";
-            globalRenderer =
-                SDL_CreateRenderer(globalWindow, -1, SDL_RENDERER_ACCELERATED |
-                                   SDL_RENDERER_TARGETTEXTURE);
-            if(globalRenderer != 0) // renderer init success
-            {
-                cout << "renderer creation success\n";
-                SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
-            }
-            else
-            {
-                std::cout << "renderer init fail\n";
-                return false; // renderer init fail
-            }
-
-            // Increate the scaling to smooth without filtering.
-            // Doesn't smooth anything!
-            //SDL_RenderSetLogicalSize(globalRenderer,640*2,400*2);
-            //SDL_RenderSetScale(globalRenderer, 0, 0);
-        }
-        else
-        {
-            std::cout << "window init fail\n";
-            return false; // window init fail
-        }
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "Terminal::init() SDL_Init: SDL_INIT_VIDEO %s", SDL_GetError());
+        return false;
     }
-    else
+
+    std::cout << "SDL init success" << std::endl;
+
+    /* initialize SDL_net */
+    if(SDLNet_Init() < 0)
     {
-        std::cout << "SDL init fail\n";
-        return false; // SDL init fail
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "Terminal::init() SDLNet_Init: %s", SDL_GetError());
+        return false;
     }
+
+    std::cout << "SDLNet_Init success" << std::endl;
+
+    /*
+     * 0 = disable vsync
+     * 1 = enable vsync
+     */
+    if(!SDL_SetHint(SDL_HINT_RENDER_VSYNC, "0"))
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "Terminal::init() SDL_SetHint SDL_HINT_RENDER_VSYNC: %s", SDL_GetError());
+
+        // Not a show stopper, continue on!
+    }
+    /*
+     * 0 or nearest = nearest pixel sampling
+     * 1 or linear  = linear filtering       (supported by OpenGL and Direct3D)
+     * 2 or best    = anisotropic filtering  (supported by Direct3D)
+     */
+    if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"))
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "Terminal::init() SDL_SetHint SDL_HINT_RENDER_SCALE_QUALITY: %s", SDL_GetError());
+
+        // Not a show stopper, continue on!
+    }
+    /*
+     * 0 disable 3D acceleration
+     * 1 enable 3D acceleration, using the default renderer
+     * X enable 3D acceleration, using X where X is one of the valid
+     *  rendering drivers. (e.g. "direct3d", "opengl", etc.)
+     */
+    if(!SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "1"))
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "Terminal::init() SDL_SetHint SDL_HINT_RENDER_SCALE_QUALITY: %s", SDL_GetError());
+
+        // Not a show stopper, continue on! but maybe!!
+    }
+
+    // init the window
+    globalWindow =
+        SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
+                         SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, flags);
+    if(!globalWindow) // window init success
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "Terminal::init() SDL_CreateWindow globalWindow: %s", SDL_GetError());
+        return false;
+    }
+
+    std::cout << "SDL_Window creation success" << std::endl;
+
+    globalRenderer =
+        SDL_CreateRenderer(globalWindow, -1, SDL_RENDERER_ACCELERATED |
+                           SDL_RENDERER_TARGETTEXTURE);
+    if(!globalRenderer) // renderer init success
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "Terminal::init() SDL_CreateRenderer globalRenderer: %s", SDL_GetError());
+        return false;
+    }
+
+    cout << "SDL_Renderer creation success" << std::endl;
+
+    if (SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "Terminal::init() SDL_SetRenderDrawColor globalRenderer: %s", SDL_GetError());
+        return false;
+    }
+
+    // Increate the scaling to smooth without filtering.
+    // Doesn't smooth anything!
+    //SDL_RenderSetLogicalSize(globalRenderer,640*2,400*2);
+    //SDL_RenderSetScale(globalRenderer, 0, 0);
+
+
     // add some sound effects - TODO move to better place
     /*
     TheSoundManager::Instance()->load("assets/ElectroRock.ogg", "music1", SOUND_MUSIC);
@@ -273,32 +289,70 @@ void Terminal::renderSelectionScreen(int x, int y)
     displayRect.x = 0;
     displayRect.y = 0;
 
-    SDL_RenderCopy(globalRenderer, globalTexture, &rectorig, &displayRect);
+    // Redraw the screen between selection changes so we have nothing left
+    // from previous coordinates.
+    if (SDL_RenderCopy(globalRenderer, globalTexture, &rectorig, &displayRect) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "renderSelectionScreen() SDL_RenderCopy globalTexture: %s", SDL_GetError());
+    }
 
     // Next create a texture to overlay for highlighting
     if(!selectionTexture)
     {
-        std::cout << "RenderCharScreen() - globalTexture" << std::endl;
         selectionTexture =
             SDL_CreateTexture(globalRenderer,
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_TARGET,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(selectionTexture, SDL_BLENDMODE_ADD);       
+        if (!selectionTexture)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderSelectionScreen() SDL_CreateTexture selectionTexture: %s", SDL_GetError());
+            return;
+        }
+        if (SDL_SetTextureBlendMode(selectionTexture, SDL_BLENDMODE_ADD) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderSelectionScreen() SDL_SetTextureBlendMode selectionTexture: %s", SDL_GetError());
+        }
+
+        // On need to set this the first time!!
+         // Set Render Target to the Texture.
+        if (SDL_SetRenderTarget(globalRenderer, selectionTexture) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderSelectionScreen() SDL_SetRenderTarget selectionTexture: %s", SDL_GetError());
+        }
+
+        if (SDL_RenderClear(globalRenderer) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderSelectionScreen() SDL_RenderClear selectionTexture: %s", SDL_GetError());
+        }
+
+        // Fill new texture with Dark Cyan Highlight.
+        if (SDL_SetRenderDrawColor(globalRenderer, 0, 50 , 50, 255) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderSelectionScreen() SDL_SetRenderDrawColor selectionTexture: %s", SDL_GetError());
+        }
+
+        // Can test filling to RECT to speed this up after it's working!
+        if (SDL_RenderFillRect(globalRenderer, NULL) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderSelectionScreen() SDL_RenderFillRect selectionTexture: %s", SDL_GetError());
+        }
+
+        //Reset back to Global Render, then push update over current texture
+        if (SDL_SetRenderTarget(globalRenderer, NULL) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderSelectionScreen() SDL_SetRenderTarget NULL: %s", SDL_GetError());
+        }
     }
-
-    // Set Render Target to the Texture.
-    SDL_SetRenderTarget(globalRenderer, selectionTexture);
-    SDL_RenderClear(globalRenderer);
-
-    // Fill new texture with Dark Cyan Highlight.
-    SDL_SetRenderDrawColor(globalRenderer, 0, 50 , 50, 255);
-
-    // Can test filling to RECT to speed this up after it's working!
-    SDL_RenderFillRect(globalRenderer, NULL);
-
-    //Reset back to Global Render, then push update over current texture
-    SDL_SetRenderTarget(globalRenderer, NULL);
+   
 
     // We need to Translate the Screen Width vs Rows and Width to
     // get actual the grid size of the Characters to snap everything correctly.
@@ -388,7 +442,11 @@ void Terminal::renderSelectionScreen(int x, int y)
     }
 
     // Draw First Highlight Overlay
-    SDL_RenderCopy(globalRenderer, selectionTexture, NULL, &rect);
+    if (SDL_RenderCopy(globalRenderer, selectionTexture, NULL, &rect) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "renderSelectionScreen() SDL_RenderCopy selectionTexture: %s", SDL_GetError());
+    }
 
     // 2 Pixel expanded shaded border (I like it!)
     rect.x -= 4;
@@ -397,7 +455,11 @@ void Terminal::renderSelectionScreen(int x, int y)
     rect.h += 8;
 
     // Draw Border Overlay
-    SDL_RenderCopy(globalRenderer, selectionTexture, NULL, &rect);
+    if (SDL_RenderCopy(globalRenderer, selectionTexture, NULL, &rect) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "renderSelectionScreen() SDL_RenderCopy selectionTexture (Overlay): %s", SDL_GetError());
+    }
 
     // Reset dont need it?
     //SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
@@ -463,8 +525,10 @@ void Terminal::freeSurfaceTextures()
     }
 
 }
+
 /*
  * Store Images later in a zip file.
+ * Not in use at this time!
  */
 bool Terminal::loadBitmapImageFromPak()
 {
@@ -550,7 +614,8 @@ bool Terminal::loadBitmapImage(std::string path)
     chachedSurface = SDL_LoadBMP(realPath.c_str());
     if(!chachedSurface)
     {
-        std::cout << "Unable to SDL_LoadBMP: " << SDL_GetError() << std::endl;
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "loadBitmapImage() SDL_LoadBMP font: %s", currentFont.c_str());
         return false;
     }
     previousFont = currentFont;
@@ -562,9 +627,6 @@ bool Terminal::loadBitmapImage(std::string path)
  */
 bool Terminal::initSurfaceTextures()
 {
-    //Initialization flag
-    bool success = true;
-
     // Setup the Surface we will plot each character cell to.
     screenSurface =
         SDL_CreateRGBSurface(
@@ -572,18 +634,30 @@ bool Terminal::initSurfaceTextures()
             redMask, greenMask, blueMask, alphaMask);
     if(!screenSurface)
     {
-        std::cout << "screenSurface - CreateRGBSurface failed: "
-                  <<  SDL_GetError() << std::endl;
-        success = false;
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() SDL_CreateRGBSurface screenSurface: %s", SDL_GetError());
+        return false;
     }
+
     screenSurface =
         SDL_ConvertSurfaceFormat(
             screenSurface, SDL_PIXELFORMAT_ARGB8888, 0);
+    if (!screenSurface)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() SDL_ConvertSurfaceFormat screenSurface: %s", SDL_GetError());
+        return false;
+    }
 
     // Fill the Surface with Black to initalize it.
-    SDL_FillRect(
+    if (SDL_FillRect(
         screenSurface, NULL,
-        SDL_MapRGB(screenSurface->format, 0, 0, 0));
+        SDL_MapRGB(screenSurface->format, 0, 0, 0)) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() SDL_FillRect screenSurface: %s", SDL_GetError());
+        return false;
+    }
 
     // Setup Temp Surface that the size of each Character Cell.
     tmpSurface =
@@ -592,13 +666,19 @@ bool Terminal::initSurfaceTextures()
             redMask, greenMask, blueMask, alphaMask);
     if(!tmpSurface)
     {
-        std::cout << "tmpSurface - CreateRGBSurface failed: "
-                  <<  SDL_GetError() << std::endl;
-        success = false;
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() SDL_CreateRGBSurface tmpSurface: %s", SDL_GetError());
+        return false;
     }
     tmpSurface =
         SDL_ConvertSurfaceFormat(
             tmpSurface, SDL_PIXELFORMAT_ARGB8888, 0);
+    if(!tmpSurface)
+    {
+       SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() SDL_ConvertSurfaceFormat tmpSurface: %s", SDL_GetError());
+        return false;
+    }
 
     // Setup Cursor Surface that the size of a Character Cell.
     // Holds the original Char when we overwrite it with an blinking cursor.
@@ -608,13 +688,20 @@ bool Terminal::initSurfaceTextures()
             redMask, greenMask, blueMask, alphaMask);
     if(!cursorOnSurface)
     {
-        std::cout << "cursorOnSurface - CreateRGBSurface failed: "
-                  << SDL_GetError() << std::endl;
-        success = false;
+       SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() SDL_CreateRGBSurface cursorOnSurface: %s", SDL_GetError());
+        return false;
     }
+
     cursorOnSurface =
         SDL_ConvertSurfaceFormat(
             cursorOnSurface, SDL_PIXELFORMAT_ARGB8888, 0);
+    if(!cursorOnSurface)
+    {
+         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() SDL_ConvertSurfaceFormat cursorOnSurface: %s", SDL_GetError());
+        return false;
+    }
 
     // Setup Cursor Surface that the size of a Character Cell.
     // Holds the original Char when we overwrite it with an blinking cursor.
@@ -624,13 +711,20 @@ bool Terminal::initSurfaceTextures()
             redMask, greenMask, blueMask, alphaMask);
     if(!cursorOffSurface)
     {
-        std::cout << "cursorOffSurface - CreateRGBSurface failed: " <<
-                  SDL_GetError() << std::endl;
-        success = false;
+         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() SDL_CreateRGBSurface cursorOffSurface: %s", SDL_GetError());
+        return false;
     }
+
     cursorOffSurface =
         SDL_ConvertSurfaceFormat(
             cursorOffSurface, SDL_PIXELFORMAT_ARGB8888, 0);
+    if (!cursorOffSurface)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() SDL_ConvertSurfaceFormat bottomSurface: %s", SDL_GetError());
+        return false;
+    }
 
     // Setup the Surface we will plot each character cell to.
     bottomSurface =
@@ -639,22 +733,42 @@ bool Terminal::initSurfaceTextures()
             redMask, greenMask, blueMask, alphaMask);
     if(!bottomSurface)
     {
-        std::cout << "bottomSurface - CreateRGBSurface failed: " <<
-                  SDL_GetError() << std::endl;
-        success = false;
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() SDL_CreateRGBSurface bottomSurface: %s", SDL_GetError());
+        return false;
     }
+
     bottomSurface =
         SDL_ConvertSurfaceFormat(
             bottomSurface, SDL_PIXELFORMAT_ARGB8888, 0);
+    if (!bottomSurface)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() SDL_ConvertSurfaceFormat bottomSurface: %s", SDL_GetError());
+        return false;
+    }
 
     // Fill the Surface with Black to initalize it.
-    SDL_FillRect(bottomSurface, NULL,
-        SDL_MapRGB(bottomSurface->format, 0, 0, 0));
+    if (SDL_FillRect(bottomSurface, NULL,
+        SDL_MapRGB(bottomSurface->format, 0, 0, 0)) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() SDL_FillRect bottomSurface: %s", SDL_GetError());
+        return false;
+    }
 
     // start the menu state
     globalTermStateMachine = new TermStateMachine();
+    if (!globalTermStateMachine)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "initSurfaceTextures() globalTermStateMachine TermStateMachine");
+        return false;
+    }
+
+    // Load into Main Menu System (Dialing Directory)
     globalTermStateMachine->changeState(new MainMenuState());
-    return success;
+    return true;
 }
 
 /*
@@ -696,7 +810,11 @@ void Terminal::scrollRegionUp()
     if(SDL_MUSTLOCK(screenSurface))
     {
         if(SDL_LockSurface(screenSurface) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "scrollRegionUp() SDL_LockSurface screenSurface: %s", SDL_GetError());
             return;
+        }
     }
 
     // Move the Entire Screen Up a 1 Row of Characters.
@@ -707,9 +825,13 @@ void Terminal::scrollRegionUp()
     if(SDL_MUSTLOCK(screenSurface))
         SDL_UnlockSurface(screenSurface);
 
-    // Clear out very last line
-    SDL_FillRect(screenSurface, &area,
-        SDL_MapRGB(screenSurface->format, 0, 0, 0));
+    // Clear out very last line of surface region.
+    if (SDL_FillRect(screenSurface, &area,
+        SDL_MapRGB(screenSurface->format, 0, 0, 0)) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "scrollRegionUp() SDL_FillRect screenSurface: %s", SDL_GetError());
+    }
 
     // If first Time, Crete Texture.
     if(!globalTexture)
@@ -719,12 +841,25 @@ void Terminal::scrollRegionUp()
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
+        if (!globalTexture)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "scrollRegionUp() SDL_CreateTexture globalRenderer: %s", SDL_GetError());
+            return;
+        }
+        if (SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "scrollRegionUp() SDL_SetTextureBlendMode globalTexture: %s", SDL_GetError());
+        }
     }
-    SDL_UpdateTexture(globalTexture, NULL,
-        screenSurface->pixels, screenSurface->pitch);
+    if (SDL_UpdateTexture(globalTexture, NULL,
+        screenSurface->pixels, screenSurface->pitch) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "scrollRegionUp() SDL_UpdateTexture globalTexture: %s", SDL_GetError());
+    }
 }
-
 
 /*
  * Clips out the Top Row of the Screen,
@@ -749,7 +884,11 @@ void Terminal::scrollScreenUp()
     if(SDL_MUSTLOCK(screenSurface))
     {
         if(SDL_LockSurface(screenSurface) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "scrollScreenUp() SDL_LockSurface screenSurface: %s", SDL_GetError());
             return;
+        }
     }
 
     // Move the Entire Screen Up a 1 Row of Characters.
@@ -766,11 +905,26 @@ void Terminal::scrollScreenUp()
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
+
+        if (!globalTexture)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "scrollScreenUp() SDL_CreateTexture globalRenderer: %s", SDL_GetError());
+            return;
+        }
+        if (SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "scrollScreenUp() SDL_SetTextureBlendMode globalTexture: %s", SDL_GetError());
+        }
     }
     // Write Scrolled screen to Texture.
-    SDL_UpdateTexture(globalTexture, NULL,
-        screenSurface->pixels, screenSurface->pitch);
+    if (SDL_UpdateTexture(globalTexture, NULL,
+        screenSurface->pixels, screenSurface->pitch) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "scrollScreenUp() SDL_UpdateTexture globalTexture: %s", SDL_GetError());
+    }
 }
 
 /**
@@ -779,8 +933,12 @@ void Terminal::scrollScreenUp()
  */
 void Terminal::clearScreenSurface()
 {
-    SDL_FillRect(screenSurface, NULL,
-                 SDL_MapRGB(screenSurface->format, 0, 0, 0));
+    if (SDL_FillRect(screenSurface, NULL,
+        SDL_MapRGB(screenSurface->format, 0, 0, 0)) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "clearScreenSurface() SDL_FillRect screenSurface: %s", SDL_GetError());
+    }
 
     if(!globalTexture)
     {
@@ -790,20 +948,39 @@ void Terminal::clearScreenSurface()
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
+        if (!globalTexture)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "clearScreenSurface() SDL_CreateTexture globalRenderer: %s", SDL_GetError());
+            return;
+        }
+        if (SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "clearScreenSurface() SDL_SetTextureBlendMode globalTexture: %s", SDL_GetError());
+        }
     }
-    SDL_UpdateTexture(globalTexture, NULL,
-        screenSurface->pixels, screenSurface->pitch);
-    SDL_RenderClear(globalRenderer);
-}
 
+    if (SDL_UpdateTexture(globalTexture, NULL,
+        screenSurface->pixels, screenSurface->pitch) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "clearScreenSurface() SDL_UpdateTexture globalRenderer: %s", SDL_GetError());
+    }
+    if (SDL_RenderClear(globalRenderer) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "clearScreenSurface() SDL_RenderClear globalRenderer: %s", SDL_GetError());
+    }
+}
 
 /**
  * Fill entire lines with space and black foregroud/Background
- * Updates super fast now!! oh yea!!
+ * Fast update to clear a row.
  */
 void Terminal::renderClearLineScreen(int y, int start, int end)
 {
-    // Save Current color so we can switch back to it.
+    // Save Background Color so we can switch back to it.
     SDL_Color originalGB = currentBGColor;
 
     // Clear out entire line.
@@ -828,8 +1005,9 @@ void Terminal::renderBottomScreen()
 
     if(!bottomSurface)
     {
-        std::cout << "bottomSurface - CreateRGBSurface failed: " <<
-            SDL_GetError() << std::endl;
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "renderBottomScreen() bottomSurface CreateRGBSurface failed.");
+        return;
     }
 
     pick.w = screenSurface->w;
@@ -848,21 +1026,47 @@ void Terminal::renderBottomScreen()
     else
         rect.y = characterHeight * 24;
 
-    SDL_FillRect(bottomSurface, NULL,
-                 SDL_MapRGB(bottomSurface->format, 0, 0, 0));
-    SDL_BlitSurface(screenSurface ,&pick, bottomSurface, NULL);
+    if (SDL_FillRect(bottomSurface, NULL,
+            SDL_MapRGB(bottomSurface->format, 0, 0, 0)) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "renderBottomScreen() SDL_FillRect bottomSurface: %s", SDL_GetError());
+        return;
+    }
+
+    if (SDL_BlitSurface(screenSurface ,&pick, bottomSurface, NULL) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "renderBottomScreen() SDL_BlitSurface bottomSurface: %s", SDL_GetError());
+        return;
+    }
+
     if(!globalTexture)
     {
-        std::cout << "RenderBottomScreen() - globalTexture" << std::endl;
         globalTexture =
             SDL_CreateTexture(globalRenderer,
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
+        if (!globalTexture)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderBottomScreen() SDL_CreateTexture globalTexture: %s", SDL_GetError());
+            return;
+        }
+        if (SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderBottomScreen() SDL_SetTextureBlendMode globalTexture: %s", SDL_GetError());
+        }
     }
-    SDL_UpdateTexture(globalTexture, &rect,
-        bottomSurface->pixels, bottomSurface->pitch);
+
+    if (SDL_UpdateTexture(globalTexture, &rect,
+        bottomSurface->pixels, bottomSurface->pitch) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "renderBottomScreen() SDL_UpdateTexture globalTexture: %s", SDL_GetError());
+    }
 }
 
 /**
@@ -872,6 +1076,7 @@ void Terminal::renderBottomScreen()
 void Terminal::renderScreen()
 {
     SDL_Rect pick;
+
     pick.x = 0;
     pick.y = 0;
     pick.w = surfaceWidth;
@@ -879,16 +1084,30 @@ void Terminal::renderScreen()
 
     if(!globalTexture)
     {
-        std::cout << "RenderScreen() - Creating globalTexture" << std::endl;
         globalTexture =
             SDL_CreateTexture(globalRenderer,
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
+        if (!globalTexture)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderScreen() SDL_CreateTexture globalTexture: %s", SDL_GetError());
+            return;
+        }
+        if (SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderScreen() SDL_SetTextureBlendMode globalTexture: %s", SDL_GetError());
+        }
     }
-    SDL_UpdateTexture(globalTexture, &pick,
-        screenSurface->pixels, screenSurface->pitch);
+
+    if (SDL_UpdateTexture(globalTexture, &pick,
+        screenSurface->pixels, screenSurface->pitch) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "renderScreen() SDL_UpdateTexture globalTexture: %s", SDL_GetError());
+    }
 }
 
 /**
@@ -906,16 +1125,31 @@ void Terminal::renderCharScreen(int x, int y)
 
     if(!globalTexture)
     {
-        std::cout << "RenderCharScreen() - globalTexture" << std::endl;
         globalTexture =
             SDL_CreateTexture(globalRenderer,
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
+        if (!globalTexture)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderCharScreen() SDL_CreateTexture globalTexture: %s", SDL_GetError());
+            return;
+        }
+
+        if (SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderCharScreen() SDL_SetTextureBlendMode globalTexture: %s", SDL_GetError());
+        }
     }
-    SDL_UpdateTexture(globalTexture, &rect,
-        screenSurface->pixels, screenSurface->pitch);
+
+    if (SDL_UpdateTexture(globalTexture, &rect,
+        screenSurface->pixels, screenSurface->pitch) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "renderCharScreen() SDL_UpdateTexture globalTexture: %s", SDL_GetError());
+    }
 }
 
 /**
@@ -941,16 +1175,30 @@ void Terminal::renderCursorOnScreen()
 
     if(!globalTexture)
     {
-        std::cout << "RenderCursorOnScreen() - globalTexture" << std::endl;
         globalTexture =
             SDL_CreateTexture(globalRenderer,
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
+        if (!globalTexture)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderCursorOnScreen() SDL_CreateTexture globalTexture: %s", SDL_GetError());
+        }
+
+        if (SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderCursorOnScreen() SDL_SetTextureBlendMode globalTexture: %s", SDL_GetError());
+        }
     }
-    SDL_UpdateTexture(globalTexture, &rect,
-        cursorOnSurface->pixels, cursorOnSurface->pitch);
+
+    if (SDL_UpdateTexture(globalTexture, &rect,
+        cursorOnSurface->pixels, cursorOnSurface->pitch) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "renderCursorOffScreen() SDL_SetTextureBlendMode globalTexture: %s", SDL_GetError());
+    }
 }
 
 /**
@@ -976,54 +1224,100 @@ void Terminal::renderCursorOffScreen()
 
     if(!globalTexture)
     {
-        std::cout << "RenderCursorOffScreen() - globalTexture" << std::endl;
         globalTexture =
             SDL_CreateTexture(globalRenderer,
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND);
+
+        if (!globalTexture)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderCursorOffScreen() SDL_CreateTexture globalTexture: %s", SDL_GetError());
+            return;
+        }
+
+        if (SDL_SetTextureBlendMode(globalTexture, SDL_BLENDMODE_BLEND) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "renderCursorOffScreen() SDL_SetTextureBlendMode globalTexture: %s", SDL_GetError());
+        }
     }
-    SDL_UpdateTexture(globalTexture, &rect,
-        cursorOffSurface->pixels, cursorOffSurface->pitch);
+
+    if (SDL_UpdateTexture(globalTexture, &rect,
+        cursorOffSurface->pixels, cursorOffSurface->pitch) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "renderCursorOffScreen() SDL_UpdateTexture globalTexture: %s", SDL_GetError());
+    }
 }
 
 /*
- * This is a proof of concept that will brighten
- * Screen displayed after Texturefiltering is applied
- * since texture filtering slightly dims colors to leave
- * a blurred feeling
+ * This hints or highlights the current screen
+ * Doesn't excatly change gama, was just testing!
+ * Could be used lateron for something.
  */
 void Terminal::drawGamaTextureScreen()
 {
-
     // Next create a texture to overlay for highlighting
+    // Create Inital Texture if it doesn't exist.
     if(!selectionTexture)
     {
-        std::cout << "drawGamaTextureScreen() - globalTexture" << std::endl;
         selectionTexture =
             SDL_CreateTexture(globalRenderer,
                 SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_TARGET,
                 screenSurface->w, screenSurface->h);
-        SDL_SetTextureBlendMode(selectionTexture, SDL_BLENDMODE_MOD);
+        if (!selectionTexture)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "drawGamaTextureScreen() SDL_CreateTexture selectionTexture: %s", SDL_GetError());
+            return;
+        }
+
+        if (SDL_SetTextureBlendMode(selectionTexture, SDL_BLENDMODE_MOD) < 0)
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "drawGamaTextureScreen() SDL_SetTextureBlendMode selectionTexture: %s", SDL_GetError());
+        }
     }
 
     // Set Render Target to the Texture.
-    SDL_SetRenderTarget(globalRenderer, selectionTexture);
-    SDL_RenderClear(globalRenderer);
-
+    if (SDL_SetRenderTarget(globalRenderer, selectionTexture) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "drawGamaTextureScreen() SDL_SetRenderTarget selectionTexture: %s", SDL_GetError());
+    }
+    // Clear the Texture
+    if (SDL_RenderClear(globalRenderer) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "drawGamaTextureScreen() SDL_RenderClear selectionTexture: %s", SDL_GetError());
+    }
     // Fill new texture with Cyan Highlight.
-    SDL_SetRenderDrawColor(globalRenderer, 255 , 255 , 255,  1);
-
+    if (SDL_SetRenderDrawColor(globalRenderer, 255 , 255 , 255,  1) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "drawGamaTextureScreen() SDL_SetRenderDrawColor selectionTexture: %s", SDL_GetError());
+    }
     // Can test filling to RECT to speed this up after it's working!
-    SDL_RenderFillRect(globalRenderer, NULL);
-
+    if (SDL_RenderFillRect(globalRenderer, NULL) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "drawGamaTextureScreen() SDL_RenderFillRect NULL: %s", SDL_GetError());
+    }
     //Reset back to Global Render, then push update over current texture
-    SDL_SetRenderTarget(globalRenderer, NULL);
-
-
-    SDL_RenderCopy(globalRenderer, selectionTexture, NULL, NULL);
+    if (SDL_SetRenderTarget(globalRenderer, NULL) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "drawGamaTextureScreen() SDL_SetRenderTarget NULL: %s", SDL_GetError());
+    }
+    // Render final update
+    if (SDL_RenderCopy(globalRenderer, selectionTexture, NULL, NULL) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "drawGamaTextureScreen() SDL_RenderCopy globalRenderer: %s", SDL_GetError());
+    }
 
     // Reset dont need it?
     //SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
@@ -1040,7 +1334,12 @@ void Terminal::drawTextureScreen()
 {
     SDL_Rect rect;
     int screenWidth, screenHeight;
-    SDL_GetRendererOutputSize(globalRenderer,&screenWidth,&screenHeight);
+
+    if (SDL_GetRendererOutputSize(globalRenderer,&screenWidth,&screenHeight) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "drawTextureScreen() SDL_GetRendererOutputSize globalRenderer: %s", SDL_GetError());
+    }
 
     // We clip off botom 80, so that we get proper 8x16
     // Display without Extra pixel borders around the screen,
@@ -1055,12 +1354,13 @@ void Terminal::drawTextureScreen()
     displayRect.h = screenHeight;
     displayRect.x = 0;
     displayRect.y = 0;
-
-    SDL_RenderCopy(globalRenderer, globalTexture, &rect, &displayRect);
+    
+    if (SDL_RenderCopy(globalRenderer, globalTexture, &rect, &displayRect) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "drawTextureScreen() SDL_RenderCopy globalRenderer: %s", SDL_GetError());
+    }
     SDL_RenderPresent(globalRenderer);
-
-    // Testing only for increasing brightness!
-    //drawGamaTextureScreen();
 }
 
 /**
@@ -1070,8 +1370,16 @@ void Terminal::drawTextureScreen()
 void Terminal::clearScreen()
 {
     //Clear screen
-    SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
-    SDL_RenderClear(globalRenderer);
+    if (SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "clearScreen() SDL_SetRenderDrawColor globalRenderer: %s", SDL_GetError());
+    }
+    if (SDL_RenderClear(globalRenderer) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "clearScreen() SDL_RenderClear globalRenderer: %s", SDL_GetError());
+    }
     SDL_RenderPresent(globalRenderer);
 }
 
@@ -1100,7 +1408,10 @@ void Terminal::replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 backgrou
     if(SDL_MUSTLOCK(src))
     {
         if(SDL_LockSurface(src) < 0)
-            return;
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "replaceColor() SDL_LockSurface src: %s", SDL_GetError());
+        }
     }
 
     int count = src->h * src->w;
@@ -1130,8 +1441,6 @@ void Terminal::setupCursorChar()
         cursorXPosition = TheAnsiParser::Instance()->x_position-1;
         cursorYPosition = TheAnsiParser::Instance()->y_position-1;
     }
-    else
-        return;
 
     SDL_Rect pick, area;
 
@@ -1152,21 +1461,45 @@ void Terminal::setupCursorChar()
     area.h = characterHeight;
 
     // Clear Surfaces
-    SDL_FillRect(tmpSurface,
-                 NULL, SDL_MapRGB(tmpSurface->format, 0, 0, 0));
-    SDL_FillRect(cursorOffSurface,
-                 NULL, SDL_MapRGB(cursorOffSurface->format, 0, 0, 0));
-    SDL_FillRect(cursorOnSurface,
-                 NULL, SDL_MapRGB(cursorOnSurface->format, 0, 0, 0));
+    if (SDL_FillRect(tmpSurface,
+        NULL, SDL_MapRGB(tmpSurface->format, 0, 0, 0)) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "setupCursorChar() SDL_FillRect tmpSurface: %s", SDL_GetError());
+    }
+    if (SDL_FillRect(cursorOffSurface,
+        NULL, SDL_MapRGB(cursorOffSurface->format, 0, 0, 0)) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "setupCursorChar() SDL_FillRect cursorOffSurface: %s", SDL_GetError());
+    }
+    if (SDL_FillRect(cursorOnSurface,
+        NULL, SDL_MapRGB(cursorOnSurface->format, 0, 0, 0)) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "setupCursorChar() SDL_FillRect cursorOnSurface: %s", SDL_GetError());
+    }
 
     //First Grab UnderScore from Font Surface
-    SDL_BlitSurface(chachedSurface,&pick,tmpSurface,NULL);
+    if (SDL_BlitSurface(chachedSurface,&pick,tmpSurface,NULL) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "setupCursorChar() SDL_BlitSurface tmpSurface: %s", SDL_GetError());
+    }
 
     // Grab current Char Block where Cursor position is at on screen
-    SDL_BlitSurface(screenSurface,&area,cursorOnSurface,NULL);
+    if (SDL_BlitSurface(screenSurface,&area,cursorOnSurface,NULL) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "setupCursorChar() SDL_BlitSurface cursorOnSurface: %s", SDL_GetError());
+    }
 
     // Grab curent Char Block where Passed Cursor position is.
-    SDL_BlitSurface(screenSurface,&area,cursorOffSurface,NULL);
+    if (SDL_BlitSurface(screenSurface,&area,cursorOffSurface,NULL) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "setupCursorChar() SDL_BlitSurface cursorOffSurface: %s", SDL_GetError());
+    }
 
     // We'll Copy over the Underscore and overall it on the cursor on
     int bpp = screenSurface->format->BytesPerPixel;
@@ -1191,7 +1524,10 @@ void Terminal::setupCursorChar()
     if(SDL_MUSTLOCK(cursorOnSurface))
     {
         if(SDL_LockSurface(cursorOnSurface) < 0)
-            return;
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "setupCursorChar() SDL_LockSurface(cursorOnSurface): %s", SDL_GetError());
+        }
     }
 
     // Copy (2) Rows of Pixels for the Cursor
@@ -1228,8 +1564,17 @@ void Terminal::drawChar(int X, int Y, int asciicode)
     area.h = characterHeight;
 
     // Clear Temp Surface before blitting it.
-    SDL_FillRect(tmpSurface, NULL, SDL_MapRGB(tmpSurface->format, 0, 0, 0));
-    SDL_BlitSurface(chachedSurface,&pick,tmpSurface,NULL);
+    if (SDL_FillRect(tmpSurface, NULL, SDL_MapRGB(tmpSurface->format, 0, 0, 0)) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "drawChar() SDL_FillRect tmpSurface: %s", SDL_GetError());
+    }
+
+    if (SDL_BlitSurface(chachedSurface,&pick,tmpSurface,NULL) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "drawChar() SDL_BlitSurface tmpSurface: %s", SDL_GetError());
+    }
 
     replaceColor(tmpSurface,
         SDL_MapRGB(tmpSurface->format, currentFGColor.r,
@@ -1238,7 +1583,11 @@ void Terminal::drawChar(int X, int Y, int asciicode)
             currentBGColor.g, currentBGColor.b));
 
     // Write to Back Buffer for Scrolling the Screen.
-    SDL_BlitSurface(tmpSurface,NULL,screenSurface,&area);
+    if (SDL_BlitSurface(tmpSurface,NULL,screenSurface,&area) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "drawChar() SDL_BlitSurface screenSurface: %s", SDL_GetError());
+    }
 }
 
 /**
@@ -1260,7 +1609,7 @@ void Terminal::drawString(int X, int Y, char text[])
     {
         asciiCode = std::char_traits<char>().to_int_type(text[i]);
         drawChar(area.x / characterWidth, area.y / characterHeight, asciiCode);
-        area.x=area.x+characterWidth;
+        area.x += characterWidth;
         if(area.x >= surfaceWidth-5)
         {
             area.x = 0;
@@ -1291,7 +1640,7 @@ void Terminal::drawCharSet(int X, int Y)
             break;
         }
         drawChar(area.x / characterWidth, area.y / characterHeight, asciicode);
-        area.x = area.x + characterWidth;
+        area.x += characterWidth;
         // Wrap
         if(area.x >= surfaceWidth-5)
         {

@@ -110,6 +110,7 @@ void cleanup()
     //char ch;
     //std::cin.get(ch);
 }
+
 /*
  *  Main Program Entrance
  */
@@ -117,7 +118,6 @@ int main(int argc, char* argv[])
 {
     // Run cleanup on exit of program
     atexit(cleanup);
-
     std::string temp;
 
     // Initalize Renderer and Window with default sizes.
@@ -144,7 +144,8 @@ int main(int argc, char* argv[])
                     //frameStart = SDL_GetTicks();
                     // If the font changed, then load the new image.
                     if(TheTerminal::Instance()->didFontChange())
-                        TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
+                        TheTerminal::Instance()->loadBitmapImage(
+                            TheTerminal::Instance()->getCurrentFont());
 
                     // Test Ansi Screens
                     //readinAnsi("test.ans",temp);
@@ -178,7 +179,7 @@ int main(int argc, char* argv[])
             std::cout << "Term init failure 2. " << SDL_GetError() << "\n";
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
                 "Closed Session", "Terminal Error on Init 2.", NULL);
-        return -1;
+            return -1;
         }
     }
     else

@@ -46,13 +46,16 @@ int SocketHandler::update()
         ret = socket->pollSocket();
         if(ret == -1)
         {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "Socket Closed by host, disconnecting.");
+
             // Shutdown Socket.
             socket->onExit();
             active = false;
         }
         else if (ret == 0) // No Data!
         {
-            // When no data is received, this is when we want to show the cursor!
+            // When no data received, this is when we want to show the cursor!
             // Setup cursor in current x/y position Cursor.
             TheTerminal::Instance()->setupCursorChar();
 
@@ -88,13 +91,16 @@ int SocketHandler::update()
             ttime = SDL_GetTicks();
             startBlinking = false;
             cursorBlink = 0;
-            TheTerminal::Instance()->renderCursorOffScreen();
-            TheTerminal::Instance()->drawTextureScreen();
+
+            // Don't show the cursor when we're going to redraw everything!
+            //TheTerminal::Instance()->renderCursorOffScreen();
+            //TheTerminal::Instance()->drawTextureScreen();
         }
     }
     else
     {
         // Inactive Connection
+        SDL_Log("Showdown received, Socket Closed.");
         ret = -1;        
     }
     return ret;
@@ -112,18 +118,19 @@ bool SocketHandler::initTelnet(std::string host, int port)
             if(socket->onEnter())
             {
                 active = true;
-                std::cout << "SocketHandler::initTelnet active = true" << std::endl;
             }
             else
             {
                 active = false;
-                std::cout << "SocketHandler::initTelnet active = false" << std::endl;
+                SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                    "Unable to initalize Telnet Socket.");
                 return false;
             }
         }
         catch(std::exception& e)
         {
-            std::cerr << "exception new SDL_Socket: " << e.what() << '\n';
+            std::cerr << "exception creating new SDL_Socket: "
+                << e.what() << std::endl;
             return false;
         }
     }
@@ -132,7 +139,8 @@ bool SocketHandler::initTelnet(std::string host, int port)
     return true;
 }
 
-bool SocketHandler::initSSH(std::string host, int port, std::string username, std::string password)
+bool SocketHandler::initSSH(std::string host, int port,
+    std::string username, std::string password)
 {
     if(!active)
     {
@@ -142,19 +150,20 @@ bool SocketHandler::initSSH(std::string host, int port, std::string username, st
             socket = new SSH_Socket(host, port, username, password);
             if(socket->onEnter())
             {
-                std::cout << "SocketHandler::initSSH active = true" << std::endl;
                 active = true;
             }
             else
             {
-                std::cout << "SocketHandler::initSSH active = false" << std::endl;
+                SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                    "Unable to initalize SSH Socket.");
                 active = false;
                 return false;
             }
         }
         catch(std::exception& e)
         {
-            std::cerr << "exception new SSH_Socket: " << e.what() << '\n';
+            std::cerr << "exception creating SSH_Socket: "
+                << e.what() << std::endl;
             return false;
         }
     }

@@ -14,7 +14,7 @@ InputHandler* InputHandler::globalInstance = 0;
 
 InputHandler::InputHandler() :
     globalShutdown(false),
-    fullScreen(false),
+    isWindowMode(false),
     fullScreenWindowSize(0),
     _isMouseSelection(false),
     mouseSourceXPosition(0),
@@ -42,7 +42,6 @@ bool InputHandler::update()
         //User requests quit
         switch (event.type)
         {
-
             // If no Keypress check now for Window Events.
             case SDL_WINDOWEVENT:
                 switch(event.window.event)
@@ -59,21 +58,21 @@ bool InputHandler::update()
                 //      break;
 
                     case SDL_WINDOWEVENT_MOVED:
-                        SDL_Log("Window %d moved to %d,%d",
-                            event.window.windowID, event.window.data1,
-                            event.window.data2);
+                        //SDL_Log("Window %d moved to %d,%d",
+                        //    event.window.windowID, event.window.data1,
+                        //    event.window.data2);
                         TheTerminal::Instance()->drawTextureScreen();
                         break;
 
                     case SDL_WINDOWEVENT_SHOWN:
-                        SDL_Log("Window %d shown", event.window.windowID);
+                        //SDL_Log("Window %d shown", event.window.windowID);
                         TheTerminal::Instance()->drawTextureScreen();
                         break;
 
                     case SDL_WINDOWEVENT_RESIZED:
-                        SDL_Log("Window %d resized to %dx%d",
-                                event.window.windowID, event.window.data1,
-                                event.window.data2);
+                        //SDL_Log("Window %d resized to %dx%d",
+                        //        event.window.windowID, event.window.data1,
+                        //        event.window.data2);
                         TheTerminal::Instance()->drawTextureScreen();
                         break;
 
@@ -82,41 +81,41 @@ bool InputHandler::update()
                 //      break;
 
                     case SDL_WINDOWEVENT_MAXIMIZED:
-                        SDL_Log("Window %d maximized", event.window.windowID);
+                        //SDL_Log("Window %d maximized", event.window.windowID);
                         TheTerminal::Instance()->drawTextureScreen();
                         break;
 
                     case SDL_WINDOWEVENT_RESTORED:
-                        SDL_Log("Window %d restored", event.window.windowID);
+                        //SDL_Log("Window %d restored", event.window.windowID);
                         TheTerminal::Instance()->drawTextureScreen();
                         break;
 
                     case SDL_WINDOWEVENT_CLOSE:
                         globalShutdown = true;
-                        SDL_Log("Window %d closed", event.window.windowID);
+                        SDL_Log("Window %d closed by user!", event.window.windowID);
                         break;
 
                     case SDL_WINDOWEVENT_ENTER:
-                        SDL_Log("Mouse entered window %d",
-                            event.window.windowID);
+                        //SDL_Log("Mouse entered window %d",
+                        //    event.window.windowID);
                         break;
                 /// case SDL_WINDOWEVENT_LEAVE:
                 //      SDL_Log("Mouse left window %d", event.window.windowID);
                 //      break;
                     case SDL_WINDOWEVENT_FOCUS_GAINED:
-                      SDL_Log("Window %d gained keyboard focus",
-                              event.window.windowID);
+                        //SDL_Log("Window %d gained keyboard focus",
+                        //    event.window.windowID);
 
                       break;
                     case SDL_WINDOWEVENT_FOCUS_LOST:
-                      SDL_Log("Window %d lost keyboard focus",
-                              event.window.windowID);
+                        //SDL_Log("Window %d lost keyboard focus",
+                        //    event.window.windowID);
                       break;
-                //
-                //  default:
-                //      SDL_Log("Window %d got unknown event %d",
-                //              event.window.windowID, event.window.event);
-                //      break;
+
+                    default:
+                        //SDL_Log("Window %d got unknown event %d",
+                        //   event.window.windowID, event.window.event);
+                     break;
 
                 }// End of Switch
                 break;
@@ -135,14 +134,15 @@ bool InputHandler::update()
                 {
                     _isMouseSelection = false;
 
-                    //Get the mouse offsets
+                    // Get the mouse offsets
                     mouseReleaseXPosition = event.button.x;
                     mouseReleaseYPosition = event.button.y;
+                    /*
                     std::cout << "Mouse released at: " << mouseReleaseXPosition << ","
                         << mouseReleaseYPosition << std::endl;
+                    */
                 }
-
-                SDL_Log("SDL_MOUSEBUTTONUP %d shown", event.button.button);
+                //SDL_Log("SDL_MOUSEBUTTONUP %d shown", event.button.button);
                 break;
 
             case SDL_MOUSEMOTION:
@@ -160,7 +160,6 @@ bool InputHandler::update()
                     // To Highligh the selected screen segment.
                     TheTerminal::Instance()->renderSelectionScreen(
                         event.motion.x, event.motion.y);
-
                 }
                 break;
 
@@ -170,19 +169,21 @@ bool InputHandler::update()
                 {
                     _isMouseSelection = true;
 
-                    //Get the mouse offsets
+                    //Get the mouse offsets                    
                     mouseSourceXPosition = event.button.x;
                     mouseSourceYPosition = event.button.y;
+                    /*
                     std::cout << "Mouse pressed at: " << mouseSourceXPosition << ","
                         << mouseSourceYPosition << std::endl;
-
-                    SDL_Log("SDL_MOUSEBUTTONDOWN %d shown", event.button.button);
+                    */
+                    //SDL_Log("SDL_MOUSEBUTTONDOWN %d shown", event.button.button);
                     break;
                 }
                 
                 //If the Right mouse button was pressed Paste Text.
                 else if(event.button.button == SDL_BUTTON_RIGHT)
                 {
+                    std::cout << "Paste Clipboard. " << std::endl;
                     SDL_StartTextInput();
                     inputText = SDL_GetClipboardText();
                     // Some input filtering
@@ -305,41 +306,63 @@ bool InputHandler::update()
                     {
                         case SDLK_RETURN:
                             // If not Full Screen Then Toggle to Next Mode.
-                            if(!fullScreen)
+                            if(!isWindowMode)
                             {
                                 // Texture Filtering OFF.
-                                // FullScreen Desktop fits the window to the desktop size,
+                                // FULLSCREEN_DESKTOP fits the window to the desktop size,
                                 // This throws off the pixels.  Using the resolution switch
                                 // so that 640, or 1280 is made to full screen fixes this
                                 // properly without needing to do any fancy recalculations
-                                fullScreen = true; // Can be Full Screen or Full Screen Desktop.
-                                SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(),
-                                    SDL_WINDOW_FULLSCREEN); // _DESKTOP);
+
+                                // However there are SDL bug reports for Linux and OSX,
+                                // Will need to look into this more!
+                                if (SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(),
+                                    //SDL_WINDOW_FULLSCREEN_DESKTOP);  // Desktop resolution
+                                    SDL_WINDOW_FULLSCREEN) < 0)        // Surface Resolution
+                                {
+                                    SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                                        "Error setting window to FullScreen Mode: %s", SDL_GetError());
+                                    isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
+                                    return false;
+                                }
+
+                                SDL_Log("Setting window to FULLSCREEN.");
+
+                                isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
                                 fullScreenWindowSize = 0;
                                 TheTerminal::Instance()->drawTextureScreen();
                                 return false;
                             }
                             else
                             {
-                                // Set Full Screen Window.
-                                SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(), 0);
+                                // Set Window Mode
+                                if (SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(), 0) < 0)
+                                {
+                                    SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                                        "Error setting window to Windowed Mode: %s", SDL_GetError());
+                                    return false;
+                                }
+
                                 //Toggle Between Window Sizes.
                                 switch(fullScreenWindowSize)
                                 {
                                     // Texture Filtering OFF.
                                     // These (2) Resolutions work perfect for 8x16 fonts
                                     // When the screen is resized the pixels are doubled
-                                    // properly without needing to do any fancy recalculations
-                                    // to make Shaded blocks or fonts look better!
+                                    // without needing to do any fancy recalculations
+                                    // WE use hthese multiple to keep shaded blocks with
+                                    // Correct looking pixel size and layout.
                                     case 0:
                                         SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
+                                        SDL_Log("Setting window size to 640 x 400.");
                                         ++fullScreenWindowSize;
                                         break;
 
                                     case 1:
                                         SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 1280, 800);
+                                        SDL_Log("Setting window size to 1280 x 800.");
                                         ++fullScreenWindowSize;
-                                        fullScreen = false;
+                                        isWindowMode = false;
                                         break;
                                 }
                                 TheTerminal::Instance()->drawTextureScreen();
