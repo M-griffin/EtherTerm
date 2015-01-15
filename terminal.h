@@ -8,7 +8,7 @@
 // $LastChangedBy$
 
 #ifdef TARGET_OS_MAC
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #elif _WIN32
 #include <SDL.h>
 #else
@@ -113,6 +113,14 @@ public:
     {
         return surfaceHeight;
     }
+    void setWindowWidth(int width)
+    {
+        windowWidth = width;
+    }
+    void setWindowHeight(int height)
+    {
+        windowHeight = height;
+    }
     int getWindowWidth() const
     {
         return windowWidth;
@@ -152,9 +160,9 @@ public:
 
     // Now for Rendering Code
 
-    // Working on Texture overlay for selection!
-    void renderSelectionScreen(int x, int y);
 
+    void restartWindowRenderer(std::string mode);
+    void renderSelectionScreen(int x, int y);
     void freeSurfaceTextures();
     bool loadBitmapImageFromPak();
     bool loadBitmapImage(std::string path);
@@ -214,6 +222,7 @@ public:
 private:
 
     SystemConnection systemConnection;
+    std::string    windowTitle;
     std::string    currentFont;
     std::string    previousFont;
 

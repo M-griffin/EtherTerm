@@ -10,8 +10,8 @@
 #include "ansiParser.h"
 
 #ifdef TARGET_OS_MAC
-#include <SDL.h>
-#include <SDL_net.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #elif _WIN32
 #include <SDL.h>
 #include <SDL_net.h>
@@ -140,7 +140,6 @@ bool SSH_Socket::onEnter()
 
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
             "Closed Session", "User has closed the program.", NULL);
-        onExit();
         return false;
     }
 
@@ -150,7 +149,6 @@ bool SSH_Socket::onEnter()
     {
         printf("\r\n SSH Error, Can't Authenticate User %s: %s - %i \r\n",
                host.c_str(), ssh_get_error(session), rc);
-        onExit();
         return false;
     }
 
@@ -161,7 +159,6 @@ bool SSH_Socket::onEnter()
         printf(
             "\r\nSetup Channel for Socket Communications %s: %s - %i \r\n",
             host.c_str(), ssh_get_error(session), rc);
-        onExit();
         return false;
     }
 
@@ -173,7 +170,6 @@ bool SSH_Socket::onEnter()
             "\r\nOpen Channel for Socket Communications %s: %s - %i \r\n",
             host.c_str(), ssh_get_error(session), rc);
         ssh_channel_free(sshChannel);
-        onExit();
         return false;
     }
 
@@ -208,7 +204,6 @@ bool SSH_Socket::onEnter()
         printf(
             "\r\nRequest for shell on channel failed. %s: %s - %i \r\n",
             host.c_str(), ssh_get_error(session), rc);
-        onExit();
         return false;
     }
     return true;
@@ -296,7 +291,7 @@ int SSH_Socket::verify_knownhost()
     {
         return -1;
     }
-   
+
     rc = ssh_get_publickey_hash(srv_pubkey, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen);
     ssh_key_free(srv_pubkey);
     if(rc < 0)

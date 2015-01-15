@@ -8,8 +8,8 @@
 // $LastChangedBy$
 
 #ifdef TARGET_OS_MAC
-#include <SDL.h>
-#include <SDL_net.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #elif _WIN32
 #include <SDL.h>
 #include <SDL_net.h>

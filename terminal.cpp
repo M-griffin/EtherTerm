@@ -11,7 +11,7 @@
 #include "inputHandler.h"
 
 #ifdef TARGET_OS_MAC
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #elif _WIN32
 #include <SDL.h>
 #else
@@ -104,6 +104,85 @@ Terminal::~Terminal()
     std::cout << "Term Released" << std::endl;
 }
 
+void Terminal::restartWindowRenderer(std::string mode)
+{
+
+
+    // First Clear the Rexture so it will get recreated with new HINT
+    if (globalTexture)
+    {
+        std::cout << "SDL_DestroyTexture globalTexture" << std::endl;
+        SDL_DestroyTexture(globalTexture);
+        globalTexture = NULL;
+    }
+
+    // Reset Renderer Attributes
+
+    /*
+     * 0 = disable vsync
+     * 1 = enable vsync
+     */
+    if(!SDL_SetHint(SDL_HINT_RENDER_VSYNC, "0"))
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "restartWindowRenderer SDL_SetHint SDL_HINT_RENDER_VSYNC: %s", SDL_GetError());
+
+        // Not a show stopper, continue on!
+    }
+
+    /*
+     * 0 or nearest = nearest pixel sampling
+     * 1 or linear  = linear filtering       (supported by OpenGL and Direct3D)
+     * 2 or best    = anisotropic filtering  (supported by Direct3D)
+     */
+    if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, mode.c_str()))
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "restartWindowRenderer SDL_SetHint SDL_HINT_RENDER_SCALE_QUALITY: %s", SDL_GetError());
+
+        // Not a show stopper, continue on!
+    }
+    /*
+     * 0 disable 3D acceleration
+     * 1 enable 3D acceleration, using the default renderer
+     * X enable 3D acceleration, using X where X is one of the valid
+     *  rendering drivers. (e.g. "direct3d", "opengl", etc.)
+     */
+    if(!SDL_SetHint(SDL_HINT_FRAMEBUFFER_ACCELERATION, "1"))
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "restartWindowRenderer SDL_SetHint SDL_HINT_RENDER_SCALE_QUALITY: %s", SDL_GetError());
+
+        // Not a show stopper, continue on! but maybe!!
+    }
+
+    // Clear and Refresh the Renderer
+
+    if (SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "restartWindowRenderer SDL_SetRenderDrawColor globalRenderer: %s", SDL_GetError());
+        return;
+    }
+
+    if (SDL_SetRenderTarget(globalRenderer, NULL) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "restartWindowRenderer SDL_SetRenderTarget NULL: %s", SDL_GetError());
+    }
+
+    if (SDL_RenderClear(globalRenderer) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "restartWindowRenderer() SDL_RenderClear globalRenderer: %s", SDL_GetError());
+    }
+
+
+    // Recreate the texture surface
+    renderScreen();
+
+}
+
 bool Terminal::init(const char* title,
                 int swidth, int sheight,
                 int wwidth, int wheight,
@@ -111,6 +190,7 @@ bool Terminal::init(const char* title,
 {
     int flags = 0;
     // store the Term width and height
+    windowTitle     = title;
     surfaceWidth    = swidth;
     surfaceHeight   = sheight;
     windowWidth     = wwidth;
@@ -120,7 +200,7 @@ bool Terminal::init(const char* title,
 
     // Resizing offset pixel in texture resize, shaded blocks are uneven!
     //flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
-    flags = SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI;
+    flags = SDL_WINDOW_SHOWN; //  | SDL_WINDOW_ALLOW_HIGHDPI;
 
     // attempt to initialise SDL
     //if(SDL_Init(SDL_INIT_EVERYTHING) == 0)
@@ -182,7 +262,7 @@ bool Terminal::init(const char* title,
 
     // init the window
     globalWindow =
-        SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
+        SDL_CreateWindow(windowTitle.c_str(), SDL_WINDOWPOS_CENTERED,
                          SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, flags);
     if(!globalWindow) // window init success
     {
@@ -243,7 +323,7 @@ void Terminal::update()
 }
 
 void Terminal::clean()
-{    
+{
     // Call from a private member to free properly.
     freeSurfaceTextures();
 
@@ -352,7 +432,7 @@ void Terminal::renderSelectionScreen(int x, int y)
                 "renderSelectionScreen() SDL_SetRenderTarget NULL: %s", SDL_GetError());
         }
     }
-   
+
 
     // We need to Translate the Screen Width vs Rows and Width to
     // get actual the grid size of the Characters to snap everything correctly.
@@ -1354,7 +1434,7 @@ void Terminal::drawTextureScreen()
     displayRect.h = screenHeight;
     displayRect.x = 0;
     displayRect.y = 0;
-    
+
     if (SDL_RenderCopy(globalRenderer, globalTexture, &rect, &displayRect) < 0)
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,

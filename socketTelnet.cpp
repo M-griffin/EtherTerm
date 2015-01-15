@@ -11,7 +11,7 @@
 #include "ansiParser.h"
 
 #ifdef TARGET_OS_MAC
-#include <SDL_net.h>
+#include <SDL2/SDL_net.h>
 #elif _WIN32
 #include <SDL_net.h>
 #else
@@ -62,7 +62,6 @@ int SDL_Socket::recvSocket(char *message)
     // TCP Connection is broken. (because of error or closure)
     if(result <= 0)
     {
-        onExit();
         return -1;
     }
     /* return the new buffer */
@@ -133,7 +132,10 @@ bool SDL_Socket::onExit()
 {
     std::cout << "SDL_Socket::onExit()" << std::endl;
     if(TheInputHandler::Instance()->isGlobalShutdown())
+    {
         SDLNet_TCP_Close(sock);
+    }
+
     SDLNet_FreeSocketSet(set);
     return true;
 }

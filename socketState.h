@@ -11,8 +11,8 @@
 #include "terminal.h"
 
 #ifdef TARGET_OS_MAC
-#include <SDL.h>
-#include <SDL_net.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #elif _WIN32
 #include <SDL.h>
 #include <SDL_net.h>
@@ -185,26 +185,27 @@ private:
 // Windows Types
 
 typedef unsigned char BYTE;
-typedef BOOL *PBOOL,*LPBOOL;
+typedef bool *PBOOL,*LPBOOL;
 typedef unsigned short WORD;
-typedef float FLOAT;
-typedef FLOAT *PFLOAT;
-typedef BYTE *PBYTE,*LPBYTE;
+typedef float  FLOAT;
+typedef FLOAT  *PFLOAT;
+typedef int8_t  *PBYTE,*LPBYTE; // BYTE
 typedef int *PINT,*LPINT;
-typedef WORD *PWORD,*LPWORD;
+typedef int16_t *PWORD,*LPWORD; // WORD
 typedef long *LPLONG;
-typedef DWORD *PDWORD,*LPDWORD;
-typedef CONST void *PCVOID,*LPCVOID;
+typedef int32_t *PDWORD,*LPDWORD; //DWORD
+typedef const void *PCVOID,*LPCVOID;
 typedef int INT;
 typedef unsigned int UINT,*PUINT,*LPUINT;
 
-typedef char CHAR;
+typedef char  CHAR;
 typedef short SHORT;
-typedef long LONG;
-typedef char CCHAR, *PCCHAR;
+typedef long  LONG;
+typedef char  CCHAR, *PCCHAR;
 typedef unsigned char UCHAR,*PUCHAR;
 typedef unsigned short USHORT,*PUSHORT;
 typedef unsigned long ULONG,*PULONG;
+
 
 #endif
 

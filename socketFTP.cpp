@@ -11,7 +11,7 @@
 #include "ansiParser.h"
 
 #ifdef TARGET_OS_MAC
-#include <SDL_net.h>
+#include <SDL2/SDL_net.h>
 #elif _WIN32
 #include <SDL_net.h>
 #else

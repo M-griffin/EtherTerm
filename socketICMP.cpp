@@ -13,8 +13,8 @@
 #include "inputHandler.h"
 
 #ifdef TARGET_OS_MAC
-#include <SDL.h>
-#include <SDL_net.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #elif _WIN32
 #include <windows.h>
 #include <SDL.h>
@@ -97,7 +97,7 @@ int ICMP_Socket::pollSocket()
         return numready;
     }
 
-    if (numready && SDLNet_SocketReady(sock) == TRUE)
+    if (numready && SDLNet_SocketReady(sock))
         numready = 1;
     else
         numready = 0;

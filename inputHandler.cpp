@@ -47,7 +47,7 @@ bool InputHandler::update()
                 switch(event.window.event)
                 {
                 //
-                //case SDL_WINDOWEVENT_SHOWN:
+                //  case SDL_WINDOWEVENT_SHOWN:
                 //      SDL_Log("Window %d shown", event.window.windowID);
                 //      break;
                 //  case SDL_WINDOWEVENT_HIDDEN:
@@ -137,6 +137,9 @@ bool InputHandler::update()
                     // Get the mouse offsets
                     mouseReleaseXPosition = event.button.x;
                     mouseReleaseYPosition = event.button.y;
+
+                    // Clear the screen of the selection box.
+                    TheTerminal::Instance()->drawTextureScreen();
                     /*
                     std::cout << "Mouse released at: " << mouseReleaseXPosition << ","
                         << mouseReleaseYPosition << std::endl;
@@ -169,7 +172,7 @@ bool InputHandler::update()
                 {
                     _isMouseSelection = true;
 
-                    //Get the mouse offsets                    
+                    //Get the mouse offsets
                     mouseSourceXPosition = event.button.x;
                     mouseSourceYPosition = event.button.y;
                     /*
@@ -179,7 +182,7 @@ bool InputHandler::update()
                     //SDL_Log("SDL_MOUSEBUTTONDOWN %d shown", event.button.button);
                     break;
                 }
-                
+
                 //If the Right mouse button was pressed Paste Text.
                 else if(event.button.button == SDL_BUTTON_RIGHT)
                 {
@@ -308,6 +311,20 @@ bool InputHandler::update()
                             // If not Full Screen Then Toggle to Next Mode.
                             if(!isWindowMode)
                             {
+
+                                // OSX Doesn't do fullscreen properly!
+                                // Reset to Linear Texting Filtering to scale bock characters
+                                // A little blur, but better then a mess!
+#ifndef _WIN32
+                                TheTerminal::Instance()->restartWindowRenderer("1");
+
+                                // Have to reset to 640 so when we come out of full screen,
+                                // it will display this rez properly! Otherwise it skips to last size.
+                                SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
+#endif
+
+
+
                                 // Texture Filtering OFF.
                                 // FULLSCREEN_DESKTOP fits the window to the desktop size,
                                 // This throws off the pixels.  Using the resolution switch
@@ -317,8 +334,11 @@ bool InputHandler::update()
                                 // However there are SDL bug reports for Linux and OSX,
                                 // Will need to look into this more!
                                 if (SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(),
-                                    //SDL_WINDOW_FULLSCREEN_DESKTOP);  // Desktop resolution
-                                    SDL_WINDOW_FULLSCREEN) < 0)        // Surface Resolution
+#ifndef _WIN32
+                                    SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)  // Desktop resolution
+#else
+                                    SDL_WINDOW_FULLSCREEN) < 0)          // Surface Resolution
+#endif
                                 {
                                     SDL_LogError(SDL_LOG_CATEGORY_ERROR,
                                         "Error setting window to FullScreen Mode: %s", SDL_GetError());
@@ -335,6 +355,9 @@ bool InputHandler::update()
                             }
                             else
                             {
+
+                                // OSX Doesn't do fullscreen properly!
+                                // Reset Texture Filtering when in windowed mode.
                                 // Set Window Mode
                                 if (SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(), 0) < 0)
                                 {
@@ -353,19 +376,30 @@ bool InputHandler::update()
                                     // WE use hthese multiple to keep shaded blocks with
                                     // Correct looking pixel size and layout.
                                     case 0:
+                                        TheTerminal::Instance()->setWindowWidth(640);
+                                        TheTerminal::Instance()->setWindowHeight(400);
                                         SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
+
+                                        //SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
+#ifndef _WIN32                          // Only need to set this on inital Flip from Full to Window.
+                                        TheTerminal::Instance()->restartWindowRenderer("0");
+#endif
+
+                                        TheTerminal::Instance()->drawTextureScreen();
                                         SDL_Log("Setting window size to 640 x 400.");
                                         ++fullScreenWindowSize;
                                         break;
 
                                     case 1:
+                                        TheTerminal::Instance()->setWindowWidth(1280);
+                                        TheTerminal::Instance()->setWindowHeight(800);
                                         SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 1280, 800);
+                                        TheTerminal::Instance()->drawTextureScreen();
                                         SDL_Log("Setting window size to 1280 x 800.");
                                         ++fullScreenWindowSize;
                                         isWindowMode = false;
                                         break;
                                 }
-                                TheTerminal::Instance()->drawTextureScreen();
                                 return false;
                             }
                             break;
@@ -443,4 +477,4 @@ bool InputHandler::update()
     }// End While
     return false;
 }
-            
+
