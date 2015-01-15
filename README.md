@@ -151,8 +151,8 @@ Once these are all set, just run the make-osx to build the executable.
 **EtherTerm will look for the ASSETS folder off the root executable folder**
 
 After you compile, the executable is placed in a default DEBUG folder.
-If you want to run from this folder you copy the assets folder to the DEBUG Folder
-or the root folder where the executable is located.
+If you want to run from this folder you must copy the assets folder to the DEBUG 
+folder or the root folder where the executable is located.
 
 For Example:
 ```
