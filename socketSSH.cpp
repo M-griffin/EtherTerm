@@ -281,7 +281,7 @@ int SSH_Socket::show_remote_processes()
 // Verify is Server is a known host.
 int SSH_Socket::verify_knownhost()
 {
-    size_t state, hlen;
+    int state, hlen;
     unsigned char *hash = NULL;
     char *hexa;
 
