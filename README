@@ -132,7 +132,7 @@ $ brew install libssh
 
 installs libssh /usr/local/Cellar/libssh6.4
 
-One these are all set, just run the make-osx to build the executable.
+Once these are all set, just run the make-osx to build the executable.
 
 **EtherTerm will look for the ASSETS folder off the root executable folder**
 
