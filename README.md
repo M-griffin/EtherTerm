@@ -71,9 +71,9 @@ SDL2_Net
 Libssh (Requires OpenSSL, Zlib)
 ```
 
-**Example Windows (mwing32) linking:**
+**Example Windows (mingw32/64) linking:**
 ```
-Libs: mingw32, SDL2main, SDL2, SDL2_net, libssh
+Libs: mingw32 or 64, SDL2main, SDL2, SDL2_net, libssh
 ```
 
 **Example (G++) linking:**
