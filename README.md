@@ -1,7 +1,7 @@
-EtherTerm (c) 2014 Michael Griffin <mrmisticismo@hotmail.com>
-An SDL2 Telnet / SSH terminal program for Windows, *Nix & OSX
+## EtherTerm (c) 2014 Michael Griffin <mrmisticismo@hotmail.com>
+# An SDL2 Telnet / SSH terminal program for Windows, *Nix & OSX
 
-Alpha Stage 1
+**Alpha Stage 1**
 
 The program is developed mainly in Windows using the (Codelite IDE) with 
 mwing32/64 and will compile in OSX, and Linux under GNU g++. 
@@ -23,7 +23,7 @@ Fonts currently setup are:
 + Pot Noodle-8x16      (AMIGA)
 + Topaz Plus-8x16      (AMIGA)
 
-UTF-8 Output encoding with TTF fonts are in the works!
+**UTF-8 Output encoding with TTF fonts are in the works!**
 
 Text selection is almost finished. You can left click and drag the mouse around.  
 to highlight text on the screen. Copying selected text will be completed soon.
@@ -61,22 +61,30 @@ There is no scroll back buffer, this is also in the works.
 
 ##To compile the following libraries must be pre-installed:
 
+'''
 SDL2
 SDL2_Net
 Libssh (Requires OpenSSL, Zlib)
+'''
 
 **Example Windows (mwing32) linking:**
+'''
 Libs: mingw32, SDL2main, SDL2, SDL2_net, libssh
+'''
 
 **Example (G++) linking:**
+'''
 libs: libSDL2, libSDL2_net, libssh
+'''
 
 Must compile with latest c++ environment flags.
 
 At the very least and you can also replace 0x with 11 on 
 newer compilers. Usually g++ (4.7)+
 
+'''
 -std=gnu++0x or -std=c++0x  
+'''
 
 #Makefile instructions:
 
@@ -84,19 +92,20 @@ To build windows you must already have a compiler and the requirements.
 You can use a good IDE like CodeLite, CodeBlocks, or Visual Studio (more headache).
 
 The following Makefile commands will always default for Windows, or you can specify.
-
+'''
 make
 make win
 
 make clean
 make clean-win
-
+'''
 
 For OSX
-
+'''
 make osx
-make clean-osx
 
+make clean-osx
+'''
 
 I haven't done a full linux conversion of the Makefile yet, but this is in the works.
 the OSX makefile shouldn't need many changes other then paths! Of course each distro
@@ -106,26 +115,26 @@ is different so i might come up with some automake tools to do this in the futur
 ##OSX Build Steps
 
 **Clone the Git repository.**
-
-$ git clone https://github.com/M-griffin/EtherTerm.git
-
+'''
+git clone https://github.com/M-griffin/EtherTerm.git
+'''
 
 **Install SDL2**
-
-$ brew install sdl2
-
+'''
+brew install sdl2
+'''
 Installs /usr/local/Cellar/sdl2/2.0.3: 
 
 **SDL2_Net doesn't seem to be in brew.**
-
-$ brew install sdl2_net
-
+'''
+brew install sdl2_net
+'''
 installs /usr/local/Cellar/sdl2_net/2.0.0
 
 **Install Libssh**
-
-$ brew install libssh
-
+'''
+brew install libssh
+'''
 installs libssh /usr/local/Cellar/libssh6.4
 
 One these are all set, just run the make-osx to build the executable.
@@ -137,15 +146,15 @@ If you want to run from this folder you copy the assets folder to the DEBUG Fold
 or the root folder where the executable is located.
 
 For Example:
-
+'''
 C:\EtherTerm\DEBUG   ( Contains EXE )
 C:\EtherTerm\assets  ( Contains Fonts, Screens and xml files )
-
+'''
 
 Copy the assets folder to the debug foler so it looks like this:
-
+'''
 C:\EtherTerm\DEBUG\assets
-
+'''
 
 **Acknowledgement and Thanks:**
 + Dingo:  Telnet options and general terminal functionality
