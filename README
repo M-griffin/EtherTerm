@@ -109,6 +109,10 @@ is different so i might come up with some automake tools to do this in the futur
 
 $ git clone https://github.com/M-griffin/EtherTerm.git
 
+**Install Brew if you don't have it already**
+
+$ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
 
 **Install SDL2**
 
@@ -116,7 +120,7 @@ $ brew install sdl2
 
 Installs /usr/local/Cellar/sdl2/2.0.3: 
 
-**SDL2_Net doesn't seem to be in brew.**
+**Install SDL2_Net**
 
 $ brew install sdl2_net
 
