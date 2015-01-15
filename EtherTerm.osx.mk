@@ -278,7 +278,6 @@ clean:
 	$(RM) ./Debug/*$(ObjectSuffix)
 	$(RM) ./Debug/*$(DependSuffix)
 	$(RM) $(OutputFile)
-	$(RM) $(OutputFile).exe
-	$(RM) "../MouseBug/.build-debug/EtherTerm"
+
 
 
