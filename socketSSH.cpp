@@ -88,7 +88,8 @@ int SSH_Socket::pollSocket()
 
 bool SSH_Socket::onEnter()
 {
-    int verb = SSH_LOG_PROTOCOL;
+    // For testing and getting debugging output
+    //int verb = SSH_LOG_PROTOCOL;
     int rc;
 
     // Setup new SSH Shell
@@ -105,7 +106,7 @@ bool SSH_Socket::onEnter()
     ssh_options_set(session, SSH_OPTIONS_HOST, host.c_str());
 
     // Testing only, otherwise slows down display!!
-    ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verb);
+    //ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verb);
 
     // Only Slllow SSH2 Connections.
     int disAllow = 0;
@@ -117,6 +118,8 @@ bool SSH_Socket::onEnter()
     ssh_options_set(session, SSH_OPTIONS_TIMEOUT, &timeout);
     ssh_options_set(session, SSH_OPTIONS_PORT, &port);
     ssh_options_set(session, SSH_OPTIONS_USER, userId.c_str());
+
+    std::cout << "Starting up SSH Connection, this can take few moments" << std::endl;
 
     // SSH Connect
     rc = ssh_connect(session);
