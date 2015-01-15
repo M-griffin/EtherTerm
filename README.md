@@ -8,7 +8,7 @@
 </center>
 
 The program is developed mainly in Windows using the (Codelite IDE) with
-mwing32/64 and will compile in OSX, and Linux under GNU g++.
+mingw32/64 and will compile in OSX, and Linux under GNU g++.
 
 This is a full graphics program just like a game engine, it's not a
 console application and best runs on more recent hardware.
