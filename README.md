@@ -169,3 +169,5 @@ C:\EtherTerm\DEBUG\assets
 + Dingo:  Telnet options and general terminal functionality
 + G00R00: Optimization ideas on scrolling pixels faster.
 + (SDL Game Programming) For good ideas with Singletons and State Machines.
++ Maze: Testing and bug reports
++ IceDevil: Testing and bug reports
