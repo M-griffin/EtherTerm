@@ -38,11 +38,11 @@ MakeDirCommand         :=makedir
 RcCmpOptions           := 
 RcCompilerName         :=C:/MinGW-4.8.1/bin/windres.exe 
 LinkOptions            :=  
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)C:/Users/Blue/Downloads/SDL2-devel-2.0.3-mingw/SDL2-2.0.3/include $(IncludeSwitch)C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2 $(IncludeSwitch)C:/libssh-0.6.0/include $(IncludeSwitch)libz-1.2.7-1-mingw32-dev $(IncludeSwitch)C:/libz-1.2.7-1-mingw32-dev/include $(IncludeSwitch)C:/libz-1.2.7-1-mingw32-dev/include/minizip 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)C:/Users/Blue/Downloads/SDL2-devel-2.0.3-mingw/SDL2-2.0.3/include $(IncludeSwitch)C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2 $(IncludeSwitch)C:/libssh-0.6.0/include $(IncludeSwitch)libz-1.2.7-1-mingw32-dev $(IncludeSwitch)C:/libz-1.2.7-1-mingw32-dev/include 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)mingw32 $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)SDL2_net $(LibrarySwitch)ssh $(LibrarySwitch)minizip 
-ArLibs                 :=  "mingw32" "SDL2main" "SDL2" "SDL2_net" "libssh" "libminizip" 
+Libs                   := $(LibrarySwitch)mingw32 $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)SDL2_net $(LibrarySwitch)ssh 
+ArLibs                 :=  "mingw32" "SDL2main" "SDL2" "SDL2_net" "libssh"
 LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:/Users/Blue/Downloads/SDL2_image-devel-2.0.0-mingw/SDL2_image-2.0.0/i686-w64-mingw32/lib $(LibraryPathSwitch)C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/lib $(LibraryPathSwitch)C:/libssh-0.6.0/bin $(LibraryPathSwitch)C:/libz-1.2.7-1-mingw32-dev/lib 
 
 ##
@@ -270,6 +270,6 @@ clean:
 	$(RM) ./Debug/*$(DependSuffix)
 	$(RM) $(OutputFile)
 	$(RM) $(OutputFile).exe
-	$(RM) ".build-debug/EtherTerm"
+
 
 
