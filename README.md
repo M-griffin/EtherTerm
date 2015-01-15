@@ -3,6 +3,10 @@
 
 **Alpha Stage 1**
 
+<center>
+![alt text](https://dl.dropboxusercontent.com/u/92792939/EtherTerm.png "EtherTerm")
+</center>
+
 The program is developed mainly in Windows using the (Codelite IDE) with
 mwing32/64 and will compile in OSX, and Linux under GNU g++.
 
