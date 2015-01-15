@@ -1,4 +1,4 @@
-## EtherTerm (c) 2014 Michael Griffin <mrmisticismo@hotmail.com>
+## EtherTerm (c) 2014-2015 Michael Griffin <mrmisticismo@hotmail.com>
 # An SDL2 Telnet / SSH terminal program for Windows, *Nix & OSX
 
 **Alpha Stage 1**
@@ -146,6 +146,24 @@ brew install libssh
 ```
 installs libssh /usr/local/Cellar/libssh6.4
 
+**Possible issue on OSX Yosemite when building libssh.**
+There is a report and confirmation of a macro redefinition error when compiling on Yosemite.  A patch for this issue was created and applied just a few days ago.  Earlier OSX versions are not affected.
+
+**You can use the following links for patch details, or get a new copy of libssh directly from the repo.**
+Brew should have all dependencies for libssh already set for a clean libssh manual compile.
+```
+Bug Report
+https://red.libssh.org/issues/164#change-488
+
+Patch
+https://red.libssh.org/attachments/download/95/patch-ConfigureChecks.cmake.diff
+```
+
+**link to libssh repo:**
+```
+git clone http://git.libssh.org/projects/libssh.git libssh
+```
+
 Once these are all set, just run the make-osx to build the executable.
 
 **EtherTerm will look for the ASSETS folder off the root executable folder**
@@ -156,13 +174,13 @@ folder or the root folder where the executable is located.
 
 For Example:
 ```
-C:\EtherTerm\DEBUG   ( Contains EXE )
-C:\EtherTerm\assets  ( Contains Fonts, Screens and xml files )
+./EtherTerm/DEBUG   ( Contains Executable )
+./EtherTerm/assets  ( Contains Fonts, Screens and xml files )
 ```
 
 Copy the assets folder to the debug foler so it looks like this:
 ```
-C:\EtherTerm\DEBUG\assets
+./EtherTerm/DEBUG/assets
 ```
 
 **Acknowledgement and Thanks:**
