@@ -337,7 +337,7 @@ extern const char *enctype_names[];
 #define    ENCTYPE_NAME(x)        enctype_names[x]
 
 #include <vector>
-#include "MenuState.h"
+#include "menuState.h"
 #include "termObject.h"
 #include "socketState.h"
 

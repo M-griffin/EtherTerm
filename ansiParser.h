@@ -70,8 +70,8 @@ public:
     const  int  TERM_WIDTH  = 80; // Temp
 
 #define NUM_LINES   25       // change to 50 for 80x50 ANSI's
-#define FALSE        0
-#define TRUE         1
+//#define FALSE        0
+//#define TRUE         1
 #define MAX_PARAMS  10
 
     // Control Sequence Terminators

@@ -40,7 +40,7 @@ typedef struct MainMenuState_INI
     void ddirectory_create();
     void ddirectory_chkpar(std::string &data);
     void ddirectory_check(std::string cfgdata);
-    int  ddirectory_parse(int idx=0);
+    bool ddirectory_parse(int idx=0);
 
 } MainMenuState_INI;
 
@@ -92,7 +92,7 @@ private:
 
     void  readinAnsi(std::string FileName, std::string &buff);
     void  parseHeader(std::string FileName);
-    int   changeTheme(int idx);
+    bool  changeTheme(int idx);
     void  setupList();
 
     bool  readDialDirectory();

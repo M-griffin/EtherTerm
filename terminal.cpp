@@ -857,9 +857,9 @@ bool Terminal::initSurfaceTextures()
 void Terminal::setScrollRegion(int top, int bot)
 {
     if(top == 0 && bot == 0)
-        scrollRegionActive = FALSE;
+        scrollRegionActive = false;
     else
-        scrollRegionActive = TRUE;
+        scrollRegionActive = true;
     topMargin = top;
     bottomMargin = bot;
 }

@@ -215,9 +215,9 @@ public:
     SDL_Color currentBGColor;
 
     // Scrolling Region
-    int scrollRegionActive;
-    int topMargin;
-    int bottomMargin;
+    bool scrollRegionActive;
+    int  topMargin;
+    int  bottomMargin;
 
 private:
 

@@ -77,7 +77,7 @@ int SDL_Socket::pollSocket()
         TheSocketHandler::Instance()->setActive(false);
         return numready;
     }
-    if(numready && SDLNet_SocketReady(sock) == TRUE)
+    if(numready && SDLNet_SocketReady(sock) > 0)
     {
         numready = 1;
     }

@@ -272,7 +272,7 @@ void MainMenuState_INI::ddirectory_check(std::string cfgdata)
 /**
  * Read / Parse INI File
  */
-int MainMenuState_INI::ddirectory_parse(int index)
+bool MainMenuState_INI::ddirectory_parse(int index)
 {
     //std::cout << "ddirectory_parse()" << std::endl;
     if(!ddirectory_exists())
@@ -298,7 +298,7 @@ int MainMenuState_INI::ddirectory_parse(int index)
     if(stream == NULL)
     {
         // File is not Present
-        return FALSE;
+        return false;
     }
     fclose(stream);
 
@@ -307,7 +307,7 @@ int MainMenuState_INI::ddirectory_parse(int index)
     if(!inStream.is_open())
     {
         printf("Couldn't Open Config File: %s\n", name);
-        return FALSE;
+        return false;
     }
 
     std::string cfgdata;
@@ -318,7 +318,7 @@ int MainMenuState_INI::ddirectory_parse(int index)
         if(inStream.eof()) break;
     }
     inStream.close();
-    return TRUE;
+    return true;
 }
 
 /**
@@ -385,16 +385,16 @@ void MainMenuState::setupList()
 /**
  * DialDirectory - Change ANSI Template Theme
  */
-int MainMenuState::changeTheme(int index)
+bool MainMenuState::changeTheme(int index)
 {
-    if(ddirectory_parse(index) == FALSE)
+    if(!ddirectory_parse(index))
     {
         // Theme Doesn't Exist.
-        return FALSE;
+        return false;
     }
     _linkList.topMargin = TOP_MARGIN;
     _linkList.bottomMargin = BOTTOM_MARGIN;
-    return TRUE;
+    return true;
 }
 
 /**
@@ -411,13 +411,13 @@ std::vector< list_bar > MainMenuState::buildDialList()
     int sequence = 0;
     std::string stringBuilder = "";
 
-    FILE              *inStream;
-    long  index       = 1;
-    char  mciCode[3]  = {0};
-    char  temp2[100]  = {0};
-    int   padding     = 0;
-    int   isRightPadding = FALSE;
-    int   isLeftPadding  = FALSE;
+    FILE               *inStream;
+    long index          = 1;
+    char mciCode[3]     = {0};
+    char temp2[100]     = {0};
+    int  padding        = 0;
+    bool isRightPadding = false;
+    bool isLeftPadding  = false;
 
     std::string currnetScreen  = "";
     std::string ansiScreen1 = "";
@@ -510,7 +510,7 @@ std::vector< list_bar > MainMenuState::buildDialList()
                         padding = atoi(mciCode);
                         if(padding != 0)
                         {
-                            isLeftPadding = TRUE;
+                            isLeftPadding = true;
                         }
                         else
                         {
@@ -525,7 +525,7 @@ std::vector< list_bar > MainMenuState::buildDialList()
                         padding = atoi(mciCode);
                         if(padding != 0)
                         {
-                            isRightPadding = TRUE;
+                            isRightPadding = true;
                         }
                         else
                         {
@@ -543,12 +543,12 @@ std::vector< list_bar > MainMenuState::buildDialList()
                             if(isLeftPadding)
                             {
                                 MenuFunction::leftSpacing(temp2,padding);
-                                isLeftPadding = FALSE;
+                                isLeftPadding = false;
                             }
                             else if(isRightPadding)
                             {
                                 MenuFunction::rightSpacing(temp2,padding);
-                                isRightPadding = FALSE;
+                                isRightPadding = false;
                             }
                             stringBuilder += temp2;
                         }
@@ -558,12 +558,12 @@ std::vector< list_bar > MainMenuState::buildDialList()
                             if(isLeftPadding)
                             {
                                 MenuFunction::leftSpacing(temp2,padding);
-                                isLeftPadding = FALSE;
+                                isLeftPadding = false;
                             }
                             else if(isRightPadding)
                             {
                                 MenuFunction::rightSpacing(temp2,padding);
-                                isRightPadding = FALSE;
+                                isRightPadding = false;
                             }
                             stringBuilder += temp2;
                         }
@@ -580,12 +580,12 @@ std::vector< list_bar > MainMenuState::buildDialList()
                             if(isLeftPadding)
                             {
                                 MenuFunction::leftSpacing(temp2,padding);
-                                isLeftPadding = FALSE;
+                                isLeftPadding = false;
                             }
                             else if(isRightPadding)
                             {
                                 MenuFunction::rightSpacing(temp2,padding);
-                                isRightPadding = FALSE;
+                                isRightPadding = false;
                             }
                             stringBuilder += temp2;
                         }
@@ -595,12 +595,12 @@ std::vector< list_bar > MainMenuState::buildDialList()
                             if(isLeftPadding)
                             {
                                 MenuFunction::leftSpacing(temp2,padding);
-                                isLeftPadding = FALSE;
+                                isLeftPadding = false;
                             }
                             else if(isRightPadding)
                             {
                                 MenuFunction::rightSpacing(temp2,padding);
-                                isRightPadding = FALSE;
+                                isRightPadding = false;
                             }
                             stringBuilder += temp2;
                         }
@@ -610,12 +610,12 @@ std::vector< list_bar > MainMenuState::buildDialList()
                             if(isLeftPadding)
                             {
                                 MenuFunction::leftSpacing(temp2,padding);
-                                isLeftPadding = FALSE;
+                                isLeftPadding = false;
                             }
                             else if(isRightPadding)
                             {
                                 MenuFunction::rightSpacing(temp2,padding);
-                                isRightPadding = FALSE;
+                                isRightPadding = false;
                             }
                             stringBuilder += temp2;
                         }

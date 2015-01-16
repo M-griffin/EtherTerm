@@ -72,7 +72,7 @@ int FTP_Socket::pollSocket()
         TheSocketHandler::Instance()->setActive(false);
         return numready;
     }
-    if(numready && SDLNet_SocketReady(controlSocket) == TRUE)
+    if(numready && SDLNet_SocketReady(controlSocket) > 0)
     {
         numready = 1;
     }
