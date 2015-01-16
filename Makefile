@@ -11,6 +11,10 @@ win:
 osx:
 	@echo "----------Building project:[ EtherTerm - (OSX) Debug ]----------"
 	@$(MAKE) -f  "EtherTerm.osx.mk"
+    
+linux:
+	@echo "----------Building project:[ EtherTerm - (LINUX) Debug ]----------"
+	@$(MAKE) -f  "EtherTerm.linux.mk"
 
 clean:
 	@echo "----------Cleaning project:[ EtherTerm - (WIN) Debug ]----------"
@@ -23,3 +27,8 @@ clean-win:
 clean-osx:
 	@echo "----------Cleaning project:[ EtherTerm - (OSX) Debug ]----------"
 	@$(MAKE) -f  "EtherTerm.osx.mk" clean
+
+clean-linux:
+	@echo "----------Cleaning project:[ EtherTerm - (LINUX) Debug ]----------"
+	@$(MAKE) -f  "EtherTerm.linux.mk" clean
+
