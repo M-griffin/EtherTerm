@@ -1,5 +1,5 @@
 ## EtherTerm (c) 2014-2015 Michael Griffin <mrmisticismo@hotmail.com>
-# An SDL2 Telnet / SSH terminal program for Windows, *Nix & OSX
+### An SDL2 Terminal Telnet/SSH program for Windows, Linux & OSX
 
 **Alpha Stage 1**
 
@@ -10,16 +10,16 @@
 The program is developed mainly in Windows using the (Codelite IDE) with
 mingw32/64 and will compile in OSX, and Linux under GNU g++.
 
-This is a full graphics program just like a game engine, it's not a
-console application and best runs on more recent hardware.
+**This is a full graphics program just like a game engine, it's not a
+console application and best runs on more recent hardware.**
 
-EtherTerm is a Telnet/SSH programing with CP437 encoding (ANSI) Graphics terminal
-for connecting to Telnet BBS systems.
+EtherTerm is a Telnet/SSH terminal with CP437 (ANSI) Graphics terminal
+emulation for connecting to Telnet/SSH BBS systems and shells.
 
 Each system can be setup with a default font.  Any systems using Syncterm
-Escape sequences for font switch will override the default.
+escape sequences for font switching will override the default font.
 
-Fonts currently setup are:
+## Fonts currently supported are:
 
 + VGA-8x16             (CP437)
 + MicroKnightPlus-8x16 (AMIGA)
@@ -38,7 +38,7 @@ ALT + ENTER toggles between different window screen sizes.
 On started 1280x800 is the default resolution, The next goes Full Screen, then down
 to 640x400 to keep the proper 8x6 font resolution.
 
-# Work in progress:
+## Work in progress:
 
 The Dialing directory is incomplete, Add, Edit, Delete, About etc..
 Not all options are setup just yet.
@@ -53,7 +53,7 @@ you connect at the moment.
 I'm also in the middle of implimenting more control sequence behavior.
 I have a lot of XTERM sequences laid out so more will be implemented with time.
 
-# Not yet implemented:
+## Not yet implemented:
 
 Lots of things are still in the early testing and debugging stages.
 There are no transfer protocols at the moment.
@@ -62,6 +62,8 @@ Some keyboard keys still need to be implemented like F1 function keys.
 All others should work just fine including CTRL Keys.
 
 There is no scroll back buffer, this is also in the works.
+
+FTP will be added too.
 
 ##To compile the following libraries must be pre-installed:
 
@@ -94,8 +96,9 @@ newer compilers. Usually g++ (4.7)+
 
 To build windows you must already have a compiler and the requirements.
 You can use a good IDE like CodeLite, CodeBlocks, or Visual Studio (more headache).
+You then must installs the libs and setup the include paths.
 
-The following Makefile commands will always default for Windows, or you can specify.
+**The following Makefile commands will always default for Windows, or you can specify.**
 ```
 make
 make win
@@ -104,19 +107,56 @@ make clean
 make clean-win
 ```
 
-For OSX
+**For OSX**
 ```
 make osx
 
 make clean-osx
 ```
 
-I haven't done a full linux conversion of the Makefile yet, but this is in the works.
-the OSX makefile shouldn't need many changes other then paths! Of course each distro
-is different so i might come up with some automake tools to do this in the future.
+**For Linux**
+```
+make linux
 
+make clean-linux
+```
 
-##OSX Build Steps
+##Linux Build Steps:
+
+**For Ubunutu, Mint and Debian you can use APT-GET to install all requirements.**
+Notes for Arch Linux will follow shortly once steps are completed.
+
+**Clone the Git repository.**
+```
+git clone https://github.com/M-griffin/EtherTerm.git
+```
+
+**Install build-essential**
+```
+sudo apt-get install build-essential
+```
+
+**Install SDL2**
+```
+sudo apt-get install libsdl2-dev
+```
+
+**Install SDL2_Net**
+```
+sudo apt-get install libsdl2-net-dev
+```
+
+**Install Libssh**
+```
+sudo apt-get install libssh-dev
+```
+
+**To compile your executable.**
+```
+make-linux 
+```
+
+##OSX Build Steps:
 
 **Clone the Git repository.**
 ```
@@ -146,7 +186,12 @@ brew install libssh
 ```
 installs libssh /usr/local/Cellar/libssh6.4
 
-**Possible issue on OSX Yosemite when building libssh.**
+**To compile your executable.**
+```
+make-osx
+```
+
+**Possible issues with OSX Yosemite when building libssh.**
 There is a report and confirmation of a macro redefinition error when compiling on Yosemite.  A patch for this issue was created and applied just a few days ago.  Earlier OSX versions are not affected.
 
 **You can use the following links for patch details, or get a new copy of libssh directly from the repo.**
@@ -164,6 +209,8 @@ https://red.libssh.org/attachments/download/95/patch-ConfigureChecks.cmake.diff
 git clone http://git.libssh.org/projects/libssh.git libssh
 ```
 
+##Executing the first time:
+
 Once these are all set, just run the make-osx to build the executable.
 
 **EtherTerm will look for the ASSETS folder off the root executable folder**
@@ -172,13 +219,13 @@ After you compile, the executable is placed in a default DEBUG folder.
 If you want to run from this folder you must copy the assets folder to the DEBUG 
 folder or the root folder where the executable is located.
 
-For Example:
+**For Example:**
 ```
 ./EtherTerm/DEBUG   ( Contains Executable )
 ./EtherTerm/assets  ( Contains Fonts, Screens and xml files )
 ```
 
-Copy the assets folder to the debug foler so it looks like this:
+**Copy the assets folder to the debug foler so it looks like this:**
 ```
 ./EtherTerm/DEBUG/assets
 ```
