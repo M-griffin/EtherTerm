@@ -199,8 +199,7 @@ make-osx
 The default compiler for OSX seems to be LLVM clang.  I use GNU g++ in most of my development and there is and
 error that has been corrected when compiling with GNU g++ below. 
 
-There is a report and confirmation of a macro redefinition error when compiling on Yosemite.  A patch for this issue was created and applied just a few days ago.  Earlier OSX versions are not affected.  LLVM clang doesn't appear to 
-be affected either at this time.
+There is a report and confirmation of a macro redefinition error when compiling on Yosemite.  A patch for this issue was created and applied just a few days ago.  Earlier OSX versions are not affected.
 
 **You can use the following links for patch details, or get a new copy of libssh directly from the repo.**
 Brew should have all dependencies for libssh already set for a clean libssh manual compile.
