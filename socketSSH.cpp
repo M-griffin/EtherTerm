@@ -52,7 +52,7 @@ int SSH_Socket::sendSocket(unsigned char *buf, Uint32 len)
 /* handle Telnet better */
 int SSH_Socket::recvSocket(char *message)
 {
-    Uint32 result = 0;
+    int result = 0;
     std::string buf;
 
     /* get the string buffer over the socket */

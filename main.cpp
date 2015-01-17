@@ -72,7 +72,7 @@ void readinAnsi(std::string FileName, std::string &buff)
 #endif
     path += FileName;
     FILE *fp;
-    std::string::size_type id1 = 0;
+
     int c = 0;
     if((fp = fopen(path.c_str(), "r+")) ==  NULL)
     {

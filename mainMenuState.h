@@ -76,11 +76,9 @@ private:
     // Class Types for use
     LinkList      _linkList;
     MenuFunction  _menuFunction;
-    MenuRecord      *_menuRecord;
-    CommandRecord   *_commandRecord;
 
-    int  numberOfCommands; // Number of Commands in Loaded Menu
-    int  systemActive;     // System Exit
+   // int  numberOfCommands; // Number of Commands in Loaded Menu
+   // int  systemActive;     // System Exit
 
     // Dialing Directory
     unsigned long LIGHTBAR_POSITION;

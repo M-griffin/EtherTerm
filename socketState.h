@@ -160,10 +160,6 @@ public:
 
 private:
 
-    int cursorBlink;
-    int startBlinking;
-    time_t ttime, ttime2;
-
     ssh_channel sshChannel;
     ssh_session session;
 
@@ -177,8 +173,8 @@ private:
 
 /*
  * Handle IMCP for Ping / Traceroutes.
+ * Not used currently.
  *
- */
 
 #ifndef _WIN32
 
@@ -259,10 +255,11 @@ struct __attribute__((packed)) ICMPHeader
 #ifdef _MSC_VER
 #pragma pack()
 #endif
+*/
 
 /*
  * Class for IMCP Ping for Server connections
- */
+ *
 class ICMP_Socket : public SocketState
 {
 public:
@@ -293,4 +290,5 @@ private:
     ICMPHeader *icmpHeader;
 
 };
+*/
 #endif

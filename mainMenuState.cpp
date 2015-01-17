@@ -335,7 +335,7 @@ void MainMenuState::readinAnsi(std::string FileName, std::string &buff)
     path += FileName;
     path += ".ans";
     FILE *fp;
-    std::string::size_type id1 = 0;
+
     int sequence = 0;
     if((fp = fopen(path.c_str(), "r+")) ==  NULL)
     {
@@ -805,7 +805,7 @@ int MainMenuState::startDialDirectory()
     char rBuffer[1024]= {0};
     unsigned char ch = '\0';
     std::string tmp;
-    std::string::size_type id1 = 0;
+
     // To Start out, keep this static lateron for next call.
     LIGHTBAR_POSITION = 0;
 

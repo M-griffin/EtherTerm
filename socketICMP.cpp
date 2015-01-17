@@ -9,6 +9,7 @@
 // Was an idea to ping servers in dialing directory
 // for idea of connection lag before connecting to system.
 
+/*
 #include "socketState.h"
 #include "inputHandler.h"
 
@@ -28,21 +29,16 @@
 #include <cstdio>
 #include <cstring>
 #include <cerrno>
-
+*/
 
 /*
  * Start of ICMP_Socket Dervived Class (PING)
  *
  *
- */
-
-
-/* send a string buffer over a TCP socket with error checking */
-/* returns 0 on any errors, length sent on success */
+ *
 int ICMP_Socket::sendSocket(unsigned char *buf, Uint32 len)
 {
     Uint32 result = 0;
-    /*
 
     // send the buffer, with the NULL as well
     result = SDLNet_TCP_Send(sock, buf, len);
@@ -58,17 +54,15 @@ int ICMP_Socket::sendSocket(unsigned char *buf, Uint32 len)
     }
 
     // return the length sent
-     */
     return(result);
 }
+*/
 
-
-/* handle Telnet better */
+/* handle Telnet better
 int ICMP_Socket::recvSocket(char *message)
 {
 
     Uint32 result = 0;
-    /*
     std::string buf;
 
     // get the string buffer over the socket
@@ -83,11 +77,12 @@ int ICMP_Socket::recvSocket(char *message)
     }
 
     // return the new buffer
-     */
     return result;
 }
+*/
 
-int ICMP_Socket::pollSocket()
+
+/*int ICMP_Socket::pollSocket()
 {
 
     int numready = SDLNet_CheckSockets(set, 0);
@@ -109,7 +104,6 @@ int ICMP_Socket::pollSocket()
 bool ICMP_Socket::onEnter()
 {
 
-    /*
     std::cout << "ICMP_Socket::onEnter()" << std::endl;
     IPaddress ip;
 
@@ -168,7 +162,6 @@ bool ICMP_Socket::onEnter()
         onExit();
         return false;
     }
-*/
     return true;
 }
 
@@ -182,3 +175,4 @@ bool ICMP_Socket::onExit()
 
     return true;
 }
+*/

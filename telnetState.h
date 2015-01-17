@@ -376,15 +376,15 @@ private:
 
     // Telnet Protocol Functions.
     unsigned
-    char telnet_opt_ack(unsigned char cmd);
+    char telnetOptionAcknowledge(unsigned char cmd);
     unsigned
-    char telnet_opt_nak(unsigned char cmd);
+    char telnetOptionDeny(unsigned char cmd);
 
-    int telnet_build_NAWS_reply();
-    int telnet_build_TTYPE_reply();
-    int send_iac(Uint32 command, Uint32 option);
+    void telnetOptionNawsReply();
+    void telnetOptionTerminalTypeReply();
+    void telnetSendIAC(Uint32 command, Uint32 option);
     unsigned
-    char telnet_process_char(unsigned char c);
+    char telnetOptionParse(unsigned char c);
 
     // Virtual Classes.
     static const std::string telnetID;
