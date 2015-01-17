@@ -34,9 +34,8 @@ to highlight text on the screen. Copying selected text will be completed soon.
 
 Right click will paste text from the clipboard.
 
-ALT + ENTER toggles between different window screen sizes.
-On started 1280x800 is the default resolution, The next goes Full Screen, then down
-to 640x400 to keep the proper 8x6 font resolution.
+```ALT + ENTER``` toggles between different window screen sizes.
+This cycles two different window resolutions then goes FULL SCREEN.
 
 ## Work in progress:
 
@@ -47,7 +46,7 @@ To add new systems or remove, you must edit the dialingdirectory.xml file
 in a text editor located in the /assets folder.
 
 If you want to connect to SSH servers, you must supply your username, and password
-in the dialdirectory.XML file since there are no prompts to enter these when
+in the ```dialdirectory.XML``` file since there are no prompts to enter these when
 you connect at the moment.
 
 I'm also in the middle of implimenting more control sequence behavior.
@@ -64,6 +63,11 @@ All others should work just fine including CTRL Keys.
 There is no scroll back buffer, this is also in the works.
 
 FTP will be added too.
+
+Terminal modes, by default EtherTerm only supports 80 x 25.  Other modes will be supported lateron.
+
+***Keymappings are planned also***
+Etherterm currently follows the default Windows telnet output keys seqeunces (used in Syncterm) for keys like arrrows, Insert, Delete, PageUp and Page Down.  Some other operating systems look for and use different escape sequence for their input keys which will be added later for more support.
 
 ##To compile the following libraries must be pre-installed:
 
@@ -192,7 +196,11 @@ make-osx
 ```
 
 **Possible issues with OSX Yosemite when building libssh.**
-There is a report and confirmation of a macro redefinition error when compiling on Yosemite.  A patch for this issue was created and applied just a few days ago.  Earlier OSX versions are not affected.
+The default compiler for OSX seems to be LLVM clang.  I use GNU g++ in most of my development and there is and
+error that has been corrected when compiling with GNU g++ below. 
+
+There is a report and confirmation of a macro redefinition error when compiling on Yosemite.  A patch for this issue was created and applied just a few days ago.  Earlier OSX versions are not affected.  LLVM clang doesn't appear to 
+be affected either at this time.
 
 **You can use the following links for patch details, or get a new copy of libssh directly from the repo.**
 Brew should have all dependencies for libssh already set for a clean libssh manual compile.
