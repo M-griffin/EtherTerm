@@ -57,8 +57,6 @@ const  int  FALSE = 0;
 
 using namespace std;
 
-int unicodeFontSet = FALSE;
-
 /**
  * Reads in Ansi file into Buffer Only
  * For Testing the Ansi Parser.
