@@ -519,7 +519,6 @@ void MenuFunction::menuLightBars(char *inPut)
     std::string inputSequence;
 
     std::vector<list_bar> lightbar;
-    std::string::size_type id1 = 0;
 
     // If no Menu Commands Return! / Add fallback menu lateron!!
     if (numCommands == 0) return;
@@ -1076,7 +1075,6 @@ void MenuFunction::menuDoCommands(CommandRecord *cmdr)
     unsigned char c2 = cmdr->CmdKeys[1];
 
     std::string parse;
-    std::string::size_type id1;
 
     //std::cout << "Do MenuCmd: CmdKey[0]: " << (char)c1 << " CmdKey[1]: " << (char)c2 << std::endl;
     std::string inputSequence;
@@ -1550,7 +1548,7 @@ void MenuFunction::ansiBackgroundColor(char *data, int bg)
  */
 void MenuFunction::sequenceToAnsi(char* szString, int buffer)
 {
-    std::string::size_type  id1 = 0, test;    // Pipe Position
+    std::string::size_type  id1 = 0;  // Pipe Position
     char szTmp[3];         // Holds 1, 2nd digit of Pipe
     char szPos1[3];        // Hold XY Pos for Ansi Postion Codes
     char szPos2[3];        // Hold XY Pos for Ansi Postion Codes
@@ -1756,7 +1754,6 @@ void MenuFunction::displayAnsiFile(std::string fileName)
     std::string buff;
 
     FILE *fp;
-    std::string::size_type id1 = 0;
     int sequence = 0;
     if ((fp = fopen(path.c_str(), "r+")) ==  NULL)
     {
