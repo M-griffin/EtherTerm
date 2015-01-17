@@ -28,11 +28,6 @@ void SSHState::handleSession()
     int len = 0;
     char msgBuffer[8193]= {'\0'};
     std::string newstring;
-    std::string::size_type id1;
-
-    // Escape parsing
-    //static std::string esc_sequence;
-    //static char more_params = 0;
     unsigned char ch;
 
     // Get Socket Data From Server
@@ -109,7 +104,6 @@ void SSHState::update()
     {
         // Poll the Socket for Incoming Data from Server.
         ret = TheSocketHandler::Instance()->update();
-
         switch(ret)
         {
             case 0:
@@ -175,6 +169,7 @@ bool SSHState::onEnter()
     std::cout << "entering SSHState\n";
     shutdown = false;
 
+    // Test Systems
     //char host[255]= {"entropybbs.co.nz"};
     //char host[255]= {"montereybbs.ath.cx"};
     //char host[255]= {"1984.ws"};
@@ -182,7 +177,6 @@ bool SSHState::onEnter()
     //char host[255]= {"fluph.darktech.org"};
     //char host[255]= {"oddnetwork.org"};
     //char host[255]= {"192.168.1.131"};
-
     //char host[255]= {"blackflag.acid.org"};
     //char host[255]= {"d1st.org"};
     //char host[255]= {"bbs.pharcyde.org"};
@@ -224,43 +218,13 @@ bool SSHState::onEnter()
     TheTerminal::Instance()->clearScreenSurface();
     TheTerminal::Instance()->renderScreen();
     TheAnsiParser::Instance()->reset();
-
-    /*
-    // parse the state
-    StateParser stateParser;
-    stateParser.parseState("assets/attack.xml", menuID, &termObjects, &textureIDList);
-    m_callbacks.push_back(0);
-    m_callbacks.push_back(s_menuToPlay);
-    m_callbacks.push_back(s_exitFromMenu);
-    // set the callbacks for menu items
-    setCallbacks(m_callbacks);
-    m_loadingComplete = true;
-    std::cout << "entering MenuState\n";
-    */
     return true;
 }
 
 bool SSHState::onExit()
 {
     std::cout << "SSHState::onExit()" << std::endl;
-    /*
-    m_exiting = true;
-    // clean the game objects
-    if(loadingComplete && !termObjects.empty())
-    {
-        termObjects.back()->clean();
-        termObjects.pop_back();
-    }
-    m_gameObjects.clear();
-
-    // clear the texture manager
-    //for(int i = 0; i < m_textureIDList.size(); i++)
-    //{
-     //   TheTextureManager::Instance()->clearFromTextureMap(m_textureIDList[i]);
-    //}
-    /
-    */
-
+    
     // reset the handler(s)
     TheInputHandler::Instance()->reset();
     TheAnsiParser::Instance()->reset();
