@@ -53,6 +53,9 @@ void AnsiParser::setScreenBuffer(std::string mySequence)
     sequenceBuffer.characterSequence.erase();
 }
 
+/*
+ * Moves the Screen Buffer Up a line to match the internal SDL_Surface
+ */
 void AnsiParser::scrollScreenBuffer()
 {
     // This remove the top line to scroll the screen up
@@ -64,6 +67,9 @@ void AnsiParser::scrollScreenBuffer()
     screenBuffer.resize( TERM_HEIGHT * TERM_WIDTH );
 }
 
+/*
+ * When the Screen/Surface is cleared, we also clear the buffer
+ */
 void AnsiParser::clearScreenBuffer()
 {
     // Allocate the Size
@@ -84,42 +90,34 @@ void AnsiParser::getScreenBufferText()
     }
 }
 
+/*
+ * Gets Coordinates from the screen already trnaslated to
+ * Screen Buffer Positions, Now we pull the position and throw the
+ * Text data into the Clipboard.
+ */
 void AnsiParser::bufferToClipboard(int startx, int starty, int numChar, int numRows)
 {
-    std::cout << "Copy Buffer to Clipboard" << std::endl;
-    std::cout << "startx " << startx << "starty " << starty
-        << "numChar " << numChar << "numRows " << numRows << std::endl;
-
     std::string textBuffer = "";
-    //get starting position in buffer
-
     int startPosition = ((starty) * characters_per_line) + (startx);
     int endPosition   = startPosition + (numChar);
-
-    std::cout << "screenBuffer.size() " << screenBuffer.size()
-        << "startPosition " << startPosition << "endPosition " << endPosition << std::endl;
 
     // Loop the Number of Rows to Grab
     for (int ot = 0; ot < numRows; ot++)
     {
-        std::cout << "startPosition " << startPosition << "endPosition " << endPosition << std::endl;
         // Grab each line per Row.
         for (int it = startPosition; it < endPosition; it++ )
         {
             if (screenBuffer[it].characterSequence != "")
             {
-                std::cout << screenBuffer[it].characterSequence << std::flush;
                 textBuffer += screenBuffer[it].characterSequence;
             }
             else
             {
-                std::cout << " " << std::flush;
                 textBuffer += " ";
             }
         }
         // Add Newline at the end of each row.
         textBuffer += "\r\n";
-        std::cout << std::endl;
 
         // Reset start/end position to next Row.
         startPosition += characters_per_line;
