@@ -61,6 +61,7 @@ public:
     // Function for populating the Screen Buffer    
     void setScreenBuffer(std::string mySequence);
     void scrollScreenBuffer();
+    void clearScreenBufferRange(int start, int end);
     void clearScreenBuffer();
     void getScreenBufferText();
     void bufferToClipboard(int startx, int starty, int numChar, int numRows);

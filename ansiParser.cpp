@@ -58,6 +58,14 @@ void AnsiParser::setScreenBuffer(std::string mySequence)
  */
 void AnsiParser::scrollScreenBuffer()
 {
+    //*** IMPORTANT (WIP), must add check for region scrolling only!
+    //TheTerminal::Instance()->scrollRegionActive &&
+    //                 y_position > TheTerminal::Instance()->bottomMargin))
+
+    // Theory, Erase Line at Top margin, then add a new line bottom margin
+    // To move it back down.  That way only the middle is scrolled up.
+
+
     // This remove the top line to scroll the screen up
     // And follow the SDL Surface!  lateron add history for scroll back.
     screenBuffer.erase(
@@ -67,6 +75,19 @@ void AnsiParser::scrollScreenBuffer()
     screenBuffer.resize( TERM_HEIGHT * TERM_WIDTH );
 }
 
+/*
+ * Clear Range of Screen Buffer for Erase Sequences.
+ */
+void AnsiParser::clearScreenBufferRange(int start, int end)
+{
+    int startPosition = ((y_position-1) * characters_per_line) + (start-1);
+
+    // Clear out entire line.
+    for(int i = startPosition; i < (startPosition+end); i++)
+    {
+        screenBuffer[i].characterSequence.erase();
+    }
+}
 /*
  * When the Screen/Surface is cleared, we also clear the buffer
  */
@@ -241,6 +262,7 @@ void AnsiParser::textInput(std::string buffer)
                     TheTerminal::Instance()->renderScreen();       // Surface to Texture
                     TheTerminal::Instance()->drawTextureScreen();  // Draw Texture to Screen
                     TheTerminal::Instance()->scrollScreenUp();     // Scroll the surface up
+                    scrollScreenBuffer();
                     if(!TheTerminal::Instance()->scrollRegionActive)
                         y_position = NUM_LINES;
                     else
@@ -252,6 +274,7 @@ void AnsiParser::textInput(std::string buffer)
                     TheTerminal::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
                     TheTerminal::Instance()->drawTextureScreen();    // Testure to Screen
                     TheTerminal::Instance()->scrollScreenUp();       // Scroll up for next line.
+                    scrollScreenBuffer();
                     if(!TheTerminal::Instance()->scrollRegionActive)
                         y_position = NUM_LINES;
                     else
@@ -316,6 +339,7 @@ void AnsiParser::textInput(std::string buffer)
                     TheTerminal::Instance()->renderScreen();       // Surface to Texture
                     TheTerminal::Instance()->drawTextureScreen();  // Draw Texture to Screen
                     TheTerminal::Instance()->scrollScreenUp();     // Scroll the surface up
+                    scrollScreenBuffer();
                     if(!TheTerminal::Instance()->scrollRegionActive)
                         y_position = NUM_LINES;
                     else
@@ -330,6 +354,7 @@ void AnsiParser::textInput(std::string buffer)
                     TheTerminal::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
                     TheTerminal::Instance()->drawTextureScreen();    // Testure to Screen
                     TheTerminal::Instance()->scrollScreenUp();       // Scroll up for next line.
+                    scrollScreenBuffer();
                     if(!TheTerminal::Instance()->scrollRegionActive)
                         y_position = NUM_LINES;
                     else
@@ -375,6 +400,7 @@ void AnsiParser::textInput(std::string buffer)
                     TheTerminal::Instance()->renderScreen();       // Surface to Texture
                     TheTerminal::Instance()->drawTextureScreen();  // Draw Texture to Screen
                     TheTerminal::Instance()->scrollScreenUp();     // Scroll the surface up
+                    scrollScreenBuffer();
                     y_position = TheTerminal::Instance()->bottomMargin;
                     cleared_the_screen = false;
                     // Reset to begining of line.
@@ -386,6 +412,7 @@ void AnsiParser::textInput(std::string buffer)
                     TheTerminal::Instance()->renderScreen();       // Surface to Texture
                     TheTerminal::Instance()->drawTextureScreen();  // Draw Texture to Screen
                     TheTerminal::Instance()->scrollScreenUp();     // Scroll the surface up
+                    scrollScreenBuffer();
                     y_position = NUM_LINES;
                     cleared_the_screen = false;
                 }
@@ -403,6 +430,7 @@ void AnsiParser::textInput(std::string buffer)
                     TheTerminal::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
                     TheTerminal::Instance()->drawTextureScreen();    // Testure to Screen
                     TheTerminal::Instance()->scrollScreenUp();       // Scroll up for next line.
+                    scrollScreenBuffer();
                     // Reset to begining of line.
                     if(x_position > characters_per_line)
                         x_position = 1;
@@ -413,6 +441,7 @@ void AnsiParser::textInput(std::string buffer)
                     TheTerminal::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
                     TheTerminal::Instance()->drawTextureScreen();    // Testure to Screen
                     TheTerminal::Instance()->scrollScreenUp();       // Scroll up for next line.
+                    scrollScreenBuffer();
                     y_position = NUM_LINES;
                 }
             }
@@ -607,6 +636,7 @@ void AnsiParser::sequenceCursorAndDisplay()
             if(parameters.size() == 1)
             {
                 TheTerminal::Instance()->clearScreenSurface();
+                clearScreenBuffer();
                 cleared_the_screen = true;
                 // Home Cursor, some bbs systems don't do this and makes a mess!!
                 x_position = 1;
@@ -614,9 +644,10 @@ void AnsiParser::sequenceCursorAndDisplay()
             }
             // Clearn Screen ESC[2J
             if(parameters.size() == 2 && parameters[1] == 2)
-            {
+            {                
                 //printf("\r\n\r\n CLEARTHESCREEN!! \r\n\r\n");
                 TheTerminal::Instance()->clearScreenSurface();
+                clearScreenBuffer();
                 cleared_the_screen = true;
                 // Home Cursor, some bbs systems don't do this and makes a mess!!
                 x_position = 1;
@@ -633,13 +664,20 @@ void AnsiParser::sequenceCursorAndDisplay()
                 //printf("\r\n EOL xpos %i, ypos %i \r\n", x_position, y_position);
                 TheTerminal::Instance()->renderClearLineScreen(y_position-1,
                         x_position-1, characters_per_line); // test removeed -1
+                clearScreenBufferRange(x_position-1, characters_per_line);
             }
             else if(parameters.size() == 2 && parameters[1] == 1) // Start of Line to Cursor
+            {
                 TheTerminal::Instance()->renderClearLineScreen(
                     y_position-1, 0, x_position);
+                clearScreenBufferRange(0, x_position);
+            }
             else if(parameters.size() == 2 && parameters[1] == 2) // Entire Line
+            {
                 TheTerminal::Instance()->renderClearLineScreen(
                     y_position-1, 0, characters_per_line);
+                clearScreenBufferRange(0, characters_per_line);
+            }
             break;
 
         default :
