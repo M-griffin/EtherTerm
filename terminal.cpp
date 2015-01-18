@@ -475,8 +475,6 @@ void Terminal::renderSelectionScreen(int x, int y)
     int screenWidth, screenHeight;
     SDL_GetRendererOutputSize(globalRenderer,&screenWidth,&screenHeight);
 
-    std::cout << "screenWidth " << screenWidth << "screenHeight " << screenHeight << std::endl;
-
     // We clip off botom 80, so that we get proper 8x16
     // Display without Extra pixel borders around the screen,
     // Texture Filter results in Pixel Bleeding.
