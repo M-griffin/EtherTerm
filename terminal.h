@@ -159,10 +159,9 @@ public:
     }
 
     // Now for Rendering Code
-
-
     void restartWindowRenderer(std::string mode);
     void pullSelectionBuffer(int x, int y);
+    void clearSelectionTexture();
     void renderSelectionScreen(int x, int y);
     void freeSurfaceTextures();
     bool loadBitmapImageFromPak();

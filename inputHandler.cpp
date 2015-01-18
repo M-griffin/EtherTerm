@@ -143,6 +143,10 @@ bool InputHandler::update()
                     TheTerminal::Instance()->pullSelectionBuffer(
                         mouseReleaseXPosition, mouseReleaseYPosition);
 
+                    // Needed for Windows Full Screen Mode Switches, otherwise it doesn't
+                    // Repopulate properly.  Clear so texture is refreshed each selection
+                    TheTerminal::Instance()->clearSelectionTexture();
+
                     /*
                     std::cout << "Mouse released at: " << mouseReleaseXPosition << ","
                         << mouseReleaseYPosition << std::endl;

@@ -106,8 +106,6 @@ Terminal::~Terminal()
 
 void Terminal::restartWindowRenderer(std::string mode)
 {
-
-
     // First Clear the Rexture so it will get recreated with new HINT
     if (globalTexture)
     {
@@ -115,9 +113,6 @@ void Terminal::restartWindowRenderer(std::string mode)
         SDL_DestroyTexture(globalTexture);
         globalTexture = NULL;
     }
-
-    // Reset Renderer Attributes
-
     /*
      * 0 = disable vsync
      * 1 = enable vsync
@@ -126,10 +121,7 @@ void Terminal::restartWindowRenderer(std::string mode)
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
             "restartWindowRenderer SDL_SetHint SDL_HINT_RENDER_VSYNC: %s", SDL_GetError());
-
-        // Not a show stopper, continue on!
     }
-
     /*
      * 0 or nearest = nearest pixel sampling
      * 1 or linear  = linear filtering       (supported by OpenGL and Direct3D)
@@ -139,8 +131,6 @@ void Terminal::restartWindowRenderer(std::string mode)
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
             "restartWindowRenderer SDL_SetHint SDL_HINT_RENDER_SCALE_QUALITY: %s", SDL_GetError());
-
-        // Not a show stopper, continue on!
     }
     /*
      * 0 disable 3D acceleration
@@ -152,35 +142,27 @@ void Terminal::restartWindowRenderer(std::string mode)
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
             "restartWindowRenderer SDL_SetHint SDL_HINT_RENDER_SCALE_QUALITY: %s", SDL_GetError());
-
-        // Not a show stopper, continue on! but maybe!!
     }
 
     // Clear and Refresh the Renderer
-
     if (SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF) < 0)
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
             "restartWindowRenderer SDL_SetRenderDrawColor globalRenderer: %s", SDL_GetError());
         return;
     }
-
     if (SDL_SetRenderTarget(globalRenderer, NULL) < 0)
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
             "restartWindowRenderer SDL_SetRenderTarget NULL: %s", SDL_GetError());
     }
-
     if (SDL_RenderClear(globalRenderer) < 0)
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
             "restartWindowRenderer() SDL_RenderClear globalRenderer: %s", SDL_GetError());
     }
-
-
     // Recreate the texture surface
     renderScreen();
-
 }
 
 bool Terminal::init(const char* title,
@@ -297,7 +279,6 @@ bool Terminal::init(const char* title,
     //SDL_RenderSetLogicalSize(globalRenderer,640*2,400*2);
     //SDL_RenderSetScale(globalRenderer, 0, 0);
 
-
     // add some sound effects - TODO move to better place
     /*
     TheSoundManager::Instance()->load("assets/ElectroRock.ogg", "music1", SOUND_MUSIC);
@@ -361,7 +342,6 @@ void Terminal::pullSelectionBuffer(int x, int y)
 
     // First we need to convert the current Screen size to 640x400
     // So we can calcuate the actual pixel size of each resized character cell.
-
     SDL_Rect rect;
 
     // We clip off botom 80, so that we get proper 8x16
@@ -438,6 +418,10 @@ void Terminal::pullSelectionBuffer(int x, int y)
         rect.h = ((sourceY -= sourceY % charHeight)) - (rect.y);
     }
 
+    // If were inbetween lines, Height = 0, then add char Height to the bottom
+    // So we always have a row!
+    if (rect.h == 0)
+        rect.h += charHeight;
 
     // Now that we have the excat coordinates of the selected text.
     // We need to translate this to the screenbuffer positions
@@ -451,16 +435,23 @@ void Terminal::pullSelectionBuffer(int x, int y)
     // Now figure out how many rows of characts to pull
     int numberRows  = rect.h / charHeight;
 
-    // Check if we have any rows.. Min = 1;
-    if (numberRows == 0)
-        return;
-
     // Use coords to pull screen text directly from screen buffer.
     TheAnsiParser::Instance()->bufferToClipboard(
         startColumn, startRow,
         length, numberRows);
 }
 
+/*
+ * Clear the Selection Texture
+ * Needed for Windows Full Screen Mode Switches, otherwise it doesn't
+ * Repopulate properly.  Clear so texture is refreshed each selection
+ * We don't want to do it each render casue that slows it down!
+ */
+void Terminal::clearSelectionTexture()
+{
+    SDL_DestroyTexture(selectionTexture);
+    selectionTexture = NULL;
+}
 /*
  * On selected mouse movement area! We want to overlay a blended texture
  * To give the affect of highlighting without having to resort to
@@ -518,7 +509,7 @@ void Terminal::renderSelectionScreen(int x, int y)
         }
 
         // On need to set this the first time!!
-         // Set Render Target to the Texture.
+        // Set Render Target to the Texture.
         if (SDL_SetRenderTarget(globalRenderer, selectionTexture) < 0)
         {
             SDL_LogError(SDL_LOG_CATEGORY_ERROR,
@@ -553,7 +544,6 @@ void Terminal::renderSelectionScreen(int x, int y)
         }
     }
 
-
     // We need to Translate the Screen Width vs Rows and Width to
     // get actual the grid size of the Characters to snap everything correctly.
     int charWidth, charHeight;
@@ -564,7 +554,6 @@ void Terminal::renderSelectionScreen(int x, int y)
 
     // First we need to convert the current Screen size to 640x400
     // So we can calcuate the actual pixel size of each resized character cell.
-
     SDL_Rect rect;
 
     // We clip off botom 80, so that we get proper 8x16
@@ -641,6 +630,11 @@ void Terminal::renderSelectionScreen(int x, int y)
         rect.h = ((sourceY -= sourceY % charHeight)) - (rect.y);
     }
 
+    // If were inbetween lines, Height = 0, then add char Height to the bottom
+    // So we always have a row!
+    if (rect.h == 0)
+        rect.h += charHeight;
+
     // Draw First Highlight Overlay
     if (SDL_RenderCopy(globalRenderer, selectionTexture, NULL, &rect) < 0)
     {
@@ -664,11 +658,6 @@ void Terminal::renderSelectionScreen(int x, int y)
     // Reset dont need it?
     //SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderPresent(globalRenderer);
-
-    // Needed for Windows Full Screen Mode Switches, otherwise it doesn't
-    // Repopulate properly.
-    SDL_DestroyTexture(selectionTexture);
-    selectionTexture = NULL;
 }
 
 /*
