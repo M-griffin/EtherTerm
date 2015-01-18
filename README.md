@@ -29,13 +29,16 @@ escape sequences for font switching will override the default font.
 
 **UTF-8 Output encoding with TTF fonts are in the works!**
 
-Text selection is almost finished. You can left click and drag the mouse around.
-to highlight text on the screen. Copying selected text will be completed soon.
-
-Right click will paste text from the clipboard.
+**Window and Full Screen Modes**
 
 ```ALT + ENTER``` toggles between different window screen sizes.
-This cycles two different window resolutions then goes FULL SCREEN.
+This cycles two different window resolutions then goes Fullscreen.
+
+**Full Copy/Paste support**
+
+```Left mouse click and drag``` to select text on the screen, release to copy selected text to the clipboard.
+
+```Right mouse click``` to paste text from the clipboard.
 
 ## Work in progress:
 
