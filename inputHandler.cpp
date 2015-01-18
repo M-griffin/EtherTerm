@@ -105,13 +105,11 @@ bool InputHandler::update()
                     case SDL_WINDOWEVENT_FOCUS_GAINED:
                         //SDL_Log("Window %d gained keyboard focus",
                         //    event.window.windowID);
-
-                      break;
+                        break;
                     case SDL_WINDOWEVENT_FOCUS_LOST:
                         //SDL_Log("Window %d lost keyboard focus",
                         //    event.window.windowID);
-                      break;
-
+                        break;
                     default:
                         //SDL_Log("Window %d got unknown event %d",
                         //   event.window.windowID, event.window.event);

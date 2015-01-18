@@ -475,6 +475,8 @@ void Terminal::renderSelectionScreen(int x, int y)
     int screenWidth, screenHeight;
     SDL_GetRendererOutputSize(globalRenderer,&screenWidth,&screenHeight);
 
+    std::cout << "screenWidth " << screenWidth << "screenHeight " << screenHeight << std::endl;
+
     // We clip off botom 80, so that we get proper 8x16
     // Display without Extra pixel borders around the screen,
     // Texture Filter results in Pixel Bleeding.
@@ -664,6 +666,11 @@ void Terminal::renderSelectionScreen(int x, int y)
     // Reset dont need it?
     //SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderPresent(globalRenderer);
+
+    // Needed for Windows Full Screen Mode Switches, otherwise it doesn't
+    // Repopulate properly.
+    SDL_DestroyTexture(selectionTexture);
+    selectionTexture = NULL;
 }
 
 /*
