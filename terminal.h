@@ -162,6 +162,7 @@ public:
 
 
     void restartWindowRenderer(std::string mode);
+    void pullSelectionBuffer(int x, int y);
     void renderSelectionScreen(int x, int y);
     void freeSurfaceTextures();
     bool loadBitmapImageFromPak();

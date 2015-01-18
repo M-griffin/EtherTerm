@@ -342,6 +342,126 @@ void Terminal::clean()
 }
 
 /*
+ * Once we have a screen selection, we will now pull the
+ * Rect radius and grab all mirrowing text from the screen
+ * buffer and copy it to the clip board. Copy/Paste.
+ */
+void Terminal::pullSelectionBuffer(int x, int y)
+{
+    int screenWidth, screenHeight;
+    SDL_GetRendererOutputSize(globalRenderer,&screenWidth,&screenHeight);
+
+    // We need to Translate the Screen Width vs Rows and Width to
+    // get actual the grid size of the Characters to snap everything correctly.
+    int charWidth, charHeight;
+    charHeight = screenHeight / 25;
+    charHeight += screenHeight % 25;
+    charWidth = screenWidth / 80;
+    charWidth += screenWidth % 80;
+
+    // First we need to convert the current Screen size to 640x400
+    // So we can calcuate the actual pixel size of each resized character cell.
+
+    SDL_Rect rect;
+
+    // We clip off botom 80, so that we get proper 8x16
+    // Display without Extra pixel borders around the screen,
+    // Texture Filter results in Pixel Bleeding.
+
+    int sourceX = TheInputHandler::Instance()->getMouseSourceXPosition();
+    int sourceY = TheInputHandler::Instance()->getMouseSourceYPosition();
+
+    // This is the source position that we Xy     = Source
+    //                                      []
+    // are starting our rect box at.          xy  = Motion
+
+    // Next We'll need to snap this to the nearest char height and width.
+    // Moving up on the top most region, and down on the bottom most region.
+
+    // First determine the smallest of source and current plot positions
+    // We want to make the Lowest Values our starting point so we either
+    // use source or motions depending where the mouse is for top left.
+
+    // This is the Top Region Snap to nearest Char Width/Height
+    if (sourceX < x)
+    {
+        // TOP Stationary -> Right ->> OK!
+        rect.x = sourceX;
+        rect.x -= rect.x % charWidth; // Snap to Left.
+    }
+    else
+    {
+        // Top -> Left ->> OK!
+        rect.x = x;
+        rect.x -= rect.x % charWidth;
+    }
+
+    if (sourceY < y)
+    {
+        // Top Stationary ->> OK!
+        rect.y = sourceY;
+        rect.y -= rect.y % charHeight; // Snap to Top
+    }
+    else
+    {
+        // Top -> Up ->> OK!
+        rect.y = y;
+        rect.y -= rect.y % charHeight;
+    }
+
+    // Width and height are calcuated by the different from motion to source
+    // Well need to round these values to the width and height of a character!
+    // Also need to swap source for the lowest value so we can select both
+    // above and behind the starting points.
+
+    // This is the bottom Region Snap to nearest Char Width/Height
+    if (sourceX < x)
+    {
+        // Bottom Width RIGHT ->> OK!
+        rect.w = charWidth +
+            ((x -= (x % charWidth)) - (sourceX -= sourceX % charWidth));
+    }
+    else
+    {
+        // Bottom Stationary ->> OK!
+        rect.w = ((sourceX -= sourceX % charWidth)) - (rect.x);
+    }
+    if (sourceY < y)
+    {
+        // Bottom -> Down ->> OK!
+        rect.h = charHeight +
+            ((y -= (y % charHeight)) - (sourceY -= sourceY % charHeight));
+    }
+    else
+    {
+        // Bottom -> Stationary ->> OK!
+        rect.h = ((sourceY -= sourceY % charHeight)) - (rect.y);
+    }
+
+
+    // Now that we have the excat coordinates of the selected text.
+    // We need to translate this to the screenbuffer positions
+    // So that we can grab the text that was selected on the screen.
+
+    // Get Starting Position
+    int startColumn = rect.x / charWidth;
+    int startRow    = rect.y / charHeight;
+    // Now figure out how many character per row
+    int length      = rect.w / charWidth;
+    // Now figure out how many rows of characts to pull
+    int numberRows  = rect.h / charHeight;
+
+    // Check if we have any rows.. Min = 1;
+    if (numberRows == 0)
+        return;
+
+    // Use coords to pull screen text directly from screen buffer.
+    TheAnsiParser::Instance()->bufferToClipboard(
+        startColumn, startRow,
+        length, numberRows);
+}
+
+/*
  * On selected mouse movement area! We want to overlay a blended texture
  * To give the affect of highlighting without having to resort to
  * grabbing screen buffer text.and redrawing it character by character

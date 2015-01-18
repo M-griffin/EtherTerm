@@ -58,11 +58,12 @@ public:
     myScreen sequenceBuffer;
     std::vector<myScreen> screenBuffer;
 
-    // Function for populating the Screen Buffer
+    // Function for populating the Screen Buffer    
     void setScreenBuffer(std::string mySequence);
     void scrollScreenBuffer();
     void clearScreenBuffer();
     void getScreenBufferText();
+    void bufferToClipboard(int startx, int starty, int numChar, int numRows);
 
     const  char ESC   = '\x1b';
     // This needs to be passed from TheTerminal instance eventually

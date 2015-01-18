@@ -140,6 +140,11 @@ bool InputHandler::update()
 
                     // Clear the screen of the selection box.
                     TheTerminal::Instance()->drawTextureScreen();
+
+                    // Copy Selected Text to Clipboard.
+                    TheTerminal::Instance()->pullSelectionBuffer(
+                        mouseReleaseXPosition, mouseReleaseYPosition);
+
                     /*
                     std::cout << "Mouse released at: " << mouseReleaseXPosition << ","
                         << mouseReleaseYPosition << std::endl;
@@ -229,59 +234,8 @@ bool InputHandler::update()
                 {
                     switch (event.key.keysym.sym)
                     {
-                        //Handle copy
-                        case SDLK_c:
-                            if (SDL_GetModState() & KMOD_CTRL)
-                            {
-                                inputText =
-                                    SDL_SetClipboardText(inputText.c_str());
-                                return false;
-                            }
-                            break;
-
-                        //Handle paste
-                        case SDLK_v:
-                            if (SDL_GetModState() & KMOD_CTRL)
-                            {
-                                inputText = SDL_GetClipboardText();
-                                // Some input filtering
-                                std::string::size_type id1 = 0;
-                                while(1)
-                                {
-                                    id1 = inputText.find("\r\n", 0);
-                                    if(id1 != std::string::npos)
-                                    {
-                                        inputText.erase(id1+1,1);
-                                    }
-                                    else
-                                        break;
-                                }
-                                while(1)
-                                {
-                                    id1 = inputText.find("\t", 0);
-                                    if(id1 != std::string::npos)
-                                    {
-                                        inputText.replace(id1,1,"    ");
-                                    }
-                                    else
-                                        break;
-                                }
-                                while(1)
-                                {
-                                    // Windows.
-                                    id1 = inputText.find("\n", 0);
-                                    if(id1 != std::string::npos)
-                                    {
-                                        inputText[id1] = '\r';
-                                    }
-                                    else
-                                        break;
-                                }
-                                setInputSequence(inputText);
-                                return true;
-                            }
-                            break;
-
+                        // Control Keys should passthrough for SSH
+                        // And other Telnet Servers to handle.
                         default:
                             // CTRL Keys have lowercase letters -
                             // translate CTRL Key combo and
@@ -294,7 +248,6 @@ bool InputHandler::update()
                                 // Translate Letter to CTRL Letter value
                                 ch = CTRLKEYTABLE[ch-97];
                                 sequence = ch;
-                                //Append the character
                                 setInputSequence(sequence.c_str());
                                 return true;
                             }
@@ -311,7 +264,6 @@ bool InputHandler::update()
                             // If not Full Screen Then Toggle to Next Mode.
                             if(!isWindowMode)
                             {
-
                                 // OSX Doesn't do fullscreen properly!
                                 // Reset to Linear Texting Filtering to scale bock characters
                                 // A little blur, but better then a mess!
@@ -322,9 +274,6 @@ bool InputHandler::update()
                                 // it will display this rez properly! Otherwise it skips to last size.
                                 SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
 #endif
-
-
-
                                 // Texture Filtering OFF.
                                 // FULLSCREEN_DESKTOP fits the window to the desktop size,
                                 // This throws off the pixels.  Using the resolution switch
@@ -347,7 +296,6 @@ bool InputHandler::update()
                                 }
 
                                 SDL_Log("Setting window to FULLSCREEN.");
-
                                 isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
                                 fullScreenWindowSize = 0;
                                 TheTerminal::Instance()->drawTextureScreen();
