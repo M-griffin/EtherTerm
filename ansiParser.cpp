@@ -16,7 +16,6 @@
 
 using namespace std;
 
-
 // Screen Buffer Vector Constructors
 AnsiParser::myScreen::myScreen()
 {
@@ -25,7 +24,6 @@ AnsiParser::myScreen::myScreen()
 
 AnsiParser::myScreen::myScreen(std::string sequence, SDL_Color fg, SDL_Color bg)
 : characterSequence(sequence), foreground(fg), background(bg) { }
-
 
 /**
  * handle screen buffer, Keeps track of all data
@@ -38,7 +36,6 @@ void AnsiParser::setScreenBuffer(std::string mySequence)
     // NOT IN USE CURRENTLY
     //if (x_position > max_x_position)
     //    max_x_position = x_position;
-
     sequenceBuffer.characterSequence = mySequence;
     sequenceBuffer.foreground = TheTerminal::Instance()->currentFGColor;
     sequenceBuffer.background = TheTerminal::Instance()->currentBGColor;
@@ -47,8 +44,14 @@ void AnsiParser::setScreenBuffer(std::string mySequence)
     position = ((y_position-1) * characters_per_line) + (x_position-1);
 
     // Add Sequence to Screen Buffer
-    screenBuffer.at(position) = sequenceBuffer;
-
+    try
+    {
+        screenBuffer.at(position) = sequenceBuffer;
+    }
+    catch (std::exception e)
+    {
+        std::cout << "Exception setScreenBuffer: " << e.what() << std::endl;
+    }
     // Clear for next sequences.
     sequenceBuffer.characterSequence.erase();
 }
@@ -65,12 +68,17 @@ void AnsiParser::scrollScreenBuffer()
     // Theory, Erase Line at Top margin, then add a new line bottom margin
     // To move it back down.  That way only the middle is scrolled up.
 
-
     // This remove the top line to scroll the screen up
     // And follow the SDL Surface!  lateron add history for scroll back.
-    screenBuffer.erase(
-        screenBuffer.begin(), screenBuffer.begin() + characters_per_line);
-
+    try
+    {
+        screenBuffer.erase(
+            screenBuffer.begin(), screenBuffer.begin() + characters_per_line);
+    }
+    catch (std::exception e)
+    {
+        std::cout << "Exception scrollScreenBuffer: " << e.what() << std::endl;
+    }
     // Readd The last Line back to the buffer.
     screenBuffer.resize( TERM_HEIGHT * TERM_WIDTH );
 }
@@ -85,7 +93,14 @@ void AnsiParser::clearScreenBufferRange(int start, int end)
     // Clear out entire line.
     for(int i = startPosition; i < (startPosition+end); i++)
     {
-        screenBuffer[i].characterSequence.erase();
+        try
+        {
+            screenBuffer[i].characterSequence.erase();
+        }
+        catch (std::exception e)
+        {
+            std::cout << "Exception clearScreenBufferRange: " << e.what() << std::endl;
+        }
     }
 }
 /*
@@ -128,13 +143,20 @@ void AnsiParser::bufferToClipboard(int startx, int starty, int numChar, int numR
         // Grab each line per Row.
         for (int it = startPosition; it < endPosition; it++ )
         {
-            if (screenBuffer[it].characterSequence != "")
+            try
             {
-                textBuffer += screenBuffer[it].characterSequence;
+                if (screenBuffer[it].characterSequence != "")
+                {
+                    textBuffer += screenBuffer[it].characterSequence;
+                }
+                else
+                {
+                    textBuffer += " ";
+                }
             }
-            else
+            catch (std::exception e)
             {
-                textBuffer += " ";
+                std::cout << "Exception bufferToClipboard: " << e.what() << std::endl;
             }
         }
         // Add Newline at the end of each row.
@@ -173,7 +195,15 @@ AnsiParser::AnsiParser() :
 AnsiParser::~AnsiParser()
 {
     std::cout << "AnsiParser Released" << std::endl;
-    std::vector<myScreen>().swap(screenBuffer); // Clear
+    try
+    {
+        std::vector<myScreen>().swap(screenBuffer); // Clear
+    }
+    catch (std::exception e)
+    {
+        std::cout << "Exception std::vector<myScreen>().swap(screenBuffer): "
+            << e.what() << std::endl;
+    }
 }
 
 /*
@@ -1584,7 +1614,15 @@ void AnsiParser::sequenceResetAndResponses()
 void AnsiParser::sequenceInput(std::vector<int> sequenceParameters)
 {
     // Grab Parameterized Control Sequence.
-    parameters.swap(sequenceParameters);
+    try
+    {
+        parameters.swap(sequenceParameters);
+    }
+    catch (std::exception e)
+    {
+        std::cout << "Exception sequenceInput parameters.swap(sequenceParameters): "
+            << e.what() << std::endl;
+    }
 
     // First Handle Any Cursor Movement and Redisplay Attributes
     switch(parameters[0])
