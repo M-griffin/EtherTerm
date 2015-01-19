@@ -46,11 +46,17 @@ void AnsiParser::setScreenBuffer(std::string mySequence)
     // Add Sequence to Screen Buffer
     try
     {
-        screenBuffer.at(position) = sequenceBuffer;
+        if ((unsigned)position < screenBuffer.size())
+            screenBuffer.at(position) = sequenceBuffer;
+        else
+        {
+            std::cout << "Xposition: " << x_position-1 << std::endl;
+        }
     }
     catch (std::exception e)
     {
         std::cout << "Exception setScreenBuffer: " << e.what() << std::endl;
+        std::cout << "Server sent data that exceeds screen dimensions." << std::endl;
     }
     // Clear for next sequences.
     sequenceBuffer.characterSequence.erase();
@@ -88,10 +94,17 @@ void AnsiParser::scrollScreenBuffer()
  */
 void AnsiParser::clearScreenBufferRange(int start, int end)
 {
-    int startPosition = ((y_position-1) * characters_per_line) + (start-1);
+    int startPosition = ((y_position-1) * characters_per_line) + (start);
+    int endPosition = startPosition + (end - start);
+
+    //std::cout << "start " << start << " end " << end
+    // << std::endl;
+
+    //std::cout << "startPosition " << startPosition << " endPosition " << endPosition
+    // << std::endl;
 
     // Clear out entire line.
-    for(int i = startPosition; i < (startPosition+end); i++)
+    for(int i = startPosition; i < endPosition; i++)
     {
         try
         {
@@ -102,6 +115,9 @@ void AnsiParser::clearScreenBufferRange(int start, int end)
             std::cout << "Exception clearScreenBufferRange: " << e.what() << std::endl;
         }
     }
+
+    // Debugging
+    //getScreenBufferText();
 }
 /*
  * When the Screen/Surface is cleared, we also clear the buffer
@@ -246,16 +262,31 @@ void AnsiParser::textInput(std::string buffer)
 
         // Grab the next character in sequence to test for
         // CRLF combinations.
-        if (i+1 < buffer.size())
-            nextSequence = buffer[i+1];
+        try
+        {
+            if (i+1 < buffer.size())
+                nextSequence = buffer[i+1];
+        }
+        catch (std::exception e)
+        {
+            std::cout << "Exception AnsiParser::textInput: "
+                << e.what() << std::endl;
+        }
+
+        // Debugging!
+        //std::cout << "sequence: " << sequence << " "
+          //  << static_cast<int>(sequence) << std::endl;
 
         // Back Space
         if(sequence == '\b')
         {
+            std::cout << "backspace: " << std::endl;
             if(x_position > 1)
                 --x_position;
             continue;
         }
+
+
         // Handle New Line in ANSI Files properly.
         if(sequence == '\r' && nextSequence == '\n')
         {

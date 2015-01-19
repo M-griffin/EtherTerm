@@ -670,53 +670,64 @@ void Terminal::freeSurfaceTextures()
     // Clear Cached Surface.
     std::cout << std::endl << "*** Releaseing Surfaces and Textures" << std::endl;
 
+    //Free texture if it exists
+    if (globalTexture)
+    {
+        std::cout << "SDL_DestroyTexture globalTexture" << std::endl;
+        SDL_DestroyTexture(globalTexture);
+        globalTexture = NULL;
+    }
+    if(selectionTexture)
+    {
+        std::cout << "SDL_DestroyTexture selectionTexture" << std::endl;
+        SDL_DestroyTexture(selectionTexture);
+        selectionTexture = NULL;
+    }
+
     if (globalWindow)
     {
         std::cout << "Destroy SDL Window" << std::endl;
         SDL_DestroyWindow(globalWindow);
+        globalWindow = NULL;
     }
     if (globalRenderer)
     {
         std::cout << "Destroy SDL Renderer" << std::endl;
         SDL_DestroyRenderer(globalRenderer);
+        globalRenderer = NULL;
     }
 
     if (chachedSurface)
     {
         std::cout << "SDL_FreeSurface chachedSurface" << std::endl;
         SDL_FreeSurface(chachedSurface);     // Bitmap    -> Fonts
+        chachedSurface = NULL;
     }
     if (screenSurface)
     {
         std::cout << "SDL_FreeSurface screenSurface" << std::endl;
         SDL_FreeSurface(screenSurface);      // Screen    -> Texture
+        screenSurface = NULL;
     }
     if (tmpSurface)
     {
         std::cout << "SDL_FreeSurface tmpSurface" << std::endl;
         SDL_FreeSurface(tmpSurface);         // Char Cell -> Screen
+        tmpSurface = NULL;
     }
     if (cursorOffSurface)
     {
         std::cout << "SDL_FreeSurface cursorOffSurface" << std::endl;
         SDL_FreeSurface(cursorOffSurface);   // Cursor Off Character Cell
+        cursorOffSurface = NULL;
     }
     if (bottomSurface)
     {
         std::cout << "SDL_FreeSurface bottomSurface" << std::endl;
         SDL_FreeSurface(bottomSurface);      // Bottom Line of Scrolling Region.
+        bottomSurface = NULL;
     }
-    //Free texture if it exists
-    if (globalTexture)
-    {
-        std::cout << "SDL_DestroyTexture globalTexture" << std::endl;
-        SDL_DestroyTexture(globalTexture);
-    }
-    if(selectionTexture)
-    {
-        std::cout << "SDL_DestroyTexture selectionTexture" << std::endl;
-        SDL_DestroyTexture(selectionTexture);
-    }
+    
 
 }
 
