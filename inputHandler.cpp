@@ -300,6 +300,11 @@ bool InputHandler::update()
                                 SDL_Log("Setting window to FULLSCREEN.");
                                 isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
                                 fullScreenWindowSize = 0;
+                                if (SDL_RenderClear(TheTerminal::Instance()->getRenderer()) < 0)
+                                {
+                                    SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                                        "InputHandler::update() SDL_RenderClear globalRenderer: %s", SDL_GetError());
+                                }
                                 TheTerminal::Instance()->drawTextureScreen();
                                 return false;
                             }
@@ -335,6 +340,11 @@ bool InputHandler::update()
                                         TheTerminal::Instance()->restartWindowRenderer("0");
 #endif
 
+                                        if (SDL_RenderClear(TheTerminal::Instance()->getRenderer()) < 0)
+                                        {
+                                            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                                                "InputHandler::update() SDL_RenderClear globalRenderer: %s", SDL_GetError());
+                                        }
                                         TheTerminal::Instance()->drawTextureScreen();
                                         SDL_Log("Setting window size to 640 x 400.");
                                         ++fullScreenWindowSize;
@@ -344,6 +354,11 @@ bool InputHandler::update()
                                         TheTerminal::Instance()->setWindowWidth(1280);
                                         TheTerminal::Instance()->setWindowHeight(800);
                                         SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 1280, 800);
+                                        if (SDL_RenderClear(TheTerminal::Instance()->getRenderer()) < 0)
+                                        {
+                                            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                                                "InputHandler::update() SDL_RenderClear globalRenderer: %s", SDL_GetError());
+                                        }
                                         TheTerminal::Instance()->drawTextureScreen();
                                         SDL_Log("Setting window size to 1280 x 800.");
                                         ++fullScreenWindowSize;
