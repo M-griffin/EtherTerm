@@ -121,17 +121,23 @@ make osx
 make clean-osx
 ```
 
-**For Linux**
+**For Linux (Ubuntu, Mint and Debian)**
 ```
 make linux
 
 make clean-linux
 ```
 
+**For Linux (Arch Linux)**
+```
+make linux-arch
+
+make clean-linux
+```
+
 ##Linux Build Steps:
 
-**For Ubunutu, Mint and Debian you can use APT-GET to install all requirements.**
-Notes for Arch Linux will follow shortly once steps are completed.
+###Ubunutu, Mint and Debian can use APT-GET to install requirements.**
 
 **Clone the Git repository.**
 ```
@@ -160,8 +166,37 @@ sudo apt-get install libssh-dev
 
 **To compile your executable.**
 ```
-make-linux 
+make linux 
 ```
+
+###Arch Linux can use PACMAN to install requirements.**
+
+**Clone the Git repository.**
+```
+git clone https://github.com/M-griffin/EtherTerm.git
+```
+
+**Install SDL2**
+```
+sudo pacman -S sdl2
+```
+
+**Install SDL2_Net**
+```
+sudo pacman -S sdl2_net
+```
+
+**Install Libssh**
+```
+sudo pacman -S extra/libssh
+```
+
+**To compile your executable.**
+```
+make linux-arch
+```
+
+
 
 ##OSX Build Steps:
 
@@ -195,7 +230,7 @@ installs libssh /usr/local/Cellar/libssh6.4
 
 **To compile your executable.**
 ```
-make-osx
+make osx
 ```
 
 **Possible issues with OSX Yosemite when building libssh.**
@@ -246,3 +281,5 @@ folder or the root folder where the executable is located.
 + (SDL Game Programming) For good ideas with Singletons and State Machines.
 + Maze: Testing and bug reports
 + IceDevil: Testing and bug reports
++ Haliphax: Testing and bug reports
++ HellBeard: Testing and bug reports
