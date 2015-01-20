@@ -1805,10 +1805,12 @@ void Terminal::setupCursorChar()
     if(SDL_MUSTLOCK(cursorOnSurface))
         SDL_UnlockSurface(cursorOnSurface);
 
-    // Draw the inital cursor on the screen, this is needed
-    // Right away for Echo'ed input.
-    TheTerminal::Instance()->renderCursorOnScreen();
-    TheTerminal::Instance()->drawTextureScreen();
+    // Render the initial cursor only if it's exposed!
+    if (TheAnsiParser::Instance()->isCursorActive())
+    {
+        TheTerminal::Instance()->renderCursorOnScreen();
+        TheTerminal::Instance()->drawTextureScreen();
+    }
 }
 
 /**

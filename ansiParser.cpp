@@ -200,7 +200,8 @@ AnsiParser::AnsiParser() :
     color_attribute(0),
     prev_color_attribute(0),
     line_wrapped(false),
-    cleared_the_screen(false)
+    cleared_the_screen(false),
+    isCursorShown(true)
 {
     //Set the default size of the vector screen buffer
     //Thne Fill each element with defaults
@@ -697,7 +698,7 @@ void AnsiParser::sequenceCursorAndDisplay()
             {
                 TheTerminal::Instance()->renderClearLineBelowScreen(
                     y_position-1, x_position-1);
-                cleared_the_screen = true;
+                //cleared_the_screen = true;
                 break;
             }
             // Erase Currnet Line and Below. ESC[0J
@@ -705,7 +706,7 @@ void AnsiParser::sequenceCursorAndDisplay()
             {
                 TheTerminal::Instance()->renderClearLineBelowScreen(
                     y_position-1,x_position-1);
-                cleared_the_screen = true;
+                //cleared_the_screen = true;
                 break;
             }
             // Erase Current Line and Above.
@@ -713,17 +714,17 @@ void AnsiParser::sequenceCursorAndDisplay()
             {
                 TheTerminal::Instance()->renderClearLineAboveScreen(
                     y_position-1, x_position-1);
-                cleared_the_screen = true;
+                //cleared_the_screen = true;
                 break;
             }
             // Clear Entire Screen. ESC[2J
             if(parameters.size() == 2 && parameters[1] == 2)
-            {                
-                //printf("\r\n\r\n CLEARTHESCREEN!! \r\n\r\n");
+            {
+                // If backgroun not 0m, we should probably fill
+                // The screen with background color per the spec?
                 TheTerminal::Instance()->clearScreenSurface();
                 clearScreenBuffer();
                 cleared_the_screen = true;
-                // Home Cursor, some bbs systems don't do this and makes a mess!!
                 x_position = 1;
                 y_position = 1;
                 //screen_buff.esc_sequence += esc_sequence;
@@ -1600,16 +1601,42 @@ void AnsiParser::sequenceResetAndResponses()
 {
     switch(parameters[0])
     {
-        case RESET_MODE:
-            //screen_buff.esc_sequence += esc_sequence;
-            if(parameters[1] == 7)
-                line_wrapped = false;
+        case SET_MODE: // [?h
+            if(parameters.size() == 3 &&
+                parameters[1] == '?' && parameters[2] == 7)
+            {
+                // Wraparound Mode (DECAWM).
+                std::cout << "Wraparound Mode" << std::endl;
+                line_wrapped = true;
+                break;
+            }
+            else if(parameters.size() == 3 &&
+                parameters[1] == '?' && parameters[2] == 25)
+            {
+                // Show Cursor (DECTCEM).
+                isCursorShown = true;
+                std::cout << "Cursor Shown" << std::endl;
+                break;
+            }
             break;
 
-        case SET_MODE:
-            if(parameters.size() > 0 && parameters[1] == 7)
+        case RESET_MODE: // [?l
+            //screen_buff.esc_sequence += esc_sequence;
+            if(parameters.size() == 3 &&
+                parameters[1] == '?' && parameters[2] == 7)
             {
-                //line_wrapped = true;
+                // Wraparound Mode disabled (DECAWM).
+                line_wrapped = false;
+                std::cout << "Wraparound Mode Disabled" << std::endl;
+                break;
+            }
+            else if(parameters.size() == 3 &&
+                parameters[1] == '?' && parameters[2] == 25)
+            {
+                // Hide Cursor (DECTCEM).
+                isCursorShown = false;
+                std::cout << "Cursor hidden" << std::endl;
+                break;
             }
             break;
 

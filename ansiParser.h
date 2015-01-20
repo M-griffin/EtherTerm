@@ -152,6 +152,8 @@ public:
     void sequenceResetAndResponses();
     void sequenceInput(std::vector<int> sequenceParameters);
 
+    bool isCursorActive() { return isCursorShown; }
+
 private:
 
     std::vector<int> parameters;
@@ -168,6 +170,7 @@ private:
 
     bool line_wrapped;
     bool cleared_the_screen;
+    bool isCursorShown;
 
     AnsiParser();
     ~AnsiParser();

@@ -9,6 +9,7 @@
 #include "socketState.h"
 #include "terminal.h"
 #include "inputHandler.h"
+#include "ansiParser.h"
 #include <iostream>
 #include <exception>
 
@@ -41,7 +42,7 @@ int SocketHandler::update()
         return 0;
 
     int ret;
-    if(active)
+    if(active && !TheInputHandler::Instance()->isGlobalShutdown())
     {
         ret = socket->pollSocket();
         if(ret == -1)
@@ -59,29 +60,32 @@ int SocketHandler::update()
             // Setup cursor in current x/y position Cursor.
             TheTerminal::Instance()->setupCursorChar();
 
-            startBlinking = true;
-            // Setup Timer for Blinking Cursor
-            // Initial State = On, then Switch to off in next loop.
-            if(cursorBlink % 2 == 0)
+            if (TheAnsiParser::Instance()->isCursorActive())
             {
-                ttime2 = SDL_GetTicks();
-                if(startBlinking && (ttime2 - ttime) > 400)
+                startBlinking = true;
+                // Setup Timer for Blinking Cursor
+                // Initial State = On, then Switch to off in next loop.
+                if(cursorBlink % 2 == 0)
                 {
-                    TheTerminal::Instance()->renderCursorOffScreen();
-                    TheTerminal::Instance()->drawTextureScreen();
-                    --cursorBlink;
-                    ttime = SDL_GetTicks();
+                    ttime2 = SDL_GetTicks();
+                    if(startBlinking && (ttime2 - ttime) > 400)
+                    {
+                        TheTerminal::Instance()->renderCursorOffScreen();
+                        TheTerminal::Instance()->drawTextureScreen();
+                        --cursorBlink;
+                        ttime = SDL_GetTicks();
+                    }
                 }
-            }
-            else
-            {
-                ttime2 = SDL_GetTicks();
-                if(startBlinking && (ttime2 - ttime) > 400)
+                else
                 {
-                    TheTerminal::Instance()->renderCursorOnScreen();
-                    TheTerminal::Instance()->drawTextureScreen();
-                    ++cursorBlink;
-                    ttime = SDL_GetTicks();
+                    ttime2 = SDL_GetTicks();
+                    if(startBlinking && (ttime2 - ttime) > 400)
+                    {
+                        TheTerminal::Instance()->renderCursorOnScreen();
+                        TheTerminal::Instance()->drawTextureScreen();
+                        ++cursorBlink;
+                        ttime = SDL_GetTicks();
+                    }
                 }
             }
         }
