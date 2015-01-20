@@ -11,7 +11,9 @@ The program is developed mainly in Windows using the (Codelite IDE) with
 mingw32/64 and will compile in OSX, and Linux under GNU g++.
 
 **This is a full graphics program just like a game engine, it's not a
-console application and best runs on more recent hardware.**
+console application and best runs on more recent hardware.** Unlike some 
+older SDL applications that use software rendering, EtherTerm uses SDL2 
+and full graphics acceleration on the GPU.
 
 EtherTerm is a Telnet/SSH terminal with CP437 (ANSI) Graphics terminal
 emulation for connecting to Telnet/SSH BBS systems and shells.
@@ -42,14 +44,16 @@ This cycles two different window resolutions then goes Fullscreen.
 
 ## Work in progress:
 
+Some items are still being worked on for scrolling regions with copy/paste and the screen buffer.
+
 The Dialing directory is incomplete, Add, Edit, Delete, About etc..
 Not all options are setup just yet.
 
-To add new systems or remove, you must edit the dialingdirectory.xml file
+To add new systems or remove, you must edit the ```dialdirectory.xml``` file
 in a text editor located in the /assets folder.
 
 If you want to connect to SSH servers, you must supply your username, and password
-in the ```dialdirectory.XML``` file since there are no prompts to enter these when
+in the ```dialdirectory.xml``` file since there are no prompts to enter these when
 you connect at the moment.
 
 I'm also in the middle of implimenting more control sequence behavior.
@@ -60,7 +64,9 @@ I have a lot of XTERM sequences laid out so more will be implemented with time.
 Lots of things are still in the early testing and debugging stages.
 There are no transfer protocols at the moment.
 
-Some keyboard keys still need to be implemented like F1 function keys.
+SSH works with login and password authentication, Public Key is in testing.
+
+Some keyboard keys still need to be implemented like F1 function keys, Keypad Keys.
 All others should work just fine including CTRL Keys.
 
 There is no scroll back buffer, this is also in the works.
@@ -81,19 +87,22 @@ Libssh (Requires OpenSSL, Zlib)
 ```
 
 **Example Windows (mingw32/64) linking:**
+Manual compiles will require the following:
 ```
 Libs: mingw32 or 64, SDL2main, SDL2, SDL2_net, libssh
 ```
 
-**Example (G++) linking:**
+**Example (G++/Clang) linking:**
+Manual compiles will require the following:
 ```
 libs: libSDL2, libSDL2_net, libssh
+linking ```libSDL2_main``` is optional on some distros.
 ```
 
 Must compile with latest c++ environment flags.
 
 At the very least and you can also replace 0x with 11 on
-newer compilers. Usually g++ (4.7)+
+newer compilers. Usually g++ (4.7)+ or compatible compiler.
 
 ```
 -std=gnu++0x or -std=c++0x
@@ -103,7 +112,10 @@ newer compilers. Usually g++ (4.7)+
 
 To build windows you must already have a compiler and the requirements.
 You can use a good IDE like CodeLite, CodeBlocks, or Visual Studio (more headache).
-You then must installs the libs and setup the include paths.
+You must install the libs and setup the include paths, like any project.
+
+Makefile(s) are provides for g++ compiles on Windows, OSX and Linux.
+With Windows you will need to update the paths, or import fresh into a new IDE project.
 
 **The following Makefile commands will always default for Windows, or you can specify.**
 ```
@@ -197,7 +209,6 @@ make linux-arch
 ```
 
 
-
 ##OSX Build Steps:
 
 **Clone the Git repository.**
@@ -226,7 +237,7 @@ installs /usr/local/Cellar/sdl2_net/2.0.0
 ```
 brew install libssh
 ```
-installs libssh /usr/local/Cellar/libssh6.4
+installs /usr/local/Cellar/libssh6.4
 
 **To compile your executable.**
 ```
@@ -234,9 +245,6 @@ make osx
 ```
 
 **Possible issues with OSX Yosemite when building libssh.**
-The default compiler for OSX seems to be LLVM clang.  I use GNU g++ in most of my development and there is and
-error that has been corrected when compiling with GNU g++ below. 
-
 There is a report and confirmation of a macro redefinition error when compiling on Yosemite.  A patch for this issue was created and applied just a few days ago.  Earlier OSX versions are not affected.
 
 **You can use the following links for patch details, or get a new copy of libssh directly from the repo.**
