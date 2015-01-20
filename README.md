@@ -96,8 +96,9 @@ Libs: mingw32 or 64, SDL2main, SDL2, SDL2_net, libssh
 Manual compiles will require the following:
 ```
 libs: libSDL2, libSDL2_net, libssh
-linking ```libSDL2_main``` is optional on some distros.
 ```
+linking ```libSDL2_main``` is optional on some distros.
+
 
 Must compile with latest c++ environment flags.
 
