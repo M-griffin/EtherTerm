@@ -37,7 +37,7 @@ bool InputHandler::update()
     std::string sequence;
 
     //Handle events on queue
-    while(SDL_PollEvent(&event) != 0)
+    while(SDL_PollEvent(&event) != 0 && !isGlobalShutdown())
     {
         //User requests quit
         switch (event.type)

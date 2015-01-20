@@ -1198,6 +1198,61 @@ void Terminal::renderClearLineScreen(int y, int start, int end)
 }
 
 /**
+ * Loops from starting y position to bottom of screen
+ * Erasing all of the screen below.
+ * Fill entire lines with space and black foregroud/Background
+ * Fast update to clear a row.
+ */
+void Terminal::renderClearLineAboveScreen(int y, int x)
+{
+    // Save Background Color so we can switch back to it.
+    SDL_Color originalGB = currentBGColor;
+
+    int startPosition = x;
+
+    // Clear out entire lines Up The Screen the screen.
+    // Fix with term variables lateron.
+    for(int ii = 0; ii < y; ii++)
+    {
+        for(int i = startPosition; i < 0; i--)
+        {
+            drawChar(i, ii, 32);
+            renderCharScreen(i, y);
+        }
+        // Reset to starting position for following lines.
+        startPosition = (80-1);
+    }
+    currentBGColor = originalGB;
+}
+
+/**
+ * Loops from starting y position to bottom of screen
+ * Erasing all of the screen below.
+ * Fill entire lines with space and black foregroud/Background
+ * Fast update to clear a row.
+ */
+void Terminal::renderClearLineBelowScreen(int y, int x)
+{
+    // Save Background Color so we can switch back to it.
+    SDL_Color originalGB = currentBGColor;
+
+    int startPosition = x;
+
+    // Clear out entire lines down the screen.
+    // Fix with term variables lateron.
+    for(int ii = y; ii < 25; ii++)
+    {
+        for(int i = startPosition; i < 80; i++)
+        {
+            drawChar(i, ii, 32);
+            renderCharScreen(i, y);
+        }
+        startPosition = 0;
+    }
+    currentBGColor = originalGB;
+}
+
+/**
  * Bascially Plots each Char to a Texture
  * Updates super fast now!!
  * So were only writting the to the bottom line of the screen only

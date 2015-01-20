@@ -280,7 +280,7 @@ void AnsiParser::textInput(std::string buffer)
         // Back Space
         if(sequence == '\b')
         {
-            std::cout << "backspace: " << std::endl;
+            //std::cout << "backspace: " << std::endl;
             if(x_position > 1)
                 --x_position;
             continue;
@@ -692,18 +692,31 @@ void AnsiParser::sequenceCursorAndDisplay()
             break;
 
         case ERASE_DISPLAY:
-            //printf("\r\n\r\n CLEARTHESCREEN!! param[0] %i, %c \r\n\r\n", param[0],param[0]);
-            // Clearn Screen ESC[J  // Lazy Servers use ESC[J!
+            // Erase Currnet Line and Below. ESC[J
             if(parameters.size() == 1)
             {
-                TheTerminal::Instance()->clearScreenSurface();
-                clearScreenBuffer();
+                TheTerminal::Instance()->renderClearLineBelowScreen(
+                    y_position-1, x_position-1);
                 cleared_the_screen = true;
-                // Home Cursor, some bbs systems don't do this and makes a mess!!
-                x_position = 1;
-                y_position = 1;
+                break;
             }
-            // Clearn Screen ESC[2J
+            // Erase Currnet Line and Below. ESC[0J
+            if(parameters.size() == 2 && parameters[1] == 0)
+            {
+                TheTerminal::Instance()->renderClearLineBelowScreen(
+                    y_position-1,x_position-1);
+                cleared_the_screen = true;
+                break;
+            }
+            // Erase Current Line and Above.
+            if(parameters.size() == 2 && parameters[1] == 1)
+            {
+                TheTerminal::Instance()->renderClearLineAboveScreen(
+                    y_position-1, x_position-1);
+                cleared_the_screen = true;
+                break;
+            }
+            // Clear Entire Screen. ESC[2J
             if(parameters.size() == 2 && parameters[1] == 2)
             {                
                 //printf("\r\n\r\n CLEARTHESCREEN!! \r\n\r\n");
@@ -714,7 +727,8 @@ void AnsiParser::sequenceCursorAndDisplay()
                 x_position = 1;
                 y_position = 1;
                 //screen_buff.esc_sequence += esc_sequence;
-            }
+                break;
+            }            
             break;
 
         case ERASE_TO_EOL:
