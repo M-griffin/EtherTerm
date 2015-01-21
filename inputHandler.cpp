@@ -389,10 +389,12 @@ bool InputHandler::update()
                             setInputSequence("\x1b[D");
                             return true;
                         case SDLK_RETURN:
+                        case SDLK_KP_ENTER:
                             setInputSequence("\r");
                             return true;
 
                         // Add Swap for BS and DEL (Win vs Nix Terms)
+                        case SDLK_KP_BACKSPACE:
                         case SDLK_BACKSPACE:
                             setInputSequence("\x08");
                             return true;
@@ -419,6 +421,8 @@ bool InputHandler::update()
                         case SDLK_PAGEDOWN: // page down
                             setInputSequence("\x1b[U");
                             return true;
+
+                        // Add Function Keys here.
 
                         default:
                             break;
