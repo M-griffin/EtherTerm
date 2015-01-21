@@ -99,7 +99,6 @@ void AnsiParser::clearScreenBufferRange(int start, int end)
 
     //std::cout << "start " << start << " end " << end
     // << std::endl;
-
     //std::cout << "startPosition " << startPosition << " endPosition " << endPosition
     // << std::endl;
 
@@ -115,7 +114,6 @@ void AnsiParser::clearScreenBufferRange(int start, int end)
             std::cout << "Exception clearScreenBufferRange: " << e.what() << std::endl;
         }
     }
-
     // Debugging
     //getScreenBufferText();
 }
@@ -197,6 +195,8 @@ AnsiParser::AnsiParser() :
     position(0),
     saved_cursor_x(1),
     saved_cursor_y(1),
+    saved_attribute(0),
+    saved_prev_attr(0),
     color_attribute(0),
     prev_color_attribute(0),
     line_wrapped(false),
@@ -668,14 +668,18 @@ void AnsiParser::sequenceCursorAndDisplay()
             break;
 
         case SAVE_CURSOR_POS:
-            saved_cursor_x = x_position;
-            saved_cursor_y = y_position;
+            saved_cursor_x  = x_position;
+            saved_cursor_y  = y_position;
+            saved_attribute = color_attribute;
+            saved_prev_attr = prev_color_attribute;
             //screen_buff.esc_sequence += esc_sequence;
             break;
 
         case RESTORE_CURSOR_POS:
             x_position = saved_cursor_x;
             y_position = saved_cursor_y;
+            color_attribute = saved_attribute;
+            prev_color_attribute = saved_prev_attr;
             //screen_buff.esc_sequence += esc_sequence;
             break;
 
@@ -1602,41 +1606,44 @@ void AnsiParser::sequenceResetAndResponses()
     switch(parameters[0])
     {
         case SET_MODE: // [?h
-            if(parameters.size() == 3 &&
-                parameters[1] == '?' && parameters[2] == 7)
+            if(parameters.size() == 3 && parameters[1] == '?')
             {
-                // Wraparound Mode (DECAWM).
-                std::cout << "Wraparound Mode" << std::endl;
-                line_wrapped = true;
-                break;
-            }
-            else if(parameters.size() == 3 &&
-                parameters[1] == '?' && parameters[2] == 25)
-            {
-                // Show Cursor (DECTCEM).
-                isCursorShown = true;
-                std::cout << "Cursor Shown" << std::endl;
-                break;
+                switch (parameters[2])
+                {
+                    case 7:
+                        // Wraparound Mode (DECAWM).
+                        //std::cout << "Wraparound Mode" << std::endl;
+                        line_wrapped = true;
+                        break;
+                    case 25:
+                        // Show Cursor (DECTCEM).
+                        isCursorShown = true;
+                        std::cout << "Cursor Shown" << std::endl;
+                        break;
+                    default:
+                        break;
+                }
             }
             break;
 
         case RESET_MODE: // [?l
-            //screen_buff.esc_sequence += esc_sequence;
-            if(parameters.size() == 3 &&
-                parameters[1] == '?' && parameters[2] == 7)
+            if(parameters.size() == 3 && parameters[1] == '?')
             {
-                // Wraparound Mode disabled (DECAWM).
-                line_wrapped = false;
-                std::cout << "Wraparound Mode Disabled" << std::endl;
-                break;
-            }
-            else if(parameters.size() == 3 &&
-                parameters[1] == '?' && parameters[2] == 25)
-            {
-                // Hide Cursor (DECTCEM).
-                isCursorShown = false;
-                std::cout << "Cursor hidden" << std::endl;
-                break;
+                switch (parameters[2])
+                {
+                    case 7:
+                        // Wraparound Mode disabled (DECAWM).
+                        line_wrapped = false;
+                        //std::cout << "Wraparound Mode Disabled" << std::endl;
+                        break;
+                    case 25:
+                        // Hide Cursor (DECTCEM).
+                        isCursorShown = false;
+                        std::cout << "Cursor hidden" << std::endl;
+                        break;
+                    default:
+                        break;
+                }
             }
             break;
 
@@ -1668,7 +1675,6 @@ void AnsiParser::sequenceResetAndResponses()
                         (unsigned char *)currentPosition.c_str(),
                         currentPosition.size()+1);
                 }
-                //screen_buff.esc_sequence += esc_sequence;
             }
             break;
 

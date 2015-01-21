@@ -387,8 +387,8 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
             else
             {
                 // Sequence Found with IAC, set to next Stage.
-                printf("\r\n ========================================== \r\n");
-                printf("\r\n Received #255 = IAC \r\n");
+                //printf("\r\n ========================================== \r\n");
+                //printf("\r\n Received #255 = IAC \r\n");
                 stage++;
             }
             break;
@@ -404,7 +404,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                 // So we going to stuff it.
                 //std::cout << "\r\n Got double IAC!!\r\n" << std::endl;
                 stage = 0;
-                return '\0';
+                return IAC;
             }
             if(c != IAC)
             {

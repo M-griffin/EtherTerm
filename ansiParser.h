@@ -165,6 +165,8 @@ private:
     int position;
     int saved_cursor_x;
     int saved_cursor_y;
+    int saved_attribute;
+    int saved_prev_attr;
     int color_attribute;
     int prev_color_attribute;
 

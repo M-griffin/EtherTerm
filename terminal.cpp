@@ -1135,11 +1135,15 @@ void Terminal::scrollScreenUp()
 /**
  * Clears the Surface Back Buffer, and Global Texture
  * Renderes the Screen Blank for new set of data.
+ *
+ * Updated, Now clears the surface to the current background color
+ * This is for ESC[2J proper behavior.
  */
 void Terminal::clearScreenSurface()
 {
     if (SDL_FillRect(screenSurface, NULL,
-        SDL_MapRGB(screenSurface->format, 0, 0, 0)) < 0)
+            SDL_MapRGB(screenSurface->format,
+                currentBGColor.r, currentBGColor.g, currentBGColor.b)) < 0)
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
             "clearScreenSurface() SDL_FillRect screenSurface: %s", SDL_GetError());
