@@ -229,12 +229,18 @@ AnsiParser::~AnsiParser()
  */
 void AnsiParser::reset()
 {
+    x_position = 1;
+    y_position = 1;
+    preceedingSequence = '\0';
     saved_cursor_x = 1;
     saved_cursor_y = 1;
+    saved_attribute = 1;
+    saved_prev_attr = 1;
     color_attribute = 0;
     prev_color_attribute = 0;
     cleared_the_screen = false;
     line_wrapped = false;
+    isCursorShown = true;
 
     // Reset Default Colors.
     TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->grey;
