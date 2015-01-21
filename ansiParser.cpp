@@ -190,6 +190,7 @@ AnsiParser* AnsiParser::globalInstance = 0;
 AnsiParser::AnsiParser() :
     x_position(1),
     y_position(1),
+    preceedingSequence('\0'),
     max_x_position(0),
     characters_per_line(80),
     position(0),
@@ -260,6 +261,9 @@ void AnsiParser::textInput(std::string buffer)
         // Grab the Sequence translate to unsigned char.
         sequence = buffer[i];
         nextSequence = '\0';
+
+        // Save a copy incase we need to repeate it later.
+        preceedingSequence = sequence;
 
         // Grab the next character in sequence to test for
         // CRLF combinations.
@@ -533,6 +537,38 @@ void AnsiParser::sequenceCursorAndDisplay()
     // Switch on Sequence Terminator
     switch(parameters[0])
     {
+        case REPEAT_CHARACTER: // ESC[b
+            // Repeat the preceding graphic character P s times (REP).
+            if (parameters.size() == 1) // Repeat Once.
+            {
+                std::string stringBuilder(1, (char)preceedingSequence);
+                textInput(stringBuilder);
+                break;
+            }
+            if (parameters.size() == 2)
+            {
+                std::string stringBuilder(parameters[1], (char)preceedingSequence);
+                textInput(stringBuilder);
+                break;
+            }
+            break;
+
+        case LINE_POS_ABSOLUTE:
+            // Line Position Absolute [row] (default = [1,column]) (VPA).
+            if (parameters.size() == 1) // Repeat Once.
+            {
+                x_position = 1;
+                y_position = 1;
+                break;
+            }
+            if (parameters.size() == 2)
+            {
+                x_position = 1;
+                y_position = parameters[1];
+                break;
+            }
+            break;
+
         case CURSOR_POSITION:
         case CURSOR_POSITION_ALT:
             //printf("\r\n CURSOR_POSITION: p = %i,  param[0] = %i param[1] = %i \r\n", p,  param[0], param[1]);
@@ -1705,6 +1741,8 @@ void AnsiParser::sequenceInput(std::vector<int> sequenceParameters)
     // First Handle Any Cursor Movement and Redisplay Attributes
     switch(parameters[0])
     {
+        case LINE_POS_ABSOLUTE:
+        case REPEAT_CHARACTER:
         case CURSOR_POSITION:
         case CURSOR_POSITION_ALT:
         case SCROLL_REGION:

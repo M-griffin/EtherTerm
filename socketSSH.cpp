@@ -89,7 +89,7 @@ int SSH_Socket::pollSocket()
 bool SSH_Socket::onEnter()
 {
     // For testing and getting debugging output
-    //int verb = SSH_LOG_PROTOCOL;
+   // int verb = SSH_LOG_PROTOCOL;
     int rc;
 
     // Setup new SSH Shell
@@ -129,7 +129,6 @@ bool SSH_Socket::onEnter()
             host.c_str(), ssh_get_error(session));
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
             "Closed Session", "User has closed the program.", NULL);
-        onExit();
         return false;
     }
 

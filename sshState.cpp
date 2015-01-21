@@ -47,6 +47,18 @@ void SSHState::handleSession()
     for(int i = 0; i < len; i++)
     {
         ch = msgBuffer[i];
+
+//#ifdef _DEBUG
+        if (ch == '\r')
+            std::cout << "^r" << std::flush;
+        else if (ch == '\n')
+            std::cout << "^n" << std::flush;
+        else if (ch == '\0')
+            std::cout << "^0" << std::flush;
+        else
+            std::cout << ch << std::flush;
+//#endif
+
         if(ch == '\0')
             continue;
         output += ch;

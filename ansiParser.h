@@ -89,6 +89,8 @@ public:
 #define ERASE_DISPLAY         'J'   // 2J
 #define ERASE_TO_EOL          'K'
 
+#define REPEAT_CHARACTER      'b'   // Repeat preceeding character
+#define LINE_POS_ABSOLUTE     'd'   // Line Position Absolute [row] (default = [1,column]) (VPA).
 #define CURSOR_POSITION_ALT   'f'   // equivalent to 'H'
 #define SET_MODE              'h'   // Line Wraparound ?7h
 #define SCROLL_REGION         'r'   // ESC[#;#r
@@ -110,6 +112,9 @@ public:
     // But not changeable!!
     int  x_position;
     int  y_position;
+
+    // Handles Character Repeats.
+    unsigned char preceedingSequence;
 
     // Text attributes
     enum
