@@ -28,26 +28,21 @@
 
 /*
  * Start of SSH_Socket Dervived Class (SSH)
- *
- *
  */
+
 /* send a string buffer over a TCP socket with error checking */
 /* returns 0 on any errors, length sent on success */
 int SSH_Socket::sendSocket(unsigned char *buf, Uint32 len)
 {
     Uint32 result = 0;
-    /* send the buffer, with the NULL as well */
+
     result = ssh_channel_write(sshChannel, buf, len);
     if(result < strlen((char *)buf))
     {
-        ssh_channel_close(sshChannel);
-        ssh_channel_free(sshChannel);
         return SSH_ERROR; // or Zero.
     }
-    /* return the length sent */
     return(result);
 }
-
 
 /* handle Telnet better */
 int SSH_Socket::recvSocket(char *message)
@@ -55,18 +50,12 @@ int SSH_Socket::recvSocket(char *message)
     int result = 0;
     std::string buf;
 
-    /* get the string buffer over the socket */
-    //result = ssh_channel_read(sshChannel, message, sizeof(message), 0);
     result = ssh_channel_read_nonblocking(sshChannel, message, 8192, 0);
     if(result < 0)
     {
         printf(" \r\n *** GETMSG ERROR \r\n ");
-        ssh_channel_close(sshChannel);
-        ssh_channel_free(sshChannel);
         return SSH_ERROR;
     }
-    //printf (" \r\n message: %i \r\n", strlen(message));
-    /* return the new buffer */
     return result;
 }
 
@@ -89,7 +78,7 @@ int SSH_Socket::pollSocket()
 bool SSH_Socket::onEnter()
 {
     // For testing and getting debugging output
-   // int verb = SSH_LOG_PROTOCOL;
+    int verb = SSH_LOG_PROTOCOL;
     int rc;
 
     // Setup new SSH Shell
@@ -98,7 +87,8 @@ bool SSH_Socket::onEnter()
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
             "Closed Session", "User has closed the program.", NULL);
-        onExit();
+
+        TheSocketHandler::Instance()->setActive(false);
         return false;
     }
 
@@ -106,7 +96,7 @@ bool SSH_Socket::onEnter()
     ssh_options_set(session, SSH_OPTIONS_HOST, host.c_str());
 
     // Testing only, otherwise slows down display!!
-    //ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verb);
+    ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verb);
 
     // Only Slllow SSH2 Connections.
     int disAllow = 0;
@@ -127,8 +117,11 @@ bool SSH_Socket::onEnter()
     {
         fprintf(stderr, "\r\n SSH Error connecting to %s: %s \r\n",
             host.c_str(), ssh_get_error(session));
+
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
             "Closed Session", "User has closed the program.", NULL);
+
+        TheSocketHandler::Instance()->setActive(false);
         return false;
     }
 
@@ -142,6 +135,8 @@ bool SSH_Socket::onEnter()
 
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
             "Closed Session", "User has closed the program.", NULL);
+
+        TheSocketHandler::Instance()->setActive(false);
         return false;
     }
 
@@ -151,6 +146,8 @@ bool SSH_Socket::onEnter()
     {
         printf("\r\n SSH Error, Can't Authenticate User %s: %s - %i \r\n",
                host.c_str(), ssh_get_error(session), rc);
+
+        TheSocketHandler::Instance()->setActive(false);
         return false;
     }
 
@@ -161,6 +158,8 @@ bool SSH_Socket::onEnter()
         printf(
             "\r\nSetup Channel for Socket Communications %s: %s - %i \r\n",
             host.c_str(), ssh_get_error(session), rc);
+
+        TheSocketHandler::Instance()->setActive(false);
         return false;
     }
 
@@ -171,7 +170,8 @@ bool SSH_Socket::onEnter()
         printf(
             "\r\nOpen Channel for Socket Communications %s: %s - %i \r\n",
             host.c_str(), ssh_get_error(session), rc);
-        ssh_channel_free(sshChannel);
+
+        TheSocketHandler::Instance()->setActive(false);
         return false;
     }
 
@@ -190,7 +190,7 @@ bool SSH_Socket::onEnter()
 
     // Set the term and pty size of the terminal.
     // Only After the Shell has been initalized.
-    if(ssh_channel_request_pty_size(sshChannel,"ansi",80,25))
+    if(ssh_channel_request_pty_size(sshChannel, "ansi", 80, 25))
     {
         printf(
             "\r\nRequest for PTY term and size failed. %s: %s - %i \r\n",
@@ -206,6 +206,8 @@ bool SSH_Socket::onEnter()
         printf(
             "\r\nRequest for shell on channel failed. %s: %s - %i \r\n",
             host.c_str(), ssh_get_error(session), rc);
+
+        TheSocketHandler::Instance()->setActive(false);
         return false;
     }
     return true;
@@ -216,14 +218,17 @@ bool SSH_Socket::onExit()
 {
     if(sshChannel)
     {
-        ssh_channel_send_eof(sshChannel);
+        if (TheSocketHandler::Instance()->isActive())
+            ssh_channel_send_eof(sshChannel);
         ssh_channel_close(sshChannel);
         ssh_channel_free(sshChannel);
+        sshChannel = NULL;
     }
     if(session)
     {
         ssh_disconnect(session);
         ssh_free(session);
+        session = NULL;
     }
     return true;
 }
@@ -277,7 +282,7 @@ int SSH_Socket::show_remote_processes()
 }
 
 
-// Verify is Server is a known host.
+// Verify if Server is a known host.
 int SSH_Socket::verify_knownhost()
 {
     int state;
@@ -423,7 +428,6 @@ int SSH_Socket::authenticate_console()
 {
     int rc;
     int method;
-    //char password[128] = {0};
     char *banner;
 
     // Try to authenticate
@@ -450,11 +454,24 @@ int SSH_Socket::authenticate_console()
     method = ssh_auth_list(session);
     while(rc != SSH_AUTH_SUCCESS)
     {
-        // Try to authenticate with public key first
+/*
+    Retrieve the public key with ssh_import_pubkey_file().
+    Offer the public key to the SSH server using ssh_userauth_try_publickey().
+     * If the return value is SSH_AUTH_SUCCESS, the SSH server accepts
+     * to authenticate using the public key and you can go to the next step.
+    Retrieve the private key, using the ssh_pki_import_privkey_file() function.
+     * If a passphrase is needed, either the passphrase specified
+     * as argument or a callback will be used.
+    Authenticate using ssh_userauth_publickey() with your private key.
+    Do not forget cleaning up memory using ssh_key_free().
+*/
+        // The function ssh_userauth_autopubkey() does this using the
+        // available keys in "~/.ssh/". The return values are the following:
+        // ** Public Key Needs more testing.
+        /*
         if(method & SSH_AUTH_METHOD_PUBLICKEY)
         {
             rc = ssh_userauth_autopubkey(session, NULL);
-            //rc = ssh_userauth_publickey_auto(session, NULL, NULL);
             switch(rc)
             {
                 case SSH_AUTH_ERROR:   //some serious error happened during authentication
@@ -472,9 +489,11 @@ int SSH_Socket::authenticate_console()
                     // to provide an other mean of authentication (like a password).
                     printf("\r\n SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_PARTIAL! \r\n");
                     break;
+                default:
+                    break;
             }
-
-            /*
+        */
+/*
             rc = ssh_userauth_try_publickey(session, NULL, "pubkey.pem");
             switch (rc)
             {
@@ -491,8 +510,10 @@ int SSH_Socket::authenticate_console()
             case SSH_AUTH_PARTIAL: //some key matched but you still have to provide an other mean of authentication (like a password).
                 printf("\r\n try_publickey - SSH_AUTH_PARTIAL! \r\n");
                 break;
-            }*/
-        }
+            default:
+                break;
+            }
+        }*/
 
         // Try to authenticate with keyboard interactive";
         if(method & SSH_AUTH_METHOD_INTERACTIVE)
@@ -513,6 +534,8 @@ int SSH_Socket::authenticate_console()
                 case SSH_AUTH_PARTIAL: //some key matched but you still have to provide an other mean of authentication (like a password).
                     printf("\r\n SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_PARTIAL! \r\n");
                     break;
+                default:
+                    break;
             }
         }
         /*
@@ -520,6 +543,7 @@ int SSH_Socket::authenticate_console()
         {
             return SSH_AUTH_ERROR;
         }*/
+
         // Try to authenticate with password
         if(method & SSH_AUTH_METHOD_PASSWORD)
         {
@@ -539,13 +563,15 @@ int SSH_Socket::authenticate_console()
                 case SSH_AUTH_PARTIAL: //some key matched but you still have to provide an other mean of authentication (like a password).
                     printf("\r\n SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_PARTIAL! \r\n");
                     break;
+                default:
+                    break;
             }
         }
     }
     banner = ssh_get_issue_banner(session);
     if(banner)
     {
-        printf("%s\n",banner);
+        std::cout << banner << std::endl;
         ssh_string_free_char(banner);
     }
     return rc;
