@@ -1021,7 +1021,9 @@ void SequenceParser::processSequence(std::string inputString)
 #endif
             try
             {
-                inputString.replace(result,1,"^");
+                //inputString.replace(result,1,"^");
+                // Pass through, remove double ESC!
+                inputString.replace(result,1,"");
             }
             catch (std::exception e)
             {
@@ -1041,7 +1043,7 @@ void SequenceParser::processSequence(std::string inputString)
         // Get next Input Sequence
         sequence = inputString[i];
 
-        // Remove Bell fromn displaying. Anoying in Shell!
+        // Remove Bell from displaying. Anoying in Shell!
         // When not displaying, we'll push this to console so it beeps!
         if (sequence == '\x07')
             continue;
@@ -1097,20 +1099,22 @@ void SequenceParser::processSequence(std::string inputString)
 #endif
                 // We now determine the preceeding sequence is invalid
                 // And remove the ESC, then proceed with the current sequence
+                /*
                 try
                 {
                     // Change to SequenceBuilder, don't touch input string
                     // If it's broken into multiple input, then this is no
                     // longer viable.
-                    //inputString.replace(escapePosition,1,"^");
-                    sequenceBuilder.replace(0,1,"^");  // ESC to ^
+
+                    // Turn this off so sequences pass through to shell.
+                    //sequenceBuilder.replace(0,1,"^");  // ESC to ^
                 }
                 catch (std::exception e)
                 {
                     std::cout << "Exception replace escapePosition: "
                         << e.what() << std::endl;
                     sequenceState = SEQ_ERROR; // Reset The State
-                }
+                }*/
             }
 #ifdef _DEBUG
             std::cout << "ESC starting new sequence parsing" << std::endl;
@@ -1195,17 +1199,18 @@ void SequenceParser::processSequence(std::string inputString)
 #endif
             // Handle Invalid Sequences by removeing the ESC character, then
             // Continue on to the next sequence.
+            /*
             try
             {
-                //inputString.replace(escapePosition,1,"^");
-                sequenceBuilder.replace(0,1,"^");
+                // Turn off for pass through on shell.
+                //sequenceBuilder.replace(0,1,"^");
             }
             catch (std::exception e)
             {
                 std::cout << "Exception replace escapePosition: "
                     << e.what() << std::endl;
                 sequenceState = SEQ_ERROR; // Reset The State
-            }
+            }*/
 
             foundSequence   = false;
             invalidSequence = false;

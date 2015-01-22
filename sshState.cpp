@@ -48,7 +48,7 @@ void SSHState::handleSession()
     {
         ch = msgBuffer[i];
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
         if (ch == '\r')
             std::cout << "^r" << std::flush;
         else if (ch == '\n')
@@ -57,7 +57,7 @@ void SSHState::handleSession()
             std::cout << "^0" << std::flush;
         else
             std::cout << ch << std::flush;
-//#endif
+#endif
 
         if(ch == '\0')
             continue;
@@ -222,11 +222,17 @@ bool SSHState::onEnter()
     else
     {
         std::cout << "Error Connecting!" << std::endl;
+        SDL_Delay(100);
         shutdown = true;
+        TheTerminal::Instance()->clearScreenSurface();
+        TheTerminal::Instance()->renderScreen();
+        TheAnsiParser::Instance()->reset();
         return false;
     }
 
     std::cout << "Connection Successful. " << std::endl;
+    SDL_Delay(100);
+
     // Clear Renderer and Ansi Parser for Fresh Connection.
     TheTerminal::Instance()->clearScreenSurface();
     TheTerminal::Instance()->renderScreen();
