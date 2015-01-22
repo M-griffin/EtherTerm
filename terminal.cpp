@@ -452,6 +452,7 @@ void Terminal::clearSelectionTexture()
     SDL_DestroyTexture(selectionTexture);
     selectionTexture = NULL;
 }
+
 /*
  * On selected mouse movement area! We want to overlay a blended texture
  * To give the affect of highlighting without having to resort to
@@ -654,9 +655,6 @@ void Terminal::renderSelectionScreen(int x, int y)
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
             "renderSelectionScreen() SDL_RenderCopy selectionTexture (Overlay): %s", SDL_GetError());
     }
-
-    // Reset dont need it?
-    //SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderPresent(globalRenderer);
 }
 
@@ -1262,8 +1260,6 @@ void Terminal::renderClearLineBelowScreen(int y, int x)
  * by moving all text on right side of cursor
  * Left x number of space, on the same line.
  */
-
- // WIP!! NOT WORKING YET.
 void Terminal::renderDeleteCharScreen(int x, int y, int num)
 {
     SDL_Rect pick;
@@ -1289,7 +1285,14 @@ void Terminal::renderDeleteCharScreen(int x, int y, int num)
         return;
     }
 
+    // Next we want to fill the hole from pull the text left with current
+    // Colors background attributes as per the spec.
+    int start = 80 - num;
+    int end = 80;
 
+    // Draw Char is 0 based.
+    for (int i = start; i < end; i++)
+        drawChar(i,y,32);
 
     renderScreen();
     drawTextureScreen();
