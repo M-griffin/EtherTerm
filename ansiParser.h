@@ -188,6 +188,9 @@ private:
     bool cleared_the_screen;
     bool isCursorShown;
 
+    SDL_Color savedForegroundColor;
+    SDL_Color savedBackgroundColor;
+
     AnsiParser();
     ~AnsiParser();
     AnsiParser(const AnsiParser&);

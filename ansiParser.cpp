@@ -634,7 +634,7 @@ void AnsiParser::sequenceCursorAndDisplay()
                 else if(x_position < 1)
                     x_position = 1;
             }
-            //screen_buff.esc_sequence += esc_sequence;
+
             break;
 
         case SCROLL_REGION:
@@ -666,7 +666,7 @@ void AnsiParser::sequenceCursorAndDisplay()
                 if(y_position < 1)
                     y_position = 1;
             }
-            //screen_buff.esc_sequence += esc_sequence;
+
             break;
 
         case CURSOR_NEXT_LINE:
@@ -682,7 +682,7 @@ void AnsiParser::sequenceCursorAndDisplay()
                 if(y_position > NUM_LINES)
                     y_position = NUM_LINES;
             }
-            //screen_buff.esc_sequence += esc_sequence;
+
             break;
 
         case CURSOR_FORWARD:
@@ -708,7 +708,7 @@ void AnsiParser::sequenceCursorAndDisplay()
                     ++y_position;
                 }
             }
-            //screen_buff.esc_sequence += esc_sequence;
+
             break;
 
         case CURSOR_BACKWARD:
@@ -725,7 +725,7 @@ void AnsiParser::sequenceCursorAndDisplay()
                 if(x_position < 1)
                     x_position = 1;
             }
-            //screen_buff.esc_sequence += esc_sequence;
+
             break;
 
         case SAVE_CURSOR_POS:
@@ -733,7 +733,9 @@ void AnsiParser::sequenceCursorAndDisplay()
             saved_cursor_y  = y_position;
             saved_attribute = color_attribute;
             saved_prev_attr = prev_color_attribute;
-            //screen_buff.esc_sequence += esc_sequence;
+            savedForegroundColor = TheTerminal::Instance()->currentFGColor;
+            savedBackgroundColor = TheTerminal::Instance()->currentBGColor;
+
             break;
 
         case RESTORE_CURSOR_POS:
@@ -741,7 +743,9 @@ void AnsiParser::sequenceCursorAndDisplay()
             y_position = saved_cursor_y;
             color_attribute = saved_attribute;
             prev_color_attribute = saved_prev_attr;
-            //screen_buff.esc_sequence += esc_sequence;
+            TheTerminal::Instance()->currentFGColor = savedForegroundColor;
+            TheTerminal::Instance()->currentBGColor = savedBackgroundColor;
+
             break;
 
         case CURSOR_X_POSITION: // XTERM
@@ -763,7 +767,6 @@ void AnsiParser::sequenceCursorAndDisplay()
             {
                 TheTerminal::Instance()->renderClearLineBelowScreen(
                     y_position-1, x_position-1);
-                //cleared_the_screen = true;
                 break;
             }
             // Erase Currnet Line and Below. ESC[0J
@@ -771,7 +774,6 @@ void AnsiParser::sequenceCursorAndDisplay()
             {
                 TheTerminal::Instance()->renderClearLineBelowScreen(
                     y_position-1,x_position-1);
-                //cleared_the_screen = true;
                 break;
             }
             // Erase Current Line and Above.
@@ -779,7 +781,6 @@ void AnsiParser::sequenceCursorAndDisplay()
             {
                 TheTerminal::Instance()->renderClearLineAboveScreen(
                     y_position-1, x_position-1);
-                //cleared_the_screen = true;
                 break;
             }
             // Clear Entire Screen. ESC[2J
@@ -792,13 +793,12 @@ void AnsiParser::sequenceCursorAndDisplay()
                 cleared_the_screen = true;
                 x_position = 1;
                 y_position = 1;
-                //screen_buff.esc_sequence += esc_sequence;
                 break;
             }            
             break;
 
         case ERASE_TO_EOL:
-            //screen_buff.esc_sequence += esc_sequence;
+
             // Handle Rendering from 1 Based to 0 Based so Subtract 1.
             if(parameters.size() == 1)  // Cursor to End of line
             {
