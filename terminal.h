@@ -171,6 +171,7 @@ public:
     void scrollRegionUp();
     void scrollScreenUp();
     void clearScreenSurface();
+    void renderDeleteCharScreen(int x, int y, int num);
     void renderClearLineAboveScreen(int y, int x);
     void renderClearLineBelowScreen(int y, int x);
     void renderClearLineScreen(int y, int start, int end);

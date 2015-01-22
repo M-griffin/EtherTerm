@@ -194,6 +194,7 @@ void TelnetState::render()
 
 bool TelnetState::onEnter()
 {
+    TheAnsiParser::Instance()->setCursorActive(true);
     TheTerminal::Instance()->setRenderReady(true);
     std::cout << "entering TelnetState\n";
     shutdown = false;

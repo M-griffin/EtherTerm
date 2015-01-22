@@ -58,7 +58,7 @@ public:
     myScreen sequenceBuffer;
     std::vector<myScreen> screenBuffer;
 
-    // Function for populating the Screen Buffer    
+    // Function for populating the Screen Buffer
     void setScreenBuffer(std::string mySequence);
     void scrollScreenBuffer();
     void clearScreenBufferRange(int start, int end);
@@ -88,6 +88,8 @@ public:
 
 #define ERASE_DISPLAY         'J'   // 2J
 #define ERASE_TO_EOL          'K'
+
+#define DELETE_CHARACTER      'P'   // Erase Character(2)
 
 #define REPEAT_CHARACTER      'b'   // Repeat preceeding character
 #define LINE_POS_ABSOLUTE     'd'   // Line Position Absolute [row] (default = [1,column]) (VPA).
@@ -157,7 +159,14 @@ public:
     void sequenceResetAndResponses();
     void sequenceInput(std::vector<int> sequenceParameters);
 
-    bool isCursorActive() { return isCursorShown; }
+    bool isCursorActive()
+    {
+        return isCursorShown;
+    }
+    void setCursorActive(bool active)
+    {
+        isCursorShown = active;
+    }
 
 private:
 

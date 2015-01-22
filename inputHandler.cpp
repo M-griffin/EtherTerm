@@ -393,7 +393,15 @@ bool InputHandler::update()
                             setInputSequence("\r");
                             return true;
 
-                        // Add Swap for BS and DEL (Win vs Nix Terms)
+                        // Add Swap for BS and DEL (Win vs Nix Terms)                        
+                        case SDLK_TAB:
+                            setInputSequence("    ");
+                            return true;
+
+                        // screen2|old VT 100/ANSI X3.64 virtual terminal:
+                        // Used By Synchronet!
+                        /*
+                         *
                         case SDLK_KP_BACKSPACE:
                         case SDLK_BACKSPACE:
                             setInputSequence("\x08");
@@ -401,11 +409,7 @@ bool InputHandler::update()
                         case SDLK_DELETE:
                             setInputSequence("\x7f");
                             return true;
-                        case SDLK_TAB:
-                            setInputSequence("    ");
-                            return true;
 
-                        // Add Swap for Number Sequences for Nix terms.
                         case SDLK_INSERT:   // insert
                             setInputSequence("\x1b[@");
                             return true;
@@ -421,6 +425,53 @@ bool InputHandler::update()
                         case SDLK_PAGEDOWN: // page down
                             setInputSequence("\x1b[U");
                             return true;
+                        */
+
+                        // VT-100
+
+                        // \x7f = ^?  // 0x08 = ^H
+                        case SDLK_KP_BACKSPACE:
+                        case SDLK_BACKSPACE:
+                            setInputSequence("\x7f");
+                            return true;
+                        case SDLK_DELETE:
+                            setInputSequence("\x1b[3~");
+                            return true;
+
+                        case SDLK_INSERT:   // insert
+                            setInputSequence("\x1b[2~");
+                            return true;
+                        case SDLK_HOME:     // home
+                            setInputSequence("\x1b[1~");
+                            return true;
+                        case SDLK_END:      // end
+                            setInputSequence("\x1b[4~");
+                            return true;
+                        case SDLK_PAGEUP:   // page up
+                            setInputSequence("\x1b[5~");
+                            return true;
+                        case SDLK_PAGEDOWN: // page down
+                            setInputSequence("\x1b[6~");
+                            return true;
+
+                        // SCO
+                        /*
+                        case SDLK_INSERT:   // insert
+                            setInputSequence("\x1b[L");
+                            return true;
+                        case SDLK_HOME:     // home
+                            setInputSequence("\x1b[H");
+                            return true;
+                        case SDLK_END:      // end
+                            setInputSequence("\x1b[F");
+                            return true;
+                        case SDLK_PAGEUP:   // page up
+                            setInputSequence("\x1b[I");
+                            return true;
+                        case SDLK_PAGEDOWN: // page down
+                            setInputSequence("\x1b[G");
+                            return true;
+                        */
 
                         // Add Function Keys here.
 

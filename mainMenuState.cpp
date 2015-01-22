@@ -86,6 +86,8 @@ void MainMenuState::render()
 
 bool MainMenuState::onEnter()
 {
+    TheAnsiParser::Instance()->setCursorActive(false);
+
     // Setup Defaults for Interface.
     directoryTopMargin = 1;
     directoryBottomMargin = 1;

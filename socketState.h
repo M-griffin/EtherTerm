@@ -148,13 +148,13 @@ public:
     virtual bool onExit();
 
     // Specific Functions for SSH
-    int show_remote_processes();
     int verify_knownhost();
     int authenticate_console();
     int authenticate_kbdint();
     void error()
     {
-        std::cout << "Authentication failed: " << ssh_get_error(session) << std::endl;
+        std::cout << "Authentication failed: "
+            << ssh_get_error(session) << std::endl;
     }
 
 

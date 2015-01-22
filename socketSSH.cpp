@@ -25,6 +25,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cerrno>
+#include <iostream>
 
 /*
  * Start of SSH_Socket Dervived Class (SSH)
@@ -53,7 +54,7 @@ int SSH_Socket::recvSocket(char *message)
     result = ssh_channel_read_nonblocking(sshChannel, message, 8192, 0);
     if(result < 0)
     {
-        printf(" \r\n *** GETMSG ERROR \r\n ");
+        std::cout << "Error: ssh_channel_read_nonblocking" << std::endl;
         return SSH_ERROR;
     }
     return result;
@@ -115,8 +116,8 @@ bool SSH_Socket::onEnter()
     rc = ssh_connect(session);
     if(rc != SSH_OK)
     {
-        fprintf(stderr, "\r\n SSH Error connecting to %s: %s \r\n",
-            host.c_str(), ssh_get_error(session));
+        std::cout << "Error: ssh_connect: " << host
+            << " " << ssh_get_error(session) << std::endl;
 
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
             "Closed Session", "User has closed the program.", NULL);
@@ -129,9 +130,8 @@ bool SSH_Socket::onEnter()
     rc = verify_knownhost();
     if(rc < 0)
     {
-        fprintf(stderr,
-                "\r\nCan't Validate Host Server to %s: %s - %i \r\n",
-                host.c_str(), ssh_get_error(session), rc);
+        std::cout << "Error: verify_knownhost: " << host
+            << " " << ssh_get_error(session) << " " << rc << std::endl;
 
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
             "Closed Session", "User has closed the program.", NULL);
@@ -144,8 +144,8 @@ bool SSH_Socket::onEnter()
     rc = authenticate_console();
     if(rc != SSH_AUTH_SUCCESS)
     {
-        printf("\r\n SSH Error, Can't Authenticate User %s: %s - %i \r\n",
-               host.c_str(), ssh_get_error(session), rc);
+         std::cout << "Error: authenticate: " << host
+            << " " << ssh_get_error(session) << " " << rc << std::endl;
 
         TheSocketHandler::Instance()->setActive(false);
         return false;
@@ -155,9 +155,8 @@ bool SSH_Socket::onEnter()
     sshChannel = ssh_channel_new(session);
     if(sshChannel == NULL)
     {
-        printf(
-            "\r\nSetup Channel for Socket Communications %s: %s - %i \r\n",
-            host.c_str(), ssh_get_error(session), rc);
+        std::cout << "Error: ssh_channel_new: " << host
+            << " " << ssh_get_error(session) << " " << rc << std::endl;
 
         TheSocketHandler::Instance()->setActive(false);
         return false;
@@ -167,9 +166,8 @@ bool SSH_Socket::onEnter()
     rc = ssh_channel_open_session(sshChannel);
     if(rc != SSH_OK)
     {
-        printf(
-            "\r\nOpen Channel for Socket Communications %s: %s - %i \r\n",
-            host.c_str(), ssh_get_error(session), rc);
+        std::cout << "Error: ssh_channel_open_session: " << host
+            << " " << ssh_get_error(session) << " " << rc << std::endl;
 
         TheSocketHandler::Instance()->setActive(false);
         return false;
@@ -192,9 +190,8 @@ bool SSH_Socket::onEnter()
     // Only After the Shell has been initalized.
     if(ssh_channel_request_pty_size(sshChannel, "ansi", 80, 25))
     {
-        printf(
-            "\r\nRequest for PTY term and size failed. %s: %s - %i \r\n",
-            host.c_str(), ssh_get_error(session), rc);
+        std::cout << "Error: ssh_channel_request_pty_size: " << host
+            << " " << ssh_get_error(session) << " " << rc << std::endl;
 
         // Not an error to exit the program on.
         //return 0;
@@ -203,9 +200,8 @@ bool SSH_Socket::onEnter()
     // Now reqeust a shell with the pty to get read/write
     if(ssh_channel_request_shell(sshChannel))
     {
-        printf(
-            "\r\nRequest for shell on channel failed. %s: %s - %i \r\n",
-            host.c_str(), ssh_get_error(session), rc);
+        std::cout << "Error: ssh_channel_request_shell: " << host
+            << " " << ssh_get_error(session) << " " << rc << std::endl;
 
         TheSocketHandler::Instance()->setActive(false);
         return false;
@@ -216,6 +212,7 @@ bool SSH_Socket::onEnter()
 
 bool SSH_Socket::onExit()
 {
+    std::cout << "SSH releasing channel" << std::endl;
     if(sshChannel)
     {
         if (TheSocketHandler::Instance()->isActive())
@@ -224,6 +221,7 @@ bool SSH_Socket::onExit()
         ssh_channel_free(sshChannel);
         sshChannel = NULL;
     }
+    std::cout << "SSH releasing session" << std::endl;
     if(session)
     {
         ssh_disconnect(session);
@@ -232,55 +230,6 @@ bool SSH_Socket::onExit()
     }
     return true;
 }
-
-// Example communications
-int SSH_Socket::show_remote_processes()
-{
-    ssh_channel channel;
-    int rc;
-    char buffer[256];
-    int nbytes;
-    channel = ssh_channel_new(session);
-
-    if(channel == NULL)
-        return SSH_ERROR;
-
-    rc = ssh_channel_open_session(channel);
-    if(rc != SSH_OK)
-    {
-        ssh_channel_free(channel);
-        return rc;
-    }
-    rc = ssh_channel_request_exec(channel, "ps aux");
-    if(rc != SSH_OK)
-    {
-        ssh_channel_close(channel);
-        ssh_channel_free(channel);
-        return rc;
-    }
-    nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
-    while(nbytes > 0)
-    {
-        if(write(1, buffer, nbytes) != nbytes)
-        {
-            ssh_channel_close(channel);
-            ssh_channel_free(channel);
-            return SSH_ERROR;
-        }
-        nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
-    }
-    if(nbytes < 0)
-    {
-        ssh_channel_close(channel);
-        ssh_channel_free(channel);
-        return SSH_ERROR;
-    }
-    ssh_channel_send_eof(channel);
-    ssh_channel_close(channel);
-    ssh_channel_free(channel);
-    return SSH_OK;
-}
-
 
 // Verify if Server is a known host.
 int SSH_Socket::verify_knownhost()
@@ -313,30 +262,31 @@ int SSH_Socket::verify_knownhost()
             break; /* ok */
 
         case SSH_SERVER_KNOWN_CHANGED:
-            fprintf(stderr, "Host key for server changed: it is now:\n");
+            std::cout << "Host key for server changed: it is now" << std::endl;
             ssh_print_hexa("Public key hash", hash, hlen);
-            fprintf(stderr, "For security reasons, connection will be stopped\n");
+            std::cout << "For security reasons, connection will be stopped" << std::endl;
             free(hash);
             return -1;
 
         case SSH_SERVER_FOUND_OTHER:
-            fprintf(stderr, "The host key for this server was not found but an other"
-                    "type of key exists.\n");
-            fprintf(stderr, "An attacker might change the default server key to"
-                    "confuse your client into thinking the key does not exist\n");
+            std::cout << "The host key for this server was not found but an other"
+                      << "type of key exists." << std::endl;
+            std::cout << "An attacker might change the default server key to"
+                      << "confuse your client into thinking the key does not exist" << std::endl;
             free(hash);
             return -1;
 
         case SSH_SERVER_FILE_NOT_FOUND:
-            fprintf(stderr, "Could not find known host file.\n");
-            fprintf(stderr, "If you accept the host key here, the file will be"
-                    "automatically created.\n");
+            std::cout << "Could not find known host file." << std::endl;
+            std::cout << "If you accept the host key here, the file will be"
+                      << "automatically created." << std::endl;
 
             /* fallback to SSH_SERVER_NOT_KNOWN behavior */
         case SSH_SERVER_NOT_KNOWN:
             hexa = ssh_get_hexa(hash, hlen);
-            fprintf(stderr,"The server is unknown. Adding Key."); //Do you trust the host key?\n");
-            fprintf(stderr, "Public key hash: %s\n", hexa);
+            //Do you trust the host key?\n");
+            std::cout << "The server is unknown. Adding Key." << std::endl;
+            std::cout << "Public key hash: " << hexa << std::endl;
             free(hexa);
 
             /*
@@ -353,14 +303,14 @@ int SSH_Socket::verify_knownhost()
             */
             if(ssh_write_knownhost(session) < 0)
             {
-                fprintf(stderr, "Error %s\n", strerror(errno));
+                std::cout << "Error: " << strerror(errno) << std::endl;
                 free(hash);
                 return -1;
             }
             break;
 
         case SSH_SERVER_ERROR:
-            fprintf(stderr, "Error %s", ssh_get_error(session));
+            std::cout << "Error: " << ssh_get_error(session) << std::endl;
             free(hash);
             return -1;
     }
@@ -435,22 +385,23 @@ int SSH_Socket::authenticate_console()
     switch(rc)
     {
         case SSH_AUTH_ERROR:   //some error happened during authentication
-            printf("\r\n ssh_userauth_none SSH_AUTH_ERROR! \r\n");
+            std::cout << "ssh_userauth_none SSH_AUTH_ERROR!" << std::endl;
             error();
             return rc;
         case SSH_AUTH_DENIED:  //no key matched
-            printf("\r\n ssh_userauth_none SSH_AUTH_DENIED! \r\n");
+            std::cout << "ssh_userauth_none SSH_AUTH_DENIED!" << std::endl;
             break;
         case SSH_AUTH_SUCCESS: //you are now authenticated
-            printf("\r\n ssh_userauth_none SSH_AUTH_SUCCESS! \r\n");
+            std::cout << "ssh_userauth_none SSH_AUTH_SUCCESS!" << std::endl;
             break;
         case SSH_AUTH_PARTIAL:
             //some key matched but you still have
             //to provide an other mean of authentication (like a password).
-            printf("\r\n ssh_userauth_none SSH_AUTH_PARTIAL! \r\n");
+            std::cout << "ssh_userauth_none SSH_AUTH_PARTIAL!" << std::endl;
             break;
     }
 
+    // Get a list of excepted Auth Sessions server wants.
     method = ssh_auth_list(session);
     while(rc != SSH_AUTH_SUCCESS)
     {
@@ -466,54 +417,55 @@ int SSH_Socket::authenticate_console()
     Do not forget cleaning up memory using ssh_key_free().
 */
         // The function ssh_userauth_autopubkey() does this using the
-        // available keys in "~/.ssh/". The return values are the following:
+        // available keys in "~/.ssh/" or sshagent. The return values are the following:
         // ** Public Key Needs more testing.
-        /*
         if(method & SSH_AUTH_METHOD_PUBLICKEY)
-        {
+        {            
             rc = ssh_userauth_autopubkey(session, NULL);
             switch(rc)
             {
                 case SSH_AUTH_ERROR:   //some serious error happened during authentication
-                    printf("\r\n SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_ERROR! \r\n");
+                    std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_ERROR!" << std::endl;
                     error();
                     return rc;
                 case SSH_AUTH_DENIED:  //no key matched
-                    printf("\r\n SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_DENIED! \r\n");
+                    std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_DENIED!" << std::endl;
                     break;
                 case SSH_AUTH_SUCCESS: //you are now authenticated
-                    printf("\r\n SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_SUCCESS! \r\n");
+                    std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_SUCCESS!" << std::endl;
                     break;
                 case SSH_AUTH_PARTIAL:
                     // some key matched but you still have
                     // to provide an other mean of authentication (like a password).
-                    printf("\r\n SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_PARTIAL! \r\n");
+                    std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_PARTIAL!" << std::endl;
                     break;
                 default:
                     break;
             }
-        */
 /*
-            rc = ssh_userauth_try_publickey(session, NULL, "pubkey.pem");
+            // Validate with specific public key file
+            rc = ssh_userauth_try_publickey(session, NULL, "pubkey.pub");
             switch (rc)
             {
-            case SSH_AUTH_ERROR:   //some serious error happened during authentication
-                printf("\r\n try_publickey - SSH_AUTH_ERROR! \r\n");
-                error(session);
-                return rc;
-            case SSH_AUTH_DENIED:  //no key matched
-                printf("\r\n try_publickey - SSH_AUTH_DENIED! \r\n");
-                break;
-            case SSH_AUTH_SUCCESS: //you are now authenticated
-                printf("\r\n try_publickey - SSH_AUTH_SUCCESS! \r\n");
-                break;
-            case SSH_AUTH_PARTIAL: //some key matched but you still have to provide an other mean of authentication (like a password).
-                printf("\r\n try_publickey - SSH_AUTH_PARTIAL! \r\n");
-                break;
-            default:
-                break;
+                case SSH_AUTH_ERROR:   //some serious error happened during authentication
+                    printf("\r\n try_publickey - SSH_AUTH_ERROR! \r\n");
+                    error(session);
+                    return rc;
+                case SSH_AUTH_DENIED:  //no key matched
+                    printf("\r\n try_publickey - SSH_AUTH_DENIED! \r\n");
+                    break;
+                case SSH_AUTH_SUCCESS: //you are now authenticated
+                    printf("\r\n try_publickey - SSH_AUTH_SUCCESS! \r\n");
+                    break;
+                case SSH_AUTH_PARTIAL: //some key matched but you still have to
+                                       //provide an other mean of authentication (like a password).
+                    printf("\r\n try_publickey - SSH_AUTH_PARTIAL! \r\n");
+                    break;
+                default:
+                    break;
             }
-        }*/
+             */
+        }
 
         // Try to authenticate with keyboard interactive";
         if(method & SSH_AUTH_METHOD_INTERACTIVE)
@@ -522,17 +474,18 @@ int SSH_Socket::authenticate_console()
             switch(rc)
             {
                 case SSH_AUTH_ERROR:   //some serious error happened during authentication
-                    printf("\r\n SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_ERROR! \r\n");
+                    std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_ERROR!" << std::endl;
                     error();
                     return rc;
                 case SSH_AUTH_DENIED:  //no key matched
-                    printf("\r\n SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_DENIED! \r\n");
+                    std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_DENIED!" << std::endl;
                     break;
                 case SSH_AUTH_SUCCESS: //you are now authenticated
-                    printf("\r\n SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_SUCCESS! \r\n");
+                    std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_SUCCESS!" << std::endl;
                     break;
-                case SSH_AUTH_PARTIAL: //some key matched but you still have to provide an other mean of authentication (like a password).
-                    printf("\r\n SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_PARTIAL! \r\n");
+                case SSH_AUTH_PARTIAL: //some key matched but you still have to
+                                       //provide an other mean of authentication (like a password).
+                    std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_PARTIAL!" << std::endl;
                     break;
                 default:
                     break;
@@ -551,17 +504,18 @@ int SSH_Socket::authenticate_console()
             switch(rc)
             {
                 case SSH_AUTH_ERROR:   //some serious error happened during authentication
-                    printf("\r\n SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_ERROR! \r\n");
+                    std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_ERROR!" << std::endl;
                     error();
                     return rc;
                 case SSH_AUTH_DENIED:  //no key matched
-                    printf("\r\n SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_DENIED! \r\n");
+                    std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_DENIED!" << std::endl;
                     break;
                 case SSH_AUTH_SUCCESS: //you are now authenticated
-                    printf("\r\n SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_SUCCESS! \r\n");
+                    std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_SUCCESS!" << std::endl;
                     break;
-                case SSH_AUTH_PARTIAL: //some key matched but you still have to provide an other mean of authentication (like a password).
-                    printf("\r\n SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_PARTIAL! \r\n");
+                case SSH_AUTH_PARTIAL: //some key matched but you still have to
+                                       // provide an other mean of authentication (like a password).
+                    std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_PARTIAL!" << std::endl;
                     break;
                 default:
                     break;

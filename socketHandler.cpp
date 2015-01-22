@@ -56,10 +56,6 @@ int SocketHandler::update()
         }
         else if (ret == 0) // No Data!
         {
-            // When no data received, this is when we want to show the cursor!
-            // Setup cursor in current x/y position Cursor.
-            TheTerminal::Instance()->setupCursorChar();
-
             if (TheAnsiParser::Instance()->isCursorActive())
             {
                 startBlinking = true;

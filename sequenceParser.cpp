@@ -1041,6 +1041,11 @@ void SequenceParser::processSequence(std::string inputString)
         // Get next Input Sequence
         sequence = inputString[i];
 
+        // Remove Bell fromn displaying. Anoying in Shell!
+        // When not displaying, we'll push this to console so it beeps!
+        if (sequence == '\x07')
+            continue;
+
         // Check for Start of Sequence, if we hit a sequence we then need
         // To send all Valid Output that Proceeds this sequence so everything
         // is FIFO with regards to how incoming data is handeled.
@@ -1214,7 +1219,7 @@ void SequenceParser::processSequence(std::string inputString)
             {
                 validOutputData += sequenceBuilder;
                 sequenceBuilder.erase();
-                    //inputString.substr(escapePosition, (i+1) - escapePosition);
+                //inputString.substr(escapePosition, (i+1) - escapePosition);
             }
             catch (std::exception e)
             {
@@ -1266,11 +1271,20 @@ void SequenceParser::processSequence(std::string inputString)
     {
         TheAnsiParser::Instance()->textInput(validOutputData);
         validOutputData.erase();
-    }
+    }    
 
     // Display final screen.
     TheTerminal::Instance()->renderScreen();
     TheTerminal::Instance()->drawTextureScreen();
+
+    // When no data received, this is when we want to show the cursor!
+    // Setup cursor in current x/y position Cursor.
+    if (TheAnsiParser::Instance()->isCursorActive())
+    {
+        TheTerminal::Instance()->setupCursorChar();
+        TheTerminal::Instance()->renderCursorOnScreen();
+        TheTerminal::Instance()->drawTextureScreen();
+    }
 }
 
 // Test Cases for Class.

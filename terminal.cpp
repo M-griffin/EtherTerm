@@ -684,19 +684,19 @@ void Terminal::freeSurfaceTextures()
         selectionTexture = NULL;
     }
 
-    if (globalWindow)
-    {
-        std::cout << "Destroy SDL Window" << std::endl;
-        SDL_DestroyWindow(globalWindow);
-        globalWindow = NULL;
-    }
     if (globalRenderer)
     {
         std::cout << "Destroy SDL Renderer" << std::endl;
         SDL_DestroyRenderer(globalRenderer);
         globalRenderer = NULL;
     }
-
+    if (globalWindow)
+    {
+        std::cout << "Destroy SDL Window" << std::endl;
+        SDL_DestroyWindow(globalWindow);
+        globalWindow = NULL;
+    }
+   
     if (chachedSurface)
     {
         std::cout << "SDL_FreeSurface chachedSurface" << std::endl;
@@ -727,8 +727,6 @@ void Terminal::freeSurfaceTextures()
         SDL_FreeSurface(bottomSurface);      // Bottom Line of Scrolling Region.
         bottomSurface = NULL;
     }
-    
-
 }
 
 /*
@@ -737,7 +735,7 @@ void Terminal::freeSurfaceTextures()
  */
 bool Terminal::loadBitmapImageFromPak()
 {
-    /*
+    /* Require minizip lib.
     // useful things from zlib/unzip.h
     unzFile            zip;
     unz_file_info    info;
@@ -1191,6 +1189,7 @@ void Terminal::renderClearLineScreen(int y, int start, int end)
 {
     // Save Background Color so we can switch back to it.
     SDL_Color originalGB = currentBGColor;
+    currentBGColor = black;
 
     // Clear out entire line.
     for(int i = start; i < end; i++)
@@ -1211,6 +1210,7 @@ void Terminal::renderClearLineAboveScreen(int y, int x)
 {
     // Save Background Color so we can switch back to it.
     SDL_Color originalGB = currentBGColor;
+    currentBGColor = black;
 
     int startPosition = x;
 
@@ -1239,6 +1239,7 @@ void Terminal::renderClearLineBelowScreen(int y, int x)
 {
     // Save Background Color so we can switch back to it.
     SDL_Color originalGB = currentBGColor;
+    currentBGColor = black;
 
     int startPosition = x;
 
@@ -1255,6 +1256,45 @@ void Terminal::renderClearLineBelowScreen(int y, int x)
     }
     currentBGColor = originalGB;
 }
+
+/**
+ * This will erase the current character or (s)
+ * by moving all text on right side of cursor
+ * Left x number of space, on the same line.
+ */
+
+ // WIP!! NOT WORKING YET.
+void Terminal::renderDeleteCharScreen(int x, int y, int num)
+{
+    SDL_Rect pick;
+    SDL_Rect dest;
+
+    // next we want to copy out for copy back.
+    pick.w = screenSurface->w - ((x + num) * characterWidth);
+    pick.h = characterHeight;
+    pick.x = (x + num) * characterWidth;
+    pick.y = characterHeight * y;
+
+    // destination
+    dest.w = screenSurface->w - ((x + num) * characterWidth);
+    dest.h = characterHeight;
+    dest.x = x * characterWidth;
+    dest.y = characterHeight * y;
+
+     // Move surface to Surface
+    if (SDL_BlitSurface(screenSurface ,&pick, screenSurface, &dest) < 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "renderDeleteCharScreen() SDL_BlitSurface bottomSurface: %s", SDL_GetError());
+        return;
+    }
+
+
+
+    renderScreen();
+    drawTextureScreen();
+}
+
 
 /**
  * Bascially Plots each Char to a Texture
@@ -1698,21 +1738,8 @@ void Terminal::replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 backgrou
  */
 void Terminal::setupCursorChar()
 {
-    /// FIXME Note: this does not handling screen
-    // Scrolling where the cursor is in the same place
-    // Ie message editor scroll up on top line.  This needs to be reworked.
-    // So that we refrash proper after new incoming data, but the proper place
-    // to add is a bit tricky.
-
-    // Check if the position has changed.
-    if(cursorXPosition != TheAnsiParser::Instance()->x_position-1 ||
-            cursorYPosition != TheAnsiParser::Instance()->y_position-1)
-    {
-        cursorXPosition = TheAnsiParser::Instance()->x_position-1;
-        cursorYPosition = TheAnsiParser::Instance()->y_position-1;
-    }
-    else
-        return;
+    cursorXPosition = TheAnsiParser::Instance()->x_position-1;
+    cursorYPosition = TheAnsiParser::Instance()->y_position-1;
 
     SDL_Rect pick, area;
 

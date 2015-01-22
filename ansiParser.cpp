@@ -240,7 +240,7 @@ void AnsiParser::reset()
     prev_color_attribute = 0;
     cleared_the_screen = false;
     line_wrapped = false;
-    isCursorShown = true;
+    //isCursorShown = true; // States will override this.
 
     // Reset Default Colors.
     TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->grey;
@@ -543,6 +543,25 @@ void AnsiParser::sequenceCursorAndDisplay()
     // Switch on Sequence Terminator
     switch(parameters[0])
     {
+        // WIP
+        case DELETE_CHARACTER:  // ESC[P
+            // Deletes the character at the current position by shifting all characters
+            // from the current column + p1 left to the current column.  Opened blanks
+            // at the end of the line are filled with the current attribute.
+            if (parameters.size() == 1) // Erase current positon, move left
+            {
+                TheTerminal::Instance()->renderDeleteCharScreen(
+                    x_position -1, y_position -1, 1);
+                break;
+            }
+            if (parameters.size() == 2) // Erase current positon, move left x
+            {
+                TheTerminal::Instance()->renderDeleteCharScreen(
+                    x_position -1, y_position -1, parameters[1]);
+                break;
+            }
+            break;
+
         case REPEAT_CHARACTER: // ESC[b
             // Repeat the preceding graphic character P s times (REP).
             if (parameters.size() == 1) // Repeat Once.
@@ -559,7 +578,7 @@ void AnsiParser::sequenceCursorAndDisplay()
             }
             break;
 
-        case LINE_POS_ABSOLUTE:
+        case LINE_POS_ABSOLUTE: // ESC[d
             // Line Position Absolute [row] (default = [1,column]) (VPA).
             if (parameters.size() == 1) // Repeat Once.
             {
@@ -1747,6 +1766,7 @@ void AnsiParser::sequenceInput(std::vector<int> sequenceParameters)
     // First Handle Any Cursor Movement and Redisplay Attributes
     switch(parameters[0])
     {
+        case DELETE_CHARACTER:
         case LINE_POS_ABSOLUTE:
         case REPEAT_CHARACTER:
         case CURSOR_POSITION:
