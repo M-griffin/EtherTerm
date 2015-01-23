@@ -1,13 +1,14 @@
 <?xml version="1.0" ?>
 <EtherTerm>
     <Phonebook version="1.0">
-        <BBS name="Haunting The Chapel" ip="htc.zapto.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" />
-        <BBS name="Black Flag" ip="blackflag.acid.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" />
-        <BBS name="Black Flag" ip="blackflag.acid.org" port="2627" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" />
-        <BBS name="Pharcyde" ip="bbs.pharcyde.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" />
-        <BBS name="1984" ip="1984.ws" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" />
-        <BBS name="1984" ip="1984.ws" port="22" protocol="SSH" login="SET_YOUR_USERNAME" password="SET_YOUR_PASSWORD" font="vga8x16.bmp" />
-        <BBS name="Blood Island" ip="bloodisland.ph4.se" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" />
-        <BBS name="d1st" ip="d1st.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" />
+        <BBS name="Haunting The Chapel" ip="htc.zapto.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" />
+        <BBS name="Black Flag (Mystic)" ip="blackflag.acid.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" />
+        <BBS name="Black Flag (Daydream)" ip="blackflag.acid.org" port="2627" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" />
+        <BBS name="Pharcyde" ip="bbs.pharcyde.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" />
+        <BBS name="1984" ip="1984.ws" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" />
+        <BBS name="1984" ip="1984.ws" port="22" protocol="SSH" login="SET_YOUR_USERNAME" password="SET_YOUR_PASSWORD" font="vga8x16.bmp" keyMap="VT100" />
+        <BBS name="Blood Island" ip="bloodisland.ph4.se" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" />
+        <BBS name="OddNetwork" ip="oddnetwork.org" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" />
+        <BBS name="d1st" ip="d1st.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" />
     </Phonebook>
 </EtherTerm>

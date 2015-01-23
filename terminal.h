@@ -76,6 +76,7 @@ public:
         std::string login;
         std::string password;  // Make this encrypted with more time.
         std::string font;
+        std::string keyMap;    // ANSI, VT100
     } SystemConnection;
 
     SystemConnection getSystemConnection() const
@@ -95,6 +96,7 @@ public:
         systemConnection.login.erase();
         systemConnection.password.erase();
         systemConnection.font.erase();
+        systemConnection.keyMap.erase();
     }
 
     bool running()
@@ -157,6 +159,7 @@ public:
     {
         return (currentFont != previousFont);
     }
+
 
     // Now for Rendering Code
     void restartWindowRenderer(std::string mode);

@@ -36,6 +36,14 @@ bool InputHandler::update()
     SDL_Event event;
     std::string sequence;
 
+    TheTerminal::SystemConnection sysConection;
+    sysConection = TheTerminal::Instance()->getSystemConnection();
+
+    // Set default KeyMapping when there is no connection
+    // ie.. Dialing Directory for Menu System.
+    if (sysConection.keyMap == "")
+        sysConection.keyMap = "ANSI";
+
     //Handle events on queue
     while(SDL_PollEvent(&event) != 0 && !isGlobalShutdown())
     {
@@ -398,85 +406,108 @@ bool InputHandler::update()
                             setInputSequence("    ");
                             return true;
 
-                        // screen2|old VT 100/ANSI X3.64 virtual terminal:
-                        // Used By Synchronet!
-                        /*
-                         *
-                        case SDLK_KP_BACKSPACE:
-                        case SDLK_BACKSPACE:
-                            setInputSequence("\x08");
-                            return true;
-                        case SDLK_DELETE:
-                            setInputSequence("\x7f");
-                            return true;
-
-                        case SDLK_INSERT:   // insert
-                            setInputSequence("\x1b[@");
-                            return true;
-                        case SDLK_HOME:     // home
-                            setInputSequence("\x1b[H");
-                            return true;
-                        case SDLK_END:      // end
-                            setInputSequence("\x1b[K");
-                            return true;
-                        case SDLK_PAGEUP:   // page up
-                            setInputSequence("\x1b[V");
-                            return true;
-                        case SDLK_PAGEDOWN: // page down
-                            setInputSequence("\x1b[U");
-                            return true;
-                        */
-
-                        // VT-100
-
-                        // \x7f = ^?  // 0x08 = ^H
-                        case SDLK_KP_BACKSPACE:
-                        case SDLK_BACKSPACE:
-                            setInputSequence("\x7f");
-                            return true;
-                        case SDLK_DELETE:
-                            setInputSequence("\x1b[3~");
-                            return true;
-
-                        case SDLK_INSERT:   // insert
-                            setInputSequence("\x1b[2~");
-                            return true;
-                        case SDLK_HOME:     // home
-                            setInputSequence("\x1b[1~");
-                            return true;
-                        case SDLK_END:      // end
-                            setInputSequence("\x1b[4~");
-                            return true;
-                        case SDLK_PAGEUP:   // page up
-                            setInputSequence("\x1b[5~");
-                            return true;
-                        case SDLK_PAGEDOWN: // page down
-                            setInputSequence("\x1b[6~");
-                            return true;
-
-                        // SCO
-                        /*
-                        case SDLK_INSERT:   // insert
-                            setInputSequence("\x1b[L");
-                            return true;
-                        case SDLK_HOME:     // home
-                            setInputSequence("\x1b[H");
-                            return true;
-                        case SDLK_END:      // end
-                            setInputSequence("\x1b[F");
-                            return true;
-                        case SDLK_PAGEUP:   // page up
-                            setInputSequence("\x1b[I");
-                            return true;
-                        case SDLK_PAGEDOWN: // page down
-                            setInputSequence("\x1b[G");
-                            return true;
-                        */
-
-                        // Add Function Keys here.
-
                         default:
                             break;
+                    }
+
+                    // Term specific key mappings
+                    if (sysConection.keyMap == "ANSI")
+                    {
+                        // screen2|old VT 100/ANSI X3.64 virtual terminal:
+                        // Used By Synchronet/Mystic and DOS Type Systems!
+                        switch(event.key.keysym.sym)
+                        {
+                            case SDLK_KP_BACKSPACE:
+                            case SDLK_BACKSPACE:
+                                setInputSequence("\x08");
+                                return true;
+                            case SDLK_DELETE:
+                                setInputSequence("\x7f");
+                                return true;
+
+                            case SDLK_INSERT:   // insert
+                                setInputSequence("\x1b[@");
+                                return true;
+                            case SDLK_HOME:     // home
+                                setInputSequence("\x1b[H");
+                                return true;
+                            case SDLK_END:      // end
+                                setInputSequence("\x1b[K");
+                                return true;
+                            case SDLK_PAGEUP:   // page up
+                                setInputSequence("\x1b[V");
+                                return true;
+                            case SDLK_PAGEDOWN: // page down
+                                setInputSequence("\x1b[U");
+                                return true;
+
+                            default:
+                                break;
+                        }
+                    }
+                    else if (sysConection.keyMap == "VT100" ||
+                             sysConection.keyMap == "LINUX")
+                    {
+                        // VT-100
+                        switch(event.key.keysym.sym)
+                        {
+                            // \x7f = ^?  // 0x08 = ^H
+                            case SDLK_KP_BACKSPACE:
+                            case SDLK_BACKSPACE:
+                                setInputSequence("\x7f");
+                                return true;
+                            case SDLK_DELETE:
+                                setInputSequence("\x1b[3~");
+                                return true;
+
+                            case SDLK_INSERT:   // insert
+                                setInputSequence("\x1b[2~");
+                                return true;
+                            case SDLK_HOME:     // home
+                                setInputSequence("\x1b[1~");
+                                return true;
+                            case SDLK_END:      // end
+                                setInputSequence("\x1b[4~");
+                                return true;
+                            case SDLK_PAGEUP:   // page up
+                                setInputSequence("\x1b[5~");
+                                return true;
+                            case SDLK_PAGEDOWN: // page down
+                                setInputSequence("\x1b[6~");
+                                return true;
+                        }
+                    }
+                    else if (sysConection.keyMap == "SCO")
+                    {
+                        switch(event.key.keysym.sym)
+                        {
+                            // \x7f = ^?  // 0x08 = ^H
+                            case SDLK_KP_BACKSPACE:
+                            case SDLK_BACKSPACE:
+                                setInputSequence("\x7f");
+                                return true;
+                            case SDLK_DELETE:
+                                setInputSequence("\x08");
+                                return true;
+                            case SDLK_INSERT:   // insert
+                                setInputSequence("\x1b[L");
+                                return true;
+                            case SDLK_HOME:     // home
+                                setInputSequence("\x1b[H");
+                                return true;
+                            case SDLK_END:      // end
+                                setInputSequence("\x1b[F");
+                                return true;
+                            case SDLK_PAGEUP:   // page up
+                                setInputSequence("\x1b[I");
+                                return true;
+                            case SDLK_PAGEDOWN: // page down
+                                setInputSequence("\x1b[G");
+                                return true;
+
+                            default:
+                                break;
+                        }
                     }
                 }
                 break;

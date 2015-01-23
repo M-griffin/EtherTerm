@@ -18,7 +18,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-
+#include <algorithm>
 #include <cstdio>
 
 const std::string MainMenuState::menuID = "MENU";
@@ -97,6 +97,7 @@ bool MainMenuState::onEnter()
     // This off, so it doesn't keep looping since it's not a game
     // with animation, this saves cpu usage.
     TheTerminal::Instance()->setRenderReady(true);
+    TheTerminal::Instance()->clearSystemConnection();
     return true;
 }
 
@@ -543,16 +544,23 @@ std::vector< list_bar > MainMenuState::buildDialList()
                         {
                             sprintf(temp2,"%lu", currentSystem+1);
                             if(isLeftPadding)
-                            {
+                            {                                
                                 MenuFunction::leftSpacing(temp2,padding);
+                                std::string stringReplace = temp2;
+                                std::replace(
+                                    stringReplace.begin(), stringReplace.end(), ' ', '.');
                                 isLeftPadding = false;
+                                stringBuilder += stringReplace;
                             }
                             else if(isRightPadding)
-                            {
+                            {                                
                                 MenuFunction::rightSpacing(temp2,padding);
+                                std::string stringReplace = temp2;
+                                std::replace(
+                                    stringReplace.begin(), stringReplace.end(), ' ', '.');
                                 isRightPadding = false;
-                            }
-                            stringBuilder += temp2;
+                                stringBuilder += stringReplace;
+                            }                            
                         }
                         else if(strcmp(mciCode,"NA") == 0)
                         {
@@ -574,7 +582,7 @@ std::vector< list_bar > MainMenuState::buildDialList()
                             // FIXME Temp - Translate Filename to Description
                             // Will add to the xml once it's ready.
                             if(systemConnection[currentSystem].font == "vga8x16.bmp")
-                                sprintf(temp2,"%s",(char *)"IBM-PC CP437 VGA 8x16");
+                                sprintf(temp2,"%s",(char *)"IBM-PC CP437 VGA  8x16");
                             else if(systemConnection[currentSystem].font == "topazPlus-8x16.bmp")
                                 sprintf(temp2,"%s",(char *)"AMIGA Topaz+ 1200 8x16");
 
@@ -593,7 +601,8 @@ std::vector< list_bar > MainMenuState::buildDialList()
                         }
                         else if(strcmp(mciCode,"PO") == 0)
                         {
-                            sprintf(temp2,"%i",systemConnection[currentSystem].port);
+                            sprintf(temp2,"%i",
+                                systemConnection[currentSystem].port);
                             if(isLeftPadding)
                             {
                                 MenuFunction::leftSpacing(temp2,padding);
@@ -608,7 +617,24 @@ std::vector< list_bar > MainMenuState::buildDialList()
                         }
                         else if(strcmp(mciCode,"PR") == 0)
                         {
-                            sprintf(temp2,"%s",systemConnection[currentSystem].protocol.c_str());
+                            sprintf(temp2,"%s",
+                                systemConnection[currentSystem].protocol.c_str());
+                            if(isLeftPadding)
+                            {
+                                MenuFunction::leftSpacing(temp2,padding);
+                                isLeftPadding = false;
+                            }
+                            else if(isRightPadding)
+                            {
+                                MenuFunction::rightSpacing(temp2,padding);
+                                isRightPadding = false;
+                            }
+                            stringBuilder += temp2;
+                        }                        
+                        else if(strcmp(mciCode,"KM") == 0)
+                        {
+                            sprintf(temp2,"%s",(char *)
+                                systemConnection[currentSystem].keyMap.c_str());
                             if(isLeftPadding)
                             {
                                 MenuFunction::leftSpacing(temp2,padding);
@@ -716,6 +742,7 @@ bool MainMenuState::readDialDirectory()
             sysconn.login = pElem->Attribute("login");
             sysconn.password = pElem->Attribute("password");
             sysconn.font = pElem->Attribute("font");
+            sysconn.keyMap = pElem->Attribute("keyMap");
             // Add to Vector so we can parse in building the dialing directory.
             systemConnection.push_back(sysconn);
         }
@@ -752,6 +779,7 @@ void MainMenuState::createDialDirectory()
     element3->SetAttribute("login", "");
     element3->SetAttribute("password", "");
     element3->SetAttribute("font", "vga8x16.bmp");
+    element3->SetAttribute("keyMap", "ANSI");
 
     TiXmlElement *element4 = new TiXmlElement("BBS");
     element2->LinkEndChild(element4);
@@ -763,6 +791,7 @@ void MainMenuState::createDialDirectory()
     element4->SetAttribute("login", "");
     element4->SetAttribute("password", "");
     element4->SetAttribute("font", "vga8x16.bmp");
+    element3->SetAttribute("keyMap", "VT100");
     doc.SaveFile(path.c_str());
 }
 
@@ -857,8 +886,9 @@ JMPINPUT1:
             _menuFunction.menuProcess(mString, LIGHTBAR_POSITION);
             //std::cout << "mString: " << mString << std::endl;
 
+             // Get CommandKey returned from Menu
             ch = mString[1];
-            // For Menu CmdKey Input
+
             if(mString[0] == '!')
             {
                 switch(toupper(ch))
