@@ -289,6 +289,7 @@ folder or the root folder where the executable is located.
 + G00R00: Optimization ideas on scrolling pixels faster.
 + (SDL Game Programming) For good ideas with Singletons and State Machines.
 + Maze: Testing and bug reports
++ Caphood: Testing and bug reports
 + IceDevil: Testing and bug reports
 + Haliphax: Testing and bug reports
 + HellBeard: Testing and bug reports
