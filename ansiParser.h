@@ -72,8 +72,6 @@ public:
     const  int  TERM_WIDTH  = 80; // Temp
 
 #define NUM_LINES   25       // change to 50 for 80x50 ANSI's
-//#define FALSE        0
-//#define TRUE         1
 #define MAX_PARAMS  10
 
     // Control Sequence Terminators
@@ -106,9 +104,9 @@ public:
     /* Extra Notes.
     ESC [ 7 ; col h Enables line wrapping at column position. If col (1-based)
      *  is absent, wrap at column 80.
-    ESC [ 7 l 	Disables line wrapping. Lines wraps at the end of screen buffer.
-    ESC [ 25 h 	Show text cursor.
-    ESC [ 25 l 	Hide text cursor.
+    ESC [ 7 l     Disables line wrapping. Lines wraps at the end of screen buffer.
+    ESC [ 25 h     Show text cursor.
+    ESC [ 25 l     Hide text cursor.
     */
     // Setup getters for these, should be accessable
     // But not changeable!!

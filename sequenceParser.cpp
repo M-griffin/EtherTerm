@@ -1348,6 +1348,6 @@ int main(int argc, char **argv)
 
     // Clear and Release Instance.
     TheSequenceParser::ReleaseInstance();
-	return 0;
+    return 0;
 }
 */

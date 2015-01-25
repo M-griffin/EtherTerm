@@ -93,7 +93,7 @@ bool SDL_Socket::onEnter()
     std::cout << "SDL_Socket::onEnter()" << std::endl;
     IPaddress ip;
 
-    set=SDLNet_AllocSocketSet(1);
+    set = SDLNet_AllocSocketSet(1);
     if(!set)
     {
         printf("SDLNet_AllocSocketSet: %s\n", SDLNet_GetError());
@@ -106,6 +106,7 @@ bool SDL_Socket::onEnter()
     if(SDLNet_ResolveHost(&ip,host.c_str(),port)==-1)
     {
         printf("SDLNet_ResolveHost: %s\n",SDLNet_GetError());
+        sock = NULL;
         onExit();
         return false;
     }
@@ -133,129 +134,131 @@ bool SDL_Socket::onExit()
     std::cout << "SDL_Socket::onExit()" << std::endl;
     if(TheInputHandler::Instance()->isGlobalShutdown())
     {
-        SDLNet_TCP_Close(sock);
+        if (sock)
+            SDLNet_TCP_Close(sock);
     }
 
-    SDLNet_FreeSocketSet(set);
+    if (set)
+        SDLNet_FreeSocketSet(set);
     return true;
 }
 
 
 /*
-	MCCP: Mud Client Compression Protocol
+    MCCP: Mud Client Compression Protocol
     The following is for reference only on handeling MCCP
 
 void *zlib_alloc( void *opaque, unsigned int items, unsigned int size )
 {
-	return calloc(items, size);
+    return calloc(items, size);
 }
 
 void zlib_free( void *opaque, void *address )
 {
-	free(address);
+    free(address);
 }
 
 int start_compress( DESCRIPTOR_DATA *d )
 {
-	char start_mccp[] = { IAC, SB, TELOPT_MCCP, IAC, SE, 0 };
-	z_stream *stream;
+    char start_mccp[] = { IAC, SB, TELOPT_MCCP, IAC, SE, 0 };
+    z_stream *stream;
 
-	if (d->mccp)
-	{
-		return TRUE;
-	}
+    if (d->mccp)
+    {
+        return TRUE;
+    }
 
-	stream = calloc(1, sizeof(z_stream));
-	stream->next_in	    = NULL;
-	stream->avail_in    = 0;
-	stream->next_out    = mud->mccp_buf;
-	stream->avail_out   = COMPRESS_BUF_SIZE;
-	stream->data_type   = Z_ASCII;
-	stream->zalloc      = zlib_alloc;
-	stream->zfree       = zlib_free;
-	stream->opaque      = Z_NULL;
+    stream = calloc(1, sizeof(z_stream));
+    stream->next_in        = NULL;
+    stream->avail_in    = 0;
+    stream->next_out    = mud->mccp_buf;
+    stream->avail_out   = COMPRESS_BUF_SIZE;
+    stream->data_type   = Z_ASCII;
+    stream->zalloc      = zlib_alloc;
+    stream->zfree       = zlib_free;
+    stream->opaque      = Z_NULL;
 
-	//	12, 5 = 32K of memory, more than enough
-	if (deflateInit2(stream, Z_BEST_COMPRESSION, Z_DEFLATED, 12, 5, Z_DEFAULT_STRATEGY) != Z_OK)
-	{
-		log_printf("start_compress: failed deflateInit2 D%d@%s", d->descriptor, d->host);
-		free(stream);
-		return FALSE;
-	}
-	write_to_descriptor(d, start_mccp, 0);
-	//	The above call must send all pending output to the descriptor, since from now on we'll be compressing.
-	d->mccp = stream;
-	return TRUE;
+    //    12, 5 = 32K of memory, more than enough
+    if (deflateInit2(stream, Z_BEST_COMPRESSION, Z_DEFLATED, 12, 5, Z_DEFAULT_STRATEGY) != Z_OK)
+    {
+        log_printf("start_compress: failed deflateInit2 D%d@%s", d->descriptor, d->host);
+        free(stream);
+        return FALSE;
+    }
+    write_to_descriptor(d, start_mccp, 0);
+    //    The above call must send all pending output to the descriptor, since from now on we'll be compressing.
+    d->mccp = stream;
+    return TRUE;
 }
 
 void end_compress( DESCRIPTOR_DATA *d )
 {
-	if (d->mccp == NULL)
-	{
-		return;
-	}
+    if (d->mccp == NULL)
+    {
+        return;
+    }
 
-	d->mccp->next_in	= NULL;
-	d->mccp->avail_in	= 0;
-	d->mccp->next_out	= mud->mccp_buf;
-	d->mccp->avail_out	= COMPRESS_BUF_SIZE;
+    d->mccp->next_in    = NULL;
+    d->mccp->avail_in    = 0;
+    d->mccp->next_out    = mud->mccp_buf;
+    d->mccp->avail_out    = COMPRESS_BUF_SIZE;
 
-	if (deflate(d->mccp, Z_FINISH) != Z_STREAM_END)
-	{
-		log_printf("end_compress: failed to deflate D%d@%s", d->descriptor, d->host);
-	}
+    if (deflate(d->mccp, Z_FINISH) != Z_STREAM_END)
+    {
+        log_printf("end_compress: failed to deflate D%d@%s", d->descriptor, d->host);
+    }
 
-	if (!HAS_BIT(d->comm_flags, COMM_FLAG_DISCONNECT))
-	{
-		process_compressed(d);
-	}
-	if (deflateEnd(d->mccp) != Z_OK)
-	{
-		log_printf("end_compress: failed to deflateEnd D%d@%s", d->descriptor, d->host);
-	}
-	free(d->mccp);
-	d->mccp = NULL;
-	return;
+    if (!HAS_BIT(d->comm_flags, COMM_FLAG_DISCONNECT))
+    {
+        process_compressed(d);
+    }
+    if (deflateEnd(d->mccp) != Z_OK)
+    {
+        log_printf("end_compress: failed to deflateEnd D%d@%s", d->descriptor, d->host);
+    }
+    free(d->mccp);
+    d->mccp = NULL;
+    return;
 }
 
 void write_compressed( DESCRIPTOR_DATA *d )
 {
-	d->mccp->next_in    = (unsigned char *) d->outbuf;
-	d->mccp->avail_in   = d->outtop;
-	d->mccp->next_out   = (unsigned char *) mud->mccp_buf;
-	d->mccp->avail_out  = COMPRESS_BUF_SIZE;
-	d->outtop           = 0;
-	if (deflate(d->mccp, Z_SYNC_FLUSH) != Z_OK)
-	{
-		return;
-	}
-	process_compressed(d);
-	return;
+    d->mccp->next_in    = (unsigned char *) d->outbuf;
+    d->mccp->avail_in   = d->outtop;
+    d->mccp->next_out   = (unsigned char *) mud->mccp_buf;
+    d->mccp->avail_out  = COMPRESS_BUF_SIZE;
+    d->outtop           = 0;
+    if (deflate(d->mccp, Z_SYNC_FLUSH) != Z_OK)
+    {
+        return;
+    }
+    process_compressed(d);
+    return;
 }
 
 void process_compressed( DESCRIPTOR_DATA *d )
 {
-	int length;
-	length = COMPRESS_BUF_SIZE - d->mccp->avail_out;
-	if (write(d->descriptor, mud->mccp_buf, length) < 1)
-	{
-		log_printf("process_compressed D%d@%s", d->descriptor, d->host);
-		SET_BIT(d->comm_flags, COMM_FLAG_DISCONNECT);
-		return;
-	}
-	return;
+    int length;
+    length = COMPRESS_BUF_SIZE - d->mccp->avail_out;
+    if (write(d->descriptor, mud->mccp_buf, length) < 1)
+    {
+        log_printf("process_compressed D%d@%s", d->descriptor, d->host);
+        SET_BIT(d->comm_flags, COMM_FLAG_DISCONNECT);
+        return;
+    }
+    return;
 }
 
 int process_do_mccp( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
 {
-	start_compress(d);
-	return 3;
+    start_compress(d);
+    return 3;
 }
 
 int process_dont_mccp( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
 {
-	end_compress(d);
-	return 3;
+    end_compress(d);
+    return 3;
 }
 
 */

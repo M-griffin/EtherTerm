@@ -72,7 +72,7 @@ private:
     std::string sequenceBuilder;
 
     //Holds the breakdown of the entire sequence
-	std::vector<int> params;
+    std::vector<int> params;
 
     // This string contains normal data passed through the sequence
     // Parser, At the end of a processing loop, this data is passed
@@ -87,7 +87,7 @@ private:
     ~SequenceParser();
 
     SequenceParser(const SequenceParser&);
-	SequenceParser& operator=(const SequenceParser&);
+    SequenceParser& operator=(const SequenceParser&);
 
 };
 
