@@ -78,7 +78,7 @@ Terminal modes, by default EtherTerm only supports 80 x 25.  Other modes will be
 ***Keymappings are planned also***
 Etherterm currently follows the default Windows telnet output keys seqeunces (used in Syncterm) for keys like arrrows, Insert, Delete, PageUp and Page Down.  Some other operating systems look for and use different escape sequence for their input keys which will be added later for more support.
 
-##Demo for Windows 
+##Demo for Windows:
 
 This is the Demo 2 Preview client for Windows.
 <br/>
@@ -159,7 +159,7 @@ make clean-linux
 
 ##Linux Build Steps:
 
-###Ubunutu, Mint and Debian can use APT-GET to install requirements.**
+###Ubunutu, Mint and Debian can use APT-GET to install requirements.
 
 **Clone the Git repository.**
 ```
@@ -191,7 +191,7 @@ sudo apt-get install libssh-dev
 make linux 
 ```
 
-###Arch Linux can use PACMAN to install requirements.**
+###Arch Linux can use PACMAN to install requirements.
 
 **Clone the Git repository.**
 ```
