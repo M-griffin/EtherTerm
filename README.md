@@ -82,7 +82,7 @@ Etherterm currently follows the default Windows telnet output keys seqeunces (us
 
 This is the Demo 2 Preview client for Windows.
 <br/>
-<a href = 'https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.zip'>EtherTerm Demo2 Preview.zip</a>
+<a href = 'https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.1.zip'>EtherTerm Demo2.1 Preview.zip</a>
 <br/>
 <br/>
 Linux, OSX can be built easily with the following instructions below.
