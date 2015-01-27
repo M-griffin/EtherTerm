@@ -162,6 +162,7 @@ public:
 
 
     // Now for Rendering Code
+    void restartWindowSize(bool fullScreen);
     void restartWindowRenderer(std::string mode);
     void pullSelectionBuffer(int x, int y);
     void clearSelectionTexture();

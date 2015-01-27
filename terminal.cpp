@@ -104,12 +104,79 @@ Terminal::~Terminal()
     std::cout << "Term Released" << std::endl;
 }
 
+
+/*
+ * Destroy and Recreate the Window
+ * SDL is broken in OSX so We need to to switch
+ * The resolution and Window Sizes properly.
+ */
+void Terminal::restartWindowSize(bool fullScreen)
+{
+    if (globalWindow)
+    {
+        //std::cout << "Destroy SDL Window" << std::endl;
+        SDL_DestroyWindow(globalWindow);
+        globalWindow = NULL;
+    }
+
+    // init the window
+    if (fullScreen)
+    {
+        globalWindow =
+            SDL_CreateWindow(windowTitle.c_str(), SDL_WINDOWPOS_CENTERED,
+                             SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight,
+#ifndef _WIN32               // Linux / OSX FullScreen Desktop Rez Only!
+                             SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP);
+#else                        // Windows do true Fullscreen.
+                             SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN);
+                             //SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP);
+#endif
+        if(!globalWindow) // window init success
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "Terminal::restartWindowSize() SDL_CreateWindow globalWindow: %s", SDL_GetError());
+            return;
+        }
+    }
+    else
+    {
+        globalWindow =
+            SDL_CreateWindow(windowTitle.c_str(), SDL_WINDOWPOS_CENTERED,
+                             SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight,
+                             SDL_WINDOW_SHOWN);
+        if(!globalWindow) // window init success
+        {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                "Terminal::restartWindowSize() SDL_CreateWindow globalWindow: %s", SDL_GetError());
+            return;
+        }
+    }
+}
+
+/*
+ * Destroy and Recreate the Renderer
+ * Mode is to toggle Texture Filtering On or Off.
+ * SDL is broken in OSX so We need to to switch
+ * The resolution and Window Sizes properly.
+ */
 void Terminal::restartWindowRenderer(std::string mode)
 {
+
+    if (globalRenderer)
+    {
+        //std::cout << "Destroy SDL Renderer" << std::endl;
+        SDL_DestroyRenderer(globalRenderer);
+        globalRenderer = NULL;
+    }
+
+    globalRenderer =
+        SDL_CreateRenderer(globalWindow, -1, SDL_RENDERER_ACCELERATED |
+                           SDL_RENDERER_TARGETTEXTURE);
+
     // First Clear the Rexture so it will get recreated with new HINT
     if (globalTexture)
     {
-        std::cout << "SDL_DestroyTexture globalTexture" << std::endl;
+        //std::cout << "SDL_DestroyTexture globalTexture" << std::endl;
         SDL_DestroyTexture(globalTexture);
         globalTexture = NULL;
     }
@@ -127,7 +194,16 @@ void Terminal::restartWindowRenderer(std::string mode)
      * 1 or linear  = linear filtering       (supported by OpenGL and Direct3D)
      * 2 or best    = anisotropic filtering  (supported by Direct3D)
      */
+#ifndef _WIN32
+    // Linux / OSX we have to use texture filter on Full screen
+    // Sad but true, True Full Screen is no go on these platforms!
     if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, mode.c_str()))
+#else
+    // Windows we want full quality Full Screen!  :)
+    if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"))
+    //if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, mode.c_str()))
+#endif
+
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
             "restartWindowRenderer SDL_SetHint SDL_HINT_RENDER_SCALE_QUALITY: %s", SDL_GetError());
@@ -156,6 +232,11 @@ void Terminal::restartWindowRenderer(std::string mode)
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
             "restartWindowRenderer SDL_SetRenderTarget NULL: %s", SDL_GetError());
     }
+
+    //int screenWidth, screenHeight;
+    //SDL_GetRendererOutputSize(globalRenderer,&screenWidth,&screenHeight);
+    //SDL_RenderSetLogicalSize(globalRenderer,screenWidth,screenHeight);
+
     if (SDL_RenderClear(globalRenderer) < 0)
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
@@ -165,6 +246,9 @@ void Terminal::restartWindowRenderer(std::string mode)
     renderScreen();
 }
 
+/*
+ * Terminal Startup and Init.
+ */
 bool Terminal::init(const char* title,
                 int swidth, int sheight,
                 int wwidth, int wheight,
@@ -276,7 +360,10 @@ bool Terminal::init(const char* title,
 
     // Increate the scaling to smooth without filtering.
     // Doesn't smooth anything!
-    //SDL_RenderSetLogicalSize(globalRenderer,640*2,400*2);
+
+    //int screenWidth, screenHeight;
+    //SDL_GetRendererOutputSize(globalRenderer,&screenWidth,&screenHeight);
+    //SDL_RenderSetLogicalSize(globalRenderer,screenWidth,screenHeight);
     //SDL_RenderSetScale(globalRenderer, 0, 0);
 
     // add some sound effects - TODO move to better place
@@ -334,11 +421,15 @@ void Terminal::pullSelectionBuffer(int x, int y)
 
     // We need to Translate the Screen Width vs Rows and Width to
     // get actual the grid size of the Characters to snap everything correctly.
-    int charWidth, charHeight;
-    charHeight = screenHeight / 25;
-    charHeight += screenHeight % 25;
-    charWidth = screenWidth / 80;
-    charWidth += screenWidth % 80;
+    double charWidth, charHeight;
+    double value;
+
+    value = (double)screenHeight / 25.0;
+    charHeight = value; //round(abs(value));
+    //charHeight += screenHeight % 25;
+    value = (double)screenWidth / 80.0;
+    charWidth = value; //round(abs(value));
+    //charWidth += screenWidth % 80;
 
     // First we need to convert the current Screen size to 640x400
     // So we can calcuate the actual pixel size of each resized character cell.
@@ -363,30 +454,35 @@ void Terminal::pullSelectionBuffer(int x, int y)
     // use source or motions depending where the mouse is for top left.
 
     // This is the Top Region Snap to nearest Char Width/Height
+    // This is the Top Region
     if (sourceX < x)
     {
         // TOP Stationary -> Right ->> OK!
-        rect.x = sourceX;
-        rect.x -= rect.x % charWidth; // Snap to Left.
+        rect.x = floor((double)sourceX / charWidth) * charWidth;
+        //rect.x = sourceX;
+        //rect.x -= rect.x % charWidth; // Snap to Left.
     }
     else
     {
         // Top -> Left ->> OK!
-        rect.x = x;
-        rect.x -= rect.x % charWidth;
+        rect.x = floor((double)x / charWidth) * charWidth;
+        //rect.x = x;
+        //rect.x -= rect.x % charWidth;
     }
 
     if (sourceY < y)
     {
         // Top Stationary ->> OK!
-        rect.y = sourceY;
-        rect.y -= rect.y % charHeight; // Snap to Top
+        rect.y = floor((double)sourceY / charHeight) * charHeight;
+        //rect.y = sourceY;
+        //rect.y -= rect.y % charHeight; // Snap to Top
     }
     else
     {
         // Top -> Up ->> OK!
-        rect.y = y;
-        rect.y -= rect.y % charHeight;
+        rect.y = floor((double)y / charHeight) * charHeight;
+        //rect.y = y;
+        //rect.y -= rect.y % charHeight;
     }
 
     // Width and height are calcuated by the different from motion to source
@@ -394,34 +490,41 @@ void Terminal::pullSelectionBuffer(int x, int y)
     // Also need to swap source for the lowest value so we can select both
     // above and behind the starting points.
 
-    // This is the bottom Region Snap to nearest Char Width/Height
+    // This is the bottom Region
     if (sourceX < x)
     {
         // Bottom Width RIGHT ->> OK!
-        rect.w = charWidth +
-            ((x -= (x % charWidth)) - (sourceX -= sourceX % charWidth));
+        //rect.w = charWidth +
+            //((x -= (x % charWidth)) - (sourceX -= sourceX % charWidth));
+        rect.w = charWidth + (floor((double)x / charWidth) * charWidth) -  rect.x ;
     }
     else
     {
         // Bottom Stationary ->> OK!
-        rect.w = ((sourceX -= sourceX % charWidth)) - (rect.x);
+        //rect.w = ((sourceX -= sourceX % charWidth)) - (rect.x);
+        rect.w = (floor((double)sourceX / charWidth) * charWidth) - rect.x; // back
     }
     if (sourceY < y)
     {
         // Bottom -> Down ->> OK!
-        rect.h = charHeight +
-            ((y -= (y % charHeight)) - (sourceY -= sourceY % charHeight));
+        //rect.h = charHeight +
+          //  ((y -= (y % charHeight)) - (sourceY -= sourceY % charHeight));
+        rect.h = charHeight + (floor((double)y / charHeight) * charHeight) - rect.y;
     }
     else
     {
         // Bottom -> Stationary ->> OK!
-        rect.h = ((sourceY -= sourceY % charHeight)) - (rect.y);
+        //rect.h = ((sourceY -= sourceY % charHeight)) - (rect.y);
+        rect.h = (floor((double)sourceY / charHeight) * charHeight) - rect.y; // back
     }
 
     // If were inbetween lines, Height = 0, then add char Height to the bottom
     // So we always have a row!
     if (rect.h == 0)
-        rect.h += charHeight;
+        rect.h += round(charHeight);
+
+    if (rect.w == 0)
+        rect.w += round(charWidth);
 
     // Now that we have the excat coordinates of the selected text.
     // We need to translate this to the screenbuffer positions
@@ -547,11 +650,15 @@ void Terminal::renderSelectionScreen(int x, int y)
 
     // We need to Translate the Screen Width vs Rows and Width to
     // get actual the grid size of the Characters to snap everything correctly.
-    int charWidth, charHeight;
-    charHeight = screenHeight / 25;
-    charHeight += screenHeight % 25;
-    charWidth = screenWidth / 80;
-    charWidth += screenWidth % 80;
+    double charWidth, charHeight;
+    double value;
+
+    value = (double)screenHeight / 25.0;
+    charHeight = value; //round(abs(value));
+    //charHeight += screenHeight % 25;
+    value = (double)screenWidth / 80.0;
+    charWidth = value; //round(abs(value));
+    //charWidth += screenWidth % 80;
 
     // First we need to convert the current Screen size to 640x400
     // So we can calcuate the actual pixel size of each resized character cell.
@@ -579,27 +686,31 @@ void Terminal::renderSelectionScreen(int x, int y)
     if (sourceX < x)
     {
         // TOP Stationary -> Right ->> OK!
-        rect.x = sourceX;
-        rect.x -= rect.x % charWidth; // Snap to Left.
+        rect.x = floor((double)sourceX / charWidth) * charWidth;
+        //rect.x = sourceX;
+        //rect.x -= rect.x % charWidth; // Snap to Left.
     }
     else
     {
         // Top -> Left ->> OK!
-        rect.x = x;
-        rect.x -= rect.x % charWidth;
+        rect.x = floor((double)x / charWidth) * charWidth;
+        //rect.x = x;
+        //rect.x -= rect.x % charWidth;
     }
 
     if (sourceY < y)
     {
         // Top Stationary ->> OK!
-        rect.y = sourceY;
-        rect.y -= rect.y % charHeight; // Snap to Top
+        rect.y = floor((double)sourceY / charHeight) * charHeight;
+        //rect.y = sourceY;
+        //rect.y -= rect.y % charHeight; // Snap to Top
     }
     else
     {
         // Top -> Up ->> OK!
-        rect.y = y;
-        rect.y -= rect.y % charHeight;
+        rect.y = floor((double)y / charHeight) * charHeight;
+        //rect.y = y;
+        //rect.y -= rect.y % charHeight;
     }
 
     // Width and height are calcuated by the different from motion to source
@@ -611,30 +722,37 @@ void Terminal::renderSelectionScreen(int x, int y)
     if (sourceX < x)
     {
         // Bottom Width RIGHT ->> OK!
-        rect.w = charWidth +
-            ((x -= (x % charWidth)) - (sourceX -= sourceX % charWidth));
+        //rect.w = charWidth +
+            //((x -= (x % charWidth)) - (sourceX -= sourceX % charWidth));
+        rect.w = charWidth + (floor((double)x / charWidth) * charWidth) -  rect.x ;
     }
     else
     {
         // Bottom Stationary ->> OK!
-        rect.w = ((sourceX -= sourceX % charWidth)) - (rect.x);
+        //rect.w = ((sourceX -= sourceX % charWidth)) - (rect.x);
+        rect.w = (floor((double)sourceX / charWidth) * charWidth) - rect.x; // back
     }
     if (sourceY < y)
     {
         // Bottom -> Down ->> OK!
-        rect.h = charHeight +
-            ((y -= (y % charHeight)) - (sourceY -= sourceY % charHeight));
+        //rect.h = charHeight +
+          //  ((y -= (y % charHeight)) - (sourceY -= sourceY % charHeight));
+        rect.h = charHeight + (floor((double)y / charHeight) * charHeight) - rect.y;
     }
     else
     {
         // Bottom -> Stationary ->> OK!
-        rect.h = ((sourceY -= sourceY % charHeight)) - (rect.y);
+        //rect.h = ((sourceY -= sourceY % charHeight)) - (rect.y);
+        rect.h = (floor((double)sourceY / charHeight) * charHeight) - rect.y; // back
     }
 
     // If were inbetween lines, Height = 0, then add char Height to the bottom
     // So we always have a row!
     if (rect.h == 0)
-        rect.h += charHeight;
+        rect.h += round(charHeight);
+
+    if (rect.w == 0)
+        rect.w += round(charWidth);
 
     // Draw First Highlight Overlay
     if (SDL_RenderCopy(globalRenderer, selectionTexture, NULL, &rect) < 0)

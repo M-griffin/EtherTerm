@@ -89,7 +89,7 @@ bool InputHandler::update()
                         SDL_Log("Window %d resized to %dx%d",
                                 event.window.windowID, event.window.data1,
                                 event.window.data2);*/
-                        //TheTerminal::Instance()->drawTextureScreen();
+                        TheTerminal::Instance()->drawTextureScreen();
                         break;
 
                     case SDL_WINDOWEVENT_MINIMIZED:
@@ -98,15 +98,15 @@ bool InputHandler::update()
 
                     case SDL_WINDOWEVENT_MAXIMIZED:
                         //SDL_Log("Window %d maximized", event.window.windowID);
-                        TheTerminal::Instance()->clearScreen();
-                        SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
+                        //TheTerminal::Instance()->clearScreen();
+                        //SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
                         TheTerminal::Instance()->drawTextureScreen();
                         break;
 
                     case SDL_WINDOWEVENT_RESTORED:
                         //SDL_Log("Window %d restored", event.window.windowID);
-                        TheTerminal::Instance()->clearScreen();
-                        SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
+                        //TheTerminal::Instance()->clearScreen();
+                        //SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
                         TheTerminal::Instance()->drawTextureScreen();
                         break;
 
@@ -290,36 +290,18 @@ bool InputHandler::update()
                             // If not Full Screen Then Toggle to Next Mode.
                             if(!isWindowMode)
                             {
-                                // Required for OSX/Linux Resets for Redrawing Window Properly.
-#ifndef _WIN32
-                                // Need to Match *nix with Texturefilter for Full Screen
-                                // X Issues!! Since FullScreen_Desktop doesn't work.
-                                TheTerminal::Instance()->restartWindowRenderer("1");
+                                //TheTerminal::Instance()->setWindowWidth(640);
+                                //TheTerminal::Instance()->setWindowHeight(400);
 
                                 // Have to reset to 640 so when we come out of full screen,
-                                // it will display this rez properly! Otherwise it skips to last size.
-                                SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
-#endif
-                                // Texture Filtering OFF.
-                                // FULLSCREEN_DESKTOP fits the window to the desktop size,
-                                // This throws off the pixels.  Using the resolution switch
-                                // so that 640, or 1280 is made to full screen fixes this
-                                // properly without needing to do any fancy recalculations
+                                // so it will display this rez properly! Otherwise it skips to last size.
+                                //SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
 
-                                // However there are SDL bug reports for Linux and OSX,
-                                // Will need to look into this more!
-                                if (SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(),
-#ifndef _WIN32
-                                    SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)  // Desktop resolution
-#else
-                                    SDL_WINDOW_FULLSCREEN) < 0)          // Surface Resolution
-#endif
-                                {
-                                    SDL_LogError(SDL_LOG_CATEGORY_ERROR,
-                                        "Error setting window to FullScreen Mode: %s", SDL_GetError());
-                                    isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
-                                    return false;
-                                }
+                                // New work around of SDL issues, we now destory the Window
+                                // And Renderer and recreated them in our desired resolutions
+                                // Due to SDL being retarded on different platforms.
+                                TheTerminal::Instance()->restartWindowSize(true);
+                                TheTerminal::Instance()->restartWindowRenderer("1");                                                             
 
                                 SDL_Log("Setting window to FULLSCREEN.");
                                 isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
@@ -355,9 +337,10 @@ bool InputHandler::update()
                                         TheTerminal::Instance()->setWindowWidth(640);
                                         TheTerminal::Instance()->setWindowHeight(400);
                                         SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
-#ifndef _WIN32                          // Required for OSX/Linux Resets for Redrawing Window Properly.
+
+                                        TheTerminal::Instance()->restartWindowSize(false);
                                         TheTerminal::Instance()->restartWindowRenderer("0");
-#endif
+
                                         TheTerminal::Instance()->clearScreen();
                                         SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
                                         TheTerminal::Instance()->drawTextureScreen();
@@ -369,9 +352,10 @@ bool InputHandler::update()
                                         TheTerminal::Instance()->setWindowWidth(1280);
                                         TheTerminal::Instance()->setWindowHeight(800);
                                         SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 1280, 800);
-#ifndef _WIN32                          // Required for OSX/Linux Resets for Redrawing Window Properly.
+
+                                        TheTerminal::Instance()->restartWindowSize(false);
                                         TheTerminal::Instance()->restartWindowRenderer("0");
-#endif
+
                                         TheTerminal::Instance()->clearScreen();
                                         SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
                                         TheTerminal::Instance()->drawTextureScreen();
