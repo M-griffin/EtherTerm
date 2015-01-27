@@ -502,7 +502,7 @@ void Terminal::pullSelectionBuffer(int x, int y)
     {
         // Bottom Stationary ->> OK!
         //rect.w = ((sourceX -= sourceX % charWidth)) - (rect.x);
-        rect.w = (floor((double)sourceX / charWidth) * charWidth) - rect.x; // back
+        rect.w = charWidth + (floor((double)sourceX / charWidth) * charWidth) - rect.x; // back
     }
     if (sourceY < y)
     {
@@ -515,7 +515,7 @@ void Terminal::pullSelectionBuffer(int x, int y)
     {
         // Bottom -> Stationary ->> OK!
         //rect.h = ((sourceY -= sourceY % charHeight)) - (rect.y);
-        rect.h = (floor((double)sourceY / charHeight) * charHeight) - rect.y; // back
+        rect.h = charHeight + (floor((double)sourceY / charHeight) * charHeight) - rect.y; // back
     }
 
     // If were inbetween lines, Height = 0, then add char Height to the bottom
@@ -730,7 +730,7 @@ void Terminal::renderSelectionScreen(int x, int y)
     {
         // Bottom Stationary ->> OK!
         //rect.w = ((sourceX -= sourceX % charWidth)) - (rect.x);
-        rect.w = (floor((double)sourceX / charWidth) * charWidth) - rect.x; // back
+        rect.w = charWidth + (floor((double)sourceX / charWidth) * charWidth) - rect.x; // back
     }
     if (sourceY < y)
     {
@@ -743,7 +743,7 @@ void Terminal::renderSelectionScreen(int x, int y)
     {
         // Bottom -> Stationary ->> OK!
         //rect.h = ((sourceY -= sourceY % charHeight)) - (rect.y);
-        rect.h = (floor((double)sourceY / charHeight) * charHeight) - rect.y; // back
+        rect.h = charHeight + (floor((double)sourceY / charHeight) * charHeight) - rect.y; // back
     }
 
     // If were inbetween lines, Height = 0, then add char Height to the bottom
