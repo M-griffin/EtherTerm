@@ -78,6 +78,15 @@ Terminal modes, by default EtherTerm only supports 80 x 25.  Other modes will be
 ***Keymappings are planned also***
 Etherterm currently follows the default Windows telnet output keys seqeunces (used in Syncterm) for keys like arrrows, Insert, Delete, PageUp and Page Down.  Some other operating systems look for and use different escape sequence for their input keys which will be added later for more support.
 
+##Demo for Windows 
+
+This is the Demo 2 Preview client for Windows.
+<br/>
+<a href = 'https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.zip'>Windows Demo2 Preview.zip</a>
+<br/>
+<br/>
+Linux, OSX can be built easily with the following instructions below.
+
 ##To compile the following libraries must be pre-installed:
 
 ```
