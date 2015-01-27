@@ -1093,12 +1093,24 @@ bool Terminal::initSurfaceTextures()
 /*
  * Overides the Scrolling region of the screen
  */
-void Terminal::setScrollRegion(int top, int bot)
+void Terminal::setScrollRegion(int top, int bot, int terminalHeight)
 {
-    if(top == 0 && bot == 0)
+    // If stupid people set the region for the size of the terminal
+    // Ignore it!
+    if (top == 1 && bot == terminalHeight)
+    {
         scrollRegionActive = false;
+        return;
+    }
+    // 0,0 is reset.
+    if(top == 0 && bot == 0)
+    {
+        scrollRegionActive = false;
+        return;
+    }
     else
         scrollRegionActive = true;
+
     topMargin = top;
     bottomMargin = bot;
 }

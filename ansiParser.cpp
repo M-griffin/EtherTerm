@@ -208,6 +208,9 @@ AnsiParser::AnsiParser() :
     //Thne Fill each element with defaults
     screenBuffer.reserve( TERM_HEIGHT * TERM_WIDTH );
     screenBuffer.resize( TERM_HEIGHT * TERM_WIDTH );
+
+    // Set Default Region to Off!
+    TheTerminal::Instance()->setScrollRegion(0, 0, TERM_HEIGHT);
 }
 
 AnsiParser::~AnsiParser()
@@ -245,6 +248,9 @@ void AnsiParser::reset()
     // Reset Default Colors.
     TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->grey;
     TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->black;
+
+    // Turn off Scrolling Region
+    TheTerminal::Instance()->setScrollRegion(0, 0, TERM_HEIGHT);
 }
 
 /*
@@ -641,12 +647,12 @@ void AnsiParser::sequenceCursorAndDisplay()
             if(parameters.size() == 1)
             {
                 // Reset to Full Screen.
-                TheTerminal::Instance()->setScrollRegion(0, 0);
+                TheTerminal::Instance()->setScrollRegion(0, 0, TERM_HEIGHT);
             }
             if(parameters.size() == 3)
             {
                 // Enable scrolling from row1 to row2
-                TheTerminal::Instance()->setScrollRegion(parameters[1], parameters[2]);
+                TheTerminal::Instance()->setScrollRegion(parameters[1], parameters[2], TERM_HEIGHT);
                 // Move the cursor to the home position
                 x_position = 1;
                 y_position = 1;

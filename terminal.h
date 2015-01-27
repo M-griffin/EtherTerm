@@ -171,7 +171,7 @@ public:
     bool loadBitmapImageFromPak();
     bool loadBitmapImage(std::string path);
     bool initSurfaceTextures();
-    void setScrollRegion(int top, int bot);
+    void setScrollRegion(int top, int bot, int terminalHeight);
     void scrollRegionUp();
     void scrollScreenUp();
     void clearScreenSurface();

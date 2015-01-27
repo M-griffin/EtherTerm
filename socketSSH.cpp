@@ -93,6 +93,9 @@ bool SSH_Socket::onEnter()
         return false;
     }
 
+    std::cout << "Connecting to: " << host << ":" << port << std::endl;
+    std::cout << "User: " << userId << std::endl;
+
     //SSH Set Connection Options
     ssh_options_set(session, SSH_OPTIONS_HOST, host.c_str());
 
@@ -120,7 +123,7 @@ bool SSH_Socket::onEnter()
             << " " << ssh_get_error(session) << std::endl;
 
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-            "Closed Session", "User has closed the program.", NULL);
+            "Closed Session", "Unable to Connect to Server!", NULL);
 
         TheSocketHandler::Instance()->setActive(false);
         return false;

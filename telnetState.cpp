@@ -67,7 +67,7 @@ void TelnetState::handleSession()
 
         // for debugging server output, mainly esc seqeucens
         // and output that might mess up screens when needed.
-#ifdef _DEBUG
+//#ifdef _DEBUG
         if (c == '\r')
             std::cout << "^r" << std::flush;
         else if (c == '\n')
@@ -76,7 +76,7 @@ void TelnetState::handleSession()
             std::cout << "^0" << std::flush;
         else
             std::cout << c << std::flush;
-#endif
+//#endif
         try
         {
             // Run the Telnet Options Parser

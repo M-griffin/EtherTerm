@@ -133,6 +133,8 @@ int main(int argc, char* argv[])
             if(TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont()))
             {
                 std::cout << "Term init success!\n";
+                TheTerminal::Instance()->clearScreen();
+
                 // Display intro ANSI Screen
                 TheTerminal::Instance()->clearScreenSurface();
                 TheAnsiParser::Instance()->reset();
