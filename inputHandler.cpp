@@ -16,7 +16,7 @@ InputHandler::InputHandler() :
     globalShutdown(false),
     isWindowMode(false),
     fullScreenWindowSize(0),
-    _isMouseSelection(false),
+    isMouseSelected(false),
     mouseSourceXPosition(0),
     mouseSourceYPosition(0),
     mouseReleaseXPosition(0),
@@ -71,8 +71,8 @@ bool InputHandler::update()
 
                     case SDL_WINDOWEVENT_EXPOSED:
                         //SDL_Log("Window %d exposed", event.window.windowID);
-                        TheTerminal::Instance()->clearScreen();
-                        SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
+                        //TheTerminal::Instance()->clearScreen();
+                        //SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
                         TheTerminal::Instance()->drawTextureScreen();                        
                         break;
 
@@ -154,7 +154,7 @@ bool InputHandler::update()
                 //If the left mouse button was released
                 if( event.button.button == SDL_BUTTON_LEFT )
                 {
-                    _isMouseSelection = false;
+                    isMouseSelected = false;
 
                     // Get the mouse offsets
                     mouseReleaseXPosition = event.button.x;
@@ -181,7 +181,7 @@ bool InputHandler::update()
 
             case SDL_MOUSEMOTION:
                 if( event.button.button == SDL_BUTTON_LEFT
-                    && _isMouseSelection)
+                    && isMouseSelected)
                 {
                     /* debugging
                     std::cout << "Mouse moved by: "
@@ -201,7 +201,7 @@ bool InputHandler::update()
 
                 if( event.button.button == SDL_BUTTON_LEFT )
                 {
-                    _isMouseSelection = true;
+                    isMouseSelected = true;
 
                     //Get the mouse offsets
                     mouseSourceXPosition = event.button.x;
@@ -441,14 +441,52 @@ bool InputHandler::update()
                                 setInputSequence("\x1b[U");
                                 return true;
 
+                            // Function Keys
+                            case SDLK_F1:
+                                setInputSequence("\x1b[OP");
+                                return true;
+                            case SDLK_F2:
+                                setInputSequence("\x1b[OQ");
+                                return true;
+                            case SDLK_F3:
+                                setInputSequence("\x1b[OR");
+                                return true;
+                            case SDLK_F4:
+                                setInputSequence("\x1b[OS");
+                                return true;
+                            case SDLK_F5:
+                                // Windows Console Telnet \\x1b[[15~
+                                setInputSequence("\x1b[OT");
+                                return true;
+                            case SDLK_F6:
+                                setInputSequence("\x1b[[17~");
+                                return true;
+                            case SDLK_F7:
+                                setInputSequence("\x1b[[18~");
+                                return true;
+                            case SDLK_F8:
+                                setInputSequence("\x1b[[19~");
+                                return true;
+                            case SDLK_F9:
+                                setInputSequence("\x1b[[20~");
+                                return true;
+                            case SDLK_F10:
+                                setInputSequence("\x1b[[21~");
+                                return true;
+                            case SDLK_F11:
+                                setInputSequence("\x1b[[23~");
+                                return true;
+                            case SDLK_F12:
+                                setInputSequence("\x1b[[24~");
+                                return true;
+
                             default:
                                 break;
                         }
                     }
-                    else if (sysConection.keyMap == "VT100" ||
-                             sysConection.keyMap == "LINUX")
+                    else if (sysConection.keyMap == "VT100")
                     {
-                        // VT-100
+                        // VT-100 Putty
                         switch(event.key.keysym.sym)
                         {
                             // \x7f = ^?  // 0x08 = ^H
@@ -475,10 +513,124 @@ bool InputHandler::update()
                             case SDLK_PAGEDOWN: // page down
                                 setInputSequence("\x1b[6~");
                                 return true;
+
+                            // Function Keys
+                            case SDLK_F1:
+                                setInputSequence("\x1b[OP");
+                                return true;
+                            case SDLK_F2:
+                                setInputSequence("\x1b[OQ");
+                                return true;
+                            case SDLK_F3:
+                                setInputSequence("\x1b[OR");
+                                return true;
+                            case SDLK_F4:
+                                setInputSequence("\x1b[OS");
+                                return true;
+                            case SDLK_F5:                                
+                                setInputSequence("\x1b[OT");
+                                return true;
+                            case SDLK_F6:
+                                setInputSequence("\x1b[OU");
+                                return true;
+                            case SDLK_F7:
+                                setInputSequence("\x1b[OV");
+                                return true;
+                            case SDLK_F8:
+                                setInputSequence("\x1b[OW");
+                                return true;
+                            case SDLK_F9:
+                                setInputSequence("\x1b[OX");
+                                return true;
+                            case SDLK_F10:
+                                setInputSequence("\x1b[OY");
+                                return true;
+                            case SDLK_F11:
+                                setInputSequence("\x1b[OZ");
+                                return true;
+                            case SDLK_F12:
+                                setInputSequence("\x1b[O[");
+                                return true;
+
+                            default:
+                                break;
+                        }
+                    }
+                    else if (sysConection.keyMap == "LINUX")
+                    {
+                        // Linux Terminal Putty
+                        switch(event.key.keysym.sym)
+                        {
+                            // \x7f = ^?  // 0x08 = ^H
+                            case SDLK_KP_BACKSPACE:
+                            case SDLK_BACKSPACE:
+                                setInputSequence("\x7f");
+                                return true;
+                            case SDLK_DELETE:
+                                setInputSequence("\x1b[3~");
+                                return true;
+
+                            case SDLK_INSERT:   // insert
+                                setInputSequence("\x1b[2~");
+                                return true;
+                            case SDLK_HOME:     // home
+                                setInputSequence("\x1b[1~");
+                                return true;
+                            case SDLK_END:      // end
+                                setInputSequence("\x1b[4~");
+                                return true;
+                            case SDLK_PAGEUP:   // page up
+                                setInputSequence("\x1b[5~");
+                                return true;
+                            case SDLK_PAGEDOWN: // page down
+                                setInputSequence("\x1b[6~");
+                                return true;
+
+                            // Function Keys
+                            case SDLK_F1:
+                                setInputSequence("\x1b[[A");
+                                return true;
+                            case SDLK_F2:
+                                setInputSequence("\x1b[[B");
+                                return true;
+                            case SDLK_F3:
+                                setInputSequence("\x1b[[C");
+                                return true;
+                            case SDLK_F4:
+                                setInputSequence("\x1b[[D");
+                                return true;
+                            case SDLK_F5:
+                                setInputSequence("\x1b[[E");
+                                return true;
+                            case SDLK_F6:
+                                setInputSequence("\x1b[[17~");
+                                return true;
+                            case SDLK_F7:
+                                setInputSequence("\x1b[[18~");
+                                return true;
+                            case SDLK_F8:
+                                setInputSequence("\x1b[[19~");
+                                return true;
+                            case SDLK_F9:
+                                setInputSequence("\x1b[[20~");
+                                return true;
+                            case SDLK_F10:
+                                setInputSequence("\x1b[[21~");
+                                return true;
+                            case SDLK_F11:
+                                setInputSequence("\x1b[[23~");
+                                return true;
+                            case SDLK_F12:
+                                setInputSequence("\x1b[[24~");
+                                return true;
+
+                            default:
+                                break;
                         }
                     }
                     else if (sysConection.keyMap == "SCO")
                     {
+                        // SCO Putty
                         switch(event.key.keysym.sym)
                         {
                             // \x7f = ^?  // 0x08 = ^H
@@ -503,6 +655,44 @@ bool InputHandler::update()
                                 return true;
                             case SDLK_PAGEDOWN: // page down
                                 setInputSequence("\x1b[G");
+                                return true;
+
+                            // Function Keys
+                            case SDLK_F1:
+                                setInputSequence("\x1b[[M");
+                                return true;
+                            case SDLK_F2:
+                                setInputSequence("\x1b[[N");
+                                return true;
+                            case SDLK_F3:
+                                setInputSequence("\x1b[[O");
+                                return true;
+                            case SDLK_F4:
+                                setInputSequence("\x1b[[P");
+                                return true;
+                            case SDLK_F5:
+                                setInputSequence("\x1b[[Q");
+                                return true;
+                            case SDLK_F6:
+                                setInputSequence("\x1b[[R");
+                                return true;
+                            case SDLK_F7:
+                                setInputSequence("\x1b[[S");
+                                return true;
+                            case SDLK_F8:
+                                setInputSequence("\x1b[[T");
+                                return true;
+                            case SDLK_F9:
+                                setInputSequence("\x1b[[U");
+                                return true;
+                            case SDLK_F10:
+                                setInputSequence("\x1b[[V");
+                                return true;
+                            case SDLK_F11:
+                                setInputSequence("\x1b[[W");
+                                return true;
+                            case SDLK_F12:
+                                setInputSequence("\x1b[[X");
                                 return true;
 
                             default:
