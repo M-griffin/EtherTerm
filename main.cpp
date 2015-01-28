@@ -154,16 +154,6 @@ int main(int argc, char* argv[])
 
                     // Main Loop
                     TheTerminal::Instance()->update();
-
-                    // Not a FPS, check for Rendering Flag.
-                    // Save CPU usage, only switch this on when
-                    // We have data to draw to the screen, once
-                    // Everything is drawn, then toggle this off
-                    // And only check Events and Input.
-                    if(TheTerminal::Instance()->getRenderReady())
-                    {
-                        TheTerminal::Instance()->render();
-                    }
                 }                
             }
             else

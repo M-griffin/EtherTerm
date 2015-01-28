@@ -25,14 +25,6 @@ void TermStateMachine::update()
     }
 }
 
-void TermStateMachine::render()
-{
-    if(!TermStates.empty())
-    {
-        TermStates.back()->render();
-    }
-}
-
 void TermStateMachine::pushState(TermState *theState)
 {
     TermStates.push_back(theState);

@@ -148,33 +148,6 @@ void SSHState::update()
     }
 }
 
-void SSHState::render()
-{
-    //std::cout << "SSHState::render()" << std::endl;
-    // Turns off the Rendering Loop when not being used.
-    TheTerminal::Instance()->setRenderReady(false);
-
-    // Testing Term, and setup for inital menu / dialing directory.
-    //TheTerm::Instance()->ClearScreenSurface();
-    //TheTerm::Instance()->DrawString(0,0,(char *)"EtherTerm Telnet Initalized.");
-    //TheTerm::Instance()->DrawString(0,16*2,(char *)"[Q] to Quit.");
-    //TheTerm::Instance()->RenderScreen();
-    //TheTerm::Instance()->DrawTextureScreen();
-
-    // After Screen is draw disable renderer untill new data is received.
-    //TheTerm::Instance()->setRenderReady(false);
-
-    // Need To handle Rendering of Dialing Directory here.
-    /*
-    if(m_loadingComplete && !m_gameObjects.empty())
-    {
-        for(int i = 0; i < m_gameObjects.size(); i++)
-        {
-            m_gameObjects[i]->draw();
-        }
-    }*/
-}
-
 bool SSHState::onEnter()
 {
     TheAnsiParser::Instance()->setCursorActive(true);

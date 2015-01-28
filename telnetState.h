@@ -355,7 +355,6 @@ public:
     virtual ~TelnetState()
         { std::cout << "Shutting Down TelnetState" << std::endl; }
     virtual void update();
-    virtual void render();
     virtual bool onEnter();
     virtual bool onExit();
     virtual std::string getStateID() const

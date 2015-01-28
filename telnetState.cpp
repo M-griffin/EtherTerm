@@ -186,12 +186,6 @@ void TelnetState::update()
     }
 }
 
-void TelnetState::render()
-{
-    // Turns off the Rendering Loop when not being used.
-    TheTerminal::Instance()->setRenderReady(false);
-}
-
 bool TelnetState::onEnter()
 {
     TheAnsiParser::Instance()->setCursorActive(true);

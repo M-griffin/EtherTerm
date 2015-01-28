@@ -49,7 +49,6 @@ public:
             int wwidth, int wheight,
             int fwidth, int fheight);
 
-    void render();
     void update();
     void clean();
 

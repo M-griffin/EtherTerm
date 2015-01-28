@@ -34,7 +34,6 @@ public:
     virtual ~SSHState()
         { std::cout << "Shutting Down SSHState" << std::endl; }
     virtual void update();
-    virtual void render();
     virtual bool onEnter();
     virtual bool onExit();
 

@@ -380,11 +380,6 @@ bool Terminal::init(const char* title,
     return true;
 }
 
-void Terminal::render()
-{
-    globalTermStateMachine->render();
-}
-
 void Terminal::update()
 {
     globalTermStateMachine->update();
@@ -1095,9 +1090,9 @@ bool Terminal::initSurfaceTextures()
  */
 void Terminal::setScrollRegion(int top, int bot, int terminalHeight)
 {
-    // If stupid people set the region for the size of the terminal
+    // If Region is larger then the Terminal,
     // Ignore it!
-    if (top == 1 && bot == terminalHeight)
+    if (top == 1 && bot >= terminalHeight)
     {
         scrollRegionActive = false;
         return;
@@ -1109,8 +1104,14 @@ void Terminal::setScrollRegion(int top, int bot, int terminalHeight)
         return;
     }
     else
+    {
+        // Make sure Bottom Region
+        // Is the same as our terminal length.
+        if (bot > terminalHeight)
+            bot = terminalHeight;
         scrollRegionActive = true;
-
+    }
+    // Set Scolling Margins
     topMargin = top;
     bottomMargin = bot;
 }
