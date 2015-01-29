@@ -12,10 +12,19 @@
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
+    #ifdef _DEBBUG
+        #include <SDL2/SDL_ttf.h>
+    #endif
 #elif _WIN32
 #include <SDL.h>
+    #ifdef _DEBBUG
+        #include <SDL_ttf.h>
+    #endif
 #else
 #include <SDL2/SDL.h>
+    #ifdef _DEBBUG
+        #include <SDL2/SDL_ttf.h>
+    #endif
 #endif
 
 #include <iostream>
@@ -47,7 +56,8 @@ Terminal::Terminal():
     cursorYPosition(0),
     isChangingState(false),
     isRunning(false),
-    isRenderReady(0)
+    isRenderReady(0),
+    isUTF8Output(false) // Default to No, if Yes Block Font Switching!
 
 {
     // Initalize Color Masks.
@@ -289,6 +299,18 @@ bool Terminal::init(const char* title,
 
     std::cout << "SDLNet_Init success" << std::endl;
 
+#ifdef _DEBBUG
+     //Also need to init SDL_ttf
+    if(TTF_Init() != 0)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "Terminal::init() SDL_TTF Init: %s", SDL_GetError());
+        return false;
+    }
+
+    std::cout << "SDL_TTF Init success" << std::endl;
+#endif
+
     /*
      * 0 = disable vsync
      * 1 = enable vsync
@@ -399,6 +421,11 @@ void Terminal::clean()
     std::cout << "Shutting Down TermStateMachine" << std::endl;
     globalTermStateMachine->clean();
     delete globalTermStateMachine;
+
+#ifdef _DEBBUG
+    std::cout << "TTF_Quit" << std::endl;
+    TTF_Quit();
+#endif
 
     std::cout << "SDL_Quit" << std::endl;
     SDL_Quit();

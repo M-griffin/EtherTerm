@@ -9,10 +9,19 @@
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
+    #ifdef _DEBBUG
+        #include <SDL2/SDL_ttf.h>
+    #endif
 #elif _WIN32
 #include <SDL.h>
+    #ifdef _DEBBUG
+        #include <SDL_ttf.h>
+    #endif
 #else
 #include <SDL2/SDL.h>
+    #ifdef _DEBBUG
+        #include <SDL2/SDL_ttf.h>
+    #endif
 #endif
 
 #include "termStateMachine.h"
@@ -76,6 +85,7 @@ public:
         std::string password;  // Make this encrypted with more time.
         std::string font;
         std::string keyMap;    // ANSI, VT100
+
     } SystemConnection;
 
     SystemConnection getSystemConnection() const
@@ -244,7 +254,11 @@ private:
     SDL_Surface*   chachedSurface;    // Cached Font CharacterSet
     SDL_Texture*   globalTexture;     // Texture for User Screen
 
-    SDL_Texture*   selectionTexture;  // WIP
+    SDL_Texture*   selectionTexture;  // For Copy Text Selection
+
+#ifdef _DEBBUG
+    TTF_Font*      trueTypeFont;      // UTF-8 Fonts.
+#endif
 
     TermStateMachine* globalTermStateMachine;
     Uint32 redMask, greenMask, blueMask, alphaMask;
@@ -265,6 +279,7 @@ private:
     bool isChangingState;
     bool isRunning;
     bool isRenderReady;
+    bool isUTF8Output;
 
     static Terminal* globalInstance;
     std::vector<std::string> globalFontFiles;
