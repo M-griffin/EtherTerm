@@ -308,12 +308,16 @@ void AnsiParser::textInput(std::string buffer)
             // If we recieve a new line, any existing text on the same line
             // After the cursor position should be cleared.
             // -- need more testing.
+            /* This isn't confirmed behavior yet, doesn't work on oddnetwork.
+             * Bad Ansi or bad behavior?
+             *
             if (x_position < 81)
             {
-                TheTerminal::Instance()->renderClearLineScreen(y_position,
+                TheTerminal::Instance()->renderClearLineScreen(y_position-1,
                             x_position-1, characters_per_line); // test removeed -1
+
                 clearScreenBufferRange(x_position-1, characters_per_line);
-            }
+            }*/
 
             // Stupid fix for expected behavior.  If were on col 81
             // And we get a newline, then were suppose to wrap to next line
@@ -396,12 +400,15 @@ void AnsiParser::textInput(std::string buffer)
             // If we recieve a new line, any existing text on the same line
             // After the cursor position should be cleared.
             // -- need more testing.
+            /* This isn't confirmed behavior yet, doesn't work on oddnetwork.
+             * Bad Ansi or bad behavior?
+             *
             if (x_position < 81)
             {
-                TheTerminal::Instance()->renderClearLineScreen(y_position,
+                TheTerminal::Instance()->renderClearLineScreen(y_position-1,
                             x_position-1, characters_per_line); // test removeed -1
                 clearScreenBufferRange(x_position-1, characters_per_line);
-            }
+            }*/
 
             // Stupid fix for expected behavior.  If were on col 81
             // And we get a newline, then were suppose to wrap to next line
@@ -790,7 +797,7 @@ void AnsiParser::sequenceCursorAndDisplay()
             if(parameters.size() == 2 && parameters[1] == 0)
             {
                 TheTerminal::Instance()->renderClearLineBelowScreen(
-                    y_position-1,x_position-1);
+                    y_position-1, x_position-1);
                 break;
             }
             // Erase Current Line and Above.

@@ -1364,6 +1364,7 @@ void Terminal::renderClearLineScreen(int y, int start, int end)
  */
 void Terminal::renderClearLineAboveScreen(int y, int x)
 {
+    std::cout << "renderClearLineAboveScreen: " << x << ";" << y << std::endl;
     // Save Background Color so we can switch back to it.
     SDL_Color originalGB = currentBGColor;
     currentBGColor = black;
@@ -1372,15 +1373,16 @@ void Terminal::renderClearLineAboveScreen(int y, int x)
 
     // Clear out entire lines Up The Screen the screen.
     // Fix with term variables lateron.
-    for(int ii = 0; ii < y; ii++)
+    for(int ii = y; (ii+1) > 0; ii--)
     {
-        for(int i = startPosition; i < 0; i--)
+        for(int i = startPosition; (i+1) > 0; i--)
         {
+            // x;y ' '
             drawChar(i, ii, 32);
-            renderCharScreen(i, y);
+            renderCharScreen(i, ii);
         }
         // Reset to starting position for following lines.
-        startPosition = (80-1);
+        startPosition = 79;
     }
     currentBGColor = originalGB;
 }
@@ -1405,8 +1407,9 @@ void Terminal::renderClearLineBelowScreen(int y, int x)
     {
         for(int i = startPosition; i < 80; i++)
         {
+            // x;y ' '
             drawChar(i, ii, 32);
-            renderCharScreen(i, y);
+            renderCharScreen(i, ii);
         }
         startPosition = 0;
     }

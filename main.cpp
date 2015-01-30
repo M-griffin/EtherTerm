@@ -63,12 +63,10 @@ using namespace std;
  */
 void readinAnsi(std::string FileName, std::string &buff)
 {
-
-    std::string path;
-#ifdef _WIN32
-//    std::string path = "assets\\";
+    #ifdef _WIN32
+    std::string path = "assets\\";
 #else
-//    std::string path = "assets/";
+    std::string path = "assets/";
 #endif
     path += FileName;
     FILE *fp;
@@ -110,6 +108,45 @@ void cleanup()
 }
 
 /*
+ * Screen Test Cases to make sure
+ * EOL and Screen Earsing functions are working properly.
+ */
+void runTestScreenCases()
+{
+
+// OK!
+    // Insert * at 11y 40x.
+    std::string seq("\x1b[11;40H*");
+    TheSequenceParser::Instance()->processSequence(seq);
+
+// OK!
+    // Line 11 Erase All Text After *, then All Text Before. Leaving only *
+    seq = "\x1b[K\x1b[2D\x1b[1K";
+    TheSequenceParser::Instance()->processSequence(seq);
+
+// OK!
+    // Line 13 Erase Entire line.
+    seq = "\x1b[13;40H*\x1b[2K";
+    TheSequenceParser::Instance()->processSequence(seq);
+
+// OK!
+    //Delete all text after and below.
+    seq = "\x1b[23;40H*\x1b[J";
+    TheSequenceParser::Instance()->processSequence(seq);
+
+// OK!
+    // Delete all text before and above.
+    seq = "\x1b[2;40H*\x1b[2D\x1b[1J";
+    TheSequenceParser::Instance()->processSequence(seq);
+
+// OK - Works correct, might not be the correct behavior through!
+    // Move to Line 17, position 1, and newline erase after newline.
+    seq = "\x1b[17;10H\r\n";
+    TheSequenceParser::Instance()->processSequence(seq);
+
+}
+
+/*
  *  Main Program Entrance
  */
 int main(int argc, char* argv[])
@@ -141,16 +178,18 @@ int main(int argc, char* argv[])
 
                 while(TheTerminal::Instance()->running())
                 {
-                    //frameStart = SDL_GetTicks();
                     // If the font changed, then load the new image.
                     if(TheTerminal::Instance()->didFontChange())
                         TheTerminal::Instance()->loadBitmapImage(
                             TheTerminal::Instance()->getCurrentFont());
 
-                    // Test Ansi Screens
-                    //readinAnsi("test.ans",temp);
-                    //TheSequenceParser::Instance()->processSequence(temp);
-                    //break;
+#ifdef _DEBUG
+                    // TestCase Ansi Cursor Functions
+                    readinAnsi("testcase.ans",temp);
+                    TheSequenceParser::Instance()->processSequence(temp);
+                    runTestScreenCases();
+                    break;
+#endif
 
                     // Main Loop
                     TheTerminal::Instance()->update();
