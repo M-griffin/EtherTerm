@@ -42,7 +42,6 @@ void TelnetState::handleSession()
 
     // Prefill buffer test, we will loop entire buffer.
     //memset(msgBuffer,'\0', 8193);
-
     unsigned char ch;
 
     // Get Socket Data From Server
@@ -65,7 +64,7 @@ void TelnetState::handleSession()
     {
         // for debugging server output, mainly esc seqeucens
         // and output that might mess up screens when needed.
-//#ifdef _DEBUG
+#ifdef _DEBUG
         if (c == '\r')
             std::cout << "^r" << std::flush;
         else if (c == '\n')
@@ -77,7 +76,7 @@ void TelnetState::handleSession()
         }
         else
             std::cout << c << std::flush;
-//#endif
+#endif
         try
         {
             // Run the Telnet Options Parser
