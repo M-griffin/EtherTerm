@@ -307,9 +307,10 @@ void AnsiParser::textInput(std::string buffer)
             // std::cout << std::endl << "CRLF xpos: " << x_position << std::endl;
             // If we recieve a new line, any existing text on the same line
             // After the cursor position should be cleared.
+            // -- need more testing.
             if (x_position < 81)
             {
-                TheTerminal::Instance()->renderClearLineScreen(y_position-1,
+                TheTerminal::Instance()->renderClearLineScreen(y_position,
                             x_position-1, characters_per_line); // test removeed -1
                 clearScreenBufferRange(x_position-1, characters_per_line);
             }
@@ -394,9 +395,10 @@ void AnsiParser::textInput(std::string buffer)
 
             // If we recieve a new line, any existing text on the same line
             // After the cursor position should be cleared.
+            // -- need more testing.
             if (x_position < 81)
             {
-                TheTerminal::Instance()->renderClearLineScreen(y_position-1,
+                TheTerminal::Instance()->renderClearLineScreen(y_position,
                             x_position-1, characters_per_line); // test removeed -1
                 clearScreenBufferRange(x_position-1, characters_per_line);
             }
