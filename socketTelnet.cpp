@@ -30,13 +30,10 @@
 /* returns 0 on any errors, length sent on success */
 int SDL_Socket::sendSocket(unsigned char *buf, Uint32 len)
 {
-    Uint32 result;
+    int result;
 
-    /* send the buffer, with the NULL as well */
     result = SDLNet_TCP_Send(sock, buf, len);
-    //printf("\r\n SOCKET SEND Len: %d, result: %u, str: %s", len, result, buf);
-
-    if(result < strlen((char *)buf))
+    if(result < (signed)strlen((char *)buf))
     {
         if(SDLNet_GetError() && strlen(SDLNet_GetError()))
         {
@@ -44,7 +41,6 @@ int SDL_Socket::sendSocket(unsigned char *buf, Uint32 len)
             return(0);
         }
     }
-    /* return the length sent */
     return(result);
 }
 
@@ -52,19 +48,23 @@ int SDL_Socket::sendSocket(unsigned char *buf, Uint32 len)
 /* handle Telnet better */
 int SDL_Socket::recvSocket(char *message)
 {
-    Uint32 result;
-    std::string buf;
+    int result = 0;
 
-    /* get the string buffer over the socket */
     result = SDLNet_TCP_Recv(sock, message, 8192);
-    //printf("\r\n SOCKET RECV Len: %d, result: %u \r\n", strlen((char *)message), result);
-
-    // TCP Connection is broken. (because of error or closure)
+    // Testing, grab 1 char at a time.
+#ifdef _DEBUG
+    result = SDLNet_TCP_Recv(sock, message, 1);
+    if (message[0] == '\n')
+        std::cout << std::endl;
+    else
+        std::cout << message << std::flush;
+#endif
     if(result <= 0)
     {
+        // -1 is Error 0 is Server Closed Connection
         return -1;
     }
-    /* return the new buffer */
+    message[result] = 0;
     return result;
 }
 

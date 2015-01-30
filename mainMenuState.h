@@ -55,7 +55,6 @@ public:
     virtual ~MainMenuState()
         { std::cout << "Shutting Down MainMenuState" << std::endl;}
     virtual void update();
-    virtual void render();
     virtual bool onEnter();
     virtual bool onExit();
     virtual std::string getStateID() const
@@ -95,6 +94,7 @@ private:
 
     bool  readDialDirectory();
     void  createDialDirectory();
+    void  writeDialDirectory();
     int   startDialDirectory();
     // Term
     std::vector<TermObject*> termObjects;

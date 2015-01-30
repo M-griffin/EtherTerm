@@ -38,9 +38,12 @@ void TelnetState::handleSession()
 {
     std::string output;
     int len = 0;
-    char msgBuffer[8193]= {'\0'};
+    char msgBuffer[8193] = {'\0'};
 
-    unsigned char c, ch;
+    // Prefill buffer test, we will loop entire buffer.
+    //memset(msgBuffer,'\0', 8193);
+
+    unsigned char ch;
 
     // Get Socket Data From Server
     len = TheSocketHandler::Instance()->recv(msgBuffer);
@@ -50,9 +53,6 @@ void TelnetState::handleSession()
         shutdown = true;
         return;
     }
-    // Else No Data just return
-    else if(len == 0)
-        return;
 
 // Debugging, write all data received to file
 //    std::fstream sout;
@@ -61,19 +61,20 @@ void TelnetState::handleSession()
 //    sout.close();
 
     // Loop through data for IAC Telnet Commands
-    for(int i = 0; i < len; i++)
+    for(unsigned char c : msgBuffer)
     {
-        c = msgBuffer[i];
-
         // for debugging server output, mainly esc seqeucens
         // and output that might mess up screens when needed.
 #ifdef _DEBUG
         if (c == '\r')
             std::cout << "^r" << std::flush;
         else if (c == '\n')
-            std::cout << "^n" << std::flush;
+            std::cout << "^n" << std::endl;
         else if (c == '\0')
-            std::cout << "^0" << std::flush;
+        {
+            //std::cout << "^0" << std::flush;
+            continue;
+        }
         else
             std::cout << c << std::flush;
 #endif

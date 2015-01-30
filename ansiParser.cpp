@@ -258,10 +258,8 @@ void AnsiParser::reset()
  */
 void AnsiParser::textInput(std::string buffer)
 {
-    //std::cout << "TextInput:" << buffer << std::endl;
-
     // Char Sequence for Parsing.
-    unsigned char sequence     = 0;
+    unsigned char sequence = 0;
 
     // Toggle on the Renderer.
     TheTerminal::Instance()->setRenderReady(true);
@@ -303,11 +301,19 @@ void AnsiParser::textInput(std::string buffer)
             continue;
         }
 
-
         // Handle New Line in ANSI Files properly.
         if(sequence == '\r' && nextSequence == '\n')
         {
             // std::cout << std::endl << "CRLF xpos: " << x_position << std::endl;
+            // If we recieve a new line, any existing text on the same line
+            // After the cursor position should be cleared.
+            if (x_position < 81)
+            {
+                TheTerminal::Instance()->renderClearLineScreen(y_position-1,
+                            x_position-1, characters_per_line); // test removeed -1
+                clearScreenBufferRange(x_position-1, characters_per_line);
+            }
+
             // Stupid fix for expected behavior.  If were on col 81
             // And we get a newline, then were suppose to wrap to next line
             // But also move down a second line!
@@ -385,6 +391,16 @@ void AnsiParser::textInput(std::string buffer)
         else if(sequence == '\n')
         {
             // std::cout << std::endl << "LF xpos: " << x_position << std::endl;
+
+            // If we recieve a new line, any existing text on the same line
+            // After the cursor position should be cleared.
+            if (x_position < 81)
+            {
+                TheTerminal::Instance()->renderClearLineScreen(y_position-1,
+                            x_position-1, characters_per_line); // test removeed -1
+                clearScreenBufferRange(x_position-1, characters_per_line);
+            }
+
             // Stupid fix for expected behavior.  If were on col 81
             // And we get a newline, then were suppose to wrap to next line
             // But also move down a second line!
@@ -640,7 +656,6 @@ void AnsiParser::sequenceCursorAndDisplay()
                 else if(x_position < 1)
                     x_position = 1;
             }
-
             break;
 
         case SCROLL_REGION:
@@ -672,7 +687,6 @@ void AnsiParser::sequenceCursorAndDisplay()
                 if(y_position < 1)
                     y_position = 1;
             }
-
             break;
 
         case CURSOR_NEXT_LINE:
@@ -688,7 +702,6 @@ void AnsiParser::sequenceCursorAndDisplay()
                 if(y_position > NUM_LINES)
                     y_position = NUM_LINES;
             }
-
             break;
 
         case CURSOR_FORWARD:
@@ -714,7 +727,6 @@ void AnsiParser::sequenceCursorAndDisplay()
                     ++y_position;
                 }
             }
-
             break;
 
         case CURSOR_BACKWARD:
@@ -731,7 +743,6 @@ void AnsiParser::sequenceCursorAndDisplay()
                 if(x_position < 1)
                     x_position = 1;
             }
-
             break;
 
         case SAVE_CURSOR_POS:
@@ -741,7 +752,6 @@ void AnsiParser::sequenceCursorAndDisplay()
             saved_prev_attr = prev_color_attribute;
             savedForegroundColor = TheTerminal::Instance()->currentFGColor;
             savedBackgroundColor = TheTerminal::Instance()->currentBGColor;
-
             break;
 
         case RESTORE_CURSOR_POS:
@@ -751,7 +761,6 @@ void AnsiParser::sequenceCursorAndDisplay()
             prev_color_attribute = saved_prev_attr;
             TheTerminal::Instance()->currentFGColor = savedForegroundColor;
             TheTerminal::Instance()->currentBGColor = savedBackgroundColor;
-
             break;
 
         case CURSOR_X_POSITION: // XTERM
@@ -804,7 +813,6 @@ void AnsiParser::sequenceCursorAndDisplay()
             break;
 
         case ERASE_TO_EOL:
-
             // Handle Rendering from 1 Based to 0 Based so Subtract 1.
             if(parameters.size() == 1)  // Cursor to End of line
             {

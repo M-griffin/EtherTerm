@@ -78,12 +78,6 @@ void MainMenuState::update()
     SDL_Delay(10);
 }
 
-void MainMenuState::render()
-{
-    std::cout << "MainMenuState::render()" << std::endl;
-    TheTerminal::Instance()->setRenderReady(false);
-}
-
 bool MainMenuState::onEnter()
 {
     TheAnsiParser::Instance()->setCursorActive(false);
@@ -689,6 +683,9 @@ std::vector< list_bar > MainMenuState::buildDialList()
     return result;
 }
 
+/*
+ * Read All Systems in Dialing Directory
+ */
 bool MainMenuState::readDialDirectory()
 {
     TheTerminal::SystemConnection sysconn;
@@ -750,6 +747,10 @@ bool MainMenuState::readDialDirectory()
     std::cout << "readDialDirectory - Done" << std::endl;
     return true;
 }
+
+/*
+ * Create a new inital dilaing directory.
+ */
 void MainMenuState::createDialDirectory()
 {
     // Create Default Phone Book.
@@ -791,9 +792,52 @@ void MainMenuState::createDialDirectory()
     element4->SetAttribute("login", "");
     element4->SetAttribute("password", "");
     element4->SetAttribute("font", "vga8x16.bmp");
-    element3->SetAttribute("keyMap", "VT100");
+    element4->SetAttribute("keyMap", "VT100");
     doc.SaveFile(path.c_str());
 }
+
+/*
+ * Write All connections to the dilaing directory
+ */
+void MainMenuState::writeDialDirectory()
+{
+    // Create Default Phone Book.
+#ifdef _WIN32
+    std::string path = "assets\\dialdirectory.xml";
+#else
+    std::string path = "assets/dialdirectory.xml";
+#endif
+    TiXmlDocument doc;
+    TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
+    doc.LinkEndChild(decl);
+
+    TiXmlElement *root = new TiXmlElement("EtherTerm");
+    doc.LinkEndChild(root);
+
+    TiXmlElement *phonebook = new TiXmlElement("Phonebook");
+    root->LinkEndChild(phonebook);
+    phonebook->SetAttribute("version", "1.0");
+
+    // Loop and write out all System Connections
+    for (auto &it : systemConnection)
+    {
+        TiXmlElement *system = new TiXmlElement("BBS");
+        phonebook->LinkEndChild(system);
+
+        system->SetAttribute("name", it.name);
+        system->SetAttribute("ip", it.ip);
+        system->SetAttribute("port", it.port);
+        system->SetAttribute("protocol", it.protocol);
+        system->SetAttribute("login", it.login);
+        system->SetAttribute("password", it.password);
+        system->SetAttribute("font", it.font);
+        system->SetAttribute("keyMap", it.keyMap);
+    }
+
+    doc.SaveFile(path.c_str());
+}
+
+
 
 /**
  * Title Scan - Start Interface
@@ -802,8 +846,6 @@ int MainMenuState::startDialDirectory()
 {
     int  currentPage  = 0;
     int  boxsize      = 0;
-//    bool more         = FALSE;
-//    bool showmore     = FALSE;
 
     // Reading in dialdirectory.ini values.
     setupList();
@@ -857,8 +899,7 @@ int MainMenuState::startDialDirectory()
         }
         else
         {
-            // No Messages, return.
-            //std::cout << "return EOF;" << std::endl;
+            // No Systems, return.
             return EOF;
         }
 
@@ -893,11 +934,6 @@ JMPINPUT1:
             {
                 switch(toupper(ch))
                 {
-                    case 'N': // Multi Area Newscan, skip to next area.
-                        _linkList.clearVectorList();
-                        std::vector<list_bar>() . swap(result); // Free Vector Up.
-                        return -2;
-
                     case 'U': // Page Up
                         if(currentPage != 0)
                         {
@@ -1029,12 +1065,13 @@ JMPINPUT1:
                         // Pass through, any functionaly that should
                         // Be handeled in Reader.
                         // to the Message Reader. ie post ,reply, delete...
+
                     default :
                         _linkList.clearVectorList();
                         std::vector<list_bar>() . swap(result); // Free Vector Up.
+                        break;
                         // Don't exit, just return with pass through command.
-                        //LIGHTBAR_POSITION = EOF;
-                        return (char)toupper(ch);
+                        //return (char)toupper(ch);
                 }
             }
         }
