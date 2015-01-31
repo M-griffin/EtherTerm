@@ -138,8 +138,8 @@ void Terminal::restartWindowSize(bool fullScreen)
 #ifndef _WIN32               // Linux / OSX FullScreen Desktop Rez Only!
                              SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP);
 #else                        // Windows do true Fullscreen.
-                             SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN);
-                             //SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP);
+                             //SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN);
+                             SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP);
 #endif
         if(!globalWindow) // window init success
         {
@@ -210,8 +210,8 @@ void Terminal::restartWindowRenderer(std::string mode)
     if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, mode.c_str()))
 #else
     // Windows we want full quality Full Screen!  :)
-    if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"))
-    //if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, mode.c_str()))
+    //if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0"))
+    if(!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, mode.c_str()))
 #endif
 
     {
