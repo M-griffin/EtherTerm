@@ -11,8 +11,8 @@ The program is developed mainly in Windows using the (Codelite IDE) with
 mingw32/64 and will compile in OSX, and Linux under GNU g++.
 
 **This is a full graphics program just like a game engine, it's not a
-console application and best runs on more recent hardware.** Unlike some 
-older SDL applications that use software rendering, EtherTerm uses SDL2 
+console application and best runs on more recent hardware.** Unlike some
+older SDL applications that use software rendering, EtherTerm uses SDL2
 and full graphics acceleration on the GPU.
 
 EtherTerm is a Telnet/SSH terminal with CP437 (ANSI) Graphics terminal
@@ -80,9 +80,9 @@ Etherterm currently follows the default Windows telnet output keys seqeunces (us
 
 ##Demo for Windows:
 
-This is the Demo 2 Preview client for Windows.
+This is the Demo 2.2 Preview client for Windows.
 <br/>
-<a href = 'https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.1.zip'>EtherTerm Demo2.1 Preview.zip</a>
+<a href = 'https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.2.zip</a>
 <br/>
 <br/>
 Linux, OSX can be built easily with the following instructions below.
@@ -188,7 +188,7 @@ sudo apt-get install libssh-dev
 
 **To compile your executable.**
 ```
-make linux 
+make linux
 ```
 
 ###Arch Linux can use PACMAN to install requirements.
@@ -279,7 +279,7 @@ Once these are all set, just run the make-osx to build the executable.
 **EtherTerm will look for the ASSETS folder off the root executable folder**
 
 After you compile, the executable is placed in a default DEBUG folder.
-If you want to run from this folder you must copy the assets folder to the DEBUG 
+If you want to run from this folder you must copy the assets folder to the DEBUG
 folder or the root folder where the executable is located.
 
 **For Example:**
