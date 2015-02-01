@@ -64,11 +64,11 @@ I have a lot of XTERM sequences laid out so more will be implemented with time.
 
 ##Some recent additions
 
-```ALT + H``` has been added for quick disconnections from systems.
+```ALT + H``` added for quick disconnections from systems.
 
-```SSH login/passowrd promts``` has been added when they are not specified in the ```dialdirectory.xml```
+```SSH login/passowrd prompts``` have been added when they are not specified in the ```dialdirectory.xml```
 
-```Keymappings``` keymappings for various terminals.
+```Keymappings``` keymappings for terminal support.
 
 ## Not yet implemented:
 
