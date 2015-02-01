@@ -7,16 +7,16 @@
 ![alt text](https://dl.dropboxusercontent.com/u/92792939/EtherTerm.png "EtherTerm")
 </center>
 
+EtherTerm is a Telnet/SSH terminal with CP437 (ANSI) Graphics terminal
+emulation for connecting to Telnet/SSH BBS systems and shells.
+
 The program is developed mainly in Windows using the (Codelite IDE) with
-mingw32/64 and will compile in OSX, and Linux under GNU g++.
+mingw32/64 and will cross-compile under OSX, and Linux with GNU g++ or clang.
 
 **This is a full graphics program just like a game engine, it's not a
 console application and best runs on more recent hardware.** Unlike some
 older SDL applications that use software rendering, EtherTerm uses SDL2
-and full graphics acceleration on the GPU.
-
-EtherTerm is a Telnet/SSH terminal with CP437 (ANSI) Graphics terminal
-emulation for connecting to Telnet/SSH BBS systems and shells.
+and full OpenGL/DirectX graphics acceleration on the GPU.
 
 Each system can be setup with a default font.  Any systems using Syncterm
 escape sequences for font switching will override the default font.
@@ -36,11 +36,18 @@ escape sequences for font switching will override the default font.
 ```ALT + ENTER``` toggles between different window screen sizes.
 This cycles two different window resolutions then goes Fullscreen.
 
-**Full Copy/Paste support**
+***Keymappings are are now available***
+
+Etherterm currently follows the default Windows telnet output keys seqeunces (used in Syncterm) 
+as the ANSI default. VT100, LINUX and SCO key mappings are supported for terminals sessions.
+
+**Copy/Paste support**
 
 ```Left mouse click and drag``` to select text on the screen, release to copy selected text to the clipboard.
 
 ```Right mouse click``` to paste text from the clipboard.
+
+Some items with copy/paste are still a work in progress.
 
 ## Work in progress:
 
@@ -52,12 +59,16 @@ Not all options are setup just yet.
 To add new systems or remove, you must edit the ```dialdirectory.xml``` file
 in a text editor located in the /assets folder.
 
-If you want to connect to SSH servers, you must supply your username, and password
-in the ```dialdirectory.xml``` file since there are no prompts to enter these when
-you connect at the moment.
-
 I'm also in the middle of implimenting more control sequence behavior.
 I have a lot of XTERM sequences laid out so more will be implemented with time.
+
+##Some recent additions
+
+```ALT + H``` has been added for quick disconnections from systems.
+
+```SSH login/passowrd promts``` has been added when they are not specified in the ```dialdirectory.xml```
+
+```Keymappings``` keymappings for various terminals.
 
 ## Not yet implemented:
 
@@ -66,23 +77,18 @@ There are no transfer protocols at the moment.
 
 SSH works with login and password authentication, Public Key is in testing.
 
-Some keyboard keys still need to be implemented like F1 function keys, Keypad Keys.
-All others should work just fine including CTRL Keys.
-
 There is no scroll back buffer, this is also in the works.
 
 FTP will be added too.
 
-Terminal modes, by default EtherTerm only supports 80 x 25.  Other modes will be supported lateron.
-
-***Keymappings are planned also***
-Etherterm currently follows the default Windows telnet output keys seqeunces (used in Syncterm) for keys like arrrows, Insert, Delete, PageUp and Page Down.  Some other operating systems look for and use different escape sequence for their input keys which will be added later for more support.
+Terminal size is locked at 80 x 25 for development.
+Other modes will be configurable later on.
 
 ##Demo for Windows:
 
-This is the Demo 2.2 Preview client for Windows.
+This is the Demo 2.3 Preview for Windows.
 <br/>
-<a href = 'https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.2.zip</a>
+<a href = 'https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.3.zip'>EtherTerm Demo 2.3</a>
 <br/>
 <br/>
 Linux, OSX can be built easily with the following instructions below.
