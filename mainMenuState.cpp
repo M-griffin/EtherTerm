@@ -52,25 +52,27 @@ void MainMenuState::update()
 
                 MenuFunction::displayAnsiFile("outro.ans");
                 SDL_Delay(1500);
-                TheTerminal::Instance()->setRenderReady(false);
                 TheTerminal::Instance()->quit();
                 break;
 
             default:
-                sysCon = TheTerminal::Instance()->getSystemConnection();
+                sysCon = TheTerminal::Instance()->getSystemConnection();                                                    
                 if(sysCon.protocol == "TELNET")
                 {
                     TheTerminal::Instance()->setCurrentFont(sysCon.font);
+                    if(TheTerminal::Instance()->didFontChange())
+                        TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
                     menuToTelnet();
                 }
                 else if(sysCon.protocol == "SSH")
                 {
                     TheTerminal::Instance()->setCurrentFont(sysCon.font);
+                    if(TheTerminal::Instance()->didFontChange())
+                        TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
                     menuToSSH();
                 }
                 break;
         }
-        TheTerminal::Instance()->setRenderReady(true);
     }
     else
         TheTerminal::Instance()->quit();
@@ -90,7 +92,6 @@ bool MainMenuState::onEnter()
     // Set Render to Ready so we draw menu, Once it's drawn we toggle
     // This off, so it doesn't keep looping since it's not a game
     // with animation, this saves cpu usage.
-    TheTerminal::Instance()->setRenderReady(true);
     TheTerminal::Instance()->clearSystemConnection();
     return true;
 }
@@ -127,7 +128,7 @@ bool MainMenuState_INI::ddirectory_exists()
     path += INI_NAME;
     FILE *stream;
     stream = fopen(path.c_str(),"rb+");
-    if(stream == NULL)
+    if(stream == nullptr)
     {
         printf("Error unable to read dialdirectory.ini, check permissions!");
         return false;
@@ -292,7 +293,7 @@ bool MainMenuState_INI::ddirectory_parse(int index)
     // Check if Theme Exists, if not return FALSE.
     FILE *stream;
     stream = fopen(name,"rb+");
-    if(stream == NULL)
+    if(stream == nullptr)
     {
         // File is not Present
         return false;
@@ -334,7 +335,7 @@ void MainMenuState::readinAnsi(std::string FileName, std::string &buff)
     FILE *fp;
 
     int sequence = 0;
-    if((fp = fopen(path.c_str(), "r+")) ==  NULL)
+    if((fp = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         std::cout << "ANSI not found: " << path << std::endl;
         return;
@@ -434,7 +435,7 @@ std::vector< list_bar > MainMenuState::buildDialList()
     std::string path = "assets/";
 #endif
     path += "ddirectorymid1.ans";
-    if((inStream = fopen(path.c_str(), "r+")) ==  NULL)
+    if((inStream = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         std::cout << "unable to read " <<  "ddirectorymid1.ans" << std::endl;
         return result;
@@ -453,7 +454,7 @@ std::vector< list_bar > MainMenuState::buildDialList()
     path = "assets/";
 #endif
     path += "ddirectorymid2.ans";
-    if((inStream = fopen(path.c_str(), "r+")) ==  NULL)
+    if((inStream = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         std::cout << "unable to read " <<  "ddirectorymid2.ans" << std::endl;
         return result;

@@ -6,6 +6,7 @@
 // $LastChangedBy$
 
 #include "inputHandler.h"
+#include "socketHandler.h"
 #include "ansiParser.h"
 #include "terminal.h"
 #include <iostream>
@@ -286,6 +287,11 @@ bool InputHandler::update()
                 {
                     switch (event.key.keysym.sym)
                     {
+
+                        case 'h': // ALT H - Hangup
+                            TheSocketHandler::Instance()->reset();
+                            return false;
+
                         case SDLK_RETURN:
                             // If not Full Screen Then Toggle to Next Mode.
                             if(!isWindowMode)

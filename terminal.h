@@ -148,14 +148,6 @@ public:
     {
         isChangingState = cs;
     }
-    void setRenderReady(bool rr)
-    {
-        isRenderReady = rr;
-    }
-    bool getRenderReady() const
-    {
-        return isRenderReady;
-    }
     void setCurrentFont(std::string font)
     {
         currentFont = font;
@@ -278,7 +270,6 @@ private:
 
     bool isChangingState;
     bool isRunning;
-    bool isRenderReady;
     bool isUTF8Output;
 
     static Terminal* globalInstance;

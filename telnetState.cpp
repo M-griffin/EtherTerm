@@ -189,7 +189,6 @@ void TelnetState::update()
 bool TelnetState::onEnter()
 {
     TheAnsiParser::Instance()->setCursorActive(true);
-    TheTerminal::Instance()->setRenderReady(true);
     std::cout << "entering TelnetState\n";
     shutdown = false;
     //char host[255]= {"entropybbs.co.nz"};

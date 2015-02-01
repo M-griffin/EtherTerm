@@ -62,7 +62,7 @@ public:
         if(it == creators.end())
         {
             std::cout << "could not find type: " << typeID << "\n";
-            return NULL;
+            return nullptr;
         }
         BaseCreator* globalCreator = (*it).second;
         return globalCreator->createTermObject();

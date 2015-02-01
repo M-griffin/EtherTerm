@@ -79,15 +79,15 @@ int SSH_Socket::pollSocket()
 bool SSH_Socket::onEnter()
 {
     // For testing and getting debugging output
-    int verb = SSH_LOG_PROTOCOL;
+    //int verb = SSH_LOG_PROTOCOL;
     int rc;
 
     // Setup new SSH Shell
     session = ssh_new();
-    if(session == NULL)
+    if(session == nullptr)
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-            "Closed Session", "User has closed the program.", NULL);
+            "Closed Session", "User has closed the program.", nullptr);
 
         TheSocketHandler::Instance()->setActive(false);
         return false;
@@ -100,7 +100,7 @@ bool SSH_Socket::onEnter()
     ssh_options_set(session, SSH_OPTIONS_HOST, host.c_str());
 
     // Testing only, otherwise slows down display!!
-    ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verb);
+    //ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verb);
 
     // Only Slllow SSH2 Connections.
     int disAllow = 0;
@@ -123,7 +123,7 @@ bool SSH_Socket::onEnter()
             << " " << ssh_get_error(session) << std::endl;
 
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-            "Closed Session", "Unable to Connect to Server!", NULL);
+            "Closed Session", "Unable to Connect to Server!", nullptr);
 
         TheSocketHandler::Instance()->setActive(false);
         return false;
@@ -137,7 +137,7 @@ bool SSH_Socket::onEnter()
             << " " << ssh_get_error(session) << " " << rc << std::endl;
 
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-            "Closed Session", "User has closed the program.", NULL);
+            "Closed Session", "User has closed the program.", nullptr);
 
         TheSocketHandler::Instance()->setActive(false);
         return false;
@@ -156,7 +156,7 @@ bool SSH_Socket::onEnter()
 
     // Setup Channel for Socket Communications
     sshChannel = ssh_channel_new(session);
-    if(sshChannel == NULL)
+    if(sshChannel == nullptr)
     {
         std::cout << "Error: ssh_channel_new: " << host
             << " " << ssh_get_error(session) << " " << rc << std::endl;
@@ -195,8 +195,7 @@ bool SSH_Socket::onEnter()
     {
         std::cout << "Error: ssh_channel_request_pty_size: " << host
             << " " << ssh_get_error(session) << " " << rc << std::endl;
-
-        // Not an error to exit the program on.
+        // Not an error to exit the connection on.
         //return 0;
     }
 
@@ -222,14 +221,14 @@ bool SSH_Socket::onExit()
             ssh_channel_send_eof(sshChannel);
         ssh_channel_close(sshChannel);
         ssh_channel_free(sshChannel);
-        sshChannel = NULL;
+        sshChannel = nullptr;
     }
     std::cout << "SSH releasing session" << std::endl;
     if(session)
     {
         ssh_disconnect(session);
         ssh_free(session);
-        session = NULL;
+        session = nullptr;
     }
     return true;
 }
@@ -239,7 +238,7 @@ int SSH_Socket::verify_knownhost()
 {
     int state;
     size_t hlen;
-    unsigned char *hash = NULL;
+    unsigned char *hash = nullptr;
     char *hexa;
 
     state = ssh_is_server_known(session);
@@ -324,7 +323,7 @@ int SSH_Socket::verify_knownhost()
 int SSH_Socket::authenticate_kbdint()
 {
     int rc;
-    rc = ssh_userauth_kbdint(session, NULL, NULL);
+    rc = ssh_userauth_kbdint(session, nullptr, nullptr);
     while(rc == SSH_AUTH_INFO)
     {
         const char *name, *instruction;
@@ -348,14 +347,14 @@ int SSH_Socket::authenticate_kbdint()
             prompt = ssh_userauth_kbdint_getprompt(session, iprompt, &echo);
             if(echo)
             {
-                char buffer[128], *ptr;
+                char buffer[128] = {0}, *ptr;
                 printf("%s", prompt);
 
-                if(fgets(buffer, sizeof(buffer), stdin) == NULL)
+                if(fgets(buffer, sizeof(buffer), stdin) == nullptr)
                     return SSH_AUTH_ERROR;
 
                 buffer[sizeof(buffer) - 1] = '\0';
-                if((ptr = strchr(buffer, '\n')) != NULL)
+                if((ptr = strchr(buffer, '\n')) != nullptr)
                     *ptr = '\0';
 
                 if(ssh_userauth_kbdint_setanswer(session, iprompt, buffer) < 0)
@@ -371,7 +370,7 @@ int SSH_Socket::authenticate_kbdint()
                     return SSH_AUTH_ERROR;
             }
         }
-        rc = ssh_userauth_kbdint(session, NULL, NULL);
+        rc = ssh_userauth_kbdint(session, nullptr, nullptr);
     }
     return rc;
 }
@@ -384,7 +383,7 @@ int SSH_Socket::authenticate_console()
     char *banner;
 
     // Try to authenticate
-    rc = ssh_userauth_none(session, NULL);
+    rc = ssh_userauth_none(session, nullptr);
     switch(rc)
     {
         case SSH_AUTH_ERROR:   //some error happened during authentication
@@ -424,7 +423,7 @@ int SSH_Socket::authenticate_console()
         // ** Public Key Needs more testing.
         if(method & SSH_AUTH_METHOD_PUBLICKEY)
         {            
-            rc = ssh_userauth_autopubkey(session, NULL);
+            rc = ssh_userauth_autopubkey(session, nullptr);
             switch(rc)
             {
                 case SSH_AUTH_ERROR:   //some serious error happened during authentication
@@ -503,7 +502,7 @@ int SSH_Socket::authenticate_console()
         // Try to authenticate with password
         if(method & SSH_AUTH_METHOD_PASSWORD)
         {
-            rc = ssh_userauth_password(session, NULL, password.c_str());
+            rc = ssh_userauth_password(session, nullptr, password.c_str());
             switch(rc)
             {
                 case SSH_AUTH_ERROR:   //some serious error happened during authentication

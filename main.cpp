@@ -72,7 +72,7 @@ void readinAnsi(std::string FileName, std::string &buff)
     FILE *fp;
 
     int c = 0;
-    if((fp = fopen(path.c_str(), "r+")) ==  NULL)
+    if((fp = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         printf("\r\n*** ANSI not found\r\n");
         return;
@@ -197,30 +197,30 @@ int main(int argc, char* argv[])
             }
             else
             {
-                std::cout << "Error Loading Font " << SDL_GetError() << "\n";
+                std::cout << "Error Loading Font." << SDL_GetError() << "\n";
                 SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                    "Closed Session", "User has closed the program.", NULL);
+                    "Closed Session", "Error Loading Font.", nullptr);
                 return -1;
             }
         }
         else
         {
-            std::cout << "Term init failure 2. " << SDL_GetError() << "\n";
+            std::cout << "Term init failure: allocating surfaces." << SDL_GetError() << "\n";
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                "Closed Session", "Terminal Error on Init 2.", NULL);
+                "Closed Session", "Term init failure: allocating surfaces.", nullptr);
             return -1;
         }
     }
     else
     {
-        std::cout << "Term init failure 1. " << SDL_GetError() << "\n";
+        std::cout << "Term init failure: SDL Init()." << SDL_GetError() << "\n";
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-            "Closed Session", "Terminal Error on Init 1.", NULL);
+            "Closed Session", "Term init failure: SDL Init().", nullptr);
         return -1;
     }
     
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-        "Closed Session", "User has closed the program.", NULL);
+        "Closed Session", "User has closed the program.", nullptr);
 
     return 0;
 }

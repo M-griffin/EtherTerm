@@ -261,9 +261,6 @@ void AnsiParser::textInput(std::string buffer)
     // Char Sequence for Parsing.
     unsigned char sequence = 0;
 
-    // Toggle on the Renderer.
-    TheTerminal::Instance()->setRenderReady(true);
-
     // Loop text and parse screen formatting.
     unsigned char nextSequence;
     for(std::string::size_type i = 0; i < buffer.size(); i++)

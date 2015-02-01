@@ -53,8 +53,8 @@ class SDL_Socket : public SocketState
 public:
 
     SDL_Socket(std::string _host, int _port) :
-        sock(0),
-        set(0)
+        sock(nullptr),
+        set(nullptr)
     {
         host = _host;
         port = _port;
@@ -86,11 +86,12 @@ class FTP_Socket : public SocketState
 {
 public:
 
-    FTP_Socket(std::string _host, int _port, std::string _user, std::string _pass) :
-        controlSocket(0),
-        listenSocket(0),
-        dataSocket(0),
-        set(0)
+    FTP_Socket(std::string _host, int _port, std::string _user, std::string _pass)
+    :
+        controlSocket(nullptr),
+        listenSocket(nullptr),
+        dataSocket(nullptr),
+        set(nullptr)
     {
         host = _host;
         port = _port;
@@ -129,7 +130,10 @@ class SSH_Socket : public SocketState
 {
 public:
 
-    SSH_Socket(std::string _host, int _port, std::string _user, std::string _pass) : sshChannel(0), session(0)
+    SSH_Socket(std::string _host, int _port, std::string _user, std::string _pass)
+    :
+        sshChannel(nullptr),
+        session(nullptr)
     {
         host = _host;
         port = _port;

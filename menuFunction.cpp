@@ -8,7 +8,8 @@
 # include "inputHandler.h"
 # include "sequenceParser.h"
 # include "linkList.h"
-//# include "ansiParser.h" // Screen Buffer Testing
+# include "ansiParser.h"
+# include "terminal.h"
 
 # include <cstdio>
 # include <cstdlib>
@@ -404,7 +405,7 @@ int MenuFunction::menuExists()
 
     FILE *fstr;
     fstr = fopen(path.c_str(),"rb+");
-    if(fstr == NULL)
+    if(fstr == nullptr)
     {
         std::cout << "Menu not Found!:  " << _curmenu << std::endl;
         return false;
@@ -442,7 +443,7 @@ void MenuFunction::menuStart()
 
     FILE *fstr;
     fstr = fopen(path.c_str(),"rb+");
-    if(fstr == NULL)
+    if(fstr == nullptr)
     {
         isLoadNewMenu = false;
         return;
@@ -1232,12 +1233,13 @@ void MenuFunction::inputField(char *text, int &len)
 
     for(int i = 0; i != len; i++)
     {
-        repeat += "±";
+        repeat += " ";
     }
 
     if (!inc)
-        sprintf(INPUT_COLOR,"|15|17");
-    sprintf(text,"%s%s%s\x1b[%iD",(char *)temp.c_str(),INPUT_COLOR,repeat.c_str(),len);
+        sprintf(INPUT_COLOR,"|00|19");
+    sprintf(text,"%s|07|16[%s%s|07|16]%s\x1b[%iD",
+        (char *)temp.c_str(),INPUT_COLOR,repeat.c_str(),INPUT_COLOR,len+1);
 }
 
 /*
@@ -1249,12 +1251,12 @@ int MenuFunction::getKey()
     while (!TheInputHandler::Instance()->isGlobalShutdown())
     {
         if(TheInputHandler::Instance()->update())
-        {
+        {            
             inputSequence = TheInputHandler::Instance()->getInputSequence();
             break;
         }
         else
-        {
+        {            
             SDL_Delay(10);
         }
     }
@@ -1262,14 +1264,14 @@ int MenuFunction::getKey()
     if (TheInputHandler::Instance()->isGlobalShutdown())
     {
         return EOF;
-    }
+    }    
     return inputSequence[0];
 }
 
 /*
  * Get Input up to <ENTER>
  */
-void MenuFunction::getLine(char *line,     // Returns Input into Line
+void MenuFunction::getLine(char *line,   // Returns Input into Line
                          int   length,   // Max Input Length of String
                          char *leadoff,  // Data to Display in Default String {Optional}
                          int   hid,      // If input is Echomail as hidden    {Optional}
@@ -1286,6 +1288,13 @@ void MenuFunction::getLine(char *line,     // Returns Input into Line
 
     std::string input;
     std::string inputSequence;
+
+    // Cursor Blinking.
+    int  cursorBlink = 0;
+    bool startBlinking = false;
+    time_t ttime, ttime2;
+
+    ttime = SDL_GetTicks();
 
     #define DEL 0x7f
 
@@ -1309,17 +1318,65 @@ void MenuFunction::getLine(char *line,     // Returns Input into Line
         //strcat(chlist,sLine);
         sprintf(sList,"%s%s",chlist,sLine);
     }
+
     while (!TheInputHandler::Instance()->isGlobalShutdown())
     {
-        if(TheInputHandler::Instance()->update())
+        if(TheInputHandler::Instance()->update() && !TheInputHandler::Instance()->isGlobalShutdown())
         {
+            // We got data, turn off the cursor!
+            ttime = SDL_GetTicks();
+            startBlinking = false;
+            cursorBlink = 0;
+            // Get the Sequence.
             inputSequence = TheInputHandler::Instance()->getInputSequence();
+
+            // Check for Abort, single ESC character.
+            if (inputSequence == "\x1b" && inputSequence.size() == 1)
+            {
+                isEscapeSequence = false;
+                strcpy(line,"\x1b\0");
+                return;
+            }
         }
         else
         {
+            if (TheAnsiParser::Instance()->isCursorActive() && !TheInputHandler::Instance()->isGlobalShutdown())
+            {
+                startBlinking = true;
+                // Setup Timer for Blinking Cursor
+                // Initial State = On, then Switch to off in next loop.
+                if(cursorBlink % 2 == 0)
+                {
+                    ttime2 = SDL_GetTicks();
+                    if(startBlinking && (ttime2 - ttime) > 400)
+                    {
+                        TheTerminal::Instance()->renderCursorOffScreen();
+                        TheTerminal::Instance()->drawTextureScreen();
+                        --cursorBlink;
+                        ttime = SDL_GetTicks();
+                    }
+                }
+                else
+                {
+                    ttime2 = SDL_GetTicks();
+                    if(startBlinking && (ttime2 - ttime) > 400)
+                    {
+                        TheTerminal::Instance()->renderCursorOnScreen();
+                        TheTerminal::Instance()->drawTextureScreen();
+                        ++cursorBlink;
+                        ttime = SDL_GetTicks();
+                    }
+                }
+            }
+
             SDL_Delay(10);
             continue;
         }
+
+        // Catch any shutdown here before doing anymore.
+        if (TheInputHandler::Instance()->isGlobalShutdown())
+            return;
+
         sequence = inputSequence[0];
 
         if (sequence == '\r') sequence = '\n';
@@ -1332,7 +1389,7 @@ void MenuFunction::getLine(char *line,     // Returns Input into Line
                 sequence = toupper(sequence);
             }
             if(strchr(sList,sequence) || sequence == '\n' ||
-                sequence == '\r' || (int)sequence == 10)
+                sequence == '\r')
             {
                 //continue;
             }
@@ -1349,27 +1406,28 @@ void MenuFunction::getLine(char *line,     // Returns Input into Line
             isEscapeSequence = true;
         }
         else
-            isEscapeSequence = false;
+        {
+            isEscapeSequence = false;                        
+        }
 
         // Catch all Escaped Keys for Cursor Movement
         if (isEscapeSequence)
         {
             switch (secondSequence)
             {
-            case '3' : // Delete
-                if (i != 0 || Col != 0)
-                {
-                    TheSequenceParser::Instance()->processSequence((std::string)"\x1b[D±\x1b[D");
-                    input.erase(Col-1,1);
-                    --i;
-                    --Col;
-                }
-                break;
+                case '3' : // Delete
+                    if (i != 0 || Col != 0)
+                    {
+                        sequenceToAnsi((char *)"\x1b[D \x1b[D");
+                        input.erase(Col-1,1);
+                        --i;
+                        --Col;
+                    }
+                    break;
 
-            default :
-                break;
-            }
-
+                default :
+                    break;
+            }    
         }
         else if ((int)sequence == 25)
         {
@@ -1378,7 +1436,7 @@ void MenuFunction::getLine(char *line,     // Returns Input into Line
             i = Col;
             for (; i != 0; i--)
             {
-                TheSequenceParser::Instance()->processSequence((std::string)"\x1b[D±\x1b[D");
+                sequenceToAnsi((char *)"\x1b[D \x1b[D");
             }
             i = 0;
             Col = i;
@@ -1392,7 +1450,7 @@ void MenuFunction::getLine(char *line,     // Returns Input into Line
         {
             if (i != 0 || Col != 0)
             {
-                TheSequenceParser::Instance()->processSequence((std::string)"\x1b[D±\x1b[D");
+                sequenceToAnsi((char *)"\x1b[D \x1b[D");
                 input.erase(Col-1,1);
                 --i;
                 --Col;
@@ -1405,20 +1463,19 @@ void MenuFunction::getLine(char *line,     // Returns Input into Line
             {
                 if (hid)
                 {
-                    output = '*';
-                    TheSequenceParser::Instance()->processSequence(output);
+                    sequenceToAnsi((char *)"*");
                 }
                 else
                 {
                     output = sequence;
-                    TheSequenceParser::Instance()->processSequence(output);
+                    sequenceToAnsi((char *)output.c_str());
                 }
                 input += sequence;
                 ++i;
                 ++Col;
             }
         }
-        else if (sequence == 10 || sequence == '\r' || sequence == '\n')
+        else if (sequence == '\r' || sequence == '\n')
         {
             input += '\0';
             strncpy(line,(char *)input.c_str(),length);
@@ -1755,7 +1812,7 @@ void MenuFunction::displayAnsiFile(std::string fileName)
 
     FILE *fp;
     int sequence = 0;
-    if ((fp = fopen(path.c_str(), "r+")) ==  NULL)
+    if ((fp = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         std::cout << "ansiPrintf - no ansi found: " << fileName << std::endl;
         return;

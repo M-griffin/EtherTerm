@@ -106,7 +106,7 @@ bool SDL_Socket::onEnter()
     if(SDLNet_ResolveHost(&ip,host.c_str(),port)==-1)
     {
         printf("SDLNet_ResolveHost: %s\n",SDLNet_GetError());
-        sock = NULL;
+        sock = nullptr;
         onExit();
         return false;
     }
@@ -136,10 +136,12 @@ bool SDL_Socket::onExit()
     {
         if (sock)
             SDLNet_TCP_Close(sock);
+        sock = nullptr;
     }
 
     if (set)
         SDLNet_FreeSocketSet(set);
+    set = nullptr;
     return true;
 }
 

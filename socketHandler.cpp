@@ -15,7 +15,7 @@
 
 SocketHandler* SocketHandler::globalInstance = 0;
 
-SocketHandler::SocketHandler() : active(false)
+SocketHandler::SocketHandler() : socket(nullptr), active(false)
 { }
 
 SocketHandler::~SocketHandler()
@@ -135,7 +135,11 @@ bool SocketHandler::initTelnet(std::string host, int port)
         }
     }
     else
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "Telnet Socket already Active!");
         return false;
+    }
     return true;
 }
 
@@ -168,20 +172,28 @@ bool SocketHandler::initSSH(std::string host, int port,
         }
     }
     else
+    {
+       SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+            "SSH Socket already Active!");
         return false;
+    }
     return true;
 }
 
 void SocketHandler::reset()
 {
-    std::cout << "SocketHandler::initTelnet reset()" << std::endl;
+    //std::cout << "SocketHandler::reset() - Close Connection." << std::endl;
     try
     {
         // Deactivate Socket, then Clean it.
-        socket->onExit();
-        delete socket;
+        if (socket)
+        {
+            socket->onExit();
+            delete socket;
+        }
         active = false;
         socketType.erase();
+        socket = nullptr;
     }
     catch(std::exception& e)
     {

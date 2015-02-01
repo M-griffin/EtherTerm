@@ -113,11 +113,11 @@ public:
 
 
     static int  getKey();
-    static void getLine(char *line, // Returns Input into Line
-                 int   length,      // Max Input Length of String
-                 char *leadoff,     // Data to Display in Default String {Optional}
-                 int   hid,         // If input is Echomail as hidden    {Optional}
-                 char *chlist);     // Valid Input Char List             {Optional}
+    static void getLine(char *line,     // Returns Input into Line
+                 int   length,          // Max Input Length of String
+                 char *leadoff = 0,     // Data to Display in Default String {Optional}
+                 int   hid     = false, // If input is Echomail as hidden    {Optional}
+                 char *chlist = 0);     // Valid Input Char List             {Optional}
 
     static void ansiForegroundColor(char *data, int fg);
     static void ansiBackgroundColor(char *data, int bg);

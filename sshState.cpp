@@ -12,6 +12,7 @@
 #include "sequenceParser.h"
 #include "terminal.h"
 #include "socketHandler.h"
+#include "menuFunction.h"
 
 #include <cstdio>
 
@@ -151,7 +152,6 @@ void SSHState::update()
 bool SSHState::onEnter()
 {
     TheAnsiParser::Instance()->setCursorActive(true);
-    TheTerminal::Instance()->setRenderReady(true);
     std::cout << "entering SSHState\n";
     shutdown = false;
 
@@ -183,19 +183,86 @@ bool SSHState::onEnter()
     TheTerminal::SystemConnection sysconn;
     sysconn = TheTerminal::Instance()->getSystemConnection();
 
-    if(TheSocketHandler::Instance()->initSSH(sysconn.ip, sysconn.port, sysconn.login, sysconn.password))
+    // Check if we need to Ask for UserName before starting SSH Connection
+    if (sysconn.login == "")
     {
-        TheTerminal::Instance()->clearScreenSurface();
-        std::cout << "SSH Initalized, Now Connecting to " << sysconn.name << "... " << std::endl;
-        TheTerminal::Instance()->drawString(0,16*2,(char *)"Connecting...");
-        TheTerminal::Instance()->renderScreen();
-        TheTerminal::Instance()->drawTextureScreen();
-        SDL_Delay(500);
+        std::string initConnection = "|CS|15Initiating connection to: [|07";
+        initConnection += sysconn.name + "|15]";
+
+        MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
+        MenuFunction::sequenceToAnsi((char *)"|CR|10Login credentials not found. Enter your login below.");
+
+        char loginId[1024] = {0};
+        char rBuffer[1024] = {0};
+        sprintf(loginId, "|CR|15Use [|07ESC|15] anytime to abort. |CR|CR|15SSH Login: ");
+        int len = 30;
+
+        // Setup the Input Field after the Text
+        MenuFunction::inputField(loginId,len);
+        MenuFunction::sequenceToAnsi(loginId);
+
+        // Loop Input
+        while(!TheInputHandler::Instance()->isGlobalShutdown())
+        {
+            // Ask for Users Real Name
+            MenuFunction::getLine(rBuffer, len);
+            if (rBuffer[0] == '\x1b') // Abort
+            {
+                shutdown = true;
+                TheTerminal::Instance()->clearScreenSurface();
+                TheTerminal::Instance()->renderScreen();
+                TheAnsiParser::Instance()->reset();
+                return false;
+            }
+            else if (strcmp(rBuffer,"") != 0 && strcmp(rBuffer,"\n") != 0)
+            {
+                sysconn.login = rBuffer;
+                break;
+            }
+        }
+
+        // Received Shutdown.
+        if (TheInputHandler::Instance()->isGlobalShutdown())
+        {
+            shutdown = true;
+            TheTerminal::Instance()->clearScreenSurface();
+            TheTerminal::Instance()->renderScreen();
+            TheAnsiParser::Instance()->reset();
+            return false;
+        }
+
+        char passwordId[1024] = {0};
+        memset(rBuffer,0,sizeof(rBuffer));
+        sprintf(passwordId, "|CR|CR|15SSH Password: ");
+
+        // Setup the Input Field after the Text
+        MenuFunction::inputField(passwordId,len);
+        MenuFunction::sequenceToAnsi(passwordId);
+
+        // Loop Input
+        while(!TheInputHandler::Instance()->isGlobalShutdown())
+        {
+            // Ask for Users Real Name
+            MenuFunction::getLine(rBuffer, len, 0, true);
+            if (rBuffer[0] == '\x1b') // Abort
+            {
+                shutdown = true;
+                TheTerminal::Instance()->clearScreenSurface();
+                TheTerminal::Instance()->renderScreen();
+                TheAnsiParser::Instance()->reset();
+                return false;
+            }
+            else if (strcmp(rBuffer,"") != 0 && strcmp(rBuffer,"\n") != 0)
+            {
+                sysconn.password = rBuffer;
+                break;
+            }
+        }
     }
-    else
+
+    // Received Shutdown.
+    if (TheInputHandler::Instance()->isGlobalShutdown())
     {
-        std::cout << "Error Connecting!" << std::endl;
-        SDL_Delay(100);
         shutdown = true;
         TheTerminal::Instance()->clearScreenSurface();
         TheTerminal::Instance()->renderScreen();
@@ -203,9 +270,35 @@ bool SSHState::onEnter()
         return false;
     }
 
-    std::cout << "Connection Successful. " << std::endl;
+    std::string initConnection = "|CR|CR|15Establishing connection.";
+    MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
+
     SDL_Delay(100);
 
+    if(TheSocketHandler::Instance()->initSSH(sysconn.ip, sysconn.port, sysconn.login, sysconn.password)
+        && !TheInputHandler::Instance()->isGlobalShutdown())
+    {
+        // Connection Success.
+        std::string initConnection = "|CR|CR|08[|07*|08] |10Connection Successful!";
+        MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
+        SDL_Delay(1000);
+    }
+    else
+    {
+        // Connection Failed.
+        std::string initConnection = "|CR|CR|08[|07*|08] |12Unable to connect!";
+        initConnection += "|CR|CR|15Hit any key to continue.";
+        MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
+        MenuFunction::getKey();
+
+        std::cout << "Error Connecting!" << std::endl;        
+        shutdown = true;
+        TheTerminal::Instance()->clearScreenSurface();
+        TheTerminal::Instance()->renderScreen();
+        TheAnsiParser::Instance()->reset();
+        return false;
+    }
+ 
     // Clear Renderer and Ansi Parser for Fresh Connection.
     TheTerminal::Instance()->clearScreenSurface();
     TheTerminal::Instance()->renderScreen();
