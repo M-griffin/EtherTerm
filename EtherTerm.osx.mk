@@ -41,7 +41,7 @@ LinkOptions            :=
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch)/usr/local/Cellar/sdl2/2.0.3/include $(IncludeSwitch)/usr/local/Cellar/sdl2/2.0.3/include/SDL2 $(IncludeSwitch)/usr/local/Cellar/sdl2_net/2.0.0/include $(IncludeSwitch)/usr/local/Cellar/sdl2_net/2.0.0/include/SDL2 $(IncludeSwitch)/usr/local/Cellar/libssh/0.6.4/include
 IncludePCH             :=
 RcIncludePath          :=
-Libs                   := $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)SDL2_net $(LibrarySwitch)ssh 
+Libs                   := $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)SDL2_net $(LibrarySwitch)ssh
 ArLibs                 :=  "SDL2main" "SDL2" "SDL2_net" "libssh"
 LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)/usr/local/Cellar/sdl2/2.0.3/lib $(LibraryPathSwitch)/usr/local/Cellar/sdl2_net/2.0.0/lib $(LibraryPathSwitch)/usr/local/Cellar/libssh/0.6.4/lib
 
@@ -77,6 +77,7 @@ Objects=$(Objects0)
 ##
 .PHONY: all clean PreBuild PrePreBuild PostBuild
 all: $(OutputFile)
+	cp ./Debug/EtherTerm .
 
 $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	@$(MakeDirCommand) $(@D)
@@ -278,6 +279,6 @@ clean:
 	$(RM) ./Debug/*$(ObjectSuffix)
 	$(RM) ./Debug/*$(DependSuffix)
 	$(RM) $(OutputFile)
-
+	$(RM) ./EtherTerm
 
 

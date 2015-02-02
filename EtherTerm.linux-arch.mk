@@ -73,6 +73,7 @@ Objects=$(Objects0)
 ##
 .PHONY: all clean PreBuild PrePreBuild PostBuild
 all: $(OutputFile)
+	cp ./Debug/EtherTerm .
 
 $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	@$(MakeDirCommand) $(@D)
@@ -275,5 +276,6 @@ clean:
 	$(RM) ./Debug/*$(DependSuffix)
 	$(RM) $(OutputFile)
 	$(RM) ".build-debug/EtherTerm"
+	$(RM) ./EtherTerm
 
 
