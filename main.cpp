@@ -198,12 +198,18 @@ int main(int argc, char* argv[])
     {
         std::cout << "Unable to get Program Path!" << std::endl;
         return 1;
-    }    
+    }
 
     const char* t = " \t\n\r\f\v";
     realPath = exePath;
     realPath = realPath.erase(realPath.find_last_not_of(t) + 1);
     realPath += "/";
+
+    // Remove Executable
+    std::string::size_type position;
+    position = realPath.rfind("/EtherTerm");
+    if (position != std::string::npos)
+        realPath.erase(position+1,realPath.size()-1);
 
 #endif
     std::cout << "Working directory is: " << realPath << std::endl;
