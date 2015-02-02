@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
 #else
 
     char exePath[PATH_MAX] = {0};
-    ssize result = readlink("/proc/self/exe", exePath, PATH_MAX );
+    ssize_t result = readlink("/proc/self/exe", exePath, PATH_MAX );
     if (result < 0)
     {
         std::cout << "Unable to get Program Path!" << std::endl;
