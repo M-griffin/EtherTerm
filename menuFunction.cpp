@@ -129,13 +129,16 @@ int MenuFunction::menuParseData(std::string cfgdata)
  */
 int MenuFunction::menuReadData(std::string MenuName)
 {
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\";
+    path += "assets\\";
 #else
-    std::string path = "assets/";
+    path += "assets/";
 #endif
     path.append(MenuName);
     path.append(".menu");
+
+    std::cout << "Read Menu: " << path << std::endl;
 
     ifstream iFS;
     iFS.open( path.c_str() );
@@ -267,11 +270,11 @@ void MenuFunction::commandsParse(std::string cfgdata, int idx)
 int MenuFunction::commandsExist(std::string MenuName, int idx)
 {
     //std::cout << "MenuFunction::cmdexist" << std::endl;
-
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\";
+    path += "assets\\";
 #else
-    std::string path = "assets/";
+    path += "assets/";
 #endif
 
     path.append(MenuName);
@@ -323,11 +326,11 @@ int MenuFunction::commandsCount(std::string MenuName)
  */
 int MenuFunction::commandsReadData(std::string MenuName, int idx)
 {
-
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\";
+    path += "assets\\";
 #else
-    std::string path = "assets/";
+    path += "assets/";
 #endif
     path.append(MenuName);
     path.append(".menu");
@@ -395,10 +398,11 @@ void MenuFunction::menuReload()
  */
 int MenuFunction::menuExists()
 {
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\";
+    path += "assets\\";
 #else
-    std::string path = "assets/";
+    path += "assets/";
 #endif
     path.append(_curmenu);
     path.append(".menu");
@@ -433,10 +437,11 @@ void MenuFunction::menuStart()
     int idx  = 0;
     int nogc = 0;
 
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\";
+    path += "assets\\";
 #else
-    std::string path = "assets/";
+    path += "assets/";
 #endif
     path.append(_curmenu);
     path.append(".menu");
@@ -1802,14 +1807,17 @@ void MenuFunction::sequenceToAnsi(char* szString, int buffer)
 void MenuFunction::displayAnsiFile(std::string fileName)
 {
     //std::cout << "ansiPrintf" << std::endl;
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\";
+    path += "assets\\";
 #else
-    std::string path = "assets/";
+    path += "assets/";
 #endif
     path += fileName;
-    std::string buff;
 
+    std::cout << "Display Ansi: " << path << std::endl;
+
+    std::string buff;
     FILE *fp;
     int sequence = 0;
     if ((fp = fopen(path.c_str(), "r+")) ==  nullptr)

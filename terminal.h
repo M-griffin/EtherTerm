@@ -61,6 +61,14 @@ public:
     void update();
     void clean();
 
+    void setProgramPath(std::string _programPath)
+    {
+        programPath = _programPath;
+    }
+    std::string getProgramPath() const
+    {
+        return programPath;
+    }
     SDL_Renderer* getRenderer() const
     {
         return globalRenderer;
@@ -170,7 +178,7 @@ public:
     void renderSelectionScreen(int x, int y);
     void freeSurfaceTextures();
     bool loadBitmapImageFromPak();
-    bool loadBitmapImage(std::string path);
+    bool loadBitmapImage(std::string fontName);
     bool initSurfaceTextures();
     void setScrollRegion(int top, int bot, int terminalHeight);
     void scrollRegionUp();
@@ -230,6 +238,7 @@ public:
 private:
 
     SystemConnection systemConnection;
+    std::string    programPath;
     std::string    windowTitle;
     std::string    currentFont;
     std::string    previousFont;
@@ -242,8 +251,8 @@ private:
     SDL_Surface*   cursorOnSurface;   // Char Cell for the cursor.
     SDL_Surface*   cursorOffSurface;  // Char Cell for the cursor.
     SDL_Surface*   screenSurface;     // Internal Screen Buffer
-    SDL_Surface*   bottomSurface;
-    SDL_Surface*   chachedSurface;    // Cached Font CharacterSet
+    SDL_Surface*   bottomSurface;     // Last Line Buffer
+    SDL_Surface*   chachedSurface;    // Cached Font Surface
     SDL_Texture*   globalTexture;     // Texture for User Screen
 
     SDL_Texture*   selectionTexture;  // For Copy Text Selection

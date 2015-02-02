@@ -120,11 +120,14 @@ bool MainMenuState_INI::ddirectory_exists()
     std::cout << "ddirectory_exists()" << std::endl;
     TOP_MARGIN = 0;
     BOTTOM_MARGIN = 0;
+
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\";
+    path += "assets\\";
 #else
-    std::string path = "assets/";
+    path += "assets/";
 #endif
+
     path += INI_NAME;
     FILE *stream;
     stream = fopen(path.c_str(),"rb+");
@@ -143,10 +146,11 @@ bool MainMenuState_INI::ddirectory_exists()
 void MainMenuState_INI::ddirectory_create()
 {
     //std::cout << "ddirectory_create()" << std::endl;
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\";
+    path += "assets\\";
 #else
-    std::string path = "assets/";
+    path += "assets/";
 #endif
     path += INI_NAME;
     std::ofstream outStream2;
@@ -281,16 +285,21 @@ bool MainMenuState_INI::ddirectory_parse(int index)
     char name[1024]  = {0};
     char name2[1024] = {0};
 
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\";
+    path += "assets\\";
 #else
-    std::string path = "assets/";
+    path += "assets/";
 #endif
+
     // Set for Theme, check index number for Themeing,.
     sprintf(name, "%s%s",path.c_str(),INI_NAME);
     sprintf(name2,"%s%s%i.ini",path.c_str(),INI_NAME,index);
     if(index != 0) strcpy(name,name2);
     // Check if Theme Exists, if not return FALSE.
+
+    std::cout << "Read dialdirectory.ini: " << name << std::endl;
+
     FILE *stream;
     stream = fopen(name,"rb+");
     if(stream == nullptr)
@@ -325,14 +334,18 @@ bool MainMenuState_INI::ddirectory_parse(int index)
 void MainMenuState::readinAnsi(std::string FileName, std::string &buff)
 {
     std::cout << "readinAnsi()" << std::endl;
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\";
+    path += "assets\\";
 #else
-    std::string path = "assets/";
+    path += "assets/";
 #endif
+
     path += FileName;
     path += ".ans";
     FILE *fp;
+
+    std::cout << "Load Ansi: " << path << std::endl;
 
     int sequence = 0;
     if((fp = fopen(path.c_str(), "r+")) ==  nullptr)
@@ -429,10 +442,11 @@ std::vector< list_bar > MainMenuState::buildDialList()
     //
     // We cache array with all four choices so we can
     // easily switch between them in the listing.
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\";
+    path += "assets\\";
 #else
-    std::string path = "assets/";
+    path += "assets/";
 #endif
     path += "ddirectorymid1.ans";
     if((inStream = fopen(path.c_str(), "r+")) ==  nullptr)
@@ -448,11 +462,13 @@ std::vector< list_bar > MainMenuState::buildDialList()
     fclose(inStream);
     sequence = '\0';
 
+    path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    path = "assets\\";
+    path += "assets\\";
 #else
-    path = "assets/";
+    path += "assets/";
 #endif
+
     path += "ddirectorymid2.ans";
     if((inStream = fopen(path.c_str(), "r+")) ==  nullptr)
     {
@@ -690,11 +706,13 @@ std::vector< list_bar > MainMenuState::buildDialList()
 bool MainMenuState::readDialDirectory()
 {
     TheTerminal::SystemConnection sysconn;
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\dialdirectory.xml";
+    path += "assets\\";
 #else
-    std::string path = "assets/dialdirectory.xml";
+    path += "assets/";
 #endif
+    path += "dialdirectory.xml";
     TiXmlDocument doc(path.c_str());
     if(!doc.LoadFile()) return false;
     TiXmlHandle hDoc(&doc);
@@ -755,11 +773,14 @@ bool MainMenuState::readDialDirectory()
 void MainMenuState::createDialDirectory()
 {
     // Create Default Phone Book.
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\dialdirectory.xml";
+    path += "assets\\";
 #else
-    std::string path = "assets/dialdirectory.xml";
+    path += "assets/";
 #endif
+    path += "dialdirectory.xml";
+
     TiXmlDocument doc;
     TiXmlDeclaration * decl = new TiXmlDeclaration("1.0", "", "");
     doc.LinkEndChild(decl);
@@ -803,11 +824,14 @@ void MainMenuState::createDialDirectory()
 void MainMenuState::writeDialDirectory()
 {
     // Create Default Phone Book.
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string path = "assets\\dialdirectory.xml";
+    path += "assets\\";
 #else
-    std::string path = "assets/dialdirectory.xml";
+    path += "assets/";
 #endif
+    path += "dialdirectory.xml";
+
     TiXmlDocument doc;
     TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
     doc.LinkEndChild(decl);

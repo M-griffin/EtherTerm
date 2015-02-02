@@ -36,16 +36,16 @@ using namespace std;
 Terminal* Terminal::globalInstance = 0;
 
 Terminal::Terminal():
-    globalWindow(0),
-    globalRenderer(0),
-    tmpSurface(0),       // Char Cell
-    cursorOnSurface(0),  // Char Cell for the cursor.
-    cursorOffSurface(0), // Char Cell for the cursor.
-    screenSurface(0),    // Internal Screen Buffer
-    bottomSurface(0),
-    chachedSurface(0),  // Cached Font CharacterSet
-    globalTexture(0),   // Texture for User Screen
-    globalTermStateMachine(0),
+    globalWindow(nullptr),
+    globalRenderer(nullptr),
+    tmpSurface(nullptr),       // Char Cell
+    cursorOnSurface(nullptr),  // Char Cell for the cursor.
+    cursorOffSurface(nullptr), // Char Cell for the cursor.
+    screenSurface(nullptr),    // Internal Screen Buffer
+    bottomSurface(nullptr),
+    chachedSurface(nullptr),   // Cached Font CharacterSet
+    globalTexture(nullptr),    // Texture for User Screen
+    globalTermStateMachine(nullptr),
     surfaceWidth(0),
     surfaceHeight(0),
     windowWidth(0),
@@ -108,9 +108,9 @@ Terminal::Terminal():
 Terminal::~Terminal()
 {
     // we must clean up after ourselves to prevent memory leaks
-    globalRenderer = 0;
-    globalWindow = 0;
-    std::cout << "Term Released" << std::endl;
+    globalRenderer = nullptr;
+    globalWindow = nullptr;
+    std::cout << "*** Term Released" << std::endl;
 }
 
 
@@ -942,17 +942,18 @@ bool Terminal::loadBitmapImageFromPak()
 * Default fonts are White on Black, inital setup for 32 cols by 8 rows
 * of Characters Cells at 9x16.
 */
-bool Terminal::loadBitmapImage(std::string path)
+bool Terminal::loadBitmapImage(std::string fontName)
 {
     //std::cout << "LoadBitmap: " << path << std::endl;
     //Load image at specified path
+    std::string path = TheTerminal::Instance()->getProgramPath();
 #ifdef _WIN32
-    std::string realPath = "assets\\";
+    path += "assets\\";
 #else
-    std::string realPath = "assets/";
+    path += "assets/";
 #endif
-    realPath += path;
-    chachedSurface = SDL_LoadBMP(realPath.c_str());
+    path += fontName;
+    chachedSurface = SDL_LoadBMP(path.c_str());
     if(!chachedSurface)
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,

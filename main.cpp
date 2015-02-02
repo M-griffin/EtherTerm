@@ -29,6 +29,7 @@
 #include <SDL.h>
 #include <SDL_Main.h>
 #include <SDL_net.h>
+#include <mach-o/dyld.h>
 #elif _WIN32
 #include <windows.h>
 #include <SDL.h>
@@ -38,15 +39,13 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_main.h>
 #include <SDL2/SDL_net.h>
-
-const  int  TRUE  = 1;
-const  int  FALSE = 0;
 #endif
 
 #include <libssh/libssh.h>
 
 #include <cstdio>
 #include <cstring>
+#include <climits>
 #include <string>
 #include <cstdlib>
 #include <sstream>
@@ -154,6 +153,61 @@ int main(int argc, char* argv[])
     // Run cleanup on exit of program
     atexit(cleanup);
     std::string temp;
+
+    // Get the Folder the Executable runs in.
+    std::string realPath;
+#ifdef TARGET_OS_MAC
+    char currentPath[PATH_MAX];
+    uint32_t size = sizeof(currentPath);
+    if (_NSGetExecutablePath(currentPath, &size) != 0)
+    {
+        std::cout << "Unable to get Program Path!" << std::endl;
+    }
+
+    // Remove Executable
+    realPath = currentPath;
+    std::string::size_type position;
+    position = realPath.rfind("/EtherTerm");
+    if (position != std::string::npos)
+        realPath.erase(position+1,realPath.size()-1);
+
+    // remove extra './'
+    position = realPath.rfind("./");
+    if (position != std::string::npos)
+        realPath.erase(position,2);
+
+#elif _WIN32
+    // Get the Current Program path.
+    char currentPath[PATH_MAX];
+    int result = GetModuleFileName(NULL, currentPath, PATH_MAX-1);
+    if(result == 0)
+    {
+        std::cout << "Unable to get Program Path!" << std::endl;
+        return 1;
+    }
+
+    realPath = currentPath;
+    std::string::size_type position = realPath.rfind("\\",realPath.size()-1);    
+    if (position != std::string::npos)
+        realPath.erase(position+1);
+#else
+
+    char exePath[PATH_MAX] = {0};
+    ssize result = readlink("/proc/self/exe", exePath, PATH_MAX );
+    if (result < 0)
+    {
+        std::cout << "Unable to get Program Path!" << std::endl;
+        return 1;
+    }    
+
+    const char* t = " \t\n\r\f\v";
+    realPath = exePath;
+    realPath = realPath.erase(realPath.find_last_not_of(t) + 1);
+    realPath += "/";
+
+#endif
+    std::cout << "Working directory is: " << realPath << std::endl;
+    TheTerminal::Instance()->setProgramPath(realPath);
 
     // Initalize Renderer and Window with default sizes.
     // We define 680 instead of 640 becasue we clip the extract off
