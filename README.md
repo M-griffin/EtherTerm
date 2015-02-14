@@ -165,7 +165,7 @@ make clean-linux
 
 ##Linux Build Steps:
 
-###Ubunutu, Mint and Debian can use APT-GET to install requirements.
+###Ubunutu, Mint and Debian can use APT-GET to easily install all requirements.
 
 **Clone the Git repository.**
 ```
@@ -197,7 +197,7 @@ sudo apt-get install libssh-dev
 make linux
 ```
 
-###Arch Linux can use PACMAN to install requirements.
+###Arch Linux can use PACMAN to easily install all requirements.
 
 **Clone the Git repository.**
 ```
@@ -224,7 +224,6 @@ sudo pacman -S extra/libssh
 make linux-arch
 ```
 
-
 ##OSX Build Steps:
 
 **Clone the Git repository.**
@@ -232,7 +231,7 @@ make linux-arch
 git clone https://github.com/M-griffin/EtherTerm.git
 ```
 
-**Install Brew if you don't have it already**
+**Install Brew if you don't have it already to easily install all requrements**
 ```
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
@@ -284,20 +283,15 @@ Once these are all set, just run the make-osx to build the executable.
 
 **EtherTerm will look for the ASSETS folder off the root executable folder**
 
-After you compile, the executable is placed in a default DEBUG folder.
-If you want to run from this folder you must copy the assets folder to the DEBUG
-folder or the root folder where the executable is located.
+The Makefiles are now updated to copy the executable down from the DEBUG folder to the root folder.
 
-**For Example:**
-```
-./EtherTerm/DEBUG   ( Contains Executable )
-./EtherTerm/assets  ( Contains Fonts, Screens and xml files )
-```
+```./EtherTerm to execute the program```
 
-**Copy the assets folder to the debug foler so it looks like this:**
-```
-./EtherTerm/DEBUG/assets
-```
+**Just in case, although I haven't seen any issues**
+
+If you have any issues with files not loading, check or reset permissions while inside of the root EtherTerm folder.
+
+```chmod -R 0777 *```
 
 **Acknowledgement and Thanks:**
 + Dingo:  Telnet options and general terminal functionality
