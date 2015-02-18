@@ -49,49 +49,12 @@ as the ANSI default. VT100, LINUX and SCO key mappings are supported for termina
 
 Some items with copy/paste are still a work in progress.
 
-## Work in progress:
-
-Some items are still being worked on for scrolling regions with copy/paste and the screen buffer.
-
-The Dialing directory is incomplete, Add, Edit, Delete, About etc..
-Not all options are setup just yet.
-
 To add new systems or remove, you must edit the ```dialdirectory.xml``` file
 in a text editor located in the /assets folder.
 
-I'm also in the middle of implimenting more control sequence behavior.
-I have a lot of XTERM sequences laid out so more will be implemented with time.
+## Windows Download
 
-##Some recent additions
-
-```ALT + H``` added for quick disconnections from systems.
-
-```SSH login/passowrd prompts``` have been added when they are not specified in the ```dialdirectory.xml```
-
-```Keymappings``` keymappings for terminal support.
-
-## Not yet implemented:
-
-Lots of things are still in the early testing and debugging stages.
-There are no transfer protocols at the moment.
-
-SSH works with login and password authentication, Public Key is in testing.
-
-There is no scroll back buffer, this is also in the works.
-
-FTP will be added too.
-
-Terminal size is locked at 80 x 25 for development.
-Other modes will be configurable later on.
-
-## Demo for Windows:
-
-This is the Demo 2.3 Preview for Windows.
-<br/>
-<a href = 'https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.3.zip'>EtherTerm Demo 2.3</a>
-<br/>
-<br/>
-Linux, OSX can be built easily with the following instructions below.
+[Demo 2.3 Preview](https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.3.zip) for Windows.
 
 ## Build Instructions
 
@@ -107,12 +70,16 @@ Linking ```libSDL2_main``` is optional on some distributions.
 
 For windows, mingw32 or 64 is required.
 
+- **NOTE**: EtherTerm will seek an ``./assets`` folder relative to the executable.  In this way,
+  it is not (yet) a very "portable" executable.  At this stage, please execute only from the
+  project folder.
+- ``./EtherTerm`` to run on unix systems, or just ``EtherTerm`` on Windows.
+
 ### Windows
 
-Must compile with latest c++ environment flags.
-
-At the very least and you can also replace 0x with 11 on
-newer compilers. Usually g++ (4.7)+ or compatible compiler.
+Must compile with latest c++ environment flags:  At the very least and you can
+also replace 0x with 11 on newer compilers. Usually g++ (4.7)+ or compatible
+compiler:
 
 ```
 -std=gnu++0x or -std=c++0x
@@ -137,38 +104,49 @@ make win
 
 - install http://brew.sh/
 - ``brew install sdl2 sdl2_net libssh``
-- ``make clean-osx; osx``
+- ``make clean-osx``
+- ``make osx``
 
 ### Ubuntu, Mint, and Debian Linux
 
 - ``sudo apt-get install build-essential libsdl2-dev libsdl2-net-dev libssh-dev``
-- ``make clean-linux; make linux``
+- ``make clean-linux``
+- ``make linux``
 
 ### Arch Linux
 
 - ``sudo pacman -S sdl2 sdl2_net extra/libssh``
-- ``make clean-linux; make linux-arch``
+- ``make clean-linux``
+- ``make linux-arch``
 
-## Executing the first time:
+## Changelog
 
-**EtherTerm will look for the ASSETS folder off the root executable folder**
+**v2.3**
 
-The Makefiles are now updated to copy the executable down from the DEBUG folder to the root folder.
+- ``ALT + H`` for quick disconnection ("hangup")
+- SSH login/password prompts when not specified in ``assets/dialdirectory.xml``
+- selection of various input key mappings (VT100, ANSI, etc.)
 
-```./EtherTerm to execute the program```
+## Work in progress:
 
-**Just in case, although I haven't seen any issues**
+- "change_scroll_region": csr terminal sequence.
+- "alternate screen" buffer: smcup, rmcup terminal sequence.
+- ability to interactively edit in the dialing directory.
+- other runtime configuration/setup options.
+- alternative window sizes, currently 80x25.
+- attempting to reach compliance with terminal type 'xterm-256color'
+- transfer protocols (x, y, and z-modem)
+- ssh pubkey authentication
+- scrollback buffer
+- ftp client support
 
-If you have any issues with files not loading, check or reset permissions while inside of the root EtherTerm folder.
+## Acknowledgments and Thanks
 
-``chmod -R u+r .``
-
-**Acknowledgement and Thanks:**
-+ Dingo:  Telnet options and general terminal functionality
-+ G00R00: Optimization ideas on scrolling pixels faster.
-+ (SDL Game Programming) For good ideas with Singletons and State Machines.
-+ Maze: Testing and bug reports
-+ Caphood: Testing and bug reports
-+ IceDevil: Testing and bug reports
-+ Haliphax: Testing and bug reports
-+ HellBeard: Testing and bug reports
+- [dingo](https://github.com/jquast): Telnet options and general terminal functionality.
+- G00R00: Optimization ideas on scrolling pixels faster.
+- (SDL Game Programming) For good ideas with Singletons and State Machines.
+- [maze](https://github.com/tehmaze): Testing and bug reports.
+- Caphood: Testing and bug reports.
+- IceDevil: Testing and bug reports.
+- [haliphax](https://github.com/haliphax): Testing and bug reports.
+- [hellbeard](https://github.com/ericolito): Testing and bug reports.
