@@ -38,12 +38,12 @@ MakeDirCommand         :=mkdir -p
 RcCmpOptions           :=
 RcCompilerName         :=C:/MinGW-4.8.1/bin/windres.exe
 LinkOptions            :=
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch)/usr/local/Cellar/sdl2/2.0.3/include $(IncludeSwitch)/usr/local/Cellar/sdl2/2.0.3/include/SDL2 $(IncludeSwitch)/usr/local/Cellar/sdl2_net/2.0.0/include $(IncludeSwitch)/usr/local/Cellar/sdl2_net/2.0.0/include/SDL2 $(IncludeSwitch)/usr/local/Cellar/libssh/0.6.4/include
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch)/usr/local/include $(IncludeSwitch)/usr/local/include/SDL2
 IncludePCH             :=
 RcIncludePath          :=
 Libs                   := $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)SDL2_net $(LibrarySwitch)ssh
 ArLibs                 :=  "SDL2main" "SDL2" "SDL2_net" "libssh"
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)/usr/local/Cellar/sdl2/2.0.3/lib $(LibraryPathSwitch)/usr/local/Cellar/sdl2_net/2.0.0/lib $(LibraryPathSwitch)/usr/local/Cellar/libssh/0.6.4/lib
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)/usr/local/lib
 
 ##
 ## Common variables
