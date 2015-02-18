@@ -1,3 +1,6 @@
+.. contents:: Table of Contents
+   :depth: 3
+
 ============
 Introduction
 ============
@@ -9,9 +12,11 @@ EtherTerm is a portable terminal emulator and telnet/ssh client for Windows
 and Unix.  It differs from standard terminal emulators such as xterm and PuTTY
 by providing a common telnet and ssh protocol across platforms, with particular
 focus on font sets appropriate for connecting to BBS servers using cp437, and
-amiga art.  EtherTerm is comparable to programs such as syncterm_ and netrunner_.
-Notably: It is an **SDL** graphics program and makes use of full OpenGL/DirectX
-graphics acceleration.
+amiga art.
+
+EtherTerm is comparable to programs such as syncterm_ and netrunner_.  Notably:
+It is an **SDL graphics program** and makes use of full OpenGL/DirectX graphics
+acceleration.
 
 .. _syncterm: http://syncterm.bbsdev.net/
 .. _netrunner: http://www.mysticbbs.com/downloads.html
@@ -46,6 +51,7 @@ Fullscreen
 ----------
 
 ``ALT + ENTER`` cycles between:
+
 - 1x unscaled window
 - 2x scaled window
 - scaled fullscreen
@@ -60,7 +66,7 @@ are also available.
 Copy/Paste
 ----------
 
-Copy and paste is comparable to X11 + xterm: ``Left mouse click and drag`` to
+Copy and paste is comparable to X11: ``Left mouse click and drag`` to
 select text on the screen, release to copy selected text to the clipboard. 
 ``Right mouse click`` to paste text from the clipboard.
 
