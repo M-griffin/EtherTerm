@@ -2,6 +2,9 @@
 Introduction
 ============
 
+.. image:: https://dl.dropboxusercontent.com/u/92792939/EtherTerm.png
+   :alt: Screenshot
+
 EtherTerm is a portable terminal emulator and telnet/ssh client for Windows
 and Unix.  It differs from standard terminal emulators such as xterm and PuTTY
 by providing a common telnet and ssh protocol across platforms, with particular
