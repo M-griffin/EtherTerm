@@ -84,7 +84,7 @@ FTP will be added too.
 Terminal size is locked at 80 x 25 for development.
 Other modes will be configurable later on.
 
-##Demo for Windows:
+## Demo for Windows:
 
 This is the Demo 2.3 Preview for Windows.
 <br/>
@@ -93,27 +93,21 @@ This is the Demo 2.3 Preview for Windows.
 <br/>
 Linux, OSX can be built easily with the following instructions below.
 
-##To compile the following libraries must be pre-installed:
+## Build Instructions
 
-```
-SDL2
-SDL2_Net
-Libssh (Requires OpenSSL, Zlib)
-```
+Generally, the following libraries must be installed:
 
-**Example Windows (mingw32/64) linking:**
-Manual compiles will require the following:
-```
-Libs: mingw32 or 64, SDL2main, SDL2, SDL2_net, libssh
-```
+- SDL2
+- SDL2_Net
+- Libssh (Requires OpenSSL, Zlib)
 
-**Example (G++/Clang) linking:**
-Manual compiles will require the following:
-```
-libs: libSDL2, libSDL2_net, libssh
-```
-linking ```libSDL2_main``` is optional on some distros.
+As well as a recent version of gnu/gcc providing g++, or clang.
 
+Linking ```libSDL2_main``` is optional on some distributions.
+
+For windows, mingw32 or 64 is required.
+
+### Windows
 
 Must compile with latest c++ environment flags.
 
@@ -124,162 +118,38 @@ newer compilers. Usually g++ (4.7)+ or compatible compiler.
 -std=gnu++0x or -std=c++0x
 ```
 
-#Makefile instructions:
-
 To build windows you must already have a compiler and the requirements.
-You can use a good IDE like CodeLite, CodeBlocks, or Visual Studio (more headache).
+You can use a good IDE like CodeLite, CodeBlocks, or Visual Studio.
 You must install the libs and setup the include paths, like any project.
 
-Makefile(s) are provides for g++ compiles on Windows, OSX and Linux.
-With Windows you will need to update the paths, or import fresh into a new IDE project.
+Makefile(s) are provided for g++ compiles on Windows.
 
-**The following Makefile commands will always default for Windows, or you can specify.**
+With Windows you will need to setup a command line environment appropriate
+for compilation of this projet, or create a build target with the necessry
+settings using a project file of your preferred IDE.
+
 ```
-make
-make win
-
-make clean
 make clean-win
+make win
 ```
 
-**For OSX**
-```
-make osx
+### OSX
 
-make clean-osx
-```
+- install http://brew.sh/
+- ``brew install sdl2 sdl2_net libssh``
+- ``make clean-osx; osx``
 
-**For Linux (Ubuntu, Mint and Debian)**
-```
-make linux
+### Ubuntu, Mint, and Debian Linux
 
-make clean-linux
-```
+- ``sudo apt-get install build-essential libsdl2-dev libsdl2-net-dev libssh-dev``
+- ``make clean-linux; make linux``
 
-**For Linux (Arch Linux)**
-```
-make linux-arch
+### Arch Linux
 
-make clean-linux
-```
+- ``sudo pacman -S sdl2 sdl2_net extra/libssh``
+- ``make clean-linux; make linux-arch``
 
-##Linux Build Steps:
-
-###Ubunutu, Mint and Debian can use APT-GET to easily install all requirements.
-
-**Clone the Git repository.**
-```
-git clone https://github.com/M-griffin/EtherTerm.git
-```
-
-**Install build-essential**
-```
-sudo apt-get install build-essential
-```
-
-**Install SDL2**
-```
-sudo apt-get install libsdl2-dev
-```
-
-**Install SDL2_Net**
-```
-sudo apt-get install libsdl2-net-dev
-```
-
-**Install Libssh**
-```
-sudo apt-get install libssh-dev
-```
-
-**To compile your executable.**
-```
-make linux
-```
-
-###Arch Linux can use PACMAN to easily install all requirements.
-
-**Clone the Git repository.**
-```
-git clone https://github.com/M-griffin/EtherTerm.git
-```
-
-**Install SDL2**
-```
-sudo pacman -S sdl2
-```
-
-**Install SDL2_Net**
-```
-sudo pacman -S sdl2_net
-```
-
-**Install Libssh**
-```
-sudo pacman -S extra/libssh
-```
-
-**To compile your executable.**
-```
-make linux-arch
-```
-
-##OSX Build Steps:
-
-**Clone the Git repository.**
-```
-git clone https://github.com/M-griffin/EtherTerm.git
-```
-
-**Install Brew if you don't have it already to easily install all requrements**
-```
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-```
-
-**Install SDL2**
-```
-brew install sdl2
-```
-Installs /usr/local/Cellar/sdl2/2.0.3:
-
-**Install SDL2_Net**
-```
-brew install sdl2_net
-```
-installs /usr/local/Cellar/sdl2_net/2.0.0
-
-**Install Libssh**
-```
-brew install libssh
-```
-installs /usr/local/Cellar/libssh6.4
-
-**To compile your executable.**
-```
-make osx
-```
-
-**Possible issues with OSX Yosemite when building libssh.**
-There is a report and confirmation of a macro redefinition error when compiling on Yosemite.  A patch for this issue was created and applied just a few days ago.  Earlier OSX versions are not affected.
-
-**You can use the following links for patch details, or get a new copy of libssh directly from the repo.**
-Brew should have all dependencies for libssh already set for a clean libssh manual compile.
-```
-Bug Report
-https://red.libssh.org/issues/164#change-488
-
-Patch
-https://red.libssh.org/attachments/download/95/patch-ConfigureChecks.cmake.diff
-```
-
-**link to libssh repo:**
-```
-git clone http://git.libssh.org/projects/libssh.git libssh
-```
-
-##Executing the first time:
-
-Once these are all set, just run the make-osx to build the executable.
+## Executing the first time:
 
 **EtherTerm will look for the ASSETS folder off the root executable folder**
 
@@ -291,7 +161,7 @@ The Makefiles are now updated to copy the executable down from the DEBUG folder 
 
 If you have any issues with files not loading, check or reset permissions while inside of the root EtherTerm folder.
 
-```chmod -R 0777 *```
+``chmod -R u+r .``
 
 **Acknowledgement and Thanks:**
 + Dingo:  Telnet options and general terminal functionality
