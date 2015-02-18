@@ -177,6 +177,6 @@ Acknowledgments and Thanks
 - `SDL Game Development <http://www.amazon.com/SDL-Game-Development-Shaun-Mitchell/dp/1849696829>`_.
 - `maze <https://github.com/tehmaze>`_: Testing and bug reports.
 - `Caphood <http://www.reddit.com/user/Caphood>`_: Testing and bug reports.
-- `IceDevil: Testing and bug reports.
+- IceDevil: Testing and bug reports.
 - `haliphax <https://github.com/haliphax>`_: Testing and bug reports.
 - `hellbeard <https://github.com/ericolito>`_: Testing and bug reports.
