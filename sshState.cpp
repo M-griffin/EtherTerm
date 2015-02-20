@@ -189,7 +189,7 @@ bool SSHState::onEnter()
     // Check if we need to Ask for UserName before starting SSH Connection
     if (sysconn.login == "")
     {
-        std::string initConnection = "|CS|15Initiating connection to: [|07";
+        std::string initConnection = "|CS|15|16Initiating connection to: [|07";
         initConnection += sysconn.name + "|15]";
 
         MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
@@ -197,7 +197,7 @@ bool SSHState::onEnter()
 
         char loginId[1024] = {0};
         char rBuffer[1024] = {0};
-        sprintf(loginId, "|CR|15Use [|07ESC|15] anytime to abort. |CR|CR|15SSH Login: ");
+        sprintf(loginId, "|CR|15Use [|07ESC|15] to abort login prompts. |CR|CR|15SSH Login: ");
         int len = 30;
 
         // Setup the Input Field after the Text
@@ -236,7 +236,8 @@ bool SSHState::onEnter()
 
         char passwordId[1024] = {0};
         memset(rBuffer,0,sizeof(rBuffer));
-        sprintf(passwordId, "|CR|CR|15SSH Password: ");
+        sprintf(passwordId,
+            "|CR|CR|03(|07Leave this blank to use 1 factor public key auth only|03)|CR|15SSH Password: ");
 
         // Setup the Input Field after the Text
         MenuFunction::inputField(passwordId,len);
@@ -255,12 +256,21 @@ bool SSHState::onEnter()
                 TheAnsiParser::Instance()->reset();
                 return false;
             }
-            else if (strcmp(rBuffer,"") != 0 && strcmp(rBuffer,"\n") != 0)
+            else if (strcmp(rBuffer,"\n") != 0)
             {
+                // Enter, Completed!
                 sysconn.password = rBuffer;
                 break;
             }
         }
+    }
+    else
+    {
+        std::string initConnection = "|CS|15|16Initiating connection to: [|07";
+        initConnection += sysconn.name + "|15]";
+
+        MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
+        MenuFunction::sequenceToAnsi((char *)"|CR|10Loading credentials from dialdirectory.xml");
     }
 
     // Received Shutdown.

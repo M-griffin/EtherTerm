@@ -1339,7 +1339,7 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
             if (inputSequence == "\x1b" && inputSequence.size() == 1)
             {
                 isEscapeSequence = false;
-                strcpy(line,"\x1b\0");
+                strcpy(line,"\x1b");
                 return;
             }
         }
@@ -1482,7 +1482,7 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
         }
         else if (sequence == '\r' || sequence == '\n')
         {
-            input += '\0';
+            //input += '\0';
             strncpy(line,(char *)input.c_str(),length);
             break;
         }
@@ -1493,12 +1493,6 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
     {
         return;
     }
-
-    // Restore Background color after input received.
-    Col = 0;
-    char sReplace[15]= {0};
-    ansiBackgroundColor(sReplace, 16);
-    sequenceToAnsi(sReplace,0);
 }
 
 
