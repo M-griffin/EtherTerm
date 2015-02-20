@@ -77,7 +77,7 @@ To add new systems or remove, you must edit the ``assets/dialdirectory.xml`` fil
 Downloads
 =========
 
-- `Windows 2.3 Preview <https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.3.zip>`_
+- `Windows 2.4 Preview <https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.4.zip>`_
 
 For all other systems, you must build from the project folder.
 
