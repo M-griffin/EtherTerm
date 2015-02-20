@@ -381,7 +381,7 @@ private:
 
     void telnetOptionNawsReply();
     void telnetOptionTerminalTypeReply();
-    void telnetSendIAC(Uint32 command, Uint32 option);
+    void telnetSendIAC(unsigned char command, unsigned char option);
     unsigned
     char telnetOptionParse(unsigned char c);
 

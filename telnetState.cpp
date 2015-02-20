@@ -349,7 +349,7 @@ void TelnetState::telnetOptionTerminalTypeReply()
 /**
  * Sends IAC Sequence back to Users Client for Terminal Negoation.
  */
-void TelnetState::telnetSendIAC(Uint32 command, Uint32 option)
+void TelnetState::telnetSendIAC(unsigned char command, unsigned char option)
 {
     unsigned char temp[50]= {0};
     sprintf((char *) temp, "%c%c%c", IAC, command, option);
@@ -398,7 +398,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
             if(c == IAC)
             {
                 // Restart on next character
-                // Double IAC = IAC.
+                // Double IAC = IAC character, not valid so skip it for now.
                 // Telnet states binary mode, double IAC mean pass through
                 // Char 255.  But this doesn't equal any text in ExtASCII
                 // So we going to stuff it.
