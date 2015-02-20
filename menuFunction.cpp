@@ -1809,14 +1809,14 @@ void MenuFunction::displayAnsiFile(std::string fileName)
 #endif
     path += fileName;
 
-    std::cout << "Display Ansi: " << path << std::endl;
+    std::cout << "Display ANSI: " << path << std::endl;
 
     std::string buff;
     FILE *fp;
     int sequence = 0;
     if ((fp = fopen(path.c_str(), "r+")) ==  nullptr)
     {
-        std::cout << "ansiPrintf - no ansi found: " << fileName << std::endl;
+        std::cout << "ansiPrintf - no ANSI found: " << fileName << std::endl;
         return;
     }
     do

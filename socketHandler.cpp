@@ -123,7 +123,7 @@ bool SocketHandler::initTelnet(std::string host, int port)
             {
                 active = false;
                 SDL_LogError(SDL_LOG_CATEGORY_ERROR,
-                    "Unable to initalize Telnet Socket.");
+                    "Unable to initialize Telnet Socket.");
                 return false;
             }
         }
@@ -159,7 +159,7 @@ bool SocketHandler::initSSH(std::string host, int port,
             else
             {
                 SDL_LogError(SDL_LOG_CATEGORY_ERROR,
-                    "Unable to initalize SSH Socket.");
+                    "Unable to initialize SSH Socket.");
                 active = false;
                 return false;
             }

@@ -313,7 +313,7 @@ bool MainMenuState_INI::ddirectory_parse(int index)
     inStream.open(name);
     if(!inStream.is_open())
     {
-        printf("Couldn't Open Config File: %s\n", name);
+        printf("Unable to open configuration file: %s\n", name);
         return false;
     }
 
@@ -345,7 +345,7 @@ void MainMenuState::readinAnsi(std::string FileName, std::string &buff)
     path += ".ans";
     FILE *fp;
 
-    std::cout << "Load Ansi: " << path << std::endl;
+    std::cout << "Load ANSI: " << path << std::endl;
 
     int sequence = 0;
     if((fp = fopen(path.c_str(), "r+")) ==  nullptr)

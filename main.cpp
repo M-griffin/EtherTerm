@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
         // Setup the Surfaces
         if(TheTerminal::Instance()->initSurfaceTextures())
         {
-            std::cout << "Surface & Textures Initalized. " << std::endl;
+            std::cout << "Surface & Textures Initialized. " << std::endl;
             // Load Font Texture to Surface
             if(TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont()))
             {

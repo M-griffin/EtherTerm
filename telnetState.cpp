@@ -465,7 +465,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                             break;
 
                         default:
-                            printf("\r\n [DONT - responsed WONT %i] \r\n",c);
+                            printf("\r\n [DONT - responded WONT %i] \r\n",c);
                             telnetSendIAC(telnetOptionAcknowledge(cmd),c);
                             stage = 0;
                             break;
@@ -477,34 +477,34 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                     switch(c)
                     {
                         case TELOPT_ECHO:
-                            printf("\r\n [DO - TELOPT_ECHO responsed WILL] \r\n");
+                            printf("\r\n [DO - TELOPT_ECHO responded WILL] \r\n");
                             telnetSendIAC(telnetOptionDeny(cmd),c);
                             didECHO = true;
                             isECHO = true;
                             break;
 
                         case TELOPT_BINARY:
-                            printf("\r\n [DO - TELOPT_BINARY responsed WILL] \r\n");
+                            printf("\r\n [DO - TELOPT_BINARY responded WILL] \r\n");
                             telnetSendIAC(telnetOptionAcknowledge(cmd),c);
                             isBIN = true;
                             didBIN = true;
                             break;
 
                         case TELOPT_SGA:
-                            printf("\r\n [DO - TELOPT_SGA responsed WILL] \r\n");
+                            printf("\r\n [DO - TELOPT_SGA responded WILL] \r\n");
                             telnetSendIAC(telnetOptionAcknowledge(cmd),c);
                             isSGA = true;
                             didSGA = true;
                             break;
 
                         case TELOPT_TTYPE:
-                            printf("\r\n [DO - TELOPT_TTYPE responsed WILL] \r\n");
+                            printf("\r\n [DO - TELOPT_TTYPE responded WILL] \r\n");
                             telnetSendIAC(telnetOptionAcknowledge(cmd),c);
                             didTERM = true;
                             break;
 
                         case TELOPT_NAWS:
-                            printf("\r\n [DO - TELOPT_NAWS responsed WILL] \r\n");
+                            printf("\r\n [DO - TELOPT_NAWS responded WILL] \r\n");
                             telnetSendIAC(telnetOptionAcknowledge(cmd),c);
                             telnetOptionNawsReply();
                             didNAWS = true;
@@ -517,7 +517,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                             */
 
                         default:
-                            printf("\r\n [DO - responsed WONT %i] \r\n",c);
+                            printf("\r\n [DO - responded WONT %i] \r\n",c);
                             telnetSendIAC(telnetOptionDeny(cmd),c);
                             break;
                     }
@@ -534,7 +534,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                         case TELOPT_ECHO:
                             if(!didECHO)
                             {
-                                printf("\r\n [WILL - TELOPT_ECHO responsed DO] \r\n");
+                                printf("\r\n [WILL - TELOPT_ECHO responded DO] \r\n");
                                 telnetSendIAC(telnetOptionAcknowledge(cmd),c);
                                 didECHO = true;
                                 isECHO = false;
@@ -544,7 +544,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                         case TELOPT_BINARY :
                             if(!didBIN)
                             {
-                                printf("\r\n [WILL - TELOPT_BINARY responsed DO] \r\n");
+                                printf("\r\n [WILL - TELOPT_BINARY responded DO] \r\n");
                                 telnetSendIAC(telnetOptionAcknowledge(cmd),c);
                                 didBIN = true;
                                 isBIN = true;
@@ -554,7 +554,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                         case TELOPT_SGA :
                             if(!didSGA)
                             {
-                                printf("\r\n [WILL - TELOPT_SGA responsed DO] \r\n");
+                                printf("\r\n [WILL - TELOPT_SGA responded DO] \r\n");
                                 telnetSendIAC(telnetOptionAcknowledge(cmd),c);
                                 didSGA = true;
                                 isSGA = true;
@@ -567,7 +567,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                             */
                         default :
                             telnetSendIAC(telnetOptionDeny(cmd),c);
-                            printf("\r\n [WILL - responsed DONT %i] \r\n",c);
+                            printf("\r\n [WILL - responded DONT %i] \r\n",c);
                             break;
                     }
                     stage = 0;
@@ -577,7 +577,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                     // Don't responset to WONT
                     printf("\r\n [WONT telnet request received] \r\n");
                     telnetSendIAC(telnetOptionAcknowledge(cmd),c);
-                    printf("\r\n [WONT - responsed DONT %i] \r\n",c);
+                    printf("\r\n [WONT - responded DONT %i] \r\n",c);
                     stage = 0;
                     break;
 

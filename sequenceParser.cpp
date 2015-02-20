@@ -192,7 +192,7 @@ void SequenceParser::processLevel0()
     {
         // Continue to Next Sequence
 #ifdef _DEBUG
-        std::cout << "Is a Seperator: " << sequence << std::endl;
+        std::cout << "Is a Separator: " << sequence << std::endl;
 #endif
         return;
     }
@@ -584,7 +584,7 @@ void SequenceParser::processLevel2()
     {
         // Continue to Next Sequence
 #ifdef _DEBUG
-        std::cout << "Is a Seperator: " << sequence << std::endl;
+        std::cout << "Is a Separator: " << sequence << std::endl;
 #endif
         return;
     }
@@ -932,7 +932,7 @@ void SequenceParser::validateSequence()
         // ignores spaces.
 #ifdef _DEBUG
         int ii = 1;
-        std::cout << "result = TRUE, found ; seperator." << std::endl;
+        std::cout << "result = TRUE, found ; separator." << std::endl;
 #endif
         while(std::getline(inStream, token, ';'))
         {
