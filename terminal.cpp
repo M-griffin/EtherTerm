@@ -463,6 +463,9 @@ void Terminal::pullSelectionBuffer(int x, int y)
     int sourceX = TheInputHandler::Instance()->getMouseSourceXPosition();
     int sourceY = TheInputHandler::Instance()->getMouseSourceYPosition();
 
+    std::cout << sourceX << ":" << x << ", ";
+    std::cout << sourceY << ":" << y << std::endl;
+
     // This is the source position that we Xy     = Source
     //                                      []
     // are starting our rect box at.          xy  = Motion

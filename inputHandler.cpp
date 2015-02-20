@@ -164,9 +164,14 @@ bool InputHandler::update()
                     // Clear the screen of the selection box.
                     TheTerminal::Instance()->drawTextureScreen();
 
-                    // Copy Selected Text to Clipboard.
-                    TheTerminal::Instance()->pullSelectionBuffer(
-                        mouseReleaseXPosition, mouseReleaseYPosition);
+                    // Copy Selected Text to Clipboard. Make sure click
+                    // in window with no movement is not considered a selection
+                    if (mouseReleaseXPosition != mouseSourceXPosition &&
+                        mouseReleaseYPosition != mouseSourceYPosition)
+                    {
+                        TheTerminal::Instance()->pullSelectionBuffer(
+                            mouseReleaseXPosition, mouseReleaseYPosition);
+                    }
 
                     // Needed for Windows Full Screen Mode Switches, otherwise it doesn't
                     // Repopulate properly.  Clear so texture is refreshed each selection
@@ -409,7 +414,7 @@ bool InputHandler::update()
 
                         // Add Swap for BS and DEL (Win vs Nix Terms)                        
                         case SDLK_TAB:
-                            setInputSequence("    ");
+                            setInputSequence("\t");
                             return true;
 
                         default:
