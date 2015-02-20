@@ -960,8 +960,19 @@ bool Terminal::loadBitmapImage(std::string fontName)
             "loadBitmapImage() SDL_LoadBMP font: %s", currentFont.c_str());
         return false;
     }
-    currentFont = path;
-    previousFont = currentFont;    
+
+    // Redraw Cursor with new font!
+    // When no data received, this is when we want to show the cursor!
+    // Setup cursor in current x/y position Cursor.
+    if (TheAnsiParser::Instance()->isCursorActive())
+    {
+        setupCursorChar();
+        renderCursorOnScreen();
+        drawTextureScreen();
+    }
+
+    previousFont = currentFont; // Current to Previous
+    currentFont  = fontName;    // New to Current.
     return chachedSurface != nullptr;
 }
 

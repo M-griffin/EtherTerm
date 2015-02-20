@@ -818,7 +818,7 @@ void SequenceParser::validateSequence()
 
     if (sequenceBuilder == "\x1b[0;0 D")
     {
-        std::cout << "switch to CP437 Font" << std::endl;
+        std::cout << std::endl << "Switched to CP437 Font" << std::endl;
         TheTerminal::Instance()->setCurrentFont("vga8x16.bmp");
         if (TheTerminal::Instance()->didFontChange())
             TheTerminal::Instance()->loadBitmapImage(
@@ -833,7 +833,7 @@ void SequenceParser::validateSequence()
     else
     if (sequenceBuilder == "\x1b[0;37 D")
     {
-        std::cout << "switch to Pot-Noodle Font" << std::endl;
+        std::cout << std::endl << "Switched to Pot-Noodle Font" << std::endl;
         TheTerminal::Instance()->setCurrentFont("potNoodle-8x16.bmp");
         if (TheTerminal::Instance()->didFontChange())
             TheTerminal::Instance()->loadBitmapImage(
@@ -846,7 +846,7 @@ void SequenceParser::validateSequence()
     else
     if (sequenceBuilder == "\x1b[0;38 D")
     {
-        std::cout << "switch to mO'sOul Font" << std::endl;
+        std::cout << std::endl << "Switched to mO'sOul Font" << std::endl;
         TheTerminal::Instance()->setCurrentFont("mo'soul-8x16.bmp");
         if (TheTerminal::Instance()->didFontChange())
             TheTerminal::Instance()->loadBitmapImage(
@@ -859,7 +859,7 @@ void SequenceParser::validateSequence()
     else
     if (sequenceBuilder == "\x1b[0;39 D")
     {
-        std::cout << "switch to Micro-Knight+ Font" << std::endl;
+        std::cout << std::endl << "Switched to Micro-Knight+ Font" << std::endl;
         TheTerminal::Instance()->setCurrentFont("microKnightPlus-8x16.bmp");
         if (TheTerminal::Instance()->didFontChange())
             TheTerminal::Instance()->loadBitmapImage(
@@ -872,7 +872,7 @@ void SequenceParser::validateSequence()
     else
     if (sequenceBuilder == "\x1b[0;40 D")
     {
-        std::cout << "switch to Topaz+ Font" << std::endl;
+        std::cout << std::endl << "Switched to Topaz+ Font" << std::endl;
         TheTerminal::Instance()->setCurrentFont("topazPlus-8x16.bmp");
         if (TheTerminal::Instance()->didFontChange())
             TheTerminal::Instance()->loadBitmapImage(

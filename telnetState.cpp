@@ -72,7 +72,7 @@ void TelnetState::handleSession()
         else if (c == '\0')
         {
             //std::cout << "^0" << std::flush;
-            continue;
+            //continue;
         }
         else
             std::cout << c << std::flush;
@@ -88,6 +88,12 @@ void TelnetState::handleSession()
         }
 
         // Skip all NULL Bytes, returned on IAC characters.
+
+        // Also:
+        // Synchronet even with supress go-aheads
+        // Send anoying amount of null bits Not "\r\0"
+        // becasue the \0 in rows of 50 or so!
+        // when waiting for input!
         if(ch == '\0')
         {
             continue;

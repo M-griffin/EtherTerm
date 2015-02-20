@@ -59,9 +59,12 @@ void SSHState::handleSession()
         else
             std::cout << ch << std::flush;
 #endif
-
+        // Synchronet sends anyoing amount of null bits
+        // becasue the \0 in rows of 50 or so!
+        // when waiting for input!
         if(ch == '\0')
             continue;
+
         output += ch;
     }
 
