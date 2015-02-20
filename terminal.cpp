@@ -808,20 +808,8 @@ void Terminal::renderSelectionScreen(int x, int y)
 void Terminal::freeSurfaceTextures()
 {
     // Clear Cached Surface.
-    std::cout << std::endl << "*** Releaseing Surfaces and Textures" << std::endl;
-    
-    if (globalRenderer)
-    {
-        std::cout << "Destroy SDL Renderer" << std::endl;
-        SDL_DestroyRenderer(globalRenderer);
-        globalRenderer = nullptr;
-    }
-    if (globalWindow)
-    {
-        std::cout << "Destroy SDL Window" << std::endl;
-        SDL_DestroyWindow(globalWindow);
-        globalWindow = nullptr;
-    }
+    std::cout << std::endl << "*** Releasing Surfaces and Textures" << std::endl;
+
 
     //Free texture if it exists
     if (globalTexture)
@@ -836,7 +824,20 @@ void Terminal::freeSurfaceTextures()
         SDL_DestroyTexture(selectionTexture);
         selectionTexture = nullptr;
     }
-   
+
+    if (globalWindow)
+    {
+        std::cout << "Destroy SDL Window" << std::endl;
+        SDL_DestroyWindow(globalWindow);
+        globalWindow = nullptr;
+    }
+	if (globalRenderer)
+    {
+        std::cout << "Destroy SDL Renderer" << std::endl;
+        SDL_DestroyRenderer(globalRenderer);
+        globalRenderer = nullptr;
+    }
+
     if (chachedSurface)
     {
         std::cout << "SDL_FreeSurface chachedSurface" << std::endl;
@@ -980,7 +981,7 @@ bool Terminal::loadBitmapImage(std::string fontName)
 }
 
 /**
- * Initalize the Render, Loads the Fonts and Create the Surfaces.
+ * Initialize the Render, Loads the Fonts and Create the Surfaces.
  */
 bool Terminal::initSurfaceTextures()
 {
@@ -1129,7 +1130,7 @@ bool Terminal::initSurfaceTextures()
 }
 
 /*
- * Overides the Scrolling region of the screen
+ * Overrides the Scrolling region of the screen
  */
 void Terminal::setScrollRegion(int top, int bot, int terminalHeight)
 {
@@ -1154,7 +1155,7 @@ void Terminal::setScrollRegion(int top, int bot, int terminalHeight)
             bot = terminalHeight;
         scrollRegionActive = true;
     }
-    // Set Scolling Margins
+    // Set Scrolling Margins
     topMargin = top;
     bottomMargin = bot;
 }
@@ -1304,7 +1305,7 @@ void Terminal::scrollScreenUp()
 
 /**
  * Clears the Surface Back Buffer, and Global Texture
- * Renderes the Screen Blank for new set of data.
+ * Renders the Screen Blank for new set of data.
  *
  * Updated, Now clears the surface to the current background color
  * This is for ESC[2J proper behavior.
@@ -1354,7 +1355,7 @@ void Terminal::clearScreenSurface()
 }
 
 /**
- * Fill entire lines with space and black foregroud/Background
+ * Fill entire lines with space and black foreground/Background
  * Fast update to clear a row.
  */
 void Terminal::renderClearLineScreen(int y, int start, int end)
@@ -1375,7 +1376,7 @@ void Terminal::renderClearLineScreen(int y, int start, int end)
 /**
  * Loops from starting y position to bottom of screen
  * Erasing all of the screen below.
- * Fill entire lines with space and black foregroud/Background
+ * Fill entire lines with space and black foreground/Background
  * Fast update to clear a row.
  */
 void Terminal::renderClearLineAboveScreen(int y, int x)
@@ -1406,7 +1407,7 @@ void Terminal::renderClearLineAboveScreen(int y, int x)
 /**
  * Loops from starting y position to bottom of screen
  * Erasing all of the screen below.
- * Fill entire lines with space and black foregroud/Background
+ * Fill entire lines with space and black foreground/Background
  * Fast update to clear a row.
  */
 void Terminal::renderClearLineBelowScreen(int y, int x)
@@ -1478,7 +1479,7 @@ void Terminal::renderDeleteCharScreen(int x, int y, int num)
 
 /**
  * Render The Bottom Row of the screen
- * So were only writting the to the bottom line of the screen only
+ * So were only writing the to the bottom line of the screen only
  * And not redrawing the entire screen each time. Used After Scrolling
  * The Screen up.
  */
@@ -1605,7 +1606,7 @@ void Terminal::renderBottomScreen()
 */
 
 /**
- * Bascially Plots each Char to Texture
+ * Basically Plots each Char to Texture
  * Updates super fast now!! oh yea!!
  */
 void Terminal::renderScreen()
@@ -1646,7 +1647,7 @@ void Terminal::renderScreen()
 }
 
 /**
- * Bascially Plots each Char to Texture
+ * Basically Plots each Char to Texture
  * Updates super fast now!! oh yea!!
  */
 void Terminal::renderCharScreen(int x, int y)
@@ -1688,7 +1689,7 @@ void Terminal::renderCharScreen(int x, int y)
 }
 
 /**
- * Bascially Plots each Char to Texture
+ * Basically Plots each Char to Texture
  * Updates super fast now!! oh yea!!
  */
 void Terminal::renderCursorOnScreen()
@@ -1737,7 +1738,7 @@ void Terminal::renderCursorOnScreen()
 }
 
 /**
- * Bascially Plots each Char to Texture
+ * Basically Plots each Char to Texture
  * Updates super fast now!! oh yea!!
  */
 void Terminal::renderCursorOffScreen()
@@ -1789,13 +1790,13 @@ void Terminal::renderCursorOffScreen()
 
 /*
  * This hints or highlights the current screen
- * Doesn't excatly change gama, was just testing!
+ * Doesn't exactly change Gama, was just testing!
  * Could be used lateron for something.
  */
 void Terminal::drawGamaTextureScreen()
 {
     // Next create a texture to overlay for highlighting
-    // Create Inital Texture if it doesn't exist.
+    // Create Initial Texture if it doesn't exist.
     if(!selectionTexture)
     {
         selectionTexture =
@@ -1854,7 +1855,7 @@ void Terminal::drawGamaTextureScreen()
             "drawGamaTextureScreen() SDL_RenderCopy globalRenderer: %s", SDL_GetError());
     }
 
-    // Reset dont need it?
+    // Reset don't need it?
     //SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderPresent(globalRenderer);
 
@@ -1863,7 +1864,7 @@ void Terminal::drawGamaTextureScreen()
 
 /**
  * Transfers the Buffer to a Texture and
- * Renderes the Screen
+ * Renders the Screen
  */
 void Terminal::drawTextureScreen()
 {
@@ -1876,7 +1877,7 @@ void Terminal::drawTextureScreen()
             "drawTextureScreen() SDL_GetRendererOutputSize globalRenderer: %s", SDL_GetError());
     }
 
-    // We clip off botom 80, so that we get proper 8x16
+    // We clip off bottom 80, so that we get proper 8x16
     // Display without Extra pixel borders around the screen,
     // Texture Filter results in Pixel Bleeding.
     rect.w = surfaceWidth  - 40; // 680 - 640 = 40
@@ -1900,7 +1901,7 @@ void Terminal::drawTextureScreen()
 
 /**
  * Clears the Renderer Screen for Fresh Redraw.
- * Renderes the Screen
+ * Renders the Screen
  */
 void Terminal::clearScreen()
 {
@@ -1928,7 +1929,7 @@ int Terminal::compareSDL_Colors(SDL_Color &src, SDL_Color &dest)
 }
 
 /**
- * Replace Foreground and Backgroud colors per character cell by pixel.
+ * Replace Foreground and Background colors per character cell by pixel.
  */
 void Terminal::replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 background)
 {
@@ -1964,7 +1965,7 @@ void Terminal::replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 backgrou
 
 /**
  * Setup The Blinking Cursor
- * This grabs the current cell of the cusor position
+ * This grabs the current cell of the cursor position
  * Then builder on and off character surfaces.
  */
 void Terminal::setupCursorChar()
@@ -2010,7 +2011,7 @@ void Terminal::setupCursorChar()
             "setupCursorChar() SDL_FillRect cursorOnSurface: %s", SDL_GetError());
     }
 
-    //First Grab UnderScore from Font Surface
+    //First Grab Underscore from Font Surface
     if (SDL_BlitSurface(chachedSurface,&pick,tmpSurface,nullptr) < 0)
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
@@ -2024,7 +2025,7 @@ void Terminal::setupCursorChar()
             "setupCursorChar() SDL_BlitSurface cursorOnSurface: %s", SDL_GetError());
     }
 
-    // Grab curent Char Block where Passed Cursor position is.
+    // Grab current Char Block where Passed Cursor position is.
     if (SDL_BlitSurface(screenSurface,&area,cursorOffSurface,nullptr) < 0)
     {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
@@ -2081,7 +2082,7 @@ void Terminal::setupCursorChar()
 }
 
 /**
- * Draws a Char Cell to x/y loction on screen surface.
+ * Draws a Char Cell to x/y location on screen surface.
  */
 void Terminal::drawChar(int X, int Y, int asciicode)
 {
@@ -2128,7 +2129,7 @@ void Terminal::drawChar(int X, int Y, int asciicode)
 }
 
 /**
- * Draws a String of Character Cells to x/y loction on screen surface.
+ * Draws a String of Character Cells to x/y location on screen surface.
  * If String is longer then screen will wrap to next line.
  * NOTE Add scrolling if hits bottom of page,
  * But this will most likely be done in the ANSI Parser.
@@ -2156,7 +2157,7 @@ void Terminal::drawString(int X, int Y, char text[])
 }
 
 /**
- * Draws Character Set of each Character Cells to x/y loction on screen surface.
+ * Draws Character Set of each Character Cells to x/y location on screen surface.
  * If String is longer then screen will wrap to next line.
  * Mainly for testing all characters loaded from Bitmap Image.
  */
