@@ -427,6 +427,45 @@ bool InputHandler::update()
                 {
                     switch(event.key.keysym.sym)
                     {
+                        // Handle KeyPad Keys without numlock
+                        // Numlock Numbers are read by Text Input already.
+                        /* Caught by TextInput()
+                        case SDLK_KP_PERIOD:
+                            if (event.key.keysym.mod & KMOD_NUM)
+                            {
+                                setInputSequence(".");
+                                return true;
+                            }
+                            break;*/
+                        case SDLK_KP_8: // UP
+                            if (!(event.key.keysym.mod & KMOD_NUM))
+                            {
+                                setInputSequence("\x1b[A");
+                                return true;
+                            }
+                            break;
+                        case SDLK_KP_2: // DN
+                           if (!(event.key.keysym.mod & KMOD_NUM))
+                            {
+                                setInputSequence("\x1b[B");
+                                return true;
+                            }
+                            break;
+                        case SDLK_KP_6: // RIGHT
+                            if (!(event.key.keysym.mod & KMOD_NUM))
+                            {
+                                setInputSequence("\x1b[C");
+                                return true;
+                            }
+                            break;
+                        case SDLK_KP_4: // LEFT
+                            if (!(event.key.keysym.mod & KMOD_NUM))
+                            {
+                                setInputSequence("\x1b[D");
+                                return true;
+                            }
+                            break;
+
                         case SDLK_ESCAPE:
                             setInputSequence("\x1b");
                             return true;
@@ -504,6 +543,57 @@ bool InputHandler::update()
                                 setInputSequence("\x1b[U");
                                 return true;
 
+                            // Handle KeyPad Keys without numlock
+                            // Numlock Numbers are read by Text Input already.
+                            case SDLK_KP_PERIOD: // Delete
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x7f");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_0: // INS
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[@");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_1: // END
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[K");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_3: // PGDN
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[U");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_5: // Empty, space?
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+
+                                }
+                                break;
+                            case SDLK_KP_7: // HOME
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[H");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_9: // PAGEUP
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[V");
+                                    return true;
+                                }
+                                break;
+
                             // Function Keys
                             case SDLK_F1:
                                 setInputSequence("\x1b[OP");
@@ -577,6 +667,57 @@ bool InputHandler::update()
                                 setInputSequence("\x1b[6~");
                                 return true;
 
+                            // Handle KeyPad Keys without numlock
+                            // Numlock Numbers are read by Text Input already.
+                            case SDLK_KP_PERIOD: // Delete
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[3~");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_0: // INS
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[2~");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_1: // END
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[4~");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_3: // PGDN
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[6~");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_5: // Empty, space?
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+
+                                }
+                                break;
+                            case SDLK_KP_7: // HOME
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[1~");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_9: // PAGEUP
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[5~");
+                                    return true;
+                                }
+                                break;
+
                             // Function Keys
                             case SDLK_F1:
                                 setInputSequence("\x1b[OP");
@@ -649,6 +790,57 @@ bool InputHandler::update()
                                 setInputSequence("\x1b[6~");
                                 return true;
 
+                            // Handle KeyPad Keys without numlock
+                            // Numlock Numbers are read by Text Input already.
+                            case SDLK_KP_PERIOD: // Delete
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[3~");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_0: // INS
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[2~");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_1: // END
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[4~");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_3: // PGDN
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[6~");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_5: // Empty, space?
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+
+                                }
+                                break;
+                            case SDLK_KP_7: // HOME
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[1~");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_9: // PAGEUP
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[5~");
+                                    return true;
+                                }
+                                break;
+
                             // Function Keys
                             case SDLK_F1:
                                 setInputSequence("\x1b[[A");
@@ -719,6 +911,57 @@ bool InputHandler::update()
                             case SDLK_PAGEDOWN: // page down
                                 setInputSequence("\x1b[G");
                                 return true;
+
+                            // Handle KeyPad Keys without numlock
+                            // Numlock Numbers are read by Text Input already.
+                            case SDLK_KP_PERIOD: // Delete
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x08");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_0: // INS
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[L");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_1: // END
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[F");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_3: // PGDN
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[G");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_5: // Empty, space?
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+
+                                }
+                                break;
+                            case SDLK_KP_7: // HOME
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[H");
+                                    return true;
+                                }
+                                break;
+                            case SDLK_KP_9: // PAGEUP
+                                if (!(event.key.keysym.mod & KMOD_NUM))
+                                {
+                                    setInputSequence("\x1b[I");
+                                    return true;
+                                }
+                                break;
 
                             // Function Keys
                             case SDLK_F1:
