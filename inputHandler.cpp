@@ -9,7 +9,9 @@
 #include "socketHandler.h"
 #include "ansiParser.h"
 #include "terminal.h"
+
 #include <iostream>
+#include <string>
 
 InputHandler* InputHandler::globalInstance = 0;
 
@@ -239,6 +241,8 @@ bool InputHandler::update()
                     }
                     while(1)
                     {   // Replace Tabs with (4) Spaces.
+                        // Need Toggle in INI for \t or 4 spaces
+                        // On Paste, not all systems handle \t.
                         id1 = inputText.find("\t", 0);
                         if(id1 != std::string::npos)
                         {
@@ -261,7 +265,40 @@ bool InputHandler::update()
                 break;
 
             case SDL_KEYDOWN:
-                // Start with CTRL and ALT Keys combo's.
+
+                // Start with CTRL and ALT Keys combo's. TESTING!
+                //if( event.key.keysym.mod  & KMOD_NUM ) printf( "\r\nNUMLOCK \r\n" );
+                //if( event.key.keysym.mod  & KMOD_CAPS ) printf( "\r\nCAPSLOCK \r\n" );
+                //if( event.key.keysym.mod  & KMOD_LCTRL ) printf( "LCTRL " );
+                //if( event.key.keysym.mod  & KMOD_RCTRL ) printf( "RCTRL " );
+                //if( event.key.keysym.mod  & KMOD_RSHIFT ) printf( "RSHIFT " );
+                //if( event.key.keysym.mod  & KMOD_LSHIFT ) printf( "LSHIFT " );
+                //if( event.key.keysym.mod  & KMOD_RALT ) printf( "RALT " );
+                //if( event.key.keysym.mod  & KMOD_LALT ) printf( "LALT " );
+                //if( event.key.keysym.mod  & KMOD_CTRL ) printf( "\r\nCTRL \r\n" );
+                //if( event.key.keysym.mod  & KMOD_SHIFT ) printf( "\r\nSHIFT \r\n" );
+                //if( event.key.keysym.mod  & KMOD_ALT ) printf( "\r\nALT \r\n" );
+                //std::cout << "done!" << std::endl;
+
+                if (event.key.keysym.mod & KMOD_SHIFT &&
+                    event.key.keysym.mod & KMOD_CTRL)
+                {
+                    switch (event.key.keysym.sym)
+                    {
+
+                        case 45: //SDLK_UNDERSCORE:
+                            //std::cout << "createUnderScoreSequence" << std::endl;
+                            setInputSequence("\x1f");
+                            return true;
+
+                        default:
+                            // Testing
+                            //std::cout << "event.key.keysym.sym: "
+                                //<< event.key.keysym.sym << std::endl;
+                            break;
+                    }
+                }
+
                 if (event.key.keysym.mod & KMOD_CTRL)
                 {
                     switch (event.key.keysym.sym)
@@ -280,7 +317,7 @@ bool InputHandler::update()
                                 // Translate Letter to CTRL Letter value
                                 ch = CTRLKEYTABLE[ch-97];
                                 sequence = ch;
-                                setInputSequence(sequence.c_str());
+                                setInputSequence(sequence);
                                 return true;
                             }
                             break;
@@ -396,16 +433,28 @@ bool InputHandler::update()
 
                         // Add Toggle for Hardware Keys ESC0A etc..
                         case SDLK_UP:
-                            setInputSequence("\x1b[A");
+                            if (event.key.keysym.mod & KMOD_SHIFT)
+                                setInputSequence("\x1b[1;2A");
+                            else
+                                setInputSequence("\x1b[A");
                             return true;
                         case SDLK_DOWN:
-                            setInputSequence("\x1b[B");
+                            if (event.key.keysym.mod & KMOD_SHIFT)
+                                setInputSequence("\x1b[1;2B");
+                            else
+                                setInputSequence("\x1b[B");
                             return true;
                         case SDLK_RIGHT:
-                            setInputSequence("\x1b[C");
+                            if (event.key.keysym.mod & KMOD_SHIFT)
+                                setInputSequence("\x1b[1;2C");
+                            else
+                                setInputSequence("\x1b[C");
                             return true;
                         case SDLK_LEFT:
-                            setInputSequence("\x1b[D");
+                            if (event.key.keysym.mod & KMOD_SHIFT)
+                                setInputSequence("\x1b[1;2D");
+                            else
+                                setInputSequence("\x1b[D");
                             return true;
                         case SDLK_RETURN:
                         case SDLK_KP_ENTER:
@@ -414,7 +463,10 @@ bool InputHandler::update()
 
                         // Add Swap for BS and DEL (Win vs Nix Terms)                        
                         case SDLK_TAB:
-                            setInputSequence("\t");
+                            if (event.key.keysym.mod & KMOD_SHIFT)
+                                setInputSequence("\x1b[Z");
+                            else
+                                setInputSequence("\t");
                             return true;
 
                         default:
