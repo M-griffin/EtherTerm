@@ -403,9 +403,11 @@ int SSH_Socket::authenticate_console()
             break;
     }
 
+    int failureCounter = 0;
+
     // Get a list of excepted Auth Sessions server wants.
     method = ssh_auth_list(session);
-    while(rc != SSH_AUTH_SUCCESS)
+    while(rc != SSH_AUTH_SUCCESS && failureCounter < 20)
     {
 /*
     Retrieve the public key with ssh_import_pubkey_file().
@@ -422,7 +424,7 @@ int SSH_Socket::authenticate_console()
         // available keys in "~/.ssh/" or sshagent. The return values are the following:
         // ** Public Key Needs more testing.
         if(method & SSH_AUTH_METHOD_PUBLICKEY)
-        {            
+        {
             rc = ssh_userauth_autopubkey(session, nullptr);
             switch(rc)
             {
@@ -432,6 +434,7 @@ int SSH_Socket::authenticate_console()
                     return rc;
                 case SSH_AUTH_DENIED:  //no key matched
                     std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_DENIED!" << std::endl;
+                    ++failureCounter;
                     break;
                 case SSH_AUTH_SUCCESS: //you are now authenticated
                     std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_SUCCESS!" << std::endl;
@@ -440,6 +443,7 @@ int SSH_Socket::authenticate_console()
                     // some key matched but you still have
                     // to provide an other mean of authentication (like a password).
                     std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_PARTIAL!" << std::endl;
+                    ++failureCounter;
                     break;
                 default:
                     break;
@@ -481,6 +485,7 @@ int SSH_Socket::authenticate_console()
                     return rc;
                 case SSH_AUTH_DENIED:  //no key matched
                     std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_DENIED!" << std::endl;
+                    ++failureCounter;
                     break;
                 case SSH_AUTH_SUCCESS: //you are now authenticated
                     std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_SUCCESS!" << std::endl;
@@ -488,6 +493,7 @@ int SSH_Socket::authenticate_console()
                 case SSH_AUTH_PARTIAL: //some key matched but you still have to
                                        //provide an other mean of authentication (like a password).
                     std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_PARTIAL!" << std::endl;
+                    ++failureCounter;
                     break;
                 default:
                     break;
@@ -502,25 +508,30 @@ int SSH_Socket::authenticate_console()
         // Try to authenticate with password
         if(method & SSH_AUTH_METHOD_PASSWORD)
         {
-            rc = ssh_userauth_password(session, nullptr, password.c_str());
-            switch(rc)
+            if (password != "")
             {
-                case SSH_AUTH_ERROR:   //some serious error happened during authentication
-                    std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_ERROR!" << std::endl;
-                    error();
-                    return rc;
-                case SSH_AUTH_DENIED:  //no key matched
-                    std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_DENIED!" << std::endl;
-                    break;
-                case SSH_AUTH_SUCCESS: //you are now authenticated
-                    std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_SUCCESS!" << std::endl;
-                    break;
-                case SSH_AUTH_PARTIAL: //some key matched but you still have to
-                                       // provide an other mean of authentication (like a password).
-                    std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_PARTIAL!" << std::endl;
-                    break;
-                default:
-                    break;
+                rc = ssh_userauth_password(session, nullptr, password.c_str());
+                switch(rc)
+                {
+                    case SSH_AUTH_ERROR:   //some serious error happened during authentication
+                        std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_ERROR!" << std::endl;
+                        error();
+                        return rc;
+                    case SSH_AUTH_DENIED:  //no key matched
+                        std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_DENIED!" << std::endl;
+                        ++failureCounter;
+                        break;
+                    case SSH_AUTH_SUCCESS: //you are now authenticated
+                        std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_SUCCESS!" << std::endl;
+                        break;
+                    case SSH_AUTH_PARTIAL: //some key matched but you still have to
+                                           // provide an other mean of authentication (like a password).
+                        std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_PARTIAL!" << std::endl;
+                        ++failureCounter;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
@@ -530,5 +541,7 @@ int SSH_Socket::authenticate_console()
         std::cout << banner << std::endl;
         ssh_string_free_char(banner);
     }
+
+    std::cout << " *** SSH Authenticate Completed." << std::endl;
     return rc;
 }

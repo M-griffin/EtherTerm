@@ -237,7 +237,7 @@ bool SSHState::onEnter()
         char passwordId[1024] = {0};
         memset(rBuffer,0,sizeof(rBuffer));
         sprintf(passwordId,
-            "|CR|CR|03(|07Leave this blank to use 1 factor public key auth only|03)|CR|15SSH Password: ");
+            "|CR|CR|03(|07Leave password blank to use public key Authenticate|03)|CR|15SSH Password: ");
 
         // Setup the Input Field after the Text
         MenuFunction::inputField(passwordId,len);
