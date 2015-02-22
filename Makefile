@@ -7,10 +7,10 @@ All:
 	@echo "make linux-arch = Arch Linux"
 	@echo "make osx        = Mac OSX Lion - Yosemite"
 	@echo " "
-	@echo "make clean
-	@echo "make clean-win
-	@echo "make clean-linux
-	@echo "make clean-osx		
+	@echo "make clean"
+	@echo "make clean-win"
+	@echo "make clean-linux"
+	@echo "make clean-osx"
 
 win:
 	@echo "----------Building project:[ EtherTerm - (WIN) Release ]----------"
@@ -35,10 +35,10 @@ clean:
 	@echo "make linux-arch = Arch Linux"
 	@echo "make osx        = Mac OSX Lion - Yosemite"
 	@echo " "
-	@echo "make clean
-	@echo "make clean-win
-	@echo "make clean-linux
-	@echo "make clean-osx
+	@echo "make clean"
+	@echo "make clean-win"
+	@echo "make clean-linux"
+	@echo "make clean-osx"
 
 clean-win:
 	@echo "----------Cleaning project:[ EtherTerm - (WIN) Release ]----------"
