@@ -4,11 +4,12 @@
         <BBS name="Haunting The Chapel" ip="htc.zapto.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" />
         <BBS name="Black Flag (Mystic)" ip="blackflag.acid.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" />
         <BBS name="Black Flag (Daydream)" ip="blackflag.acid.org" port="2627" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" />
-        <BBS name="1984" ip="1984.ws" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" />
-        <BBS name="1984" ip="1984.ws" port="22" protocol="SSH" login="" password="" font="vga8x16.bmp" keyMap="VT100" />
-        <BBS name="Blood Island" ip="bloodisland.ph4.se" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" />
-        <BBS name="79 Columns" ip="oddnetwork.org" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" />
-        <BBS name="Pharcyde" ip="bbs.pharcyde.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" />
-        <BBS name="d1st" ip="d1st.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" />
+        <BBS name="1984 (x84)" ip="1984.ws" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" />
+        <BBS name="1984 SSH (x84)" ip="1984.ws" port="22" protocol="SSH" login="" password="" font="vga8x16.bmp" keyMap="VT100" />
+        <BBS name="Blood Island (x84)" ip="bloodisland.ph4.se" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" />
+        <BBS name="79 Columns (x84)" ip="oddnetwork.org" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" />
+        <BBS name="Distortion (Mystic)" ip="d1st.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" />
+        <BBS name="Pharcyde (Synchronet)" ip="bbs.pharcyde.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" />
+        <BBS name="Shroo.ms (Daydream)" ip="bbs.shroo.ms" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" />
     </Phonebook>
 </EtherTerm>
