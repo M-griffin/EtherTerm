@@ -2,18 +2,18 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased
 ##
-## Release
+## Debug
 ProjectName            :=EtherTerm
-ConfigurationName      :=Release
+ConfigurationName      :=Debug
 WorkspacePath          := "/code/EtherTerm"
 ProjectPath            := "/code/EtherTerm"
-IntermediateDirectory  :=./Release
+IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=02/22/15
+Date                   :=01/14/15
 CodeLitePath           :="C:\Program Files (x86)\CodeLite"
 LinkerName             :=g++
 SharedObjectLinkerName :=g++ -shared -fPIC
@@ -53,9 +53,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)/usr/local/l
 #CXX      := C:/MinGW-4.8.1/bin/g++.exe
 #CC       := C:/MinGW-4.8.1/bin/gcc.exe
 CXX      := g++
-CXXFLAGS :=  -O2 -Wall -std=gnu++0x $(Preprocessors)
-CFLAGS   :=  -O2 -Wall -std=gnu++0x $(Preprocessors)
-
+CXXFLAGS :=  -g -O0 -Wall -std=gnu++0x $(Preprocessors)
+CFLAGS   :=  -g -O0 -Wall -std=gnu++0x $(Preprocessors)
 ASFLAGS  :=
 #AS       := C:/MinGW-4.8.1/bin/as.exe
 
@@ -78,7 +77,7 @@ Objects=$(Objects0)
 ##
 .PHONY: all clean PreBuild PrePreBuild PostBuild
 all: $(OutputFile)
-	cp ./Release/EtherTerm .
+	cp ./Debug/EtherTerm .
 
 $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	@$(MakeDirCommand) $(@D)
@@ -87,7 +86,7 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
 
 $(IntermediateDirectory)/.d:
-	@$(MakeDirCommand) "./Release"
+	@$(MakeDirCommand) "./Debug"
 
 PreBuild:
 
@@ -277,8 +276,8 @@ $(IntermediateDirectory)/socketFTP.cpp$(PreprocessSuffix): socketFTP.cpp
 ## Clean
 ##
 clean:
-	$(RM) ./Release/*$(ObjectSuffix)
-	$(RM) ./Release/*$(DependSuffix)
+	$(RM) ./Debug/*$(ObjectSuffix)
+	$(RM) ./Debug/*$(DependSuffix)
 	$(RM) $(OutputFile)
 	$(RM) ./EtherTerm
 

@@ -2,18 +2,18 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased
 ##
-## Debug
+## Release
 ProjectName            :=EtherTerm
-ConfigurationName      :=Debug
+ConfigurationName      :=Release
 WorkspacePath          := "C:\Users\Blue\Desktop\EtherTerm"
 ProjectPath            := "C:\Users\Blue\Desktop\EtherTerm"
-IntermediateDirectory  :=./Debug
+IntermediateDirectory  :=./Release
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=01/05/15
+Date                   :=02/22/15
 CodeLitePath           :="C:\Program Files (x86)\CodeLite"
 LinkerName             :=C:/MinGW-4.8.1/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-4.8.1/bin/g++.exe -shared -fPIC
@@ -35,27 +35,27 @@ PreprocessOnlySwitch   :=-E
 ObjectsFileList        :="EtherTerm.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=makedir
-RcCmpOptions           :=
-RcCompilerName         :=C:/MinGW-4.8.1/bin/windres.exe
-LinkOptions            :=
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)C:/Users/Blue/Downloads/SDL2-devel-2.0.3-mingw/SDL2-2.0.3/include $(IncludeSwitch)C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2 $(IncludeSwitch)C:/libssh-0.6.0/include $(IncludeSwitch)libz-1.2.7-1-mingw32-dev $(IncludeSwitch)C:/libz-1.2.7-1-mingw32-dev/include
-IncludePCH             :=
-RcIncludePath          :=
-Libs                   := $(LibrarySwitch)mingw32 $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)SDL2_net $(LibrarySwitch)ssh
-ArLibs                 :=  "mingw32" "SDL2main" "SDL2" "SDL2_net" "libssh"
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:/Users/Blue/Downloads/SDL2_image-devel-2.0.0-mingw/SDL2_image-2.0.0/i686-w64-mingw32/lib $(LibraryPathSwitch)C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/lib $(LibraryPathSwitch)C:/libssh-0.6.0/bin $(LibraryPathSwitch)C:/libz-1.2.7-1-mingw32-dev/lib
+RcCmpOptions           := 
+RcCompilerName         :=C:/MinGW-4.8.1/bin/windres.exe 
+LinkOptions            :=  
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)C:/Users/Blue/Downloads/SDL2-devel-2.0.3-mingw/SDL2-2.0.3/include $(IncludeSwitch)C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2 $(IncludeSwitch)C:/Users/Blue/Downloads/libssh-0.6.4/include $(IncludeSwitch)C:/Users/Blue/Downloads/SDL2_ttf-2.0.12/i686-w64-mingw32/include/SDL2 
+IncludePCH             := 
+RcIncludePath          := 
+Libs                   := $(LibrarySwitch)mingw32 $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)SDL2_net $(LibrarySwitch)ssh 
+ArLibs                 :=  "mingw32" "SDL2main" "SDL2" "SDL2_net" "libssh" 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/lib $(LibraryPathSwitch)C:/Users/Blue/Downloads/SDL2_ttf-2.0.12/i686-w64-mingw32/lib $(LibraryPathSwitch)C:/libz-1.2.7-1-mingw32-dev/lib $(LibraryPathSwitch)C:/Users/Blue/Downloads/libssh-0.6.4/lib 
 
 ##
 ## Common variables
 ## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
 ##
 AR       := C:/MinGW-4.8.1/bin/ar.exe rcu
-CXX      := C:/MinGW-4.8.1/bin/g++.exe
-CC       := C:/MinGW-4.8.1/bin/gcc.exe
-CXXFLAGS :=  -g -O0 -Wall -std=gnu++0x $(Preprocessors)
-CFLAGS   :=  -g -O0 -Wall -std=gnu++0x $(Preprocessors)
-ASFLAGS  :=
-AS       := C:/MinGW-4.8.1/bin/as.exe
+CXX      := C:/MinGW-4.8.1/bin/g++.exe 
+CC       := C:/MinGW-4.8.1/bin/gcc.exe 
+CXXFLAGS :=  -O2 -Wall -std=gnu++0x $(Preprocessors)
+CFLAGS   :=  -O2 -Wall -std=gnu++0x $(Preprocessors)
+ASFLAGS  := 
+AS       := C:/MinGW-4.8.1/bin/as.exe 
 
 
 ##
@@ -64,8 +64,8 @@ AS       := C:/MinGW-4.8.1/bin/as.exe
 CodeLiteDir:=C:\Program Files (x86)\CodeLite
 UNIT_TEST_PP_SRC_DIR:=C:\UnitTest++-1.3
 Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/termStateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/termObjectFactory.cpp$(ObjectSuffix) $(IntermediateDirectory)/mainMenuState.cpp$(ObjectSuffix) $(IntermediateDirectory)/inputHandler.cpp$(ObjectSuffix) $(IntermediateDirectory)/stateParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinystr.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinyxml.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinyxmlerror.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinyxmlparser.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/telnetState.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketSSH.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketTelnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketHandler.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketICMP.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuFunction.cpp$(ObjectSuffix) $(IntermediateDirectory)/ansiParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/linkList.cpp$(ObjectSuffix) $(IntermediateDirectory)/sshState.cpp$(ObjectSuffix) $(IntermediateDirectory)/terminal.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/sequenceParser.cpp$(ObjectSuffix)
+	$(IntermediateDirectory)/telnetState.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketSSH.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketTelnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketHandler.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuFunction.cpp$(ObjectSuffix) $(IntermediateDirectory)/ansiParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/linkList.cpp$(ObjectSuffix) $(IntermediateDirectory)/sshState.cpp$(ObjectSuffix) $(IntermediateDirectory)/terminal.cpp$(ObjectSuffix) $(IntermediateDirectory)/sequenceParser.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/socketFTP.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketICMP.cpp$(ObjectSuffix) 
 
 
 
@@ -84,7 +84,7 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
 
 $(IntermediateDirectory)/.d:
-	@$(MakeDirCommand) "./Debug"
+	@$(MakeDirCommand) "./Release"
 
 PreBuild:
 
@@ -204,14 +204,6 @@ $(IntermediateDirectory)/socketHandler.cpp$(DependSuffix): socketHandler.cpp
 $(IntermediateDirectory)/socketHandler.cpp$(PreprocessSuffix): socketHandler.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/socketHandler.cpp$(PreprocessSuffix) "socketHandler.cpp"
 
-$(IntermediateDirectory)/socketICMP.cpp$(ObjectSuffix): socketICMP.cpp $(IntermediateDirectory)/socketICMP.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/socketICMP.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/socketICMP.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/socketICMP.cpp$(DependSuffix): socketICMP.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/socketICMP.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/socketICMP.cpp$(DependSuffix) -MM "socketICMP.cpp"
-
-$(IntermediateDirectory)/socketICMP.cpp$(PreprocessSuffix): socketICMP.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/socketICMP.cpp$(PreprocessSuffix) "socketICMP.cpp"
-
 $(IntermediateDirectory)/menuFunction.cpp$(ObjectSuffix): menuFunction.cpp $(IntermediateDirectory)/menuFunction.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/menuFunction.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/menuFunction.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/menuFunction.cpp$(DependSuffix): menuFunction.cpp
@@ -260,14 +252,30 @@ $(IntermediateDirectory)/sequenceParser.cpp$(DependSuffix): sequenceParser.cpp
 $(IntermediateDirectory)/sequenceParser.cpp$(PreprocessSuffix): sequenceParser.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/sequenceParser.cpp$(PreprocessSuffix) "sequenceParser.cpp"
 
+$(IntermediateDirectory)/socketFTP.cpp$(ObjectSuffix): socketFTP.cpp $(IntermediateDirectory)/socketFTP.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/socketFTP.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/socketFTP.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/socketFTP.cpp$(DependSuffix): socketFTP.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/socketFTP.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/socketFTP.cpp$(DependSuffix) -MM "socketFTP.cpp"
+
+$(IntermediateDirectory)/socketFTP.cpp$(PreprocessSuffix): socketFTP.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/socketFTP.cpp$(PreprocessSuffix) "socketFTP.cpp"
+
+$(IntermediateDirectory)/socketICMP.cpp$(ObjectSuffix): socketICMP.cpp $(IntermediateDirectory)/socketICMP.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/socketICMP.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/socketICMP.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/socketICMP.cpp$(DependSuffix): socketICMP.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/socketICMP.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/socketICMP.cpp$(DependSuffix) -MM "socketICMP.cpp"
+
+$(IntermediateDirectory)/socketICMP.cpp$(PreprocessSuffix): socketICMP.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/socketICMP.cpp$(PreprocessSuffix) "socketICMP.cpp"
+
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
 ##
 ## Clean
 ##
 clean:
-	$(RM) ./Debug/*$(ObjectSuffix)
-	$(RM) ./Debug/*$(DependSuffix)
+	$(RM) ./Release/*$(ObjectSuffix)
+	$(RM) ./Release/*$(DependSuffix)
 	$(RM) $(OutputFile)
 	$(RM) $(OutputFile).exe
 	$(RM) ./EtherTerm

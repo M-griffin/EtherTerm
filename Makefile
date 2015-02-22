@@ -1,44 +1,54 @@
 .PHONY: clean All
 
 All:
-	@echo "----------Building project:[ EtherTerm - (WIN) Debug ]----------"
-	@$(MAKE) -f  "EtherTerm.mk"
+	@echo "----------------Building EtherTerm-------------------"
+	@echo "make win        = Windows Build"
+	@echo "make linux      = Linux (Debian, Mint, Ubuntu)"
+	@echo "make linux-arch = Arch Linux"
+	@echo "make osx        = Mac OSX Lion - Yosemite"
+	@echo " "
+	@echo "make clean
+	@echo "make clean-win
+	@echo "make clean-linux
+	@echo "make clean-osx		
 
 win:
-	@echo "----------Building project:[ EtherTerm - (WIN) Debug ]----------"
+	@echo "----------Building project:[ EtherTerm - (WIN) Release ]----------"
 	@$(MAKE) -f  "EtherTerm.mk"
 
 osx:
-	@echo "----------Building project:[ EtherTerm - (OSX) Debug ]----------"
-	@echo "----------Build Supports: [Lion, Mountain Lion, Mavericks, Yosemite builds ]-------"
+	@echo "----------Building project:[ EtherTerm - (OSX) Release ]----------"
 	@$(MAKE) -f  "EtherTerm.osx.mk"
-    
+
 linux:
-	@echo "----------Building project:[ EtherTerm - (LINUX) Debug ]----------"
-	@echo "----------Build Supports: [Ubuntu, Mint and Debian builds ]-------"
+	@echo "----------Building project:[ EtherTerm - (LINUX) Release ]----------"
 	@$(MAKE) -f  "EtherTerm.linux.mk"
-	
+
 linux-arch:
-	@echo "----------Building project:[ EtherTerm - (ARCH LINUX) Debug ]----------"
+	@echo "----------Building project:[ EtherTerm - (ARCH LINUX) Release ]----------"
 	@$(MAKE) -f  "EtherTerm.linux-arch.mk"
 
 clean:
-	@echo "----------Cleaning project:[ EtherTerm - (WIN) Debug ]----------"
-	@$(MAKE) -f  "EtherTerm.mk" clean
+	@echo "----------------Building EtherTerm-------------------"
+	@echo "make win        = Windows Build"
+	@echo "make linux      = Linux (Debian, Mint, Ubuntu)"
+	@echo "make linux-arch = Arch Linux"
+	@echo "make osx        = Mac OSX Lion - Yosemite"
+	@echo " "
+	@echo "make clean
+	@echo "make clean-win
+	@echo "make clean-linux
+	@echo "make clean-osx
 
 clean-win:
-	@echo "----------Cleaning project:[ EtherTerm - (WIN) Debug ]----------"
+	@echo "----------Cleaning project:[ EtherTerm - (WIN) Release ]----------"
 	@$(MAKE) -f  "EtherTerm.mk" clean
 
 clean-osx:
-	@echo "----------Cleaning project:[ EtherTerm - (OSX) Debug ]----------"
+	@echo "----------Cleaning project:[ EtherTerm - (OSX) Release ]----------"
 	@$(MAKE) -f  "EtherTerm.osx.mk" clean
 
 clean-linux:
-	@echo "----------Cleaning project:[ EtherTerm - (LINUX) Debug ]----------"
+	@echo "----------Cleaning project:[ EtherTerm - (LINUX) Release ]----------"
 	@$(MAKE) -f  "EtherTerm.linux.mk" clean
-
-clean-linux-arch:
-	@echo "----------Cleaning project:[ EtherTerm - (ARCH LINUX) Debug ]----------"
-	@$(MAKE) -f  "EtherTerm.linux-arch.mk" clean
 

@@ -2,18 +2,18 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased
 ##
-## Debug
+## Release
 ProjectName            :=EtherTerm
-ConfigurationName      :=Debug
+ConfigurationName      :=Release
 WorkspacePath          := "/EtherTerm"
 ProjectPath            := "/EtherTerm"
-IntermediateDirectory  :=./Debug
+IntermediateDirectory  :=./Release
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Michae Griffin
-Date                   :=01/16/15
+Date                   :=02/22/15
 CodeLitePath           :="/home/merc/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -50,8 +50,9 @@ LibPath                := $(LibraryPathSwitch).
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS :=  -g -O0 -Wall  -std=gnu++0x $(Preprocessors)
-CFLAGS   :=  -g -O0 -Wall  -std=gnu++0x $(Preprocessors)
+CXXFLAGS :=  -O2 -Wall -std=gnu++0x $(Preprocessors)
+CFLAGS   :=  -O2 -Wall -std=gnu++0x $(Preprocessors)
+
 ASFLAGS  :=
 AS       := /usr/bin/as
 
@@ -73,7 +74,7 @@ Objects=$(Objects0)
 ##
 .PHONY: all clean PreBuild PrePreBuild PostBuild
 all: $(OutputFile)
-	cp ./Debug/EtherTerm .
+	cp ./Release/EtherTerm .
 
 $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	@$(MakeDirCommand) $(@D)
@@ -82,7 +83,7 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
 
 $(IntermediateDirectory)/.d:
-	@test -d ./Debug || $(MakeDirCommand) ./Debug
+	@test -d ./Release || $(MakeDirCommand) ./Release
 
 PreBuild:
 
@@ -272,10 +273,10 @@ $(IntermediateDirectory)/tinyxmlparser.cpp$(PreprocessSuffix): tinyxmlparser.cpp
 ## Clean
 ##
 clean:
-	$(RM) ./Debug/*$(ObjectSuffix)
-	$(RM) ./Debug/*$(DependSuffix)
+	$(RM) ./Release/*$(ObjectSuffix)
+	$(RM) ./Release/*$(DependSuffix)
 	$(RM) $(OutputFile)
-	$(RM) ".build-debug/EtherTerm"
+	$(RM) ".build-release/EtherTerm"
 	$(RM) ./EtherTerm
 
 
