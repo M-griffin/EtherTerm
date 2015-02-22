@@ -66,7 +66,7 @@ Copy/Paste
 ----------
 
 Copy and paste is comparable to X11: ``Left mouse click and drag`` to
-select text on the screen, release to copy selected text to the clipboard. 
+select text on the screen, release to copy selected text to the clipboard.
 ``Right mouse click`` to paste text from the clipboard.
 
 Dialing directory
@@ -77,7 +77,7 @@ To add new systems or remove, you must edit the ``assets/dialdirectory.xml`` fil
 Downloads
 =========
 
-- `Windows 2.4 Preview <https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.4.zip>`_
+- `Windows 2.5 Preview <https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.5.zip>`_
 
 For all other systems, you must build from the project folder.
 
