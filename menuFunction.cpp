@@ -1282,7 +1282,7 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
                          int   hid,      // If input is Echomail as hidden    {Optional}
                          char *chlist)   // Valid Input Char List             {Optional}
 {
-    int sequence, secondSequence;
+    int sequence = 0, secondSequence = 0;
     int i   = 0;
     int Col = 0;
     int isEscapeSequence;

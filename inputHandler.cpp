@@ -146,6 +146,11 @@ bool InputHandler::update()
                 break;
 
             case SDL_TEXTINPUT:
+
+                // Check for NumKey and Number Input,  IF Numlock if off
+                // Then ignore numbers
+                //if (!(event.key.keysym.mod & KMOD_NUM))
+
                 setInputSequence(event.text.text);
                 return true;
 

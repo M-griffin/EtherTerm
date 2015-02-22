@@ -42,7 +42,7 @@ void TelnetState::handleSession()
 
     // Prefill buffer test, we will loop entire buffer.
     //memset(msgBuffer,'\0', 8193);
-    unsigned char ch;
+    unsigned char ch = 0;
 
     // Get Socket Data From Server
     len = TheSocketHandler::Instance()->recv(msgBuffer);
@@ -223,13 +223,28 @@ bool TelnetState::onEnter()
 
     TheTerminal::SystemConnection sysconn;
     sysconn = TheTerminal::Instance()->getSystemConnection();
+
+    std::string initConnection = "|CS|15|16Initiating connection to: [|07";
+    initConnection += sysconn.name + "|15]";
+
+    MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
+
     if(!TheSocketHandler::Instance()->initTelnet(sysconn.ip,sysconn.port))
     {
+        initConnection = "|CR|CR|04|16Unable to establish connection.";
+        MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
+        SDL_Delay(1000);
         std::cout << "Error Connecting!" << std::endl;
         shutdown = true;
     }
+    else
+    {
+        std::cout << "Connection Successful. " << std::endl;
+        initConnection = "|CR|CR|10|16Connection established.";
+        MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
+        SDL_Delay(1000);
+    }
 
-    std::cout << "Connection Successful. " << std::endl;
     // Clear Renderer and Ansi Parser for Fresh Connection.
     TheTerminal::Instance()->clearScreenSurface();
     TheTerminal::Instance()->renderScreen();
