@@ -171,6 +171,10 @@ void Terminal::restartWindowSize(bool fullScreen)
 void Terminal::restartWindowRenderer(std::string mode)
 {
 
+
+// Test for Windows if we can just recreate the texture.
+#ifndef _WIN32
+
     if (globalRenderer)
     {
         //std::cout << "Destroy SDL Renderer" << std::endl;
@@ -181,6 +185,7 @@ void Terminal::restartWindowRenderer(std::string mode)
     globalRenderer =
         SDL_CreateRenderer(globalWindow, -1, SDL_RENDERER_ACCELERATED |
                            SDL_RENDERER_TARGETTEXTURE);
+#endif
 
     // First Clear the Rexture so it will get recreated with new HINT
     if (globalTexture)

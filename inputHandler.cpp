@@ -353,9 +353,13 @@ bool InputHandler::update()
                                 // New work around of SDL issues, we now destory the Window
                                 // And Renderer and recreated them in our desired resolutions
                                 // Due to SDL being retarded on different platforms.
+#ifndef _WIN32
                                 TheTerminal::Instance()->restartWindowSize(true);
-                                TheTerminal::Instance()->restartWindowRenderer("1");                                                             
-
+                                TheTerminal::Instance()->restartWindowRenderer("1");
+#else
+                                TheTerminal::Instance()->restartWindowRenderer("1");
+                                SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(), SDL_WINDOW_FULLSCREEN_DESKTOP);
+#endif
                                 SDL_Log("Setting window to FULLSCREEN.");
                                 isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
                                 fullScreenWindowSize = 0;
@@ -391,9 +395,12 @@ bool InputHandler::update()
                                         TheTerminal::Instance()->setWindowHeight(400);
                                         SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
 
+#ifndef _WIN32
                                         TheTerminal::Instance()->restartWindowSize(false);
                                         TheTerminal::Instance()->restartWindowRenderer("0");
-
+#else
+                                        TheTerminal::Instance()->restartWindowRenderer("0");
+#endif
                                         TheTerminal::Instance()->clearScreen();
                                         SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
                                         TheTerminal::Instance()->drawTextureScreen();
@@ -405,10 +412,12 @@ bool InputHandler::update()
                                         TheTerminal::Instance()->setWindowWidth(1280);
                                         TheTerminal::Instance()->setWindowHeight(800);
                                         SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 1280, 800);
-
+#ifndef _WIN32
                                         TheTerminal::Instance()->restartWindowSize(false);
                                         TheTerminal::Instance()->restartWindowRenderer("0");
-
+#else
+                                        TheTerminal::Instance()->restartWindowRenderer("0");
+#endif
                                         TheTerminal::Instance()->clearScreen();
                                         SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
                                         TheTerminal::Instance()->drawTextureScreen();
