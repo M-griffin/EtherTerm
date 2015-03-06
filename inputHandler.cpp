@@ -214,15 +214,18 @@ bool InputHandler::update()
 
                 if( event.button.button == SDL_BUTTON_LEFT )
                 {
-                    isMouseSelected = true;
-
                     //Get the mouse offsets
                     mouseSourceXPosition = event.button.x;
                     mouseSourceYPosition = event.button.y;
-                    /*
-                    std::cout << "Mouse pressed at: " << mouseSourceXPosition << ","
-                        << mouseSourceYPosition << std::endl;
-                    */
+
+                    //std::cout << "Mouse pressed at: " << mouseSourceXPosition << ","
+                    //    << mouseSourceYPosition << std::endl;
+
+                    // Fix for clicking on title bar, 0 pixels will not register
+                    // for text selection
+                    if (mouseSourceXPosition > 0 && mouseSourceYPosition > 0)
+                        isMouseSelected = true;
+
                     //SDL_Log("SDL_MOUSEBUTTONDOWN %d shown", event.button.button);
                     break;
                 }
