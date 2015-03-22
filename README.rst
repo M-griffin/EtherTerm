@@ -59,7 +59,7 @@ Keymapping
 ----------
 
 Etherterm currently follows the default Windows telnet output keys sequences
-as used in Syncterm as ``ANSI``. ``VT100``, ``LINUX`` and ``SCO`` key mappings
+as used in Syncterm as **ANSI**, **VT100**, **LINUX** and **SCO** key mappings
 are also available.
 
 Copy/Paste
@@ -117,7 +117,7 @@ You must install the libs and setup the include paths, like any project.
 Makefile(s) are provided for g++ compiles on Windows.
 
 With Windows you will need to setup a command line environment appropriate
-for compilation of this projet, or create a build target with the necessry
+for compilation of this project, or create a build target with the necessary
 settings using a project file of your preferred IDE::
 
     make clean-win
@@ -126,7 +126,7 @@ settings using a project file of your preferred IDE::
 OSX
 ---
 
-- install http://brew.sh/
+- Install HomeBrew http://brew.sh/
 - ``brew install sdl2 sdl2_net libssh``
 - ``make clean-osx``
 - ``make osx``
