@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Etherterm : EtherTerm (SDL2) Telnet/SSH Terminal">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Etherterm</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/M-griffin/EtherTerm">View on GitHub</a>
+
+          <h1 id="project_title">Etherterm</h1>
+          <h2 id="project_tagline">EtherTerm (SDL2) Telnet/SSH Terminal</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/M-griffin/EtherTerm/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/M-griffin/EtherTerm/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>.. contents:: Table of Contents
+   :depth: 3</p>
+
+<h1>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h1>
+
+<p>.. image:: <a href="https://dl.dropboxusercontent.com/u/92792939/EtherTerm.png">https://dl.dropboxusercontent.com/u/92792939/EtherTerm.png</a>
+   :alt: Screenshot</p>
+
+<p>EtherTerm is a portable terminal emulator and telnet/ssh client for Windows
+and Unix.  It differs from standard terminal emulators such as xterm and PuTTY
+by providing a common telnet and ssh protocol across platforms, with particular
+focus on font sets appropriate for connecting to BBS servers using cp437, and
+amiga art.</p>
+
+<p>EtherTerm is comparable to programs such as syncterm_ and netrunner_.  Notably:
+It is an <strong>SDL graphics program</strong> and makes use of full OpenGL/DirectX graphics
+acceleration.</p>
+
+<p>.. _syncterm: <a href="http://syncterm.bbsdev.net/">http://syncterm.bbsdev.net/</a>
+.. _netrunner: <a href="http://www.mysticbbs.com/downloads.html">http://www.mysticbbs.com/downloads.html</a></p>
+
+<h1>
+<a id="project-details" class="anchor" href="#project-details" aria-hidden="true"><span class="octicon octicon-link"></span></a>Project details</h1>
+
+<p>EtherTerm is Public Domain Software, <code>(c) 2014-2015 Michael Griffin &lt;mrmisticismo@hotmail.com&gt;</code></p>
+
+<p>Currently, no <em>auto-configure</em> environment is provided, and build targets are
+limited to Windows, Linux, and OSX.  EtherTerm is <strong>Alpha</strong> software.  Please
+report any issues or feature requests as a <code>github issue</code>_.  Pull requests welcome.</p>
+
+<p>.. _github issue: <a href="https://github.com/M-griffin/EtherTerm/issues">https://github.com/M-griffin/EtherTerm/issues</a></p>
+
+<h2>
+<a id="fonts" class="anchor" href="#fonts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fonts</h2>
+
+<p>Each system can be setup with a default font.  Any systems using
+<code>Syncterm escape sequences</code>_ for font switching will override the
+default font.</p>
+
+<ul>
+<li>VGA-8x16 (CP437)</li>
+<li>MicroKnightPlus-8x16 (AMIGA)</li>
+<li>Mo'soul-8x16 (AMIGA)</li>
+<li>Pot Noodle-8x16 (AMIGA)</li>
+<li>Topaz Plus-8x16 (AMIGA)</li>
+</ul>
+
+<p>.. _Syncterm escape sequences: <a href="http://cvs.synchro.net/cgi-bin/viewcvs.cgi/*checkout*/src/conio/cterm.txt">http://cvs.synchro.net/cgi-bin/viewcvs.cgi/*checkout*/src/conio/cterm.txt</a></p>
+
+<h2>
+<a id="fullscreen" class="anchor" href="#fullscreen" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fullscreen</h2>
+
+<p><code>ALT + ENTER</code> cycles between:</p>
+
+<ul>
+<li>1x unscaled window</li>
+<li>2x scaled window</li>
+<li>scaled fullscreen</li>
+</ul>
+
+<h2>
+<a id="keymapping" class="anchor" href="#keymapping" aria-hidden="true"><span class="octicon octicon-link"></span></a>Keymapping</h2>
+
+<p>Etherterm currently follows the default Windows telnet output keys sequences
+as used in Syncterm as <code>ANSI</code>. <code>VT100</code>, <code>LINUX</code> and <code>SCO</code> key mappings
+are also available.</p>
+
+<h2>
+<a id="copypaste" class="anchor" href="#copypaste" aria-hidden="true"><span class="octicon octicon-link"></span></a>Copy/Paste</h2>
+
+<p>Copy and paste is comparable to X11: <code>Left mouse click and drag</code> to
+select text on the screen, release to copy selected text to the clipboard.
+<code>Right mouse click</code> to paste text from the clipboard.</p>
+
+<h2>
+<a id="dialing-directory" class="anchor" href="#dialing-directory" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dialing directory</h2>
+
+<p>To add new systems or remove, you must edit the <code>assets/dialdirectory.xml</code> file.</p>
+
+<h1>
+<a id="downloads" class="anchor" href="#downloads" aria-hidden="true"><span class="octicon octicon-link"></span></a>Downloads</h1>
+
+<ul>
+<li>
+<code>Windows 2.6 Preview &lt;https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.6.zip&gt;</code>_</li>
+</ul>
+
+<p>For all other systems, you must build from the project folder.</p>
+
+<h1>
+<a id="building" class="anchor" href="#building" aria-hidden="true"><span class="octicon octicon-link"></span></a>Building</h1>
+
+<p>Generally, the following libraries must be installed:</p>
+
+<ul>
+<li>sdl2 and sdl2_net</li>
+<li>libssh (Requires OpenSSL, Zlib)</li>
+</ul>
+
+<p>As well as a recent version of gnu/gcc providing g++, or clang.</p>
+
+<p>For Windows, mingw32 or 64 is required.</p>
+
+<ul>
+<li><p><strong>NOTE</strong>: EtherTerm will seek an <code>./assets</code> folder relative to the executable.  In this way,
+it is not (yet) a very "portable" executable.  At this stage, please execute only from the
+project folder.</p></li>
+<li><p><code>./EtherTerm</code> to run on unix systems, or just <code>EtherTerm</code> on Windows.</p></li>
+</ul>
+
+<h2>
+<a id="windows" class="anchor" href="#windows" aria-hidden="true"><span class="octicon octicon-link"></span></a>Windows</h2>
+
+<p>Must compile with latest c++ environment flags:  At the very least and you can
+also replace 0x with 11 on newer compilers. Usually g++ (4.7)+ or compatible
+compiler:</p>
+
+<pre><code>-std=gnu++0x or -std=c++0x
+</code></pre>
+
+<p>To build windows you must already have a compiler and the requirements.
+You can use a good IDE like CodeLite, CodeBlocks, or Visual Studio.
+You must install the libs and setup the include paths, like any project.</p>
+
+<p>Makefile(s) are provided for g++ compiles on Windows.</p>
+
+<p>With Windows you will need to setup a command line environment appropriate
+for compilation of this projet, or create a build target with the necessry
+settings using a project file of your preferred IDE::</p>
+
+<pre><code>make clean-win
+make win
+</code></pre>
+
+<h2>
+<a id="osx" class="anchor" href="#osx" aria-hidden="true"><span class="octicon octicon-link"></span></a>OSX</h2>
+
+<ul>
+<li>install <a href="http://brew.sh/">http://brew.sh/</a>
+</li>
+<li><code>brew install sdl2 sdl2_net libssh</code></li>
+<li><code>make clean-osx</code></li>
+<li><code>make osx</code></li>
+</ul>
+
+<h2>
+<a id="ubuntu-mint-and-debian-linux" class="anchor" href="#ubuntu-mint-and-debian-linux" aria-hidden="true"><span class="octicon octicon-link"></span></a>Ubuntu, Mint, and Debian Linux</h2>
+
+<ul>
+<li><code>sudo apt-get install build-essential libsdl2-dev libsdl2-net-dev libssh-dev</code></li>
+<li><code>make clean-linux</code></li>
+<li><code>make linux</code></li>
+</ul>
+
+<h2>
+<a id="arch-linux" class="anchor" href="#arch-linux" aria-hidden="true"><span class="octicon octicon-link"></span></a>Arch Linux</h2>
+
+<ul>
+<li><code>sudo pacman -S sdl2 sdl2_net extra/libssh</code></li>
+<li><code>make clean-linux</code></li>
+<li><code>make linux-arch</code></li>
+</ul>
+
+<h1>
+<a id="changelog" class="anchor" href="#changelog" aria-hidden="true"><span class="octicon octicon-link"></span></a>Changelog</h1>
+
+<p><strong>v2.3</strong></p>
+
+<ul>
+<li>
+<code>ALT + H</code> for quick disconnection ("hangup")</li>
+<li>SSH login/password prompts when not specified in <code>assets/dialdirectory.xml</code>
+</li>
+<li>selection of various input key mappings (VT100, ANSI, etc.)</li>
+</ul>
+
+<h1>
+<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span class="octicon octicon-link"></span></a>TODO</h1>
+
+<ul>
+<li>"change_scroll_region": csr terminal sequence.</li>
+<li>"alternate screen" buffer: smcup, rmcup terminal sequence.</li>
+<li>scrollback buffer.</li>
+<li>interactively edit the dialing directory.</li>
+<li>other runtime configuration/setup options.</li>
+<li>alternative window sizes, currently limited to only 80x25.</li>
+<li>attempting to reach compliance with terminal type 'xterm-256color'.</li>
+<li>transfer protocols (x, y, and z-modem).</li>
+<li>ssh pubkey authentication.</li>
+<li>ftp client support.</li>
+<li>utf-8 encoding.</li>
+</ul>
+
+<h1>
+<a id="acknowledgments-and-thanks" class="anchor" href="#acknowledgments-and-thanks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Acknowledgments and Thanks</h1>
+
+<ul>
+<li>
+<code>dingo &lt;https://github.com/jquast&gt;</code>_: Telnet options and general terminal functionality.</li>
+<li>
+<code>g00r00 &lt;http://www.mysticbbs.com/&gt;</code>_: Optimization ideas on scrolling pixels faster.</li>
+<li>
+<code>SDL Game Development &lt;http://www.amazon.com/SDL-Game-Development-Shaun-Mitchell/dp/1849696829&gt;</code>_.</li>
+<li>
+<code>maze &lt;https://github.com/tehmaze&gt;</code>_: Testing and bug reports.</li>
+<li>
+<code>Caphood &lt;http://www.reddit.com/user/Caphood&gt;</code>_: Testing and bug reports.</li>
+<li>IceDevil: Testing and bug reports.</li>
+<li>
+<code>haliphax &lt;https://github.com/haliphax&gt;</code>_: Testing and bug reports.</li>
+<li>
+<code>hellbeard &lt;https://github.com/ericolito&gt;</code>_: Testing and bug reports.</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Etherterm maintained by <a href="https://github.com/M-griffin">M-griffin</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
