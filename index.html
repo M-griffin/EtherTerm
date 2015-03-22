@@ -1,44 +1,34 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Etherterm by M-griffin</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/respond.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
     <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="stylesheets/ie.css">
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
+    <title>Etherterm by M-griffin</title>
   </head>
+
   <body>
-      <div id="header">
-        <nav>
-          <li class="fork"><a href="https://github.com/M-griffin/EtherTerm">View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/M-griffin/EtherTerm/zipball/master">ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/M-griffin/EtherTerm/tarball/master">TAR</a></li>
-          <li class="title">DOWNLOADS</li>
-        </nav>
-      </div><!-- end header -->
+    <header>
+      <div class="inner">
+        <h1>Etherterm</h1>
+        <h2>EtherTerm (SDL2) Telnet/SSH Terminal</h2>
+        <a href="https://github.com/M-griffin/EtherTerm" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
 
-    <div class="wrapper">
-
-      <section>
-        <div id="title">
-          <h1>Etherterm</h1>
-          <p>EtherTerm (SDL2) Telnet/SSH Terminal</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/M-griffin">M-griffin</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
-        </div>
-
-        <h1>
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
 <a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Introduction</strong>
 </h1>
 
@@ -185,31 +175,31 @@ make win
 <ul>
 <li>install <a href="http://brew.sh/">HomeBrew</a>
 </li>
-<li><code>brew install sdl2 sdl2_net libssh</code></li>
-<li><code>make clean-osx</code></li>
-<li><code>make osx</code></li>
 </ul>
+
+<pre><code>brew install sdl2 sdl2_net libssh
+make clean-osx
+make osx
+</code></pre>
 
 <h2>
 <a id="ubuntu-mint-and-debian-linux" class="anchor" href="#ubuntu-mint-and-debian-linux" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Ubuntu, Mint, and Debian Linux</strong>
 </h2>
 
-<ul>
-<li><code>sudo apt-get install build-essential</code></li>
-<li><code>sudo apt-get install libsdl2-dev libsdl2-net-dev libssh-dev</code></li>
-<li><code>make clean-linux</code></li>
-<li><code>make linux</code></li>
-</ul>
+<pre><code>sudo apt-get install build-essential
+sudo apt-get install libsdl2-dev libsdl2-net-dev libssh-dev
+make clean-linux
+make linux
+</code></pre>
 
 <h2>
 <a id="arch-linux" class="anchor" href="#arch-linux" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Arch Linux</strong>
 </h2>
 
-<ul>
-<li><code>sudo pacman -S sdl2 sdl2_net extra/libssh</code></li>
-<li><code>make clean-linux</code></li>
-<li><code>make linux-arch</code></li>
-</ul>
+<pre><code>sudo pacman -S sdl2 sdl2_net extra/libssh
+make clean-linux
+make linux-arch
+</code></pre>
 
 <h1>
 <a id="changelog" class="anchor" href="#changelog" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Changelog</strong>
@@ -262,10 +252,25 @@ make win
 <li>
 <a href="https://github.com/ericolito">hellbeard</a>: Testing and bug reports.</li>
 </ul>
-      </section>
+        </section>
 
+        <aside id="sidebar">
+          <a href="https://github.com/M-griffin/EtherTerm/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/M-griffin/EtherTerm/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/M-griffin/EtherTerm"></a> is maintained by <a href="https://github.com/M-griffin">M-griffin</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
+
+  
   </body>
 </html>
