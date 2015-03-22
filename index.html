@@ -43,22 +43,24 @@ by providing a common telnet and ssh protocol across platforms, with particular
 focus on font sets appropriate for connecting to BBS servers using cp437, and
 amiga art.</p>
 
-<p>EtherTerm is comparable to programs such as syncterm_ and netrunner_.  Notably:
+<p>EtherTerm is comparable to programs such as Syncterm and Netrunner.  Notably:
 It is an <strong>SDL graphics program</strong> and makes use of full OpenGL/DirectX graphics
 acceleration.</p>
 
-<p><a href="http://syncterm.bbsdev.net/">Syncterm</a>
-<a href="http://www.mysticbbs.com/downloads.html">Netrunner</a></p>
+<ul>
+<li><a href="http://syncterm.bbsdev.net/">Syncterm</a></li>
+<li><a href="http://www.mysticbbs.com/downloads.html">Netrunner</a></li>
+</ul>
 
 <h1>
 <a id="project-details" class="anchor" href="#project-details" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Project details</strong>
 </h1>
 
-<p>EtherTerm is Public Domain Software, (c) 2014-2015 Michael Griffin <a href="mailto://mrmisticismo@hotmail.com">mrmisticismo@hotmail.com</a></p>
+<p>EtherTerm is Public Domain Software, (c) 2014-2015 Michael Griffin &lt;<a href="mailto://mrmisticismo@hotmail.com">mrmisticismo@hotmail.com</a>&gt;</p>
 
 <p>Currently, no <em>auto-configure</em> environment is provided, and build targets are
 limited to Windows, Linux, and OSX.  EtherTerm is <strong>Alpha</strong> software.  Please
-report any issues or feature requests as a <code>github issue</code>_.  Pull requests welcome.</p>
+report any issues or feature requests as a <code>github issue</code>.  Pull requests welcome.</p>
 
 <p><a href="https://github.com/M-griffin/EtherTerm/issues">Github Issue Tracker</a></p>
 
@@ -67,7 +69,7 @@ report any issues or feature requests as a <code>github issue</code>_.  Pull req
 </h2>
 
 <p>Each system can be setup with a default font.  Any systems using
-<code>Syncterm escape sequences</code>_ for font switching will override the
+<code>Syncterm escape sequences</code> for font switching will override the
 default font.</p>
 
 <ul>
@@ -97,7 +99,7 @@ default font.</p>
 </h2>
 
 <p>Etherterm currently follows the default Windows telnet output keys sequences
-as used in Syncterm as <code>ANSI</code>. <code>VT100</code>, <code>LINUX</code> and <code>SCO</code> key mappings
+as used in Syncterm as <strong>ANSI</strong>, <strong>VT100</strong>, <strong>LINUX</strong> and <strong>SCO</strong> key mappings
 are also available.</p>
 
 <h2>
@@ -133,9 +135,9 @@ select text on the screen, release to copy selected text to the clipboard.
 <li>libssh (Requires OpenSSL, Zlib)</li>
 </ul>
 
-<p>As well as a recent version of gnu/gcc providing g++, or clang.</p>
+<p>As well as a recent version of GNU/GCC providing G++, or CLANG.</p>
 
-<p>For Windows, mingw32 or 64 is required.</p>
+<p>For Windows, MINGW32 or 64 is required.</p>
 
 <ul>
 <li><p><strong>NOTE</strong>: EtherTerm will seek an <code>./assets</code> folder relative to the executable.  In this way,
@@ -163,7 +165,7 @@ You must install the libs and setup the include paths, like any project.</p>
 
 <p>With Windows you will need to setup a command line environment appropriate
 for compilation of this project, or create a build target with the necessary
-settings using a project file of your preferred IDE::</p>
+settings using a project file of your preferred IDE:</p>
 
 <pre><code>make clean-win
 make win
@@ -186,7 +188,8 @@ make win
 </h2>
 
 <ul>
-<li><code>sudo apt-get install build-essential libsdl2-dev libsdl2-net-dev libssh-dev</code></li>
+<li>``sudo apt-get install build-essential </li>
+<li><code>sudo apt-get install libsdl2-dev libsdl2-net-dev libssh-dev</code></li>
 <li><code>make clean-linux</code></li>
 <li><code>make linux</code></li>
 </ul>
@@ -228,7 +231,6 @@ make win
 <li>alternative window sizes, currently limited to only 80x25.</li>
 <li>attempting to reach compliance with terminal type 'xterm-256color'.</li>
 <li>transfer protocols (x, y, and z-modem).</li>
-<li>ssh pubkey authentication.</li>
 <li>ftp client support.</li>
 <li>utf-8 encoding.</li>
 </ul>
