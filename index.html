@@ -1,36 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Etherterm : EtherTerm (SDL2) Telnet/SSH Terminal">
+    <title>Etherterm by M-griffin</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Etherterm</title>
   </head>
-
   <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/M-griffin/EtherTerm">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/M-griffin/EtherTerm/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/M-griffin/EtherTerm/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/M-griffin/EtherTerm">View on GitHub</a>
+    <div class="wrapper">
 
-          <h1 id="project_title">Etherterm</h1>
-          <h2 id="project_tagline">EtherTerm (SDL2) Telnet/SSH Terminal</h2>
+      <section>
+        <div id="title">
+          <h1>Etherterm</h1>
+          <p>EtherTerm (SDL2) Telnet/SSH Terminal</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/M-griffin">M-griffin</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/M-griffin/EtherTerm/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/M-griffin/EtherTerm/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
         <h1>
 <a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Introduction</strong>
 </h1>
@@ -188,7 +195,7 @@ make win
 </h2>
 
 <ul>
-<li>``sudo apt-get install build-essential </li>
+<li><code>sudo apt-get install build-essential</code></li>
 <li><code>sudo apt-get install libsdl2-dev libsdl2-net-dev libssh-dev</code></li>
 <li><code>make clean-linux</code></li>
 <li><code>make linux</code></li>
@@ -256,17 +263,9 @@ make win
 <a href="https://github.com/ericolito">hellbeard</a>: Testing and bug reports.</li>
 </ul>
       </section>
-    </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Etherterm maintained by <a href="https://github.com/M-griffin">M-griffin</a></p>
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
-      </footer>
     </div>
-
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
-
   </body>
 </html>
