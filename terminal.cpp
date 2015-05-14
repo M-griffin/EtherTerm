@@ -46,6 +46,7 @@ Terminal::Terminal():
     chachedSurface(nullptr),   // Cached Font CharacterSet
     globalTexture(nullptr),    // Texture for User Screen
     globalTermStateMachine(nullptr),
+    selectionTexture(nullptr), // Texture for Copy/Paste Selection
     surfaceWidth(0),
     surfaceHeight(0),
     windowWidth(0),
