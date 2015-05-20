@@ -379,7 +379,7 @@ bool InputHandler::update()
                                 // Set Window Mode
                                 if (SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(), 0) < 0)
                                 {
-                                    SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                                    SDL_Log(
                                         "Error setting window to Windowed Mode: %s", SDL_GetError());
                                     return false;
                                 }

@@ -101,7 +101,7 @@ void cleanup()
     TheInputHandler::ReleaseInstance();
     TheTerminal::ReleaseInstance();
     std::cout << "Shutdown complete." << std::endl;
-    // Pause to check for messages
+    // Pause to check shutdown messages before window closes.
     //char ch;
     //std::cin.get(ch);
 }
@@ -220,7 +220,7 @@ int main(int argc, char* argv[])
     // in Screen->Texure.  We do this becasue when Texture filtering is used
     // Pixels on the last line tend to bleed from bledning. This clips off the
     // Bleeding Leaving a nice screen.
-    if(TheTerminal::Instance()->init("EtherTerm v1.0.0a", 680, 480, 1280, 800, 8, 16))
+    if(TheTerminal::Instance()->init("EtherTerm v2.7 alpha preview", 680, 480, 1280, 800, 8, 16))
     {
         // Setup the Surfaces
         if(TheTerminal::Instance()->initSurfaceTextures())

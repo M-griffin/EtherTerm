@@ -9,19 +9,19 @@
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
-    #ifdef _DEBBUG
-        #include <SDL2/SDL_ttf.h>
-    #endif
+#ifdef _DEBBUG
+#include <SDL2/SDL_ttf.h>
+#endif
 #elif _WIN32
 #include <SDL.h>
-    #ifdef _DEBBUG
-        #include <SDL_ttf.h>
-    #endif
+#ifdef _DEBBUG
+#include <SDL_ttf.h>
+#endif
 #else
 #include <SDL2/SDL.h>
-    #ifdef _DEBBUG
-        #include <SDL2/SDL_ttf.h>
-    #endif
+#ifdef _DEBBUG
+#include <SDL2/SDL_ttf.h>
+#endif
 #endif
 
 #include "termStateMachine.h"
@@ -54,9 +54,9 @@ public:
 
     // Pass Starting Screen and Font Values.
     bool init(const char* title,
-            int swidth, int sheight,
-            int wwidth, int wheight,
-            int fwidth, int fheight);
+              int swidth, int sheight,
+              int wwidth, int wheight,
+              int fwidth, int fheight);
 
     void update();
     void clean();
@@ -179,6 +179,14 @@ public:
     void freeSurfaceTextures();
     bool loadBitmapImageFromPak();
     bool loadBitmapImage(std::string fontName);
+
+    void createTexture(int textureType,
+                       SDL_Surface *surface,
+                       std::string log);
+    void fillSurface(SDL_Surface *surface);
+    void convertSurface(int surfaceType);
+    void createSurface(int surfaceType);
+
     bool initSurfaceTextures();
     void setScrollRegion(int top, int bot, int terminalHeight);
     void scrollRegionUp();
@@ -246,16 +254,33 @@ private:
     SDL_Window*    globalWindow;
     SDL_Renderer*  globalRenderer;
 
-    //Loaded Surface
+    // Surfaces
     SDL_Surface*   tmpSurface;        // Char Cell
     SDL_Surface*   cursorOnSurface;   // Char Cell for the cursor.
     SDL_Surface*   cursorOffSurface;  // Char Cell for the cursor.
     SDL_Surface*   screenSurface;     // Internal Screen Buffer
     SDL_Surface*   bottomSurface;     // Last Line Buffer
-    SDL_Surface*   chachedSurface;    // Cached Font Surface
-    SDL_Texture*   globalTexture;     // Texture for User Screen
+    SDL_Surface*   cachedSurface;    // Cached Font Surface
 
+    // Textures
+    SDL_Texture*   globalTexture;     // Texture for User Screen
     SDL_Texture*   selectionTexture;  // For Copy Text Selection
+
+    // Handle Surface Alias
+    enum {
+        TEMP_SURFACE = 0,
+        CURSOR_ON_SURFACE,
+        CURSOR_OFF_SURFACE,
+        SCREEN_SURFACE,
+        BOTTOM_SURFACE,
+        CACHED_SURFACE
+    };
+
+    // Handle Texture Alias
+    enum {
+        GLOBAL_TEXTURE = 0,
+        SELECTION_TEXTURE
+    };
 
 #ifdef _DEBBUG
     TTF_Font*      trueTypeFont;      // UTF-8 Fonts.
@@ -268,6 +293,7 @@ private:
     int surfaceHeight;
     int windowWidth;
     int windowHeight;
+    int surfaceBits;
 
     SDL_Rect displayRect;
     SDL_Rect rectBackground;
