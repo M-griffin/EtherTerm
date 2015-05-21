@@ -57,7 +57,7 @@ public:
 
 protected:
 
-    // constructor with default initialisation list
+    // constructor with default initialization list
     TermObject() :  surfaceWidth(0),
         surfaceHeight(0),
         windowWidth(0),
@@ -73,7 +73,7 @@ protected:
 
     std::string textureID;
 
-    // common boolean variables
+    // common Boolean variables
     bool isUpdating;
 };
 

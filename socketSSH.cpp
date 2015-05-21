@@ -28,7 +28,7 @@
 #include <iostream>
 
 /*
- * Start of SSH_Socket Dervived Class (SSH)
+ * Start of SSH_Socket Derived Class (SSH)
  */
 
 /* send a string buffer over a TCP socket with error checking */
@@ -102,7 +102,7 @@ bool SSH_Socket::onEnter()
     // Testing only, otherwise slows down display!!
     //ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verb);
 
-    // Only Slllow SSH2 Connections.
+    // Only allow SSH2 Connections.
     int disAllow = 0;
     int allow    = 1;
     int timeout  = 30;
@@ -190,7 +190,7 @@ bool SSH_Socket::onEnter()
     }*/
 
     // Set the term and pty size of the terminal.
-    // Only After the Shell has been initalized.
+    // Only After the Shell has been initialized.
     if(ssh_channel_request_pty_size(sshChannel, "ansi", 80, 25))
     {
         std::cout << "Error: ssh_channel_request_pty_size: " << host
@@ -199,7 +199,7 @@ bool SSH_Socket::onEnter()
         //return 0;
     }
 
-    // Now reqeust a shell with the pty to get read/write
+    // Now request a shell with the pty to get read/write
     if(ssh_channel_request_shell(sshChannel))
     {
         std::cout << "Error: ssh_channel_request_shell: " << host
@@ -415,13 +415,13 @@ int SSH_Socket::authenticate_console()
      * If the return value is SSH_AUTH_SUCCESS, the SSH server accepts
      * to authenticate using the public key and you can go to the next step.
     Retrieve the private key, using the ssh_pki_import_privkey_file() function.
-     * If a passphrase is needed, either the passphrase specified
+     * If a pass phrase is needed, either the pass phrase specified
      * as argument or a callback will be used.
     Authenticate using ssh_userauth_publickey() with your private key.
     Do not forget cleaning up memory using ssh_key_free().
 */
         // The function ssh_userauth_autopubkey() does this using the
-        // available keys in "~/.ssh/" or sshagent. The return values are the following:
+        // available keys in "~/.ssh/" or ssh-agent. The return values are the following:
         // ** Public Key Needs more testing.
         if(method & SSH_AUTH_METHOD_PUBLICKEY)
         {

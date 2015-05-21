@@ -27,7 +27,7 @@
 #define    DO      253        // please, you use option
 #define    WONT    252        // I won't use option
 #define    WILL    251        // I will use option
-#define    SB      250        // interpret as subnegotiation
+#define    SB      250        // interpret as sub-negotiation
 #define    GA      249        // you may reverse the line
 #define    EL      248        // erase the current line
 #define    EC      247        // erase the current character
@@ -74,14 +74,14 @@ extern const char *telcmds[];
 #define TELOPT_NAOL            8    // negotiate about output line width
 #define TELOPT_NAOP            9    // negotiate about output page size
 #define TELOPT_NAOCRD         10    // negotiate about CR disposition
-#define TELOPT_NAOHTS         11    // negotiate about horizontal tabstops
+#define TELOPT_NAOHTS         11    // negotiate about horizontal tab-stops
 #define TELOPT_NAOHTD         12    // negotiate about horizontal tab disposition
-#define TELOPT_NAOFFD         13    // negotiate about formfeed disposition
+#define TELOPT_NAOFFD         13    // negotiate about form-feed disposition
 #define TELOPT_NAOVTS         14    // negotiate about vertical tab stops
 #define TELOPT_NAOVTD         15    // negotiate about vertical tab disposition
 #define TELOPT_NAOLFD         16    // negotiate about output LF disposition
-#define TELOPT_XASCII         17    // extended ascic character set
-#define TELOPT_LOGOUT         18    // force logout
+#define TELOPT_XASCII         17    // extended ASCII character set
+#define TELOPT_LOGOUT         18    // force log out
 #define TELOPT_BM             19    // byte macro
 #define TELOPT_DET            20    // data entry terminal
 #define TELOPT_SUPDUP         21    // supdup protocol
@@ -97,7 +97,7 @@ extern const char *telcmds[];
 #define TELOPT_NAWS           31    // window size
 #define TELOPT_TSPEED         32    // terminal speed
 #define TELOPT_LFLOW          33    // remote flow control
-#define TELOPT_LINEMODE       34    // Linemode option
+#define TELOPT_LINEMODE       34    // Line-mode option
 #define TELOPT_XDISPLOC       35    // X Display Location
 #define TELOPT_OLD_ENVIRON    36    // Old - Environment variables
 #define TELOPT_AUTHENTICATION 37    // Authenticate
@@ -115,7 +115,7 @@ extern const char *telcmds[];
 #define TELOPT_MCCP_1         85    // MUD zlib stream compression Version 1
 #define TELOPT_MCCP_2         86    // MUD zlib stream compression Version 2 RFC1950.
 #define TELOPT_MSP            90    // used to toggle Mud Sound Protocol
-#define TELOPT_MXP            91    // used to toggle Mud Extention Protocol
+#define TELOPT_MXP            91    // used to toggle Mud Extension Protocol
 
 #define TELOPT_FIRST    TELOPT_BINARY
 #define TELOPT_LAST     TELOPT_KERMIT
@@ -155,7 +155,7 @@ const char *telopts[NTELOPTS+1] =
 #define    LFLOW_RESTART_ANY   2    // Restart output on any char
 #define    LFLOW_RESTART_XON   3    // Restart output only on XON
 
-// LINEMODE suboptions
+// LINE-MODE sub-options
 #define    LM_MODE            1
 #define    LM_FORWARDMASK     2
 #define    LM_SLC             3
@@ -296,7 +296,7 @@ extern const char *authtype_names[];
 #define    AUTHTYPE_NAME_OK(x)    ((unsigned int)(x) < AUTHTYPE_CNT)
 #define    AUTHTYPE_NAME(x)    authtype_names[x]
 
-// ENCRYPTION suboptions
+// ENCRYPTION sub-options
 #define    ENCRYPT_IS           0    // I pick encryption type ...
 #define    ENCRYPT_SUPPORT      1    // I support encryption types ...
 #define    ENCRYPT_REPLY        2    // Initial setup response
@@ -342,8 +342,8 @@ extern const char *enctype_names[];
 #include "socketState.h"
 
 /*
- * Telnet Class handles Telopt Negoation
- * Parsing Socket Data and Sending Through to Ansi Parser.
+ * Telnet Class handles Tel-opt Negotiation
+ * Parsing Socket Data and Sending Through to ANSI Parser.
  */
 
 
@@ -366,7 +366,7 @@ private:
 
     void handleSession();
 
-    // Gobal Option State for Telnet Options Parsing.
+    // Global Option State for Telnet Options Parsing.
     int stage;
     int cmd;
     bool isSGA,  isBIN, isECHO;

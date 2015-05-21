@@ -24,8 +24,8 @@
 #include "socketState.h"
 
 /*
- * Telnet Class handles Telopt Negoation
- * Parsing Socket Data and Sending Through to Ansi Parser.
+ * Telnet Class handles Tel-opt Negotiation
+ * Parsing Socket Data and Sending Through to ANSI Parser.
  */
 class SSHState : public MenuState
 {

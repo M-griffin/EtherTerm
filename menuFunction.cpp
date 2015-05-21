@@ -34,18 +34,18 @@ MenuFunction::MenuFunction()
     commandIndexLightbar = 0;
     isSystemActive = true;
     choice         = 0;
-    // For Lightbar Starting Position
-    // Now uses menu system for lightbars.
+    // For Light-bar Starting Position
+    // Now uses menu system for light-bars.
     currentSystem = 0;
 
 }
 
 MenuFunction::~MenuFunction()
 {
-    if (menuRecord    != 0)        delete    menuRecord;
-    if (commandRecord != 0)        delete [] commandRecord;
-    if (commandIndex  != 0)        delete [] commandIndex;
-    if (commandIndexLightbar != 0) delete [] commandIndexLightbar;
+    if(menuRecord    != 0)        delete    menuRecord;
+    if(commandRecord != 0)        delete [] commandRecord;
+    if(commandIndex  != 0)        delete [] commandIndex;
+    if(commandIndexLightbar != 0) delete [] commandIndexLightbar;
     menuRecord    = 0;
     commandRecord = 0;
     commandIndex  = 0;
@@ -65,13 +65,13 @@ void MenuFunction::dataParseHelper(std::string &temp)
 
     st1 = temp.find('"', 0);
     st2 = temp.find('"', st1+1);
-    if (st1 != std::string::npos &&
-        st2 != std::string::npos)
+    if(st1 != std::string::npos &&
+            st2 != std::string::npos)
     {
         ++st1;
         temp1 = temp.substr(st1,st2);
         ct = st2 - st1;
-        if (temp1.length() > ct)
+        if(temp1.length() > ct)
             temp1.erase(ct,temp1.length());
         temp = temp1;
     }
@@ -86,11 +86,11 @@ int MenuFunction::menuParseData(std::string cfgdata)
 {
     std::string::size_type id1 = 0;
 
-    // Disgards any Config lines with the # Character
-    if (cfgdata[0] == '#') return false;
+    // Discards any Configure lines with the # Character
+    if(cfgdata[0] == '#') return false;
 
     id1 = cfgdata.find("MenuName ", 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
         menuRecord->MenuName = cfgdata;
@@ -98,7 +98,7 @@ int MenuFunction::menuParseData(std::string cfgdata)
     }
 
     id1 = cfgdata.find("Directive ", 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
         menuRecord->Directive = cfgdata;
@@ -106,7 +106,7 @@ int MenuFunction::menuParseData(std::string cfgdata)
     }
 
     id1 = cfgdata.find("MenuPrompt ", 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
         menuRecord->MenuPrompt = cfgdata;
@@ -114,10 +114,10 @@ int MenuFunction::menuParseData(std::string cfgdata)
     }
 
     id1 = cfgdata.find("Lightbar ", 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
-        if (cfgdata == "TRUE") menuRecord->Lightbar = true;
+        if(cfgdata == "TRUE") menuRecord->Lightbar = true;
         else menuRecord->Lightbar = false;
         return false;
     }
@@ -141,19 +141,19 @@ int MenuFunction::menuReadData(std::string MenuName)
     std::cout << "Read Menu: " << path << std::endl;
 
     ifstream iFS;
-    iFS.open( path.c_str() );
-    if (!iFS.is_open())
+    iFS.open(path.c_str());
+    if(!iFS.is_open())
     {
         return false;
     }
 
     std::string cfgdata;
-    for (;;)
+    for(;;)
     {
         if(iFS.eof()) break;
         std::getline(iFS,cfgdata,'\n');
         if(iFS.eof()) break;
-        if (menuParseData(cfgdata) == true) break;
+        if(menuParseData(cfgdata) == true) break;
     }
     iFS.close();
     return true;
@@ -167,12 +167,12 @@ void MenuFunction::commandsParse(std::string cfgdata, int idx)
     std::string::size_type id1 = 0;
     char sText[200] = {0};
 
-    // Disgards any Config lines with the # Character
-    if (cfgdata[0] == '#') return ;
+    // Discards any Configure lines with the # Character
+    if(cfgdata[0] == '#') return ;
 
     sprintf(sText,"LDesc[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
         commandRecord[idx].LDesc = cfgdata;
@@ -181,7 +181,7 @@ void MenuFunction::commandsParse(std::string cfgdata, int idx)
 
     sprintf(sText,"SDesc[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
         commandRecord[idx].SDesc = cfgdata;
@@ -190,7 +190,7 @@ void MenuFunction::commandsParse(std::string cfgdata, int idx)
 
     sprintf(sText,"CKeys[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
         commandRecord[idx].CKeys = cfgdata;
@@ -199,7 +199,7 @@ void MenuFunction::commandsParse(std::string cfgdata, int idx)
 
     sprintf(sText,"CmdKeys[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
         commandRecord[idx].CmdKeys = cfgdata;
@@ -208,7 +208,7 @@ void MenuFunction::commandsParse(std::string cfgdata, int idx)
 
     sprintf(sText,"MString[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
         commandRecord[idx].MString = cfgdata;
@@ -217,7 +217,7 @@ void MenuFunction::commandsParse(std::string cfgdata, int idx)
 
     sprintf(sText,"HiString[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
         commandRecord[idx].HiString = cfgdata;
@@ -226,7 +226,7 @@ void MenuFunction::commandsParse(std::string cfgdata, int idx)
 
     sprintf(sText,"LoString[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
         commandRecord[idx].LoString = cfgdata;
@@ -235,7 +235,7 @@ void MenuFunction::commandsParse(std::string cfgdata, int idx)
 
     sprintf(sText,"Xcoord[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
         commandRecord[idx].Xcoord = atoi((char *)cfgdata.c_str());
@@ -244,7 +244,7 @@ void MenuFunction::commandsParse(std::string cfgdata, int idx)
 
     sprintf(sText,"Ycoord[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
         commandRecord[idx].Ycoord = atoi((char *)cfgdata.c_str());
@@ -253,10 +253,10 @@ void MenuFunction::commandsParse(std::string cfgdata, int idx)
 
     sprintf(sText,"LBarCmd[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
-    if (id1 != std::string::npos)
+    if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
-        if (cfgdata == "TRUE")
+        if(cfgdata == "TRUE")
             commandRecord[idx].LBarCmd = true;
         else
             commandRecord[idx].LBarCmd = false;
@@ -284,8 +284,8 @@ int MenuFunction::commandsExist(std::string MenuName, int idx)
 
     // Open file for reading and parsing.
     ifstream iFS2;
-    iFS2.open( path.c_str() );
-    if (!iFS2.is_open())
+    iFS2.open(path.c_str());
+    if(!iFS2.is_open())
     {
         //errlog((char *)"Couldn't Open Menu Command [cmdexist()]: %s\n", path.c_str());
         return ret;
@@ -294,10 +294,10 @@ int MenuFunction::commandsExist(std::string MenuName, int idx)
     // Loop Through and Find the The Command
     sprintf(sText,"[CommandRec%.03d]",idx);
     std::string cfgdata;
-    for (;;)
+    for(;;)
     {
         std::getline(iFS2,cfgdata,'\n');
-        if (cfgdata.find(sText,0) != std::string::npos)
+        if(cfgdata.find(sText,0) != std::string::npos)
             ret = true;
         if(iFS2.eof()) break;
     }
@@ -314,7 +314,7 @@ int MenuFunction::commandsExist(std::string MenuName, int idx)
 int MenuFunction::commandsCount(std::string MenuName)
 {
     int  cnt = 0;
-    while (commandsExist(MenuName,cnt))
+    while(commandsExist(MenuName,cnt))
     {
         ++cnt;
     }
@@ -337,19 +337,19 @@ int MenuFunction::commandsReadData(std::string MenuName, int idx)
 
     int ret;
     ret = commandsExist(MenuName,idx);
-    if (ret < 1) return false;
+    if(ret < 1) return false;
 
     // Else Read and Parse it
     ifstream iFS;
-    iFS.open( path.c_str() );
-    if (!iFS.is_open())
+    iFS.open(path.c_str());
+    if(!iFS.is_open())
     {
         //errlog((char *)"Couldn't Open Menu Commands: %s\n", path.c_str());
         return false;
     }
 
     std::string cfgdata;
-    for (;;)
+    for(;;)
     {
         std::getline(iFS,cfgdata,'\n');
         commandsParse(cfgdata,idx);
@@ -365,30 +365,30 @@ int MenuFunction::commandsReadData(std::string MenuName, int idx)
 void MenuFunction::menuReadCommands()
 {
     int  idx = 0;
-    while (commandsReadData(_curmenu,idx))
+    while(commandsReadData(_curmenu,idx))
     {
         ++idx;
     }
 }
 
 /**
- * reset or Set Inital Defaults before a menu is read.
+ * reset or Set Initial Defaults before a menu is read.
  */
 void MenuFunction::menuReload()
 {
     xPosition      = 1;                // Holds X Coord
     yPosition      = 1;                // Holds Y Coord
     numCommands    = 0;                // Number of Commands.
-    numLightbarCommand = 0;            // Holds Lightbar # of choices
+    numLightbarCommand = 0;            // Holds Light-bar # of choices
     cntEscCmds     = 0;                // Number of ESC Commands.
 
     sequence  = '\0';
-    secondSequence = '\0';               // Hold Input / Lightbar Key
+    secondSequence = '\0';               // Hold Input / Light-bar Key
     isEscapeSequence = false;            // Is Input key Escaped char, or Normal Key
-    memset(&outBuff,0,sizeof(outBuff));  // Holds Formatted Lightbar Data
-    output.erase();                      // Buffer for writing all lightbars at the same time
+    memset(&outBuff,0,sizeof(outBuff));  // Holds Formatted Light-bar Data
+    output.erase();                      // Buffer for writing all light-bars at the same time
 
-    commandsExecuted = 0;                // Test's for hot keys commands excuted, if non pass through loop
+    commandsExecuted = 0;                // Test's for hot keys commands executed, if non pass through loop
     // This is so scrolling isn't killed with invalid menu input!
     firstCommandsExecuted = 0;
 }
@@ -427,7 +427,7 @@ int MenuFunction::menuExists()
 void MenuFunction::menuStart()
 {
     ////errlog2("readin() 1 %s,%s",(char *)_premenu.c_str(),(char *)_curmenu.c_str());
-    if (_premenu == _curmenu || _curmenu == "")
+    if(_premenu == _curmenu || _curmenu == "")
     {
         //std::cout << "MenuFunction::menu_readin:  _loadnew = false " << std::endl;
         isLoadNewMenu = false;
@@ -460,13 +460,13 @@ void MenuFunction::menuStart()
 
     // Setup the Default Setting and And Clear Allocations.
     menuReload(); // Loading new Menu, Clear!
-    if (menuRecord != 0)
+    if(menuRecord != 0)
     {
         delete menuRecord;
         menuRecord = 0;
     }
     menuRecord = new MenuRecord;
-    if (!menuRecord)
+    if(!menuRecord)
     {
         return;
     }
@@ -476,19 +476,19 @@ void MenuFunction::menuStart()
 
     nogc = 0;
     numCommands = commandsCount(_curmenu);
-    if (commandRecord != 0)
+    if(commandRecord != 0)
     {
         delete [] commandRecord;
         commandRecord = 0;
     }
     commandRecord = new CommandRecord[numCommands+nogc+1];
-    if (!commandRecord)
+    if(!commandRecord)
     {
         return;
     }
 
     menuReadCommands();
-    if (nogc > 0)
+    if(nogc > 0)
     {
         idx = 0;
         while(commandsReadData((char *)"global",idx))
@@ -507,17 +507,17 @@ void MenuFunction::menuClearObjects()
 {
     // Clear
     ////errlog2(" *** menu_clearbars()");
-    if (commandIndex)         delete [] commandIndex;
-    if (commandIndexLightbar) delete [] commandIndexLightbar;
+    if(commandIndex)         delete [] commandIndex;
+    if(commandIndexLightbar) delete [] commandIndexLightbar;
     commandIndex         = 0;
     commandIndexLightbar = 0;
 }
 
 /**
- * Used for Lightbars and Hotkey Menu's
+ * Used for Light-bars and Hokey Menu's
  * This is also used in Full Screen Interfaces
- * for Lightbars slections and Return
- * PassThough commands from Menu Lightbar Prompts.
+ * for Light-bars selections and Return
+ * Pass-though commands from Menu Light-bar Prompts.
  */
 void MenuFunction::menuLightBars(char *inPut)
 {
@@ -526,40 +526,40 @@ void MenuFunction::menuLightBars(char *inPut)
 
     std::vector<list_bar> lightbar;
 
-    // If no Menu Commands Return! / Add fallback menu lateron!!
-    if (numCommands == 0) return;
+    // If no Menu Commands Return! / Add fallback menu later on!!
+    if(numCommands == 0) return;
 
-    // Read Menu Ansi to String that will hold lightbars, Push to screen sametime
-    // Will speed up display and make ghosting not apear as much
+    // Read Menu ANSI to String that will hold light-bars, Push to screen same-time
+    // Will speed up display and make ghosting not appear as much
 
     bool menufile = false;
-    if (menuRecord->Directive != "")
+    if(menuRecord->Directive != "")
     {
         displayAnsiFile((char *)menuRecord->Directive.c_str());
         menufile = true;
     }
 
-    // First time load, Map CommandKeys to HOTKEYS
+    // First time load, Map Command Keys to HOTKEYS
     // If menu has changed, then reload commands.
-    if (_premenu != _curmenu)
+    if(_premenu != _curmenu)
     {
-        if (commandIndex != 0)
+        if(commandIndex != 0)
         {
             delete [] commandIndex;
             commandIndex = 0;
         }
-        commandIndex = new short[numCommands+1];  // Set to # of comamnd for now, preload.
-        if (!commandIndex)
+        commandIndex = new short[numCommands+1];  // Set to # of command for now, preload.
+        if(!commandIndex)
         {
             return;
         }
-        if (commandIndexLightbar != 0)
+        if(commandIndexLightbar != 0)
         {
             delete [] commandIndexLightbar;
             commandIndexLightbar = 0;
         }
         commandIndexLightbar = new short[numCommands+1];
-        if (!commandIndexLightbar)
+        if(!commandIndexLightbar)
         {
             return;
         }
@@ -567,82 +567,82 @@ void MenuFunction::menuLightBars(char *inPut)
         numLightbarCommand = 0;
         firstCommandsExecuted = 0;
         cntEscCmds = 0;
-        for (int i = 0; i != numCommands; i++)
+        for(int i = 0; i != numCommands; i++)
         {
             // If we find a FIRSTCMD, Execute it right away!
-            if (commandRecord[i].CKeys == "FIRSTCMD")
+            if(commandRecord[i].CKeys == "FIRSTCMD")
             {
                 ////errlog2("menu_bars() 6.2 - FIRSTCMD");
                 menuDoCommands(&commandRecord[i]);
                 // Count /Commands, if we execute all FIRSTCMDS then return when completed.
                 ++firstCommandsExecuted;
             }
-            // Get Ligthbar Commands
-            if (commandRecord[i].LBarCmd) //&& isANSI == true)
+            // Get Light-bar Commands
+            if(commandRecord[i].LBarCmd)  //&& isANSI == true)
             {
                 ////errlog2("menu_bars() 6.3 - Lightbar");
                 commandIndex[numLightbarCommand] = i;
                 ++numLightbarCommand;
             }
-            //while running throguh each command, put into a vector formatted.
-            // No ansi menu file, generate menu commands.
-            if (!menufile && numLightbarCommand == 0)
+            //while running through each command, put into a vector formatted.
+            // No ANSI menu file, generate menu commands.
+            if(!menufile && numLightbarCommand == 0)
             {
                 //errlog((char *)"menu_bars() 6.4 - Setting Menu Command Layout");
                 // Insert code here for generating generic menu with commands.
             }
             ////errlog2("menu_bars() 10");
-            // Count Escape Keys in Menu System to override passthrough
-            if (commandRecord[i].CKeys == "ESC")
+            // Count Escape Keys in Menu System to override pass-through
+            if(commandRecord[i].CKeys == "ESC")
             {
                 commandIndexLightbar[cntEscCmds] = i;
                 ++cntEscCmds;
             }
-            else if (commandRecord[i].CKeys == "LEFT")
+            else if(commandRecord[i].CKeys == "LEFT")
             {
                 commandIndexLightbar[cntEscCmds] = i;
                 ++cntEscCmds;
             }
-            else if (commandRecord[i].CKeys == "RIGHT")
+            else if(commandRecord[i].CKeys == "RIGHT")
             {
                 commandIndexLightbar[cntEscCmds] = i;
                 ++cntEscCmds;
             }
-            else if (commandRecord[i].CKeys == "UP")
+            else if(commandRecord[i].CKeys == "UP")
             {
                 commandIndexLightbar[cntEscCmds] = i;
                 ++cntEscCmds;
             }
-            else if (commandRecord[i].CKeys == "DOWN")
-            {
-                commandIndexLightbar[cntEscCmds] = i;
-                ++cntEscCmds;
-            }
-
-            else if (commandRecord[i].CKeys == "HOME")
-            {
-                commandIndexLightbar[cntEscCmds] = i;
-                ++cntEscCmds;
-            }
-            else if (commandRecord[i].CKeys == "END")
+            else if(commandRecord[i].CKeys == "DOWN")
             {
                 commandIndexLightbar[cntEscCmds] = i;
                 ++cntEscCmds;
             }
 
-            else if (commandRecord[i].CKeys == "PAGEUP")
+            else if(commandRecord[i].CKeys == "HOME")
             {
                 commandIndexLightbar[cntEscCmds] = i;
                 ++cntEscCmds;
             }
-            else if (commandRecord[i].CKeys == "PAGEDN")
+            else if(commandRecord[i].CKeys == "END")
+            {
+                commandIndexLightbar[cntEscCmds] = i;
+                ++cntEscCmds;
+            }
+
+            else if(commandRecord[i].CKeys == "PAGEUP")
+            {
+                commandIndexLightbar[cntEscCmds] = i;
+                ++cntEscCmds;
+            }
+            else if(commandRecord[i].CKeys == "PAGEDN")
             {
                 commandIndexLightbar[cntEscCmds] = i;
                 ++cntEscCmds;
             }
         }
-        // Return if we executed all comamnds as FRISTCMD!
-        if (firstCommandsExecuted == numCommands)
+        // Return if we executed all commands as FIRSTCMD!
+        if(firstCommandsExecuted == numCommands)
         {
             return;
         }
@@ -650,7 +650,7 @@ void MenuFunction::menuLightBars(char *inPut)
     }
     output.clear();
 
-    if (numLightbarCommand != 0)
+    if(numLightbarCommand != 0)
     {
         // Throw out a menu prompt if there is one available. - Add MCI Parsing too!
         // Use Same X Row, these got reversed somehow!!! grrrr
@@ -659,16 +659,16 @@ void MenuFunction::menuLightBars(char *inPut)
     }
 
     std::string sMenu = _curmenu;
-    while (!TheInputHandler::Instance()->isGlobalShutdown())
+    while(!TheInputHandler::Instance()->isGlobalShutdown())
     {
-        // Lightbar menu then draw
-        if (numLightbarCommand > 0)
+        // Light-bar menu then draw
+        if(numLightbarCommand > 0)
         {
-            //std::cout << "lightbars" << std::endl;
-            // Setup of Remaining Lightbars in Low highlight Form
-            for (int rep = 0; rep != numLightbarCommand; rep++)
+            //std::cout << "light-bars" << std::endl;
+            // Setup of Remaining Light-bars in Low highlight Form
+            for(int rep = 0; rep != numLightbarCommand; rep++)
             {
-                if (rep != choice)
+                if(rep != choice)
                 {
                     xPosition = commandRecord[commandIndex[rep]].Xcoord;
                     yPosition = commandRecord[commandIndex[rep]].Ycoord;
@@ -683,28 +683,28 @@ void MenuFunction::menuLightBars(char *inPut)
                     output += outBuff;
                 }
             }
-            // Moves cursor to end of line during lightbars.
+            // Moves cursor to end of line during light-bars.
             sprintf(outBuff,"\x1b[%i;79H",yPosition);
             output += outBuff;
             sequenceToAnsi((char*)output.c_str(),0);
         }
-        // Not Lightbars, print out menu ansi.
+        // Not Light-bars, print out menu ANSI.
         else
         {
             sequenceToAnsi((char*)output.c_str(),0);
         }
-        //Replcae Messages Left...
+        //Replace Messages Left...
         output.clear();
         output = menuRecord->MenuPrompt;
 
-        // If lightbar prompt, reset to begining of line.
-        if (numLightbarCommand > 0)
+        // If light-bar prompt, reset to beginning of line.
+        if(numLightbarCommand > 0)
         {
             xPosition = 1;
             sprintf(outBuff,"\x1b[%i;%iH%s",yPosition,xPosition,(char *)menuRecord->MenuPrompt.c_str());
             output = outBuff;
         }
-        if (output.size() > 1)
+        if(output.size() > 1)
         {
             sequenceToAnsi((char *)output.c_str(),0);
         }
@@ -713,7 +713,7 @@ void MenuFunction::menuLightBars(char *inPut)
         TheInputHandler::Instance()->reset();
         inputSequence.erase();
 
-        //std::cout << "Menu_Bars Input Loop" << std::endl;
+        //std::cout << "Menu Bars Input Loop" << std::endl;
         while(!TheInputHandler::Instance()->isGlobalShutdown())
         {
             if(TheInputHandler::Instance()->update())
@@ -725,25 +725,21 @@ void MenuFunction::menuLightBars(char *inPut)
         }
 
         // If Global Exit, return right away.
-        if (TheInputHandler::Instance()->isGlobalShutdown())
+        if(TheInputHandler::Instance()->isGlobalShutdown())
             return;
 
-        //std::cout << "Menu_Bars Input received: " << inputSequence << std::endl;
+        //std::cout << "Menu Bars Input received: " << inputSequence << std::endl;
         sequence = inputSequence[0];
 
-       // Testing Screen Buffer.
-       //TheAnsiParser::Instance()->clearScreenBuffer();
-       //TheAnsiParser::Instance()->getScreenBufferText();
-
         // Check here for Arrow Key / Escaped Input was Received
-        if ((int)sequence == 27)
+        if((int)sequence == 27)
         {
             //std::cout << "ESC RECEIVED" << std::endl;
-            if (inputSequence.size() > 1)
+            if(inputSequence.size() > 1)
             {
                 secondSequence = inputSequence[2];
                 // Handle Hardware Input Sequences
-                if (secondSequence == '0')
+                if(secondSequence == '0')
                 {
                     secondSequence = inputSequence[3];
                 }
@@ -760,73 +756,73 @@ void MenuFunction::menuLightBars(char *inPut)
 
         ////errlog2("menu_bars() 23 .0 ");
         commandsExecuted  = 0;
-        if (isEscapeSequence)
+        if(isEscapeSequence)
         {
             // Input Key is Escaped Meaning Arrow Keys
             //std::cout << "ESC Hit: " << cc << " cntEscCmds:" << cntEscCmds << std::endl;
-            // Run through and check for any Menu commands that overive default passthrough!
-            if (cntEscCmds > 0)
+            // Run through and check for any Menu commands that overdrive default pass-through!
+            if(cntEscCmds > 0)
             {
-                // ESC Commands in Menu might overide lightbars.
-                for (int ckey = 0; ckey != (signed)cntEscCmds; ckey++)
+                // ESC Commands in Menu might override light-bars.
+                for(int ckey = 0; ckey != (signed)cntEscCmds; ckey++)
                 {
-                    if (secondSequence == '\0') // Stright ESC Key
+                    if(secondSequence == '\0')  // Straight ESC Key
                     {
-                        if (commandRecord[commandIndexLightbar[ckey]].CKeys == "ESC")
+                        if(commandRecord[commandIndexLightbar[ckey]].CKeys == "ESC")
                         {
                             ++commandsExecuted;
                             menuDoCommands(&commandRecord[commandIndexLightbar[ckey]]);
                             strcpy(inPut,(const char*)commandRecord[commandIndexLightbar[ckey]].CmdKeys.c_str());
                         }
                     }
-                    else if (secondSequence == 'A')
+                    else if(secondSequence == 'A')
                     {
-                        if (commandRecord[commandIndexLightbar[ckey]].CKeys == "UP")
+                        if(commandRecord[commandIndexLightbar[ckey]].CKeys == "UP")
                         {
                             ++commandsExecuted;
                             menuDoCommands(&commandRecord[commandIndexLightbar[ckey]]);
                             strcpy(inPut,(const char*)commandRecord[commandIndexLightbar[ckey]].CmdKeys.c_str());
                         }
                     }
-                    else if (secondSequence == 'B')
+                    else if(secondSequence == 'B')
                     {
-                        if (commandRecord[commandIndexLightbar[ckey]].CKeys == "DOWN")
+                        if(commandRecord[commandIndexLightbar[ckey]].CKeys == "DOWN")
                         {
                             ++commandsExecuted;
                             menuDoCommands(&commandRecord[commandIndexLightbar[ckey]]);
                             strcpy(inPut,(const char*)commandRecord[commandIndexLightbar[ckey]].CmdKeys.c_str());
                         }
                     }
-                    else if (secondSequence == 'C')
+                    else if(secondSequence == 'C')
                     {
-                        if (commandRecord[commandIndexLightbar[ckey]].CKeys == "RIGHT")
+                        if(commandRecord[commandIndexLightbar[ckey]].CKeys == "RIGHT")
                         {
                             ++commandsExecuted;
                             menuDoCommands(&commandRecord[commandIndexLightbar[ckey]]);
                             strcpy(inPut,(const char*)commandRecord[commandIndexLightbar[ckey]].CmdKeys.c_str());
                         }
                     }
-                    else if (secondSequence == 'D')
+                    else if(secondSequence == 'D')
                     {
-                        if (commandRecord[commandIndexLightbar[ckey]].CKeys == "LEFT")
+                        if(commandRecord[commandIndexLightbar[ckey]].CKeys == "LEFT")
                         {
                             ++commandsExecuted;
                             menuDoCommands(&commandRecord[commandIndexLightbar[ckey]]);
                             strcpy(inPut,(const char*)commandRecord[commandIndexLightbar[ckey]].CmdKeys.c_str());
                         }
                     }
-                    else if (secondSequence == 'V' || (secondSequence == '5' && inputSequence[3] == '~'))
+                    else if(secondSequence == 'V' || (secondSequence == '5' && inputSequence[3] == '~'))
                     {
-                        if (commandRecord[commandIndexLightbar[ckey]].CKeys == "PAGEUP")
+                        if(commandRecord[commandIndexLightbar[ckey]].CKeys == "PAGEUP")
                         {
                             ++commandsExecuted;
                             menuDoCommands(&commandRecord[commandIndexLightbar[ckey]]);
                             strcpy(inPut,(const char*)commandRecord[commandIndexLightbar[ckey]].CmdKeys.c_str());
                         }
                     }
-                    else if (secondSequence == 'U' || (secondSequence == '6' && inputSequence[3] == '~'))
+                    else if(secondSequence == 'U' || (secondSequence == '6' && inputSequence[3] == '~'))
                     {
-                        if (commandRecord[commandIndexLightbar[ckey]].CKeys == "PAGEDN")
+                        if(commandRecord[commandIndexLightbar[ckey]].CKeys == "PAGEDN")
                         {
                             ++commandsExecuted;
                             menuDoCommands(&commandRecord[commandIndexLightbar[ckey]]);
@@ -836,54 +832,54 @@ void MenuFunction::menuLightBars(char *inPut)
                 }
                 // Executed == 0, Then Key Pressed was not valid! :)
                 // Pass through the ESC then
-                if (commandsExecuted == 0)
+                if(commandsExecuted == 0)
                 {
                     inPut[0] = secondSequence;
-                    // Translater to Terminal ESC Keys
-                    if (secondSequence == '0')
+                    // Translate to Terminal ESC Keys
+                    if(secondSequence == '0')
                         secondSequence = inputSequence[3];
                 }
                 else
                 {
-                    //std::cout << "Executed, now passthrough back to interface the key pressed!" << std::endl;
+                    //std::cout << "Executed, now pass-through back to interface the key pressed!" << std::endl;
                     return;
                 }
             }
 
             // If true, means we pass A and B up/dn through to system!
-            //elog ("Start Lightbar Processing... CMD: %c, cntEscCmds: %ld", cc, cntEscCmds);
-            if (numLightbarCommand > 0)
+            //elog ("Start Light-bar Processing... CMD: %c, cntEscCmds: %ld", cc, cntEscCmds);
+            if(numLightbarCommand > 0)
             {
                 ////errlog2("menu_bars() 23.4 - iNoc > 0");
-                if (secondSequence == 'D' && commandsExecuted == 0)
+                if(secondSequence == 'D' && commandsExecuted == 0)
                 {
                     xPosition = commandRecord[commandIndex[choice]].Xcoord;
                     yPosition = commandRecord[commandIndex[choice]].Ycoord;
                     sprintf(outBuff,"\x1b[%i;%iH%s",yPosition,xPosition,
-                        (char *)commandRecord[commandIndex[choice]].LoString.c_str());
+                            (char *)commandRecord[commandIndex[choice]].LoString.c_str());
                     output += outBuff;
-                    if (choice == 0) choice = numLightbarCommand-1;
+                    if(choice == 0) choice = numLightbarCommand-1;
                     else --choice;
                     xPosition = commandRecord[commandIndex[choice]].Xcoord;
                     yPosition = commandRecord[commandIndex[choice]].Ycoord;
                     sprintf(outBuff,"\x1b[%i;%iH%s\x1b[%i;79H",yPosition,xPosition,
-                        (char *)commandRecord[commandIndex[choice]].HiString.c_str(),yPosition);
+                            (char *)commandRecord[commandIndex[choice]].HiString.c_str(),yPosition);
                     output += outBuff;
                     sequenceToAnsi((char*)output.c_str(),0);
                 }
-                else if (secondSequence == 'C' && commandsExecuted == 0)
+                else if(secondSequence == 'C' && commandsExecuted == 0)
                 {
                     xPosition = commandRecord[commandIndex[choice]].Xcoord;
                     yPosition = commandRecord[commandIndex[choice]].Ycoord;
                     sprintf(outBuff,"\x1b[%i;%iH%s",yPosition,xPosition,
-                        (char *)commandRecord[commandIndex[choice]].LoString.c_str());
+                            (char *)commandRecord[commandIndex[choice]].LoString.c_str());
                     output += outBuff;
-                    if (choice == numLightbarCommand-1) choice = 0;
+                    if(choice == numLightbarCommand-1) choice = 0;
                     else ++choice;
                     xPosition = commandRecord[commandIndex[choice]].Xcoord;
                     yPosition = commandRecord[commandIndex[choice]].Ycoord;
                     sprintf(outBuff,"\x1b[%i;%iH%s\x1b[%i;79H",yPosition,xPosition,
-                        (char *)commandRecord[commandIndex[choice]].HiString.c_str(),yPosition);
+                            (char *)commandRecord[commandIndex[choice]].HiString.c_str(),yPosition);
                     output += outBuff;
                     sequenceToAnsi((char*)output.c_str(),0);
                 }
@@ -893,33 +889,33 @@ void MenuFunction::menuLightBars(char *inPut)
             {
                 //std::cout << "Normal Key Input!: " << (int)c << std::endl;
                 // normal Key Input.
-                if ((int)sequence == 10)
+                if((int)sequence == 10)
                 {
                     commandsExecuted = 0;
                     // Here Loop through and execute stacked Commands
-                    for (int ckey = 0; ckey != numCommands; ckey++)
+                    for(int ckey = 0; ckey != numCommands; ckey++)
                     {
-                        if ( commandRecord[ckey].CKeys == "ENTER" )
+                        if(commandRecord[ckey].CKeys == "ENTER")
                         {
                             ++commandsExecuted;
                             menuDoCommands(&commandRecord[ckey]);
                             strcpy(inPut,(const char*)commandRecord[ckey].CmdKeys.c_str());
                         }
-                        else if ( commandRecord[ckey].CKeys == commandRecord[commandIndex[choice]].CKeys )
+                        else if(commandRecord[ckey].CKeys == commandRecord[commandIndex[choice]].CKeys)
                         {
                             ++commandsExecuted;
                             menuDoCommands(&commandRecord[ckey]);
                             strcpy(inPut,(const char*)commandRecord[ckey].CmdKeys.c_str());
                         }
                     }
-                    if (commandsExecuted > 0)
+                    if(commandsExecuted > 0)
                     {
                         return;
                     }
                     else
                     {
                         // Redraw screen!
-                        if (menuRecord->Directive != "")
+                        if(menuRecord->Directive != "")
                         {
                             displayAnsiFile((char *)menuRecord->Directive.c_str());
                         }
@@ -928,15 +924,15 @@ void MenuFunction::menuLightBars(char *inPut)
                 //  Else go through and run stack commands on hot key pressed.
                 else
                 {
-                    commandsExecuted = 0;     // Normal Key Inputed, if Match's
+                    commandsExecuted = 0;     // Normal Key Inputted, if Match's
                     std::string t1;
-                    for (int ckey = 0; ckey != numCommands; ckey++)
+                    for(int ckey = 0; ckey != numCommands; ckey++)
                     {
                         // Loop and Run Stacked Commands.
-                        if (sequence == 32)
+                        if(sequence == 32)
                         {
-                            // Else check if it's a spacebar
-                            if (commandRecord[ckey].CKeys == "SPACE")
+                            // Else check if it's a space-bar
+                            if(commandRecord[ckey].CKeys == "SPACE")
                             {
                                 ++commandsExecuted;
                                 menuDoCommands(&commandRecord[ckey]);
@@ -944,8 +940,8 @@ void MenuFunction::menuLightBars(char *inPut)
                             }
                         }
                         else // Check any remaining Keys Hot Key Input.
-                            if (commandRecord[ckey].CKeys[0] == toupper(sequence) &&
-                                commandRecord[ckey].CKeys.size() < 2)
+                            if(commandRecord[ckey].CKeys[0] == toupper(sequence) &&
+                                    commandRecord[ckey].CKeys.size() < 2)
                             {
                                 ++commandsExecuted;
                                 menuDoCommands(&commandRecord[ckey]);
@@ -954,7 +950,7 @@ void MenuFunction::menuLightBars(char *inPut)
                     }
                 }
                 // Executed == 0, Then Key Pressed was not valid!, and no stacked commands to loop :)
-                if (commandsExecuted > 0)
+                if(commandsExecuted > 0)
                 {
                     return;
                 }
@@ -963,58 +959,58 @@ void MenuFunction::menuLightBars(char *inPut)
         // Normal Key Input
         else
         {
-            // If Enter, Return Cmd # of Lightbar Executed
+            // If Enter, Return Cmd # of Light-bar Executed
             // also catch any stacked keys and execute in order!
-            if ((int)sequence == 13 && numLightbarCommand > 0)
+            if((int)sequence == 13 && numLightbarCommand > 0)
             {
-                // Only Executte [ENTER] on Lightbars!
+                // Only Execute [ENTER] on Light-bars!
                 commandsExecuted = 0;
                 // Here Loop through and execute stacked Commands
-                for (int ckey = 0; ckey != numCommands; ckey++)
+                for(int ckey = 0; ckey != numCommands; ckey++)
                 {
-                    if (commandRecord[ckey].CKeys == commandRecord[commandIndex[choice]].CKeys)
+                    if(commandRecord[ckey].CKeys == commandRecord[commandIndex[choice]].CKeys)
                     {
                         ++commandsExecuted;
                         menuDoCommands(&commandRecord[ckey]);
                         strcpy(inPut,(const char*)commandRecord[ckey].CmdKeys.c_str());
                     }
                 }
-                if (commandsExecuted > 0)
+                if(commandsExecuted > 0)
                 {
-                    ////errlog2("Excuted Return Passthrough or Normal Key!");
+                    ////errlog2("Excuted Return Pass-through or Normal Key!");
                     return;
                 }
                 else
                 {
                     // Redraw screen!
-                    if (menuRecord->Directive != "")
+                    if(menuRecord->Directive != "")
                     {
                         displayAnsiFile((char *)menuRecord->Directive.c_str());
                     }
                 }
             }
-            else if ((int)sequence == 13 && numLightbarCommand == 0)
+            else if((int)sequence == 13 && numLightbarCommand == 0)
             {
                 // Check for ENTER CKEY!
                 commandsExecuted = 0;
                 // Here Loop through and execute stacked Commands
-                for (int ckey = 0; ckey != numCommands; ckey++)
+                for(int ckey = 0; ckey != numCommands; ckey++)
                 {
-                    if (commandRecord[ckey].CKeys == "ENTER")
+                    if(commandRecord[ckey].CKeys == "ENTER")
                     {
                         ++commandsExecuted;
                         menuDoCommands(&commandRecord[ckey]);
                         strcpy(inPut,(const char*)commandRecord[ckey].CmdKeys.c_str());
                     }
                 }
-                if (commandsExecuted > 0)
+                if(commandsExecuted > 0)
                 {
                     return;
                 }
                 else
                 {
                     // Redraw screen!
-                    if (menuRecord->Directive != "")
+                    if(menuRecord->Directive != "")
                     {
                         displayAnsiFile((char *)menuRecord->Directive.c_str());
                     }
@@ -1023,15 +1019,15 @@ void MenuFunction::menuLightBars(char *inPut)
             //  Else go through and run stack commands on hot key pressed.
             else
             {
-                commandsExecuted = 0;      // Normal Key Inputed, if Match's
+                commandsExecuted = 0;      // Normal Key Inputted, if Match's
                 std::string t1;
-                for (int ckey = 0; ckey != numCommands; ckey++)
+                for(int ckey = 0; ckey != numCommands; ckey++)
                 {
                     // Loop and Run Stacked Commands.
-                    if (sequence == 32)
+                    if(sequence == 32)
                     {
-                        // Else check if it's a spacebar
-                        if (commandRecord[ckey].CKeys == "SPACE")
+                        // Else check if it's a space-bar
+                        if(commandRecord[ckey].CKeys == "SPACE")
                         {
                             ++commandsExecuted;
                             menuDoCommands(&commandRecord[ckey]);
@@ -1039,7 +1035,7 @@ void MenuFunction::menuLightBars(char *inPut)
                         }
                     }
                     else // Check any remaining Keys Hot Key Input.
-                        if (commandRecord[ckey].CKeys[0] == toupper(sequence) && commandRecord[ckey].CKeys.size() < 2)
+                        if(commandRecord[ckey].CKeys[0] == toupper(sequence) && commandRecord[ckey].CKeys.size() < 2)
                         {
                             ++commandsExecuted;
                             menuDoCommands(&commandRecord[ckey]);
@@ -1047,7 +1043,7 @@ void MenuFunction::menuLightBars(char *inPut)
                         }
                 }
                 // Executed == 0, Then Key Pressed was not valid!, and no stacked commands to loop :)
-                if (commandsExecuted > 0)
+                if(commandsExecuted > 0)
                 {
                     return;
                 }
@@ -1058,13 +1054,13 @@ void MenuFunction::menuLightBars(char *inPut)
 }
 
 /**
- * Main Entry Point for a Menu and Startup.
+ * Main Entry Point for a Menu and Start-up.
  */
 void MenuFunction::menuProcess(char *mString, uint32_t area)
 {
     currentSystem = area;
     strcpy(mString,"");
-    if (numCommands == 0)
+    if(numCommands == 0)
     {
         menuReload();
         return;
@@ -1085,15 +1081,15 @@ void MenuFunction::menuDoCommands(CommandRecord *cmdr)
     //std::cout << "Do MenuCmd: CmdKey[0]: " << (char)c1 << " CmdKey[1]: " << (char)c2 << std::endl;
     std::string inputSequence;
 
-    switch (c1)
+    switch(c1)
     {
-        // Message Reader Return right away
+            // Message Reader Return right away
         case '!' :
-            // These are Passthrough Menu Commands.
+            // These are Pass-through Menu Commands.
             break;
 
         case '-' :
-            switch (c2)
+            switch(c2)
             {
                 case '^' : // Change Menu
                     //strcpy(_curmenu,mString);
@@ -1113,7 +1109,7 @@ void MenuFunction::menuDoCommands(CommandRecord *cmdr)
                     break;
 
                 case '!' : // Return to Original Menu from GoSub Menu.
-                    if (_gosub == "") break;
+                    if(_gosub == "") break;
                     _curmenu.clear();
                     _curmenu = _gosub;
                     isLoadNewMenu = true;
@@ -1130,7 +1126,7 @@ void MenuFunction::menuDoCommands(CommandRecord *cmdr)
             }
             break;
 
-        // None Found!
+            // None Found!
         default  :
             break;
     }
@@ -1141,12 +1137,12 @@ void MenuFunction::menuDoCommands(CommandRecord *cmdr)
  */
 void MenuFunction::rightSpacing(char *str, int space)   // Pad Right
 {
-    if (space == 0) return;
+    if(space == 0) return;
 
     std::string Line = str;
     int s = Line.size();
-    // if Line > Sapce, Erase to Make it match!
-    if (s >= space)
+    // if Line > Space, Erase to Make it match!
+    if(s >= space)
     {
         Line.erase(space,(s-space));
         strcpy(str,Line.c_str());
@@ -1163,12 +1159,12 @@ void MenuFunction::rightSpacing(char *str, int space)   // Pad Right
  */
 void MenuFunction::leftSpacing(char *str, int space)   // Pad Left
 {
-    if (space == 0) return;
+    if(space == 0) return;
 
     std::string Line = "";
     int s = strlen(str);
-    // if Line > Sapce, Erase to Make it match!
-    if (s > space)
+    // if Line > Space, Erase to Make it match!
+    if(s > space)
     {
         Line.erase(space,(s-space));
         strcpy(str,Line.c_str());
@@ -1206,24 +1202,24 @@ void MenuFunction::inputField(char *text, int &len)
     // Parse for Input String Modifiers
     temp = text;
     int tLen, id1;
-    char INPUT_COLOR[255]={0};
+    char INPUT_COLOR[255]= {0};
     bool inc = false; //found input color
 
-    // Overide Input Length for Ansi
+    // Override Input Length for ANSI
     id1 = temp.find("|IN",0);
-    if (id1 != -1)
+    if(id1 != -1)
     {
         sTmp[0] = temp[id1+3];
         sTmp[1] = temp[id1+4];
         temp.erase(id1,5);
-        tLen = atoi( sTmp );
-        if (tLen < len) len = tLen; // Set new Length
+        tLen = atoi(sTmp);
+        if(tLen < len) len = tLen;  // Set new Length
     }
 
-    // Overide Foreground/Background Input Field Colors
+    // Override Foreground/Background Input Field Colors
     id1 = -1;
     id1 = temp.find("|FB",0);
-    if (id1 != -1)
+    if(id1 != -1)
     {
         memset(&sTmp,0,3);
         sTmp[0] = temp[id1+3]; // Foreground 00-15
@@ -1241,10 +1237,10 @@ void MenuFunction::inputField(char *text, int &len)
         repeat += " ";
     }
 
-    if (!inc)
+    if(!inc)
         sprintf(INPUT_COLOR,"|00|19");
     sprintf(text,"%s|07|16[%s%s|07|16]%s\x1b[%iD",
-        (char *)temp.c_str(),INPUT_COLOR,repeat.c_str(),INPUT_COLOR,len+1);
+            (char *)temp.c_str(),INPUT_COLOR,repeat.c_str(),INPUT_COLOR,len+1);
 }
 
 /*
@@ -1253,23 +1249,23 @@ void MenuFunction::inputField(char *text, int &len)
 int MenuFunction::getKey()
 {
     std::string inputSequence;
-    while (!TheInputHandler::Instance()->isGlobalShutdown())
+    while(!TheInputHandler::Instance()->isGlobalShutdown())
     {
         if(TheInputHandler::Instance()->update())
-        {            
+        {
             inputSequence = TheInputHandler::Instance()->getInputSequence();
             break;
         }
         else
-        {            
+        {
             SDL_Delay(10);
         }
     }
     // If Global Exit, return right away.
-    if (TheInputHandler::Instance()->isGlobalShutdown())
+    if(TheInputHandler::Instance()->isGlobalShutdown())
     {
         return EOF;
-    }    
+    }
     return inputSequence[0];
 }
 
@@ -1277,10 +1273,10 @@ int MenuFunction::getKey()
  * Get Input up to <ENTER>
  */
 void MenuFunction::getLine(char *line,   // Returns Input into Line
-                         int   length,   // Max Input Length of String
-                         char *leadoff,  // Data to Display in Default String {Optional}
-                         int   hid,      // If input is Echomail as hidden    {Optional}
-                         char *chlist)   // Valid Input Char List             {Optional}
+                           int   length,   // Max Input Length of String
+                           char *leadoff,  // Data to Display in Default String {Optional}
+                           int   hid,      // If input is Echoed as hidden      {Optional}
+                           char *chlist)   // Valid Input Char List             {Optional}
 {
     int sequence = 0, secondSequence = 0;
     int i   = 0;
@@ -1298,13 +1294,12 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
     int  cursorBlink = 0;
     bool startBlinking = false;
     time_t ttime, ttime2;
-
     ttime = SDL_GetTicks();
 
-    #define DEL 0x7f
+#define DEL 0x7f
 
     // If were starting Off Input with a String already in buffer!  display it!
-    if (leadoff != 0)
+    if(leadoff != 0)
     {
         input = leadoff;
         i = input.size();
@@ -1312,10 +1307,10 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
         TheSequenceParser::Instance()->processSequence(input);
     }
 
-    // This is a list of Valid inPut Keys
+    // This is a list of Valid input Keys
     // We will only grab chars in this list
     // Only if a list is passed to the Function.
-    if (chlist != 0)
+    if(chlist != 0)
     {
         // Append ESC, CTRL Y, BACKSPACE, ENTER
         // For Line Movement and End of Line Keys so they are always valid input.
@@ -1324,7 +1319,7 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
         sprintf(sList,"%s%s",chlist,sLine);
     }
 
-    while (!TheInputHandler::Instance()->isGlobalShutdown())
+    while(!TheInputHandler::Instance()->isGlobalShutdown())
     {
         if(TheInputHandler::Instance()->update() && !TheInputHandler::Instance()->isGlobalShutdown())
         {
@@ -1336,7 +1331,7 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
             inputSequence = TheInputHandler::Instance()->getInputSequence();
 
             // Check for Abort, single ESC character.
-            if (inputSequence == "\x1b" && inputSequence.size() == 1)
+            if(inputSequence == "\x1b" && inputSequence.size() == 1)
             {
                 isEscapeSequence = false;
                 strcpy(line,"\x1b");
@@ -1345,7 +1340,8 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
         }
         else
         {
-            if (TheAnsiParser::Instance()->isCursorActive() && !TheInputHandler::Instance()->isGlobalShutdown())
+            if(TheAnsiParser::Instance()->isCursorActive() &&
+                    !TheInputHandler::Instance()->isGlobalShutdown())
             {
                 startBlinking = true;
                 // Setup Timer for Blinking Cursor
@@ -1379,22 +1375,22 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
         }
 
         // Catch any shutdown here before doing anymore.
-        if (TheInputHandler::Instance()->isGlobalShutdown())
+        if(TheInputHandler::Instance()->isGlobalShutdown())
             return;
 
         sequence = inputSequence[0];
 
-        if (sequence == '\r') sequence = '\n';
+        if(sequence == '\r') sequence = '\n';
 
         // Valid Key List Checking....
-        if (chlist != 0)
+        if(chlist != 0)
         {
             if(sequence >= 'a' && sequence <= 'z')
             {
                 sequence = toupper(sequence);
             }
             if(strchr(sList,sequence) || sequence == '\n' ||
-                sequence == '\r')
+                    sequence == '\r')
             {
                 //continue;
             }
@@ -1404,24 +1400,24 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
             }
         }
         // Escape in this case, ignore, later add movement in string
-        if ((int)sequence == 27)
+        if((int)sequence == 27)
         {
-            if (inputSequence.size() >= 3)
+            if(inputSequence.size() >= 3)
                 secondSequence = inputSequence[2];
             isEscapeSequence = true;
         }
         else
         {
-            isEscapeSequence = false;                        
+            isEscapeSequence = false;
         }
 
         // Catch all Escaped Keys for Cursor Movement
-        if (isEscapeSequence)
+        if(isEscapeSequence)
         {
-            switch (secondSequence)
+            switch(secondSequence)
             {
                 case '3' : // Delete
-                    if (i != 0 || Col != 0)
+                    if(i != 0 || Col != 0)
                     {
                         sequenceToAnsi((char *)"\x1b[D \x1b[D");
                         input.erase(Col-1,1);
@@ -1432,14 +1428,14 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
 
                 default :
                     break;
-            }    
+            }
         }
-        else if ((int)sequence == 25)
+        else if((int)sequence == 25)
         {
             // CTRL Y - Clear Line
             input.erase();
             i = Col;
-            for (; i != 0; i--)
+            for(; i != 0; i--)
             {
                 sequenceToAnsi((char *)"\x1b[D \x1b[D");
             }
@@ -1451,9 +1447,9 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
         // Do destructive backspace
         // on VT100 Terms 127 DEL == BS!
         // Since we have no DELETE in this, delete on 1 liens will works like BS.
-        else if ((int)sequence == 0x08 || (int)sequence == 127 || int(sequence) == 8 || int(sequence) == 207 || (int)sequence == 0x7f)
+        else if((int)sequence == 0x08 || (int)sequence == 127 || int(sequence) == 8 || int(sequence) == 207 || (int)sequence == 0x7f)
         {
-            if (i != 0 || Col != 0)
+            if(i != 0 || Col != 0)
             {
                 sequenceToAnsi((char *)"\x1b[D \x1b[D");
                 input.erase(Col-1,1);
@@ -1464,9 +1460,9 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
         // Normal Key Input, Letters & numbers
         else if((int)sequence > 31 && (int)sequence < 126)
         {
-            if (i != length-1)
+            if(i != length-1)
             {
-                if (hid)
+                if(hid)
                 {
                     sequenceToAnsi((char *)"*");
                 }
@@ -1480,7 +1476,7 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
                 ++Col;
             }
         }
-        else if (sequence == '\r' || sequence == '\n')
+        else if(sequence == '\r' || sequence == '\n')
         {
             //input += '\0';
             strncpy(line,(char *)input.c_str(),length);
@@ -1489,7 +1485,7 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
     }
 
     // If Global Exit, return right away.
-    if (TheInputHandler::Instance()->isGlobalShutdown())
+    if(TheInputHandler::Instance()->isGlobalShutdown())
     {
         return;
     }
@@ -1501,7 +1497,7 @@ void MenuFunction::getLine(char *line,   // Returns Input into Line
  */
 void MenuFunction::ansiForegroundColor(char *data, int fg)
 {
-    switch (fg)
+    switch(fg)
     {
         case 0:
             strcat(data, "x[0;30m");
@@ -1562,7 +1558,7 @@ void MenuFunction::ansiForegroundColor(char *data, int fg)
  */
 void MenuFunction::ansiBackgroundColor(char *data, int bg)
 {
-    switch (bg)
+    switch(bg)
     {
         case 16:
             strcat(data, "x[40m");
@@ -1606,131 +1602,131 @@ void MenuFunction::sequenceToAnsi(char* szString, int buffer)
 {
     std::string::size_type  id1 = 0;  // Pipe Position
     char szTmp[3];         // Holds 1, 2nd digit of Pipe
-    char szPos1[3];        // Hold XY Pos for Ansi Postion Codes
-    char szPos2[3];        // Hold XY Pos for Ansi Postion Codes
-    char szReplace[1024];  // Holds Converted Pipe 2 Ansi
+    char szPos1[3];        // Hold XY Pos for ANSI Position Codes
+    char szPos2[3];        // Hold XY Pos for ANSI Position Codes
+    char szReplace[1024];  // Holds Converted Pipe 2 ANSI
 
     std::string fTmp;
     std::string AnsiString = szString;
 
-    #define SP 0x20
+#define SP 0x20
 
     // Search for First Pipe
     id1 = 0;
-    while (id1 != std::string::npos)
+    while(id1 != std::string::npos)
     {
         id1 = AnsiString.find("|",id1);
-        if (id1 != std::string::npos)
+        if(id1 != std::string::npos)
         {
             memset(&szTmp,0,sizeof(szTmp));
             memset(&szReplace,0,sizeof(szReplace));
             szTmp[0] = AnsiString[id1+1];  // Get First # after Pipe
             szTmp[1] = AnsiString[id1+2];  // Get Second Number After Pipe
-            if (szTmp[0] == '\0' || szTmp[0] == '\r' || szTmp[0] == EOF) break;
-            if (szTmp[1] == '\0' || szTmp[1] == '\r' || szTmp[0] == EOF) break;
+            if(szTmp[0] == '\0' || szTmp[0] == '\r' || szTmp[0] == EOF) break;
+            if(szTmp[1] == '\0' || szTmp[1] == '\r' || szTmp[0] == EOF) break;
 
             //std::cout << "\r\n*** szTmp: " << szTmp << std::endl;
-            if (isdigit(szTmp[0]) && isdigit(szTmp[1]))
+            if(isdigit(szTmp[0]) && isdigit(szTmp[1]))
             {
-                switch (szTmp[0])
+                switch(szTmp[0])
                 {
-                    // Parse from pipe to Foreground/back Color Ansi Sequences.
+                    // Parse from pipe to Foreground/back Color ANSI Sequences.
                     case '0' :
-                        switch (szTmp[1])
+                        switch(szTmp[1])
                         {
-                        case '0' :
-                            ansiForegroundColor(szReplace, 0);
-                            break;
-                        case '1' :
-                            ansiForegroundColor(szReplace, 1);
-                            break;
-                        case '2' :
-                            ansiForegroundColor(szReplace, 2);
-                            break;
-                        case '3' :
-                            ansiForegroundColor(szReplace, 3);
-                            break;
-                        case '4' :
-                            ansiForegroundColor(szReplace, 4);
-                            break;
-                        case '5' :
-                            ansiForegroundColor(szReplace, 5);
-                            break;
-                        case '6' :
-                            ansiForegroundColor(szReplace, 6);
-                            break;
-                        case '7' :
-                            ansiForegroundColor(szReplace, 7);
-                            break;
-                        case '8' :
-                            ansiForegroundColor(szReplace, 8);
-                            break;
-                        case '9' :
-                            ansiForegroundColor(szReplace, 9);
-                            break;
-                        default :
-                            ++id1;
-                            break;
+                            case '0' :
+                                ansiForegroundColor(szReplace, 0);
+                                break;
+                            case '1' :
+                                ansiForegroundColor(szReplace, 1);
+                                break;
+                            case '2' :
+                                ansiForegroundColor(szReplace, 2);
+                                break;
+                            case '3' :
+                                ansiForegroundColor(szReplace, 3);
+                                break;
+                            case '4' :
+                                ansiForegroundColor(szReplace, 4);
+                                break;
+                            case '5' :
+                                ansiForegroundColor(szReplace, 5);
+                                break;
+                            case '6' :
+                                ansiForegroundColor(szReplace, 6);
+                                break;
+                            case '7' :
+                                ansiForegroundColor(szReplace, 7);
+                                break;
+                            case '8' :
+                                ansiForegroundColor(szReplace, 8);
+                                break;
+                            case '9' :
+                                ansiForegroundColor(szReplace, 9);
+                                break;
+                            default :
+                                ++id1;
+                                break;
                         }
                         break;
 
                     case '1' :
-                        switch (szTmp[1])
+                        switch(szTmp[1])
                         {
-                        case '0' :
-                            ansiForegroundColor(szReplace, 10);
-                            break;
-                        case '1' :
-                            ansiForegroundColor(szReplace, 11);
-                            break;
-                        case '2' :
-                            ansiForegroundColor(szReplace, 12);
-                            break;
-                        case '3' :
-                            ansiForegroundColor(szReplace, 13);
-                            break;
-                        case '4' :
-                            ansiForegroundColor(szReplace, 14);
-                            break;
-                        case '5' :
-                            ansiForegroundColor(szReplace, 15);
-                            break;
-                        case '6' :
-                            ansiBackgroundColor(szReplace, 16);
-                            break;
-                        case '7' :
-                            ansiBackgroundColor(szReplace, 17);
-                            break;
-                        case '8' :
-                            ansiBackgroundColor(szReplace, 18);
-                            break;
-                        case '9' :
-                            ansiBackgroundColor(szReplace, 19);
-                            break;
-                        default :
-                            ++id1;
-                            break;
+                            case '0' :
+                                ansiForegroundColor(szReplace, 10);
+                                break;
+                            case '1' :
+                                ansiForegroundColor(szReplace, 11);
+                                break;
+                            case '2' :
+                                ansiForegroundColor(szReplace, 12);
+                                break;
+                            case '3' :
+                                ansiForegroundColor(szReplace, 13);
+                                break;
+                            case '4' :
+                                ansiForegroundColor(szReplace, 14);
+                                break;
+                            case '5' :
+                                ansiForegroundColor(szReplace, 15);
+                                break;
+                            case '6' :
+                                ansiBackgroundColor(szReplace, 16);
+                                break;
+                            case '7' :
+                                ansiBackgroundColor(szReplace, 17);
+                                break;
+                            case '8' :
+                                ansiBackgroundColor(szReplace, 18);
+                                break;
+                            case '9' :
+                                ansiBackgroundColor(szReplace, 19);
+                                break;
+                            default :
+                                ++id1;
+                                break;
                         }
                         break;
 
                     case '2' :
-                        switch (szTmp[1])
+                        switch(szTmp[1])
                         {
-                        case '0' :
-                            ansiBackgroundColor(szReplace, 20);
-                            break;
-                        case '1' :
-                            ansiBackgroundColor(szReplace, 21);
-                            break;
-                        case '2' :
-                            ansiBackgroundColor(szReplace, 22);
-                            break;
-                        case '3' :
-                            ansiBackgroundColor(szReplace, 23);
-                            break;
-                        default :
-                            ++id1;
-                            break;
+                            case '0' :
+                                ansiBackgroundColor(szReplace, 20);
+                                break;
+                            case '1' :
+                                ansiBackgroundColor(szReplace, 21);
+                                break;
+                            case '2' :
+                                ansiBackgroundColor(szReplace, 22);
+                                break;
+                            case '3' :
+                                ansiBackgroundColor(szReplace, 23);
+                                break;
+                            default :
+                                ++id1;
+                                break;
                         }
                         break;
 
@@ -1738,15 +1734,15 @@ void MenuFunction::sequenceToAnsi(char* szString, int buffer)
                         ++id1;
                         break;
                 }
-                // Replace pipe code with Ansi Sequence
-                if (strcmp(szReplace,"") != 0)
+                // Replace pipe code with ANSI Sequence
+                if(strcmp(szReplace,"") != 0)
                     AnsiString.replace(id1,3,szReplace);
             }
             // Else not a Pipe Color / Parse for Screen Modification
-            else if (szTmp[0] == 'C')
+            else if(szTmp[0] == 'C')
             {
                 // Carriage Return / New Line
-                if (strcmp(szTmp,"CR") == 0)
+                if(strcmp(szTmp,"CR") == 0)
                 {
                     ansiBackgroundColor(szReplace, 16);  // Clear Background Attribute first
                     strcat(szReplace,"\r\n");
@@ -1754,7 +1750,7 @@ void MenuFunction::sequenceToAnsi(char* szString, int buffer)
                     id1 = 0;
                 }
                 // Clear Screen
-                else if (strcmp(szTmp,"CS") == 0)
+                else if(strcmp(szTmp,"CS") == 0)
                 {
                     ansiBackgroundColor(szReplace, 16);
                     // Set Scroll Region, Clear Background, Then Home Cursor.
@@ -1766,7 +1762,7 @@ void MenuFunction::sequenceToAnsi(char* szString, int buffer)
             }
             else
             {
-                if (strcmp(szTmp,"XY") == 0)
+                if(strcmp(szTmp,"XY") == 0)
                 {
                     memset(&szPos1,0,sizeof(szPos1));
                     memset(&szPos2,0,sizeof(szPos2));
@@ -1783,7 +1779,7 @@ void MenuFunction::sequenceToAnsi(char* szString, int buffer)
                 else
                 {
                     // End of the Line, nothing parsed out so
-                    // Skipp ahead past current code.
+                    // Skip ahead past current code.
                     ++id1;
                 }
             }
@@ -1795,8 +1791,8 @@ void MenuFunction::sequenceToAnsi(char* szString, int buffer)
 }
 
 /**
- * Reads in Ansi file into Buffer Only
- * For Testing the Ansi Parser.
+ * Reads in ANSI file into Buffer Only
+ * For Testing the ANSI Parser.
  */
 void MenuFunction::displayAnsiFile(std::string fileName)
 {
@@ -1814,7 +1810,7 @@ void MenuFunction::displayAnsiFile(std::string fileName)
     std::string buff;
     FILE *fp;
     int sequence = 0;
-    if ((fp = fopen(path.c_str(), "r+")) ==  nullptr)
+    if((fp = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         std::cout << "ansiPrintf - no ANSI found: " << fileName << std::endl;
         return;
@@ -1822,10 +1818,10 @@ void MenuFunction::displayAnsiFile(std::string fileName)
     do
     {
         sequence = getc(fp);
-        if (sequence != EOF)
+        if(sequence != EOF)
             buff += sequence;
     }
-    while (sequence != EOF);
+    while(sequence != EOF);
     fclose(fp);
     TheSequenceParser::Instance()->processSequence(buff);
 }

@@ -23,7 +23,7 @@ TelnetState::TelnetState() :
     cmd(0),
     isSGA(false),
     isBIN(false),
-    isECHO(true),  // Default to True for MUDS etc.
+    isECHO(true),  // Default to True for MUD'S etc.
     didSGA(false),
     didTERM(false),
     didNAWS(false),
@@ -31,7 +31,7 @@ TelnetState::TelnetState() :
     didECHO(false)
 { }
 /*
- * Handles Reading the Socket for Data, then Pasring the Data.
+ * Handles Reading the Socket for Data, then Parsing the Data.
  */
 
 void TelnetState::handleSession()
@@ -62,7 +62,7 @@ void TelnetState::handleSession()
     // Loop through data for IAC Telnet Commands
     for(unsigned char c : msgBuffer)
     {
-        // for debugging server output, mainly esc seqeucens
+        // for debugging server output, mainly esc sequence
         // and output that might mess up screens when needed.
 #ifdef _DEBUG
         if (c == '\r')
@@ -90,9 +90,9 @@ void TelnetState::handleSession()
         // Skip all NULL Bytes, returned on IAC characters.
 
         // Also:
-        // Synchronet even with supress go-aheads
-        // Send anoying amount of null bits Not "\r\0"
-        // becasue the \0 in rows of 50 or so!
+        // Synchronet even with suppress go-ahead
+        // Sends annoying amount of null bits Not "\r\0"
+        // because the \0 in rows of 50 or so!
         // when waiting for input!
         if(ch == '\0')
         {
@@ -102,7 +102,7 @@ void TelnetState::handleSession()
         output += ch;
     }
 
-    // If available, push Data through ANSI Pasrser then Screen.
+    // If available, push Data through ANSI Passer then Screen.
     if(output.size() > 0)
     {
         // Parse Incoming Screen Data
@@ -138,9 +138,9 @@ void TelnetState::update()
         if(TheSocketHandler::Instance()->isActive())
         {
             ret = TheSocketHandler::Instance()->send((unsigned char *)inputSequence.c_str(), (int)inputSequence.size());
-            // Check return value lateron on, not used at the moment.
+            // Check return value later on on, not used at the moment.
             // Server is not echoing input back to us, we need to do it ourselves.
-            // Jump into LINEMODE Editing here.
+            // Jump into LINE MODE Editing here.
             //***
             if(isECHO)
             {
@@ -174,7 +174,7 @@ void TelnetState::update()
                     ++inputCount;
                 break;
             case -1:
-                // Lost connection, return to mainMenu. Maybe Propmpt or freeze?
+                // Lost connection, return to mainMenu. Maybe Prompt or freeze?
                 inputCount = 0;
                 shutdown = true;
                 break;
@@ -245,7 +245,7 @@ bool TelnetState::onEnter()
         SDL_Delay(1000);
     }
 
-    // Clear Renderer and Ansi Parser for Fresh Connection.
+    // Clear Renderer and ANSI Parser for Fresh Connection.
     TheTerminal::Instance()->clearScreenSurface();
     TheTerminal::Instance()->renderScreen();
     TheTerminal::Instance()->drawTextureScreen();
@@ -330,7 +330,7 @@ void TelnetState::telnetOptionNawsReply()
     if(TheSocketHandler::Instance()->isActive())
     {
         TheSocketHandler::Instance()->send(temp, 9);
-        // Check return value lateron on, not used at the moment.
+        // Check return value later on, not used at the moment.
     }
     else
     {
@@ -351,7 +351,7 @@ void TelnetState::telnetOptionTerminalTypeReply()
     if(TheSocketHandler::Instance()->isActive())
     {
         TheSocketHandler::Instance()->send(temp, 10);
-        // Check return value lateron on, not used at the moment.
+        // Check return value later-on on, not used at the moment.
     }
     else
     {
@@ -362,7 +362,7 @@ void TelnetState::telnetOptionTerminalTypeReply()
 
 
 /**
- * Sends IAC Sequence back to Users Client for Terminal Negoation.
+ * Sends IAC Sequence back to Users Client for Terminal Negation.
  */
 void TelnetState::telnetSendIAC(unsigned char command, unsigned char option)
 {
@@ -372,7 +372,7 @@ void TelnetState::telnetSendIAC(unsigned char command, unsigned char option)
     if(TheSocketHandler::Instance()->isActive())
     {
         TheSocketHandler::Instance()->send(temp, 3);
-        // Check return value lateron on, not used at the moment.
+        // Check return value later on on, not used at the moment.
     }
     else
     {
@@ -383,12 +383,12 @@ void TelnetState::telnetSendIAC(unsigned char command, unsigned char option)
 
 
 /*
- * Parses Telnet Options negoations between client / severs
- * On which Features are supports and terminal inforamtion.
+ * Parses Telnet Options negotiations between client / severs
+ * On which Features are supports and terminal information.
  */
 unsigned char TelnetState::telnetOptionParse(unsigned char c)
 {
-    // TELOPT Pasrer
+    // TEL-OPT Parser
     switch(stage)
     {
             // Find IAC
@@ -425,7 +425,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
             {
                 switch(c)
                 {
-                        // Catch Passthrough commands.
+                        // Catch Pass-through commands.
                     case GA:    //     249        /* you may reverse the line */
                     case EL:    //     248        /* erase the current line */
                     case EC:    //     247        /* erase the current character */
@@ -441,12 +441,12 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                     case SUSP:  //     237        /* Suspend process */
                     case xEOF:  //     236        /* End of file: EOF is already used... */
                         // Pass Through commands that don't need Response.
-                        printf("\r\n [IAC][%d] 'PASSTHROUGH' \r\n", c);
+                        printf("\r\n [IAC][%d] 'PASS-THROUGH' \r\n", c);
                         stage = 0;
                         break;
 
                     default:
-                        // Move to Comamnd Parsing.
+                        // Move to Command Parsing.
                         printf("\r\n [IAC][%d] \r\n", c);
                         cmd = c;
                         stage++;
@@ -589,14 +589,14 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                     break;
 
                 case WONT:
-                    // Don't responset to WONT
+                    // Don't respond to WONT
                     printf("\r\n [WONT telnet request received] \r\n");
                     telnetSendIAC(telnetOptionAcknowledge(cmd),c);
                     printf("\r\n [WONT - responded DONT %i] \r\n",c);
                     stage = 0;
                     break;
 
-                    // Start of Sub Negoations and Stages 3 - 4
+                    // Start of Sub Negotiations and Stages 3 - 4
                 case SB: // 250
                     printf("\r\n [TELNET_STATE_SB ENTERED] \r\n");
                     if(c == TELOPT_TTYPE)
@@ -613,7 +613,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                     break;
 
                 default:
-                    // Options or Conmmands Not Pasrsed, RESET.
+                    // Options or Commands Not Parsed, RESET.
                     printf("\r\n [*****] DEFAULT CMD - %i / %i \r\n", cmd,c);
                     stage = 0;
                     break;
@@ -637,7 +637,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                     break;
 
                 default:
-                    //printf("\r\n [Stage 3 - unregistered suff it] - %i, %i \r\n",opt, c);
+                    //printf("\r\n [Stage 3 - unregistered stuff it] - %i, %i \r\n",opt, c);
                     if(c == SE)
                     {
                         printf("\r\n [TELNET_STATE_SB SE] \r\n");
@@ -652,7 +652,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
             }
             break;
 
-            // Only Gets here on TTYPE Subnegoation.
+            // Only Gets here on TTYPE Sub-Negotiation.
         case 4:
             printf("\r\n [Stage 4] - %i \r\n",c);
             switch(c)
@@ -664,7 +664,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                 case SE:
                     printf("\r\n [TELNET_STATE_SB SE] \r\n");
 
-                    // Send TTYPE After End of Compelte Sequence is Registered.
+                    // Send TTYPE After End of Complete Sequence is Registered.
                     telnetOptionTerminalTypeReply();
                     stage = 0;
                     break;

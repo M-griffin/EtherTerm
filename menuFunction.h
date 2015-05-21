@@ -14,7 +14,7 @@ typedef struct MenuRecord
     std::string MenuName;     // menu name
     std::string Directive;    // normal menu text file
     std::string MenuPrompt;   // menu prompt
-    bool        Lightbar;     // Lightbar Menu?
+    bool        Lightbar;     // Light-bar Menu?
 
 } MenuRecord;
 
@@ -25,11 +25,11 @@ typedef struct CommandRecord
     std::string  CKeys;       // command execution keys
     std::string  CmdKeys;     // command keys
     std::string  MString;     // command data
-    bool         LBarCmd;     // Is This a Lighbar Cmd
-    std::string  HiString;    // Highlighed
-    std::string  LoString;    // Unhighlighted
-    uint16_t     Xcoord;      // Lightbar X coord
-    uint16_t     Ycoord;      // Lightbar Y coord
+    bool         LBarCmd;     // Is This a Light-bar Cmd
+    std::string  HiString;    // Highlighted
+    std::string  LoString;    // Un-highlighted
+    uint16_t     Xcoord;      // Light-bar X coordinate
+    uint16_t     Ycoord;      // Light-bar Y coordinate
 
 } CommandRecord;
 
@@ -51,11 +51,11 @@ public:
     std::string _premenu;  // Previous Menu
     std::string _gosub;    // GoSub Menu.
 
-    // Menu Lightbar Variables
-    short xPosition;               // Holds X Coord
-    short yPosition;               // Holds Y Coord
-    short numLightbarCommand;      // Holds Lightbar # of choices
-    short choice;                  // Holds Currect Lightbar #
+    // Menu Light-bar Variables
+    short xPosition;               // Holds X coordinate
+    short yPosition;               // Holds Y coordinate
+    short numLightbarCommand;      // Holds Light-bar # of choices
+    short choice;                  // Holds Current Light-bar #
 
     short  *commandIndex;
     short  *commandIndexLightbar;
@@ -64,13 +64,13 @@ public:
 
     int  sequence, secondSequence;
     bool isEscapeSequence;       // Is Input key Escaped char, or Normal Key
-    char outBuff[1024];          // Holds Formatted Lightbar Data
-    std::string output;          // Buffer for writing all lightbars at the same time
+    char outBuff[1024];          // Holds Formatted Light-bar Data
+    std::string output;          // Buffer for writing all light-bars at the same time
 
-    int commandsExecuted;        // Test's for hot keys commands excuted, if non pass through loop
+    int commandsExecuted;        // Test's for hot keys commands executed, if non pass through loop
     int firstCommandsExecuted;   // If we executed all FIRSTCMD and nothing is left then return
 
-    int currentSystem;           // Lightbar Starting Position for Interfaces.
+    int currentSystem;           // Light-bar Starting Position for Interfaces.
     // This needs access from ie Title Scan Class.
 
     MenuFunction();
@@ -116,7 +116,7 @@ public:
     static void getLine(char *line,     // Returns Input into Line
                  int   length,          // Max Input Length of String
                  char *leadoff = 0,     // Data to Display in Default String {Optional}
-                 int   hid     = false, // If input is Echomail as hidden    {Optional}
+                 int   hid     = false, // If input is Echoed as hidden      {Optional}
                  char *chlist = 0);     // Valid Input Char List             {Optional}
 
     static void ansiForegroundColor(char *data, int fg);

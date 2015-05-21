@@ -176,7 +176,7 @@ private:
 
 
 /*
- * Handle IMCP for Ping / Traceroutes.
+ * Handle IMCP for Ping / Trace-routes.
  * Not used currently.
  *
 

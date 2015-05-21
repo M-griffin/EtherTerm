@@ -1,7 +1,7 @@
 
 /*
  *  EtherTerm (c) 2014-2015 Michael Griffin <mrmisticismo@hotmail.com>
- *  A full Telnet / SSH emulated terminal clinet in SDL 2.0
+ *  A full Telnet / SSH emulated terminal client in SDL 2.0
  *  With with CP437 Character set and ANSI Graphic Support.
  *
  *  Linker Options: -mwindows to remove Console Debug Window.
@@ -57,8 +57,8 @@
 using namespace std;
 
 /**
- * Reads in Ansi file into Buffer Only
- * For Testing the Ansi Parser.
+ * Reads in ANSI file into Buffer Only
+ * For Testing the ANSI Parser.
  */
 void readinAnsi(std::string FileName, std::string &buff)
 {
@@ -91,7 +91,7 @@ void readinAnsi(std::string FileName, std::string &buff)
  */
 void cleanup()
 {
-    // Clearnup Surfaces and Textures
+    // Cleanup Surfaces and Textures
     TheTerminal::Instance()->clean();
 
     //Release Instances
@@ -108,7 +108,7 @@ void cleanup()
 
 /*
  * Screen Test Cases to make sure
- * EOL and Screen Earsing functions are working properly.
+ * EOL and Screen Erasing functions are working properly.
  */
 void runTestScreenCases()
 {
@@ -215,10 +215,10 @@ int main(int argc, char* argv[])
     std::cout << "Working directory is: " << realPath << std::endl;
     TheTerminal::Instance()->setProgramPath(realPath);
 
-    // Initalize Renderer and Window with default sizes.
-    // We define 680 instead of 640 becasue we clip the extract off
-    // in Screen->Texure.  We do this becasue when Texture filtering is used
-    // Pixels on the last line tend to bleed from bledning. This clips off the
+    // Initialize Renderer and Window with default sizes.
+    // We define 680 instead of 640 because we clip the extract off
+    // in Screen->Texture.  We do this because when Texture filtering is used
+    // Pixels on the last line tend to bleed from blending. This clips off the
     // Bleeding Leaving a nice screen.
     if(TheTerminal::Instance()->init("EtherTerm v2.7 alpha preview", 680, 480, 1280, 800, 8, 16))
     {
@@ -244,7 +244,7 @@ int main(int argc, char* argv[])
                             TheTerminal::Instance()->getCurrentFont());
 
 #ifdef _DEBUG
-                    // TestCase Ansi Cursor Functions
+                    // Test-Case ANSI Cursor Functions
                     readinAnsi("testcase.ans",temp);
                     TheSequenceParser::Instance()->processSequence(temp);
                     runTestScreenCases();

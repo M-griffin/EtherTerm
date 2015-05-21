@@ -262,7 +262,7 @@ private:
     {
         if(rep_ != &nullrep_)
         {
-            // The rep_ is really an array of ints. (see the allocator, above).
+            // The rep_ is really an array of ints. (see the allocate, above).
             // Cast it back before delete, so the compiler won't incorrectly call destructors.
             delete [](reinterpret_cast<int*>(rep_));
         }
@@ -323,7 +323,7 @@ TiXmlString operator + (const char* a, const TiXmlString & b);
 
 /*
    TiXmlOutStream is an emulation of std::ostream. It is based on TiXmlString.
-   Only the operators that we need for TinyXML have been developped.
+   Only the operators that we need for TinyXML have been developed.
 */
 class TiXmlOutStream : public TiXmlString
 {

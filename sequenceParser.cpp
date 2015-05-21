@@ -31,7 +31,7 @@
 // Init the Global Instance
 SequenceParser* SequenceParser::globalInstance = 0;
 
-// Initalize Class Variables
+// Initialize Class Variables
 SequenceParser::SequenceParser() :
     sequenceState(SEQ_NORMAL),
     sequence(0),
@@ -50,7 +50,7 @@ SequenceParser::~SequenceParser()
 }
 
 /*
- * Level 0 Parsing check for Start of CSI or Alternate ESC Sequecnes
+ * Level 0 Parsing check for Start of CSI or Alternate ESC Sequences
  * Supported in Xterm that a server might send.
  * Switch Statement catches the Start of a Valid Sequence.
  */
@@ -58,10 +58,10 @@ void SequenceParser::processLevel0()
 {
     switch (sequence)
     {
-        case '[': // Control Sequence Introducer ( CSI is 0x9b).
+        case '[': // Control Sequence Introduction ( CSI is 0x9b).
             break;
 
-        // Xterm Sequences Not implimented, pass through
+        // Xterm Sequences Not implemented, pass through
         case ' ':
             //ESC SP F 7-bit controls (S7C1T).
             //ESC SP G 8-bit controls (S8C1T).
@@ -102,7 +102,7 @@ void SequenceParser::processLevel0()
             //The same character sets apply as for ESC ( C.
         case '?':
             // Set/Reset Modes
-            // Invalid, should have CSI = ESC[ preceeding ?
+            // Invalid, should have CSI = ESC[ preceding ?
 
         // Xterm C1 (8-Bit) Control Characters
         case 'D':  // Index ( IND is 0x84).
@@ -169,10 +169,10 @@ void SequenceParser::processLevel0()
 
 /*
  * Level 1 Parsing Comes After ESC[ = CSI.
- * Numbers and Seperators are found in the middle of sequences as Parameters
+ * Numbers and Separators are found in the middle of sequences as Parameters
  * Switch Statement catch the end of a Valid Sequence.
  *
- * Any nonSupported sequences can have certain charactes after the CSI
+ * Any non-supported sequences can have certain characters after the CSI
  * and These are parsed so that they are skipped and marked Invalid.
  */
  void SequenceParser::processLevel1()
@@ -181,7 +181,7 @@ void SequenceParser::processLevel0()
     // First Check for Parameters in Sequence
     if (std::isdigit(sequence)) // Mark for Parameter
     {
-        // Contine to next sequence
+        // Continue to next sequence
 #ifdef _DEBUG
         std::cout << "Is a Number: " << sequence << std::endl;
 #endif
@@ -517,7 +517,7 @@ void SequenceParser::processLevel0()
             break;
 
             // Unsupported Text and Keyboard Modifiers.
-            // These are Preceeding Modifiers ie after ESC [ >
+            // These are Preceding Modifiers ie after ESC [ >
         case '>':
         case '$':
         case '"':
@@ -527,7 +527,7 @@ void SequenceParser::processLevel0()
 
         case '?': // -- Switch to next sequenceLevel
                   // Ie.. handle ESC[?7h, ESC[?7l, and other ? DEC Sequences.
-                  // These Sequences DEC Level Sequecnes and need extra Parsing.
+                  // These Sequences DEC Level Sequences and need extra Parsing.
         case ' ': // Need to Precheck SyncTerm Font switching ' D' Space D.
             ++sequenceLevel;
             break;
@@ -544,18 +544,18 @@ void SequenceParser::processLevel0()
 
 /*
  * Level 2 Parsing Catches (2) Different Sequence Styles and Comes After ESC[ = CSI.
- * Specifically for ? preceeding sequenceing, and ' ' Space D ending Sequence
+ * Specifically for ? preceding sequencing, and ' ' Space D ending Sequence
  * For syncterm font switching.
  *
- * Numbers and Seperators are found in the middle of sequences as Parameters
+ * Numbers and Separators are found in the middle of sequences as Parameters
  * Switch Statement catch the end of a Valid Sequence.
  *
- * Any nonSupported sequences can have certain charactes after the CSI
+ * Any non-supported sequences can have certain characters after the CSI
  * and These are parsed so that they are skipped and marked Invalid.
  */
 void SequenceParser::processLevel2()
 {
-    // If the last addition to seqeunce is a space and we are now here.
+    // If the last addition to sequence is a space and we are now here.
     // The only valid terminator = 'D' for Sycnterm Font Switching.
 #ifdef _DEBUG
     std::cout << "bad sequence check: '" << sequenceBuilder[sequenceBuilder.size()-2] << "' " << sequence << std::endl;
@@ -573,7 +573,7 @@ void SequenceParser::processLevel2()
     // First Check for Parameters in Sequence
     if (std::isdigit(sequence)) // Mark for Parameter
     {
-        // Contine to next sequence
+        // Continue to next sequence
 #ifdef _DEBUG
         std::cout << "Is a Number: " << sequence << std::endl;
 #endif
@@ -594,7 +594,7 @@ void SequenceParser::processLevel2()
     {
         case 'D':
             // SyncTerm Font Switching Sequences
-            // Syncterm Sequences have a Space before the D,
+            // SyncTerm Sequences have a Space before the D,
             // If a space is found, the sequence is passed from the previous level.
             // ESC [0;0 D
 
@@ -774,7 +774,7 @@ void SequenceParser::processLevel2()
             break;
 
             // Unsupported Text and Keyboard Modifiers.
-            // These are Preceeding Modifiers ie after ESC [ >
+            // These are Preceding Modifiers ie after ESC [ >
         case '>':
         case '$':
         case '"':
@@ -826,7 +826,7 @@ void SequenceParser::validateSequence()
 
         //std::cout << "sequenceBuilder.erase();" << std::endl;
     //    sequenceBuilder.erase();
-    //    sequenceState = SEQ_NORMAL; // Reset to passthrough
+    //    sequenceState = SEQ_NORMAL; // Reset to pass-through
     //    return;
     }
     //37 - P0T NOoDLE (Amiga)
@@ -839,7 +839,7 @@ void SequenceParser::validateSequence()
             TheTerminal::Instance()->loadBitmapImage(
                 TheTerminal::Instance()->getCurrentFont());
     //    sequenceBuilder.erase();
-    //    sequenceState = SEQ_NORMAL; // Reset to passthrough
+    //    sequenceState = SEQ_NORMAL; // Reset to pass-through
     //    return;
     }
     //38 - mO'sOul (Amiga)
@@ -852,7 +852,7 @@ void SequenceParser::validateSequence()
             TheTerminal::Instance()->loadBitmapImage(
                 TheTerminal::Instance()->getCurrentFont());
     //    sequenceBuilder.erase();
-    //    sequenceState = SEQ_NORMAL; // Reset to passthrough
+    //    sequenceState = SEQ_NORMAL; // Reset to pass-through
     //    return;
     }
     //39 - MicroKnight (Amiga)
@@ -865,7 +865,7 @@ void SequenceParser::validateSequence()
             TheTerminal::Instance()->loadBitmapImage(
                 TheTerminal::Instance()->getCurrentFont());
     //    sequenceBuilder.erase();
-    //    sequenceState = SEQ_NORMAL; // Reset to passthrough
+    //    sequenceState = SEQ_NORMAL; // Reset to pass-through
     //    return;
     }
     //40 - Topaz (Amiga)
@@ -878,21 +878,21 @@ void SequenceParser::validateSequence()
             TheTerminal::Instance()->loadBitmapImage(
                 TheTerminal::Instance()->getCurrentFont());
     //    sequenceBuilder.erase();
-    //    sequenceState = SEQ_NORMAL; // Reset to passthrough
+    //    sequenceState = SEQ_NORMAL; // Reset to pass-through
     //    return;
     }
 
 #ifdef _DEBUG
     std::cout << "Params Size(): " << params.size() << std::endl;
 #endif
-    // If we get there, we have full CSI with possiable ; ; seperators.
+    // If we get there, we have full CSI with possible ; ; separators.
     try
     {
         sequenceBuilder.erase(0,2);                      // Remove ESC [
         sequenceTerminator =                            // Get Terminator
             sequenceBuilder[sequenceBuilder.size()-1];
 
-        // First Parameter is always the SequenceTerminator.
+        // First Parameter is always the Sequence Terminator.
         params.push_back(sequenceTerminator);
 
         // Remove Sequence Terminator from string to text for parameters.
@@ -904,7 +904,7 @@ void SequenceParser::validateSequence()
             << e.what() << std::endl;
     }
 
-    // Split String by ';' character to seperate parameters if it exists.
+    // Split String by ';' character to separate parameters if it exists.
     if (sequenceBuilder.size() == 0)
     {
         // We have no parameters, just terminator for single sequence.
@@ -920,7 +920,7 @@ void SequenceParser::validateSequence()
         return;
     }
 
-    // If we have a parameter seqerator, then tokenize the parameters.
+    // If we have a parameter separator, then tokenize the parameters.
     std::string::size_type result = sequenceBuilder.find(";",0);
     if (result != std::string::npos)
     {
@@ -955,7 +955,7 @@ void SequenceParser::validateSequence()
                     << std::endl;
                 continue;
             }
-            params.push_back(parameter); // Add to Parameteres Vector.
+            params.push_back(parameter); // Add to Parameters Vector.
         }
     }
     else
@@ -968,7 +968,7 @@ void SequenceParser::validateSequence()
 #endif
             try
             {
-                params.push_back('?');      // Add to Parameteres Vector.
+                params.push_back('?');      // Add to Parameters Vector.
                 sequenceBuilder.erase(0,1); // Remove ?
             }
             catch (std::exception e)
@@ -977,7 +977,7 @@ void SequenceParser::validateSequence()
                     << e.what() << std::endl;
             }
         }
-        // No seperator, translate the 1-3 digit code that should be present.
+        // No separator, translate the 1-3 digit code that should be present.
         std::istringstream tokenStream;
         tokenStream.str(sequenceBuilder);         // String to Stream
         if ((tokenStream >> parameter).fail())    // String to Int
@@ -987,7 +987,7 @@ void SequenceParser::validateSequence()
                 << std::endl;
         }
         else
-            params.push_back(parameter); // Add to Parameteres Vector.
+            params.push_back(parameter); // Add to Parameters Vector.
     }
 
 #ifdef _DEBUG
@@ -1034,7 +1034,7 @@ void SequenceParser::processSequence(std::string inputString)
         }
     }
 
-    // Now loop enire string and find valid escape sequences.
+    // Now loop entire string and find valid escape sequences.
     for (std::string::size_type i = 0; i < inputString.size(); i++)
     {
 #ifdef _DEBUG
@@ -1043,14 +1043,14 @@ void SequenceParser::processSequence(std::string inputString)
         // Get next Input Sequence
         sequence = inputString[i];
 
-        // Remove Bell from displaying. Anoying in Shell!
+        // Remove Bell from displaying. Annoying in Shell!
         // When not displaying, we'll push this to console so it beeps!
         if (sequence == '\x07')
             continue;
 
         // Check for Start of Sequence, if we hit a sequence we then need
         // To send all Valid Output that Proceeds this sequence so everything
-        // is FIFO with regards to how incoming data is handeled.
+        // is FIFO with regards to how incoming data is handled.
         if (sequence == '\x1b')
         {
             sequenceState = SEQ_START;
@@ -1080,7 +1080,7 @@ void SequenceParser::processSequence(std::string inputString)
                 break;
 
             case SEQ_ERROR:
-                // Validing the Sequence Bombed, Clear the vector and continue.
+                // Validating the Sequence Bombed, Clear the vector and continue.
                 std::vector<int>().swap(params); // Clear for next run.
                 sequenceBuilder.erase();         // Clear Any Prebuilt.
                 sequenceState = SEQ_NORMAL;
@@ -1097,7 +1097,7 @@ void SequenceParser::processSequence(std::string inputString)
                 std::cout << "Invalid Sequence, ESC in current sequence"
                     << std::endl;
 #endif
-                // We now determine the preceeding sequence is invalid
+                // We now determine the preceding sequence is invalid
                 // And remove the ESC, then proceed with the current sequence
                 /*
                 try
@@ -1165,13 +1165,13 @@ void SequenceParser::processSequence(std::string inputString)
 #ifdef _DEBUG
             std::cout << "SequenceCompleted!" << std::endl;
 #endif
-            // Copy just this sequenec into string for validation
+            // Copy just this sequence into string for validation
             try
             {
                 //escapeSequence =
                 //    inputString.substr(escapePosition,(i+1)-escapePosition);
 
-                // Break up the sequence into seperate parameters for
+                // Break up the sequence into separate parameters for
                 // The Screen Parser.
                 validateSequence();
                 sequenceState = SEQ_DONE;
@@ -1197,7 +1197,7 @@ void SequenceParser::processSequence(std::string inputString)
 #ifdef _DEBUG
             std::cout << " *** SequenceInvalid!" << std::endl;
 #endif
-            // Handle Invalid Sequences by removeing the ESC character, then
+            // Handle Invalid Sequences by removing the ESC character, then
             // Continue on to the next sequence.
             /*
             try
@@ -1218,7 +1218,7 @@ void SequenceParser::processSequence(std::string inputString)
 
             // First grab the entire sequence parsed so far, from ESC position
             // Place it into validOutputData to display on the screen,
-            // We don't want To reset the loop becasue it will incriment,
+            // We don't want To reset the loop because it will increment,
             // so we grab all characters parsed so far.
             try
             {
@@ -1256,7 +1256,7 @@ void SequenceParser::processSequence(std::string inputString)
                 break;
 
             case SEQ_ERROR:
-                // Validing the Sequence Bombed, Clear the vector and continue.
+                // Validating the Sequence Bombed, Clear the vector and continue.
                 std::vector<int>().swap(params); // Clear for next run.
                 sequenceState = SEQ_NORMAL; // Reset The State
                 sequenceBuilder.erase();
@@ -1299,7 +1299,7 @@ int main(int argc, char **argv)
     // ESC Sequence
     std::string inputString;
 
-    // Test a split ESC sequence in seperate strings
+    // Test a split ESC sequence in separate strings
     // Valid Sequence
     inputString = "\x1b[1;34;2";
     TheSequenceParser::Instance()->ProcessSequence(inputString);

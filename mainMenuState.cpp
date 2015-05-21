@@ -113,7 +113,7 @@ void MainMenuState::setCallbacks(const std::vector<Callback>& callbacks)
 }
 
 /**
- * Start of DialDirectory INI Class
+ * Start of Dial-directory INI Class
  */
 bool MainMenuState_INI::ddirectory_exists()
 {
@@ -292,7 +292,7 @@ bool MainMenuState_INI::ddirectory_parse(int index)
     path += "assets/";
 #endif
 
-    // Set for Theme, check index number for Themeing,.
+    // Set for Theme, check index number for themes,.
     sprintf(name, "%s%s",path.c_str(),INI_NAME);
     sprintf(name2,"%s%s%i.ini",path.c_str(),INI_NAME,index);
     if(index != 0) strcpy(name,name2);
@@ -329,7 +329,7 @@ bool MainMenuState_INI::ddirectory_parse(int index)
 }
 
 /**
- * Reads in Ansi file into Buffer Only
+ * Reads in ANSI file into Buffer Only
  */
 void MainMenuState::readinAnsi(std::string FileName, std::string &buff)
 {
@@ -364,7 +364,7 @@ void MainMenuState::readinAnsi(std::string FileName, std::string &buff)
 }
 
 /**
- * DialDirectory - Parse ANSI Template
+ * Dial-directory - Parse ANSI Template
  */
 void MainMenuState::parseHeader(std::string FileName)
 {
@@ -383,7 +383,7 @@ void MainMenuState::parseHeader(std::string FileName)
 }
 
 /**
- * DialDirectory - Setup Reading INI File and init Theme
+ * Dial-directory - Setup Reading INI File and init Theme
  */
 void MainMenuState::setupList()
 {
@@ -394,7 +394,7 @@ void MainMenuState::setupList()
 }
 
 /**
- * DialDirectory - Change ANSI Template Theme
+ * Dial-directory - Change ANSI Template Theme
  */
 bool MainMenuState::changeTheme(int index)
 {
@@ -409,9 +409,9 @@ bool MainMenuState::changeTheme(int index)
 }
 
 /**
- * Build Phonebook with List of Systems
+ * Build Phone-book with List of Systems
  * This function creates 4 versions of each line,
- * one for default, defeault selected, new, then new selected.
+ * one for default, default selected, new, then new selected.
  * This doesn't mark which are new or to be used.
  */
 std::vector< list_bar > MainMenuState::buildDialList()
@@ -434,10 +434,10 @@ std::vector< list_bar > MainMenuState::buildDialList()
     std::string ansiScreen1 = "";
     std::string ansiScreen2 = "";
 
-    // Prefetch ansi lightbar themes
-    // These ansi are used as the light bars to be displayed,
-    // We rotate between 2 ansi lightbars.
-    // 1. Unselected Systems
+    // Pre-fetch ANSI light bar themes
+    // These ANSI are used as the light bars to be displayed,
+    // We rotate between 2 ANSI light bars.
+    // 1. Un-selected Systems
     // 4. Current System Selected
     //
     // We cache array with all four choices so we can
@@ -498,24 +498,24 @@ std::vector< list_bar > MainMenuState::buildDialList()
             {
                 case 0:
                     currnetScreen = ansiScreen2;
-                    break; // Display HighLight None.  ON
+                    break; // Display High-light None.  ON
 
                 case 1:
                     currnetScreen = ansiScreen1;
-                    break; // Dispaly Lowlight None    OFF
+                    break; // Display Low-light None    OFF
 
                 default:
                     break;
             }
             counter = 0;
             sequence = 0;
-            // Parse mciCode Codes per each light bar ansi file
+            // Parse MCI Codes per each light bar ANSI file
             do
             {
                 memset(&mciCode,0,sizeof(mciCode));
                 sequence = currnetScreen[counter];
                 if(sequence == '\0') break;
-                // Check for Spacing mciCode Code
+                // Check for Spacing MCI Code
                 switch(sequence)
                 {
                     case '{' : // Left Justify
@@ -590,7 +590,7 @@ std::vector< list_bar > MainMenuState::buildDialList()
                         }
                         else if(strcmp(mciCode,"FO") == 0)
                         {
-                            // FIXME Temp - Translate Filename to Description
+                            // FIXME Temp - Translate File-name to Description
                             // Will add to the xml once it's ready.
                             if(systemConnection[currentSystem].font == "vga8x16.bmp")
                                 sprintf(temp2,"%s",(char *)"IBM-PC CP437 VGA  8x16");
@@ -682,10 +682,10 @@ std::vector< list_bar > MainMenuState::buildDialList()
             {
                 case 0:
                     _lightbar.ansiString2 = stringBuilder;
-                    break; // Display HighLight None.  ON
+                    break; // Display High-light None.  ON
                 case 1:
                     _lightbar.ansiString1 = stringBuilder;
-                    break; // Dispaly Lowlight None    OFF
+                    break; // Display Low-light None    OFF
 
                 default:
                     break;
@@ -739,7 +739,7 @@ bool MainMenuState::readDialDirectory()
         // save this for later
         hRoot=TiXmlHandle(pElem);
     }
-    // block: Phonebook
+    // block: Phone-book
     {
         //std::cout << "readDialDirectory - Phonebook" << std::endl;
         pElem=hRoot.FirstChild("Phonebook").Element();
@@ -768,7 +768,7 @@ bool MainMenuState::readDialDirectory()
 }
 
 /*
- * Create a new inital dilaing directory.
+ * Create a new initial dialing directory.
  */
 void MainMenuState::createDialDirectory()
 {
@@ -819,7 +819,7 @@ void MainMenuState::createDialDirectory()
 }
 
 /*
- * Write All connections to the dilaing directory
+ * Write All connections to the dialing directory
  */
 void MainMenuState::writeDialDirectory()
 {
@@ -872,7 +872,7 @@ int MainMenuState::startDialDirectory()
     int  currentPage  = 0;
     int  boxsize      = 0;
 
-    // Reading in dialdirectory.ini values.
+    // Reading in dial-directory.ini values.
     setupList();
     std::cout << "ANSI File: "<< ANSI_FILE << std::endl;
 
@@ -883,7 +883,7 @@ int MainMenuState::startDialDirectory()
     std::vector<list_bar> result;
     std::string inputSequence;
 
-    // Readin or Crete Dialing Directory.
+    // Read-in or Crete Dialing Directory.
     if(!readDialDirectory())
     {
         createDialDirectory();
@@ -904,10 +904,10 @@ int MainMenuState::startDialDirectory()
     unsigned char ch = '\0';
     std::string tmp;
 
-    // To Start out, keep this static lateron for next call.
+    // To Start out, keep this static later on for next call.
     LIGHTBAR_POSITION = 0;
 
-    // Loop Lightbar Interface.
+    // Loop Light bar Interface.
     do
     {
         parseHeader(ANSI_FILE);
@@ -952,7 +952,7 @@ JMPINPUT1:
             _menuFunction.menuProcess(mString, LIGHTBAR_POSITION);
             //std::cout << "mString: " << mString << std::endl;
 
-             // Get CommandKey returned from Menu
+             // Get Command Key returned from Menu
             ch = mString[1];
 
             if(mString[0] == '!')
@@ -999,11 +999,11 @@ JMPINPUT1:
                         //std::cout << "Move to next bar." << std::endl;
                         ++LIGHTBAR_POSITION;
                         //Calculate if we go down, ++Current Area, are we on next page or not.
-                        // Becasue 0 Based, need to add +1
+                        // Because 0 Based, need to add +1
                         // Test if we moved to next page.
                         if((signed)LIGHTBAR_POSITION+1 < (boxsize*(currentPage+1))+1)
                         {
-                            // Lowlight Current, then Highlight Next.
+                            // Low-light Current, then Highlight Next.
                             sprintf(rBuffer, "\x1b[%i;%iH|16%s",
                                 _linkList.currentSelection, 1, (char *)_linkList.listing[LIGHTBAR_POSITION-1].ansiString1.c_str());
 
@@ -1025,7 +1025,7 @@ JMPINPUT1:
                             _linkList.drawVectorList(currentPage,LIGHTBAR_POSITION);
                             break;
                         }
-                    case '-': // Previous Messasge - Move Up
+                    case '-': // Previous Message - Move Up
 
                         // Skipping to JMPINPUT bypasses redraws, much faster!
                         if(LIGHTBAR_POSITION > 0 && _linkList.listing.size() != 0)
@@ -1034,12 +1034,12 @@ JMPINPUT1:
                             goto JMPINPUT1;
 
                         //Calculate if we go down, --Current Area, are we on next page or not.
-                        // Becasue 0 Based, need to add +1
+                        // Because 0 Based, need to add +1
                         // Test if we moved to next page.
                         if((signed)LIGHTBAR_POSITION+1 > (boxsize*(currentPage)))
                         {
                             // Still on Same Page
-                            // Lowlight Current, then Highlight Next.
+                            // Low-light Current, then Highlight Next.
                             sprintf(rBuffer, "\x1b[%i;%iH|16%s", _linkList.currentSelection, 1, (char *)_linkList.listing[LIGHTBAR_POSITION+1].ansiString1.c_str());
                             outputBuffer = rBuffer;
                             _linkList.currentSelection -= 1;
@@ -1064,18 +1064,18 @@ JMPINPUT1:
                         return EOF;
 
                     case '?': // Directory Help
-  //                    ansiPrintf(sANSI_HELP); // Display Ansi Help file,
+  //                    ansiPrintf(sANSI_HELP); // Display ANSI Help file,
                         //getkey(true);
-                        parseHeader(ANSI_FILE); // Redisplay Display Ansi
+                        parseHeader(ANSI_FILE); // Re-display Display ANSI
                         _linkList.drawVectorList(currentPage,LIGHTBAR_POSITION);
                         break;
 
                     case 'A': // About
-                        parseHeader((char *)"about.ans"); // Redisplay Display Ansi
+                        parseHeader((char *)"about.ans"); // Re-display Display ANSI
                         // Wait for input:
-                        //std::cout << "Menu_Bars Input Loop" << std::endl;
+                        //std::cout << "Menu Bars Input Loop" << std::endl;
                         MenuFunction::getKey();
-                        parseHeader((char *)"about2.ans"); // Redisplay Display Ansi
+                        parseHeader((char *)"about2.ans"); // Re-display Display ANSI
                         MenuFunction::getKey();
                         // If Global Exit, return right away.
                         if(TheInputHandler::Instance()->isGlobalShutdown())
@@ -1084,11 +1084,11 @@ JMPINPUT1:
                             std::vector<list_bar>() . swap(result); // Free Vector Up.
                             return EOF;
                         }
-                        parseHeader((char *)"et2.ans"); // Redisplay Display Ansi
+                        parseHeader((char *)"et2.ans"); // Re-display Display ANSI
                         _linkList.drawVectorList(currentPage,LIGHTBAR_POSITION);
                         break;
-                        // Pass through, any functionaly that should
-                        // Be handeled in Reader.
+                        // Pass through, any functionally that should
+                        // Be handled in Reader.
                         // to the Message Reader. ie post ,reply, delete...
 
                     default :

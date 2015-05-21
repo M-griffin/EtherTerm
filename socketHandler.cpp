@@ -39,7 +39,7 @@ int SocketHandler::update()
     //std::cout << "SocketHandler::update() active: " << active << std::endl;
 
     // If were in the middle of selecting text,
-    // hold all incoming data untill were finished.
+    // hold all incoming data until were finished.
     if(TheInputHandler::Instance()->isMouseSelection())
         return 0;
 

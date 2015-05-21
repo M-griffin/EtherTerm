@@ -42,7 +42,7 @@ bool InputHandler::update()
     TheTerminal::SystemConnection sysConection;
     sysConection = TheTerminal::Instance()->getSystemConnection();
 
-    // Set default KeyMapping when there is no connection
+    // Set default Key-mapping when there is no connection
     // ie.. Dialing Directory for Menu System.
     if (sysConection.keyMap == "")
         sysConection.keyMap = "ANSI";
@@ -53,7 +53,7 @@ bool InputHandler::update()
         //User requests quit
         switch (event.type)
         {
-            // If no Keypress check now for Window Events.
+            // If no Key-press check now for Window Events.
             case SDL_WINDOWEVENT:
                 switch(event.window.event)
                 {
@@ -204,7 +204,7 @@ bool InputHandler::update()
                         << std::endl;
                     */
                     // Process the Mouse Position from the Origin
-                    // To Highligh the selected screen segment.
+                    // To Highlight the selected screen segment.
                     TheTerminal::Instance()->renderSelectionScreen(
                         event.motion.x, event.motion.y);
                 }
@@ -311,7 +311,7 @@ bool InputHandler::update()
                 {
                     switch (event.key.keysym.sym)
                     {
-                        // Control Keys should passthrough for SSH
+                        // Control Keys should pass-through for SSH
                         // And other Telnet Servers to handle.
                         default:
                             // CTRL Keys have lowercase letters -
@@ -353,7 +353,7 @@ bool InputHandler::update()
                                 // so it will display this rez properly! Otherwise it skips to last size.
                                 //SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
 
-                                // New work around of SDL issues, we now destory the Window
+                                // New work around of SDL issues, we now destroy the Window
                                 // And Renderer and recreated them in our desired resolutions
                                 // Due to SDL being retarded on different platforms.
 #ifndef _WIN32
@@ -374,7 +374,7 @@ bool InputHandler::update()
                             else
                             {
 
-                                // OSX Doesn't do fullscreen properly!
+                                // OSX Doesn't do full-screen properly!
                                 // Reset Texture Filtering when in windowed mode.
                                 // Set Window Mode
                                 if (SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(), 0) < 0)
@@ -389,9 +389,9 @@ bool InputHandler::update()
                                 {
                                     // Texture Filtering OFF.
                                     // These (2) Resolutions work perfect for 8x16 fonts
-                                    // When the screen is resized the pixels are doubled
+                                    // When the screen is re-sized the pixels are doubled
                                     // without needing to do any fancy recalculations
-                                    // WE use hthese multiple to keep shaded blocks with
+                                    // WE use these multiple to keep shaded blocks with
                                     // Correct looking pixel size and layout.
                                     case 0:
                                         TheTerminal::Instance()->setWindowWidth(640);
@@ -560,7 +560,7 @@ bool InputHandler::update()
                                 setInputSequence("\x1b[U");
                                 return true;
 
-                            // Handle KeyPad Keys without numlock
+                            // Handle KeyPad Keys without Numlock
                             // Numlock Numbers are read by Text Input already.
                             case SDLK_KP_PERIOD: // Delete
                                 if (!(event.key.keysym.mod & KMOD_NUM))
@@ -684,8 +684,8 @@ bool InputHandler::update()
                                 setInputSequence("\x1b[6~");
                                 return true;
 
-                            // Handle KeyPad Keys without numlock
-                            // Numlock Numbers are read by Text Input already.
+                            // Handle KeyPad Keys without NumLock
+                            // NumLock Numbers are read by Text Input already.
                             case SDLK_KP_PERIOD: // Delete
                                 if (!(event.key.keysym.mod & KMOD_NUM))
                                 {
@@ -807,8 +807,8 @@ bool InputHandler::update()
                                 setInputSequence("\x1b[6~");
                                 return true;
 
-                            // Handle KeyPad Keys without numlock
-                            // Numlock Numbers are read by Text Input already.
+                            // Handle KeyPad Keys without NumLock
+                            // NumLock Numbers are read by Text Input already.
                             case SDLK_KP_PERIOD: // Delete
                                 if (!(event.key.keysym.mod & KMOD_NUM))
                                 {
@@ -929,8 +929,8 @@ bool InputHandler::update()
                                 setInputSequence("\x1b[G");
                                 return true;
 
-                            // Handle KeyPad Keys without numlock
-                            // Numlock Numbers are read by Text Input already.
+                            // Handle KeyPad Keys without NumLock
+                            // NumLock Numbers are read by Text Input already.
                             case SDLK_KP_PERIOD: // Delete
                                 if (!(event.key.keysym.mod & KMOD_NUM))
                                 {

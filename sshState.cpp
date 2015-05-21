@@ -19,7 +19,7 @@
 const std::string SSHState::sshID = "SSH";
 
 /*
- * Handles Reading the Socket for Data, then Pasring the Data.
+ * Handles Reading the Socket for Data, then Parsing the Data.
  */
 void SSHState::handleSession()
 {
@@ -59,8 +59,8 @@ void SSHState::handleSession()
         else
             std::cout << ch << std::flush;
 #endif
-        // Synchronet sends anyoing amount of null bits
-        // becasue the \0 in rows of 50 or so!
+        // Synchronet sends annoying amount of null bits
+        // because the \0 in rows of 50 or so!
         // when waiting for input!
         if(ch == '\0')
             continue;
@@ -68,7 +68,7 @@ void SSHState::handleSession()
         output += ch;
     }
 
-    // If available, push Data through ANSI Pasrser then Screen.
+    // If available, push Data through ANSI Parser then Screen.
     if(output.size() > 0)
     {
         // Parse Incoming Screen Data
@@ -104,7 +104,7 @@ void SSHState::update()
         if(TheSocketHandler::Instance()->isActive())
         {
             ret = TheSocketHandler::Instance()->send((unsigned char *)inputSequence.c_str(), (int)inputSequence.size());
-            // Check return value lateron on, not used at the moment.
+            // Check return value later on on, not used at the moment.
         }
         else
         {
@@ -134,7 +134,7 @@ void SSHState::update()
                     ++inputCount;
                 break;
             case -1:
-                // Lost connection, return to mainMenu. Maybe Propmpt or freeze?
+                // Lost connection, return to mainMenu. Maybe Prompt or freeze?
                 inputCount = 0;
                 shutdown = true;
                 break;
@@ -186,7 +186,7 @@ bool SSHState::onEnter()
     TheTerminal::SystemConnection sysconn;
     sysconn = TheTerminal::Instance()->getSystemConnection();
 
-    // Check if we need to Ask for UserName before starting SSH Connection
+    // Check if we need to Ask for User-name before starting SSH Connection
     if (sysconn.login == "")
     {
         std::string initConnection = "|CS|15|16Initiating connection to: [|07";
@@ -312,7 +312,7 @@ bool SSHState::onEnter()
         return false;
     }
  
-    // Clear Renderer and Ansi Parser for Fresh Connection.
+    // Clear Renderer and ANSI Parser for Fresh Connection.
     TheTerminal::Instance()->clearScreenSurface();
     TheTerminal::Instance()->renderScreen();
     TheAnsiParser::Instance()->reset();

@@ -53,7 +53,7 @@ void TermStateMachine::changeState(TermState *theState)
         TermStates.pop_back();
     }
 
-    // initialise it
+    // initialize it
     theState->onEnter();
 
     // push back our new state

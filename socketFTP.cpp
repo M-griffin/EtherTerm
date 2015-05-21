@@ -24,7 +24,7 @@
 #include <time.h>
 
 /*
- * Start of FTP_Socket Dervived Class (FTP)
+ * Start of FTP_Socket Derived Class (FTP)
  */
 /* send a string buffer over a TCP socket with error checking */
 /* returns 0 on any errors, length sent on success */
@@ -96,7 +96,7 @@ bool FTP_Socket::onEnter()
         return false;
     }
 
-    /* Resolve the argument into an IPaddress type */
+    /* Resolve the argument into an IP address type */
     std::cout << "Connecting to " << host.c_str() << " on port " << port << std::endl;
     if(SDLNet_ResolveHost(&ip,host.c_str(),port) == -1)
     {

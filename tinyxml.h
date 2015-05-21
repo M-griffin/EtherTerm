@@ -57,7 +57,7 @@ distribution.
 // Deprecated library function hell. Compilers want to use the
 // new safe versions. This probably doesn't fully address the problem,
 // but it gets closer. There are too many compilers for me to fully
-// test. If you get compilation troubles, undefine TIXML_SAFE
+// test. If you get compilation troubles, undefined TIXML_SAFE
 #define TIXML_SAFE
 
 #ifdef TIXML_SAFE
@@ -121,12 +121,12 @@ struct TiXmlCursor
     are simply called with Visit().
 
     If you return 'true' from a Visit method, recursive parsing will continue. If you return
-    false, <b>no children of this node or its sibilings</b> will be Visited.
+    false, <b>no children of this node or its siblings</b> will be Visited.
 
     All flavors of Visit methods have a default implementation that returns 'true' (continue
     visiting). You need to only override methods that are interesting to you.
 
-    Generally Accept() is called on the TiXmlDocument, although all nodes suppert Visiting.
+    Generally Accept() is called on the TiXmlDocument, although all nodes support Visiting.
 
     You should never change the document from a callback.
 
@@ -236,7 +236,7 @@ public:
         This is a formatted print, and will insert
         tabs and newlines.
 
-        (For an unformatted stream, use the << operator.)
+        (For an un-formatted stream, use the << operator.)
     */
     virtual void Print(FILE* cfile, int depth) const = 0;
 
@@ -297,7 +297,7 @@ public:
         return userData;    ///< Get a pointer to arbitrary user data.
     }
 
-    // Table that returs, for a given lead byte, the total number of bytes
+    // Table that returns, for a given lead byte, the total number of bytes
     // in the UTF-8 sequence.
     static const int utf8ByteTable[256];
 
@@ -305,7 +305,7 @@ public:
                               TiXmlParsingData* data,
                               TiXmlEncoding encoding /*= TIXML_ENCODING_UNKNOWN */) = 0;
 
-    /** Expands entities in a string. Note this should not contian the tag's '<', '>', etc,
+    /** Expands entities in a string. Note this should not contain the tag's '<', '>', etc,
         or they will be transformed into entities!
     */
     static void EncodeString(const TIXML_STRING& str, TIXML_STRING* out);
@@ -409,7 +409,7 @@ protected:
     }
 
     // Return true if the next characters in the stream are any of the endTag sequences.
-    // Ignore case only works for english, and should only be relied on when comparing
+    // Ignore case only works for English, and should only be relied on when comparing
     // to English words: StringEqual( p, "version", true ) is fine.
     static bool StringEqual(const char* p,
                             const char* endTag,
@@ -487,7 +487,7 @@ public:
 
         The operator<< and operator>> are not completely symmetric. Writing
         a node to a stream is very well defined. You'll get a nice stream
-        of output, without any extra whitespace or newlines.
+        of output, without any extra white-space or newlines.
 
         But reading is not as well defined. (As it always is.) If you create
         a TiXmlElement (for example) and read that from an input stream,
@@ -523,14 +523,14 @@ public:
     /** The meaning of 'value' changes for the specific type of
         TiXmlNode.
         @verbatim
-        Document:   filename of the xml file
+        Document:   file name of the xml file
         Element:    name of the element
         Comment:    the comment text
         Unknown:    the tag contents
         Text:       the text string
         @endverbatim
 
-        The subclasses will wrap this function.
+        The sub-classes will wrap this function.
     */
     const char *Value() const
     {
@@ -555,7 +555,7 @@ public:
 
     /** Changes the value of the node. Defined as:
         @verbatim
-        Document:   filename of the xml file
+        Document:   file name of the xml file
         Element:    name of the element
         Comment:    the comment text
         Unknown:    the tag contents
@@ -677,7 +677,7 @@ public:
 #endif
 
     /** Add a new node related to this. Adds a child past the LastChild.
-        Returns a pointer to the new object or NULL if an error occured.
+        Returns a pointer to the new object or NULL if an error occurred.
     */
     TiXmlNode* InsertEndChild(const TiXmlNode& addThis);
 
@@ -694,17 +694,17 @@ public:
     TiXmlNode* LinkEndChild(TiXmlNode* addThis);
 
     /** Add a new node related to this. Adds a child before the specified child.
-        Returns a pointer to the new object or NULL if an error occured.
+        Returns a pointer to the new object or NULL if an error occurred.
     */
     TiXmlNode* InsertBeforeChild(TiXmlNode* beforeThis, const TiXmlNode& addThis);
 
     /** Add a new node related to this. Adds a child after the specified child.
-        Returns a pointer to the new object or NULL if an error occured.
+        Returns a pointer to the new object or NULL if an error occurred.
     */
     TiXmlNode* InsertAfterChild(TiXmlNode* afterThis, const TiXmlNode& addThis);
 
     /** Replace a child of this node.
-        Returns a pointer to the new object or NULL if an error occured.
+        Returns a pointer to the new object or NULL if an error occurred.
     */
     TiXmlNode* ReplaceChild(TiXmlNode* replaceThis, const TiXmlNode& withThis);
 
@@ -899,7 +899,7 @@ public:
     */
     virtual TiXmlNode* Clone() const = 0;
 
-    /** Accept a hierchical visit the nodes in the TinyXML DOM. Every node in the
+    /** Accept a hierarchical visit the nodes in the TinyXML DOM. Every node in the
         XML tree will be conditionally visited and the host will be called back
         via the TiXmlVisitor interface.
 
@@ -1381,7 +1381,7 @@ public:
     // Print the Element to a FILE stream.
     virtual void Print(FILE* cfile, int depth) const;
 
-    /*  Attribtue parsing starts: next char past '<'
+    /*  Attribute parsing starts: next char past '<'
                          returns: next char past '>'
     */
     virtual const char* Parse(const char* p, TiXmlParsingData* data, TiXmlEncoding encoding);
@@ -1441,7 +1441,7 @@ public:
     // Write this Comment to a FILE stream.
     virtual void Print(FILE* cfile, int depth) const;
 
-    /*  Attribtue parsing starts: at the ! of the !--
+    /*  Attribute parsing starts: at the ! of the !--
                          returns: next char past '>'
     */
     virtual const char* Parse(const char* p, TiXmlParsingData* data, TiXmlEncoding encoding);
@@ -1732,9 +1732,9 @@ public:
     bool LoadFile(TiXmlEncoding encoding = TIXML_DEFAULT_ENCODING);
     /// Save a file using the current document value. Returns true if successful.
     bool SaveFile() const;
-    /// Load a file using the given filename. Returns true if successful.
+    /// Load a file using the given file name. Returns true if successful.
     bool LoadFile(const char * filename, TiXmlEncoding encoding = TIXML_DEFAULT_ENCODING);
-    /// Save a file using the given filename. Returns true if successful.
+    /// Save a file using the given file name. Returns true if successful.
     bool SaveFile(const char * filename) const;
     /** Load a file using the given FILE*. Returns true if successful. Note that this method
         doesn't stream - the entire object pointed at by the FILE*
@@ -1785,7 +1785,7 @@ public:
         return error;
     }
 
-    /// Contains a textual (english) description of the error if one occurs.
+    /// Contains a textual (English) description of the error if one occurs.
     const char * ErrorDesc() const
     {
         return errorDesc.c_str();
@@ -1812,7 +1812,7 @@ public:
     }
     int ErrorCol() const
     {
-        return errorLocation.col+1;    ///< The column where the error occured. See ErrorRow()
+        return errorLocation.col+1;    ///< The column where the error occurred. See ErrorRow()
     }
 
     /** SetTabSize() allows the error reporting functions (ErrorRow() and ErrorCol())
@@ -1825,8 +1825,8 @@ public:
         the source file.
 
         The tab size is required for calculating the location of nodes. If not
-        set, the default of 4 is used. The tabsize is set per document. Setting
-        the tabsize to 0 disables row/column tracking.
+        set, the default of 4 is used. The tab-size is set per document. Setting
+        the tab-size to 0 disables row/column tracking.
 
         Note that row and column tracking is not supported when using operator>>.
 
@@ -2166,7 +2166,7 @@ public:
     }
     /** Set the line breaking string. By default set to newline (\n).
         Some operating systems prefer other characters, or can be
-        set to the null/empty string for no indenation.
+        set to the null/empty string for no indention.
     */
     void SetLineBreak(const char* _lineBreak)
     {
@@ -2179,7 +2179,7 @@ public:
     }
 
     /** Switch over to "stream printing" which is the most dense formatting without
-        linebreaks. Common when the XML is needed for network transmission.
+        line-breaks. Common when the XML is needed for network transmission.
     */
     void SetStreamPrinting()
     {

@@ -46,7 +46,7 @@ typedef struct MainMenuState_INI
 
 /*
  * This Class Holds a connection to the MenuState -> SocketState -> Term
- * This is where we will inital either Telnet or SSH
+ * This is where we will initiate either Telnet or SSH
  */
 class MainMenuState : public MenuState, MainMenuState_INI
 {

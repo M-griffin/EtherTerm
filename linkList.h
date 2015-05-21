@@ -36,7 +36,7 @@ public:
     LineRec *currentNode;
     LineRec *lastNode;
 
-    // Passing Lightbars between Interfaces
+    // Passing Light bars between Interfaces
     std::vector<list_bar> listing;
 
     int currentRow;

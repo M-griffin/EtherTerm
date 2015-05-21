@@ -180,9 +180,7 @@ public:
     bool loadBitmapImageFromPak();
     bool loadBitmapImage(std::string fontName);
 
-    void createTexture(int textureType,
-                       SDL_Surface *surface,
-                       std::string log);
+    void createTexture(int textureType, SDL_Surface *surface);
     void fillSurface(SDL_Surface *surface);
     void convertSurface(int surfaceType);
     void createSurface(int surfaceType);
@@ -265,6 +263,8 @@ private:
     // Textures
     SDL_Texture*   globalTexture;     // Texture for User Screen
     SDL_Texture*   selectionTexture;  // For Copy Text Selection
+
+    std::vector<SDL_Surface *> surfaceList;
 
     // Handle Surface Alias
     enum {

@@ -14,7 +14,7 @@ class SequenceParser
 {
 public:
 
-    //  Instaniate the Singleton
+    //  Instantiate the Singleton
     static SequenceParser* Instance()
     {
         if(globalInstance == 0)
@@ -65,7 +65,7 @@ private:
     void processLevel2();
     void validateSequence();
 
-    // Holds the interm data while we build the sequence,
+    // Holds the intern data while we build the sequence,
     // This is needed if inputString doesn't have a complete sequence
     // Then we need to append so that the string will have the
     // Original first half of the already parsed sequence.
@@ -76,7 +76,7 @@ private:
 
     // This string contains normal data passed through the sequence
     // Parser, At the end of a processing loop, this data is passed
-    // for writting to the screen.
+    // for writing to the screen.
     std::string validOutputData;
     std::string::size_type
          escapePosition;

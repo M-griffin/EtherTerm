@@ -44,7 +44,7 @@ public:
     }
 
     // Holds Screen Buffer Structure
-    // We want each character as a strin for multi-byte UTF8 characters.
+    // We want each character as a string for multi-byte UTF8 characters.
     struct myScreen
     {
         myScreen();
@@ -89,7 +89,7 @@ public:
 
 #define DELETE_CHARACTER      'P'   // Erase Character(2)
 
-#define REPEAT_CHARACTER      'b'   // Repeat preceeding character
+#define REPEAT_CHARACTER      'b'   // Repeat preceding character
 #define LINE_POS_ABSOLUTE     'd'   // Line Position Absolute [row] (default = [1,column]) (VPA).
 #define CURSOR_POSITION_ALT   'f'   // equivalent to 'H'
 #define SET_MODE              'h'   // Line Wraparound ?7h
@@ -108,8 +108,7 @@ public:
     ESC [ 25 h     Show text cursor.
     ESC [ 25 l     Hide text cursor.
     */
-    // Setup getters for these, should be accessable
-    // But not changeable!!
+
     int  x_position;
     int  y_position;
 
@@ -149,7 +148,7 @@ public:
     };
     // Reset Static Variables values for the class
     void reset();
-    // Parses Stright Text input with no control sequences
+    // Parses Straight Text input with no control sequences
     void textInput(std::string buffer);
     // Parses Control sequences passed in vector. (sequenceParser)
     void sequenceCursorAndDisplay();

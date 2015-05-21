@@ -31,7 +31,7 @@ LinkList::LinkList()
     currnetLineNumber = 1;
     currentPage       = 1;
     totalPages        = 0;
-    rowsPerPage       = 0;               // # of Rows on Last Page with ScrollDown
+    rowsPerPage       = 0;               // # of Rows on Last Page with Scroll-down
 }
 
 LinkList::~LinkList()
@@ -68,8 +68,8 @@ void LinkList::clearVectorList()
 }
 
 /**
- * New Faster Full Screen Interface for Lightbars and Lists
- * This one fucntions does all start and  pageup/down
+ * New Faster Full Screen Interface for Light-bars and Lists
+ * This one functions does all start and  page up/down
  * And Handles jumping to different pages.
  */
 void LinkList::drawVectorList(unsigned long page, unsigned long list)
@@ -78,7 +78,7 @@ void LinkList::drawVectorList(unsigned long page, unsigned long list)
     char capture[200]= {0};
     currentPage = page;
 
-    // Calcuate Box Size and Total Pages
+    // Calculate Box Size and Total Pages
     int boxsize = bottomMargin - topMargin; // Fist Get Box Size
     totalLines = listing.size();
     totalPages = totalLines / boxsize;
@@ -105,7 +105,7 @@ void LinkList::drawVectorList(unsigned long page, unsigned long list)
         if(((boxsize*currentPage)+i)-1 >= (signed)listing.size())
             break;
 
-        // If Area has new message rotate output to new lightbars.
+        // If Area has new message rotate output to new light bars.
         if((signed)list+1 == (boxsize*currentPage)+i)
         {
             currentSelection = topMargin+i-1; // Get current place in box to display.

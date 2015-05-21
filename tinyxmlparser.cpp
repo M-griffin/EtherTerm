@@ -49,7 +49,7 @@ TiXmlBase::Entity TiXmlBase::entity[ TiXmlBase::NUM_ENTITY ] =
     { "&apos;", 6, '\'' }
 };
 
-// Bunch of unicode info at:
+// Bunch of Unicode info at:
 //      http://www.unicode.org/faq/utf_bom.html
 // Including the basic of this table, which determines the #bytes in the
 // sequence from the lead byte. 1 placed for invalid sequences --
@@ -107,7 +107,7 @@ void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* lengt
 
     output += *length;
 
-    // Scary scary fall throughs.
+    // Scary scary fall through.
     switch(*length)
     {
         case 4:
@@ -130,9 +130,9 @@ void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* lengt
 
 /*static*/ int TiXmlBase::IsAlpha(unsigned char anyByte, TiXmlEncoding /*encoding*/)
 {
-    // This will only work for low-ascii, everything else is assumed to be a valid
+    // This will only work for low-ASCII, everything else is assumed to be a valid
     // letter. I'm not sure this is the best approach, but it is quite tricky trying
-    // to figure out alhabetical vs. not across encoding. So take a very
+    // to figure out alphabetical vs. not across encoding. So take a very
     // conservative approach.
 
 //  if ( encoding == TIXML_ENCODING_UTF8 )
@@ -140,7 +140,7 @@ void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* lengt
     if(anyByte < 127)
         return isalpha(anyByte);
     else
-        return 1;   // What else to do? The unicode set is huge...get the english ones right.
+        return 1;   // What else to do? The Unicode set is huge...get the English ones right.
 //  }
 //  else
 //  {
@@ -150,9 +150,9 @@ void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* lengt
 
 /*static*/ int TiXmlBase::IsAlphaNum(unsigned char anyByte, TiXmlEncoding /*encoding*/)
 {
-    // This will only work for low-ascii, everything else is assumed to be a valid
+    // This will only work for low-ASCII, everything else is assumed to be a valid
     // letter. I'm not sure this is the best approach, but it is quite tricky trying
-    // to figure out alhabetical vs. not across encoding. So take a very
+    // to figure out alphabetical vs. not across encoding. So take a very
     // conservative approach.
 
 //  if ( encoding == TIXML_ENCODING_UTF8 )
@@ -160,7 +160,7 @@ void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* lengt
     if(anyByte < 127)
         return isalnum(anyByte);
     else
-        return 1;   // What else to do? The unicode set is huge...get the english ones right.
+        return 1;   // What else to do? The Unicode set is huge...get the English ones right.
 //  }
 //  else
 //  {
@@ -199,7 +199,7 @@ void TiXmlParsingData::Stamp(const char* now, TiXmlEncoding encoding)
 {
     assert(now);
 
-    // Do nothing if the tabsize is 0.
+    // Do nothing if the tab-size is 0.
     if(tabsize < 1)
     {
         return;
@@ -293,7 +293,7 @@ void TiXmlParsingData::Stamp(const char* now, TiXmlEncoding encoding)
             default:
                 if(encoding == TIXML_ENCODING_UTF8)
                 {
-                    // Eat the 1 to 4 byte utf8 character.
+                    // Eat the 1 to 4 byte UTF-8 character.
                     int step = TiXmlBase::utf8ByteTable[* ((const unsigned char*) p)];
                     if(step == 0)
                         step = 1;       // Error case from bad encoding, but handle gracefully.
@@ -406,19 +406,19 @@ const char* TiXmlBase::SkipWhiteSpace(const char* p, TiXmlEncoding encoding)
 //
 const char* TiXmlBase::ReadName(const char* p, TIXML_STRING * name, TiXmlEncoding encoding)
 {
-    // Oddly, not supported on some comilers,
+    // Oddly, not supported on some compilers,
     //name->clear();
     // So use this:
     *name = "";
     assert(p);
 
     // Names start with letters or underscores.
-    // Of course, in unicode, tinyxml has no idea what a letter *is*. The
+    // Of course, in Unicode, tinyxml has no idea what a letter *is*. The
     // algorithm is generous.
     //
     // After that, they can be letters, underscores, numbers,
-    // hyphens, or colons. (Colons are valid ony for namespaces,
-    // but tinyxml can't tell namespaces from names.)
+    // hyphens, or colons. (Colons are valid ony for name-spaces,
+    // but tinyxml can't tell name-spaces from names.)
     if(p && *p
             && (IsAlpha((unsigned char) *p, encoding) || *p == '_'))
     {
@@ -586,8 +586,8 @@ const char* TiXmlBase::ReadText(const char* p,
                                 TiXmlEncoding encoding)
 {
     *text = "";
-    if(!trimWhiteSpace              // certain tags always keep whitespace
-            || !condenseWhiteSpace)    // if true, whitespace is always kept
+    if(!trimWhiteSpace              // certain tags always keep white-space
+            || !condenseWhiteSpace)    // if true, white-space is always kept
     {
         // Keep all the white space.
         while(p && *p
@@ -621,8 +621,8 @@ const char* TiXmlBase::ReadText(const char* p,
             }
             else
             {
-                // If we've found whitespace, add it before the
-                // new character. Any whitespace just becomes a space.
+                // If we've found white-space, add it before the
+                // new character. Any white-space just becomes a space.
                 if(whitespace)
                 {
                     (*text) += ' ';
@@ -843,8 +843,8 @@ TiXmlNode* TiXmlNode::Identify(const char* p, TiXmlEncoding encoding)
     // What is this thing?
     // - Elements start with a letter or underscore, but xml is reserved.
     // - Comments: <!--
-    // - Decleration: <?xml
-    // - Everthing else is unknown to tinyxml.
+    // - Deceleration: <?xml
+    // - Everything else is unknown to tinyxml.
     //
 
     const char* xmlHeader = { "<?xml" };

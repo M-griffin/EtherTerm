@@ -27,7 +27,7 @@ bool StateParser::parseState(const char *stateFile, string stateID, vector<TermO
 
     // pre declare the states root node
     TiXmlElement* pStateRoot = 0;
-    // get this states root node and assing it to pStateRoot
+    // get this states root node and assign it to pStateRoot
     for(TiXmlElement* e = pRoot->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
     {
         if(e->Value() == stateID)
@@ -73,7 +73,7 @@ bool StateParser::parseState(const char *stateFile, string stateID, vector<TermO
 
 void StateParser::parseTextures(TiXmlElement* pStateRoot, std::vector<std::string> *pTextureIDs)
 {
-    // for each texture we get the filename and the desired ID and add them to the texture manager
+    // for each texture we get the file name and the desired ID and add them to the texture manager
     for(TiXmlElement* e = pStateRoot->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
     {
         string filenameAttribute = e->Attribute("filename");
