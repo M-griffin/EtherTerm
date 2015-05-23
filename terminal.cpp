@@ -6,7 +6,6 @@
 
 #include "terminal.h"
 #include "ansiParser.h"
-#include "termObjectFactory.h"
 #include "mainMenuState.h"
 #include "inputHandler.h"
 
@@ -657,19 +656,20 @@ void Terminal::createTexture(int textureType, SDL_Surface *surface)
                 }
             }
             break;
+
         case SELECTION_TEXTURE:
             if(selectionTexture)
                 SDL_DestroyTexture(selectionTexture);
             selectionTexture =
                 SDL_CreateTexture(globalRenderer,
                                   SDL_PIXELFORMAT_ARGB8888,
-                                  SDL_TEXTUREACCESS_STREAMING,
+                                  SDL_TEXTUREACCESS_TARGET,
                                   surface->w, surface->h);
             if(selectionTexture)
             {
                 if(SDL_SetTextureBlendMode(
                             selectionTexture,
-                            SDL_BLENDMODE_MOD) < 0)
+                            SDL_BLENDMODE_ADD) < 0)
 
                 {
                     SDL_Log("%s: Error Setting Blend on Texture - %s",
