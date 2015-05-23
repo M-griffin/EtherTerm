@@ -338,7 +338,6 @@ extern const char *enctype_names[];
 
 #include <vector>
 #include "menuState.h"
-#include "termObject.h"
 #include "socketState.h"
 
 /*
@@ -393,7 +392,6 @@ private:
     std::string inputSequence;
     bool shutdown;
 
-    std::vector<TermObject*> termObjects;
 };
 
 #endif

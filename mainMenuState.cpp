@@ -858,7 +858,6 @@ void MainMenuState::writeDialDirectory()
         system->SetAttribute("font", it.font);
         system->SetAttribute("keyMap", it.keyMap);
     }
-
     doc.SaveFile(path.c_str());
 }
 
@@ -911,8 +910,6 @@ int MainMenuState::startDialDirectory()
     do
     {
         parseHeader(ANSI_FILE);
-
-        // Jump to Current Page
         boxsize = _linkList.bottomMargin - _linkList.topMargin;
         currentPage = LIGHTBAR_POSITION / boxsize;
 

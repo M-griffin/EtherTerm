@@ -6,7 +6,7 @@
 
 #include "stateParser.h"
 #include "terminal.h"
-#include "termObjectFactory.h"
+//#include "termObjectFactory.h"
 
 using namespace std;
 

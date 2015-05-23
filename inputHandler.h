@@ -135,6 +135,18 @@ private:
         CTRLU, CTRLV, CTRLW, CTRLX, CTRLY,
         CTRLZ
     };
+
+    // First Break Up into Seperate Functions,
+    // Later Map Enum and and setup commands for the following.
+    void handleWindowEvents(SDL_Event &event);
+    void handleTextInputEvent(SDL_Event &event);
+    void handleMouseButtonUpEvent(SDL_Event &event);
+    void handleMouseMotionEvent(SDL_Event &event);
+    bool handleMouseButtonDownEvent(SDL_Event &event);
+    bool handleShiftControlKeys(SDL_Event &event);
+    bool handleControlKeys(SDL_Event &event);
+    bool handleAlternateKeys(SDL_Event &event);
+
 };
 typedef InputHandler TheInputHandler;
 

@@ -649,7 +649,6 @@ void Terminal::createTexture(int textureType, SDL_Surface *surface)
                 if(SDL_SetTextureBlendMode(
                             globalTexture,
                             SDL_BLENDMODE_BLEND) < 0)
-
                 {
                     SDL_Log("%s: Error Setting Blend on Texture - %s",
                             SDL_GetError());
@@ -670,7 +669,6 @@ void Terminal::createTexture(int textureType, SDL_Surface *surface)
                 if(SDL_SetTextureBlendMode(
                             selectionTexture,
                             SDL_BLENDMODE_ADD) < 0)
-
                 {
                     SDL_Log("%s: Error Setting Blend on Texture - %s",
                             SDL_GetError());
@@ -713,6 +711,7 @@ void Terminal::convertSurface(int surfaceType)
                 SDL_FreeSurface(tmpSurface);
             }
             break;
+
         case CURSOR_ON_SURFACE:
             if(cursorOnSurface)
                 cursorOnSurface = SDL_ConvertSurfaceFormat(
@@ -725,6 +724,7 @@ void Terminal::convertSurface(int surfaceType)
                 SDL_FreeSurface(cursorOnSurface);
             }
             break;
+
         case CURSOR_OFF_SURFACE:
             if(cursorOffSurface)
                 cursorOffSurface = SDL_ConvertSurfaceFormat(
@@ -737,6 +737,7 @@ void Terminal::convertSurface(int surfaceType)
                 SDL_FreeSurface(cursorOffSurface);
             }
             break;
+
         case SCREEN_SURFACE:
             if(screenSurface)
                 screenSurface = SDL_ConvertSurfaceFormat(
@@ -749,6 +750,7 @@ void Terminal::convertSurface(int surfaceType)
                 SDL_FreeSurface(screenSurface);
             }
             break;
+
         case BOTTOM_SURFACE:
             if(bottomSurface)
                 bottomSurface = SDL_ConvertSurfaceFormat(
@@ -761,6 +763,7 @@ void Terminal::convertSurface(int surfaceType)
                 SDL_FreeSurface(bottomSurface);
             }
             break;
+
         case CACHED_SURFACE:
             if(cachedSurface)
                 cachedSurface = SDL_ConvertSurfaceFormat(
@@ -773,6 +776,7 @@ void Terminal::convertSurface(int surfaceType)
                 SDL_FreeSurface(cachedSurface);
             }
             break;
+
         default:
             break;
     }
@@ -796,6 +800,7 @@ void Terminal::createSurface(int surfaceType)
             if(tmpSurface)
                 convertSurface(surfaceType);
             break;
+
         case CURSOR_ON_SURFACE:
             if(cursorOnSurface)
                 SDL_FreeSurface(cursorOnSurface);
@@ -806,6 +811,7 @@ void Terminal::createSurface(int surfaceType)
             if(cursorOnSurface)
                 convertSurface(surfaceType);
             break;
+
         case CURSOR_OFF_SURFACE:
             if(cursorOffSurface)
                 SDL_FreeSurface(cursorOffSurface);
@@ -816,6 +822,7 @@ void Terminal::createSurface(int surfaceType)
             if(cursorOffSurface)
                 convertSurface(surfaceType);
             break;
+
         case SCREEN_SURFACE:
             if(screenSurface)
                 SDL_FreeSurface(screenSurface);
@@ -826,6 +833,7 @@ void Terminal::createSurface(int surfaceType)
             if(screenSurface)
                 convertSurface(surfaceType);
             break;
+
         case BOTTOM_SURFACE:
             if(bottomSurface)
                 SDL_FreeSurface(bottomSurface);
@@ -836,6 +844,7 @@ void Terminal::createSurface(int surfaceType)
             if(bottomSurface)
                 convertSurface(surfaceType);
             break;
+
         case CACHED_SURFACE:
             if(cachedSurface)
                 SDL_FreeSurface(cachedSurface);
@@ -1854,7 +1863,6 @@ void Terminal::drawGamaTextureScreen()
     // Reset don't need it?
     //SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
     SDL_RenderPresent(globalRenderer);
-
 }
 
 

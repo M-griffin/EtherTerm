@@ -10,7 +10,6 @@
 #include <string>
 #include <vector>
 #include "menuState.h"
-#include "termObject.h"
 #include "linkList.h"
 #include "menuFunction.h"
 
@@ -96,8 +95,7 @@ private:
     void  createDialDirectory();
     void  writeDialDirectory();
     int   startDialDirectory();
-    // Term
-    std::vector<TermObject*> termObjects;
+
 };
 
 #endif
