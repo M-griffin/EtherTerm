@@ -134,12 +134,17 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
 }
 
 // SDL_TEXTINPUT
-void InputHandler::handleTextInputEvent(SDL_Event &event)
+bool InputHandler::handleTextInputEvent(SDL_Event &event)
 {
     // Check for NumKey and Number Input,  IF Numlock if off
     // Then ignore numbers
     //if (!(event.key.keysym.mod & KMOD_NUM))
-    setInputSequence(event.text.text);
+    if (strlen(event.text.text) > 0)
+        setInputSequence(event.text.text);
+    else
+        return false;
+
+    return true;
 }
 
 // SDL_MOUSEBUTTONUP:
@@ -400,11 +405,601 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
     }
     return false;
 }
-bool InputHandler::update()
-{
-    SDL_Event event;
-    std::string sequence;
 
+
+bool InputHandler::handleKeyPadAndFunctionKeys(SDL_Event &event)
+{
+    switch(event.key.keysym.sym)
+    {
+            // Handle KeyPad Keys without numlock
+            // Numlock Numbers are read by Text Input already.
+            /* Caught by TextInput()
+            case SDLK_KP_PERIOD:
+                if (event.key.keysym.mod & KMOD_NUM)
+                {
+                    setInputSequence(".");
+                    return true;
+                }
+                break;*/
+        case SDLK_KP_8: // UP
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[A");
+                return true;
+            }
+            break;
+        case SDLK_KP_2: // DN
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[B");
+                return true;
+            }
+            break;
+        case SDLK_KP_6: // RIGHT
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[C");
+                return true;
+            }
+            break;
+        case SDLK_KP_4: // LEFT
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[D");
+                return true;
+            }
+            break;
+
+        case SDLK_ESCAPE:
+            setInputSequence("\x1b");
+            return true;
+
+            // Add Toggle for Hardware Keys ESC0A etc..
+        case SDLK_UP:
+            if(event.key.keysym.mod & KMOD_SHIFT)
+                setInputSequence("\x1b[1;2A");
+            else
+                setInputSequence("\x1b[A");
+            return true;
+        case SDLK_DOWN:
+            if(event.key.keysym.mod & KMOD_SHIFT)
+                setInputSequence("\x1b[1;2B");
+            else
+                setInputSequence("\x1b[B");
+            return true;
+        case SDLK_RIGHT:
+            if(event.key.keysym.mod & KMOD_SHIFT)
+                setInputSequence("\x1b[1;2C");
+            else
+                setInputSequence("\x1b[C");
+            return true;
+        case SDLK_LEFT:
+            if(event.key.keysym.mod & KMOD_SHIFT)
+                setInputSequence("\x1b[1;2D");
+            else
+                setInputSequence("\x1b[D");
+            return true;
+        case SDLK_RETURN:
+        case SDLK_KP_ENTER:
+            setInputSequence("\r");
+            return true;
+
+            // Add Swap for BS and DEL (Win vs Nix Terms)
+        case SDLK_TAB:
+            if(event.key.keysym.mod & KMOD_SHIFT)
+                setInputSequence("\x1b[Z");
+            else
+                setInputSequence("\t");
+            return true;
+
+        default:
+            break;
+    }
+    return false;
+}
+
+bool InputHandler::handleANSIKeyMapFunctionKeys(SDL_Event &event)
+{
+    // screen2|old VT 100/ANSI X3.64 virtual terminal:
+    // Used By Synchronet/Mystic and DOS Type Systems!
+    switch(event.key.keysym.sym)
+    {
+        case SDLK_KP_BACKSPACE:
+        case SDLK_BACKSPACE:
+            setInputSequence("\x08");
+            return true;
+        case SDLK_DELETE:
+            setInputSequence("\x7f");
+            return true;
+
+        case SDLK_INSERT:   // insert
+            setInputSequence("\x1b[@");
+            return true;
+        case SDLK_HOME:     // home
+            setInputSequence("\x1b[H");
+            return true;
+        case SDLK_END:      // end
+            setInputSequence("\x1b[K");
+            return true;
+        case SDLK_PAGEUP:   // page up
+            setInputSequence("\x1b[V");
+            return true;
+        case SDLK_PAGEDOWN: // page down
+            setInputSequence("\x1b[U");
+            return true;
+
+            // Handle KeyPad Keys without Numlock
+            // Numlock Numbers are read by Text Input already.
+        case SDLK_KP_PERIOD: // Delete
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x7f");
+                return true;
+            }
+            break;
+        case SDLK_KP_0: // INS
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[@");
+                return true;
+            }
+            break;
+        case SDLK_KP_1: // END
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[K");
+                return true;
+            }
+            break;
+        case SDLK_KP_3: // PGDN
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[U");
+                return true;
+            }
+            break;
+        case SDLK_KP_5: // Empty, space?
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+
+            }
+            break;
+        case SDLK_KP_7: // HOME
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[H");
+                return true;
+            }
+            break;
+        case SDLK_KP_9: // PAGEUP
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[V");
+                return true;
+            }
+            break;
+
+            // Function Keys
+        case SDLK_F1:
+            setInputSequence("\x1b[OP");
+            return true;
+        case SDLK_F2:
+            setInputSequence("\x1b[OQ");
+            return true;
+        case SDLK_F3:
+            setInputSequence("\x1b[OR");
+            return true;
+        case SDLK_F4:
+            setInputSequence("\x1b[OS");
+            return true;
+        case SDLK_F5:
+            // Windows Console Telnet \\x1b[[15~
+            setInputSequence("\x1b[OT");
+            return true;
+        case SDLK_F6:
+            setInputSequence("\x1b[[17~");
+            return true;
+        case SDLK_F7:
+            setInputSequence("\x1b[[18~");
+            return true;
+        case SDLK_F8:
+            setInputSequence("\x1b[[19~");
+            return true;
+        case SDLK_F9:
+            setInputSequence("\x1b[[20~");
+            return true;
+        case SDLK_F10:
+            setInputSequence("\x1b[[21~");
+            return true;
+        case SDLK_F11:
+            setInputSequence("\x1b[[23~");
+            return true;
+        case SDLK_F12:
+            setInputSequence("\x1b[[24~");
+            return true;
+
+        default:
+            break;
+    }
+    return false;
+}
+
+bool InputHandler::handleVT100KeyMapFunctionKeys(SDL_Event &event)
+{
+    // VT-100 Putty
+    switch(event.key.keysym.sym)
+    {
+            // \x7f = ^?  // 0x08 = ^H
+        case SDLK_KP_BACKSPACE:
+        case SDLK_BACKSPACE:
+            setInputSequence("\x7f");
+            return true;
+        case SDLK_DELETE:
+            setInputSequence("\x1b[3~");
+            return true;
+
+        case SDLK_INSERT:   // insert
+            setInputSequence("\x1b[2~");
+            return true;
+        case SDLK_HOME:     // home
+            setInputSequence("\x1b[1~");
+            return true;
+        case SDLK_END:      // end
+            setInputSequence("\x1b[4~");
+            return true;
+        case SDLK_PAGEUP:   // page up
+            setInputSequence("\x1b[5~");
+            return true;
+        case SDLK_PAGEDOWN: // page down
+            setInputSequence("\x1b[6~");
+            return true;
+
+            // Handle KeyPad Keys without NumLock
+            // NumLock Numbers are read by Text Input already.
+        case SDLK_KP_PERIOD: // Delete
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[3~");
+                return true;
+            }
+            break;
+        case SDLK_KP_0: // INS
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[2~");
+                return true;
+            }
+            break;
+        case SDLK_KP_1: // END
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[4~");
+                return true;
+            }
+            break;
+        case SDLK_KP_3: // PGDN
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[6~");
+                return true;
+            }
+            break;
+        case SDLK_KP_5: // Empty, space?
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+
+            }
+            break;
+        case SDLK_KP_7: // HOME
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[1~");
+                return true;
+            }
+            break;
+        case SDLK_KP_9: // PAGEUP
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[5~");
+                return true;
+            }
+            break;
+
+            // Function Keys
+        case SDLK_F1:
+            setInputSequence("\x1b[OP");
+            return true;
+        case SDLK_F2:
+            setInputSequence("\x1b[OQ");
+            return true;
+        case SDLK_F3:
+            setInputSequence("\x1b[OR");
+            return true;
+        case SDLK_F4:
+            setInputSequence("\x1b[OS");
+            return true;
+        case SDLK_F5:
+            setInputSequence("\x1b[OT");
+            return true;
+        case SDLK_F6:
+            setInputSequence("\x1b[OU");
+            return true;
+        case SDLK_F7:
+            setInputSequence("\x1b[OV");
+            return true;
+        case SDLK_F8:
+            setInputSequence("\x1b[OW");
+            return true;
+        case SDLK_F9:
+            setInputSequence("\x1b[OX");
+            return true;
+        case SDLK_F10:
+            setInputSequence("\x1b[OY");
+            return true;
+        case SDLK_F11:
+            setInputSequence("\x1b[OZ");
+            return true;
+        case SDLK_F12:
+            setInputSequence("\x1b[O[");
+            return true;
+
+        default:
+            break;
+    }
+    return false;
+}
+
+bool InputHandler::handleLINUXKeyMapFunctionKeys(SDL_Event &event)
+{
+    // Linux Terminal Putty
+    switch(event.key.keysym.sym)
+    {
+            // \x7f = ^?  // 0x08 = ^H
+        case SDLK_KP_BACKSPACE:
+        case SDLK_BACKSPACE:
+            setInputSequence("\x7f");
+            return true;
+        case SDLK_DELETE:
+            setInputSequence("\x1b[3~");
+            return true;
+
+        case SDLK_INSERT:   // insert
+            setInputSequence("\x1b[2~");
+            return true;
+        case SDLK_HOME:     // home
+            setInputSequence("\x1b[1~");
+            return true;
+        case SDLK_END:      // end
+            setInputSequence("\x1b[4~");
+            return true;
+        case SDLK_PAGEUP:   // page up
+            setInputSequence("\x1b[5~");
+            return true;
+        case SDLK_PAGEDOWN: // page down
+            setInputSequence("\x1b[6~");
+            return true;
+
+            // Handle KeyPad Keys without NumLock
+            // NumLock Numbers are read by Text Input already.
+        case SDLK_KP_PERIOD: // Delete
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[3~");
+                return true;
+            }
+            break;
+        case SDLK_KP_0: // INS
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[2~");
+                return true;
+            }
+            break;
+        case SDLK_KP_1: // END
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[4~");
+                return true;
+            }
+            break;
+        case SDLK_KP_3: // PGDN
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[6~");
+                return true;
+            }
+            break;
+        case SDLK_KP_5: // Empty, space?
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+
+            }
+            break;
+        case SDLK_KP_7: // HOME
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[1~");
+                return true;
+            }
+            break;
+        case SDLK_KP_9: // PAGEUP
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[5~");
+                return true;
+            }
+            break;
+
+            // Function Keys
+        case SDLK_F1:
+            setInputSequence("\x1b[[A");
+            return true;
+        case SDLK_F2:
+            setInputSequence("\x1b[[B");
+            return true;
+        case SDLK_F3:
+            setInputSequence("\x1b[[C");
+            return true;
+        case SDLK_F4:
+            setInputSequence("\x1b[[D");
+            return true;
+        case SDLK_F5:
+            setInputSequence("\x1b[[E");
+            return true;
+        case SDLK_F6:
+            setInputSequence("\x1b[[17~");
+            return true;
+        case SDLK_F7:
+            setInputSequence("\x1b[[18~");
+            return true;
+        case SDLK_F8:
+            setInputSequence("\x1b[[19~");
+            return true;
+        case SDLK_F9:
+            setInputSequence("\x1b[[20~");
+            return true;
+        case SDLK_F10:
+            setInputSequence("\x1b[[21~");
+            return true;
+        case SDLK_F11:
+            setInputSequence("\x1b[[23~");
+            return true;
+        case SDLK_F12:
+            setInputSequence("\x1b[[24~");
+            return true;
+
+        default:
+            break;
+    }
+    return false;
+}
+
+bool InputHandler::handleSCOKeyMapFunctionKeys(SDL_Event &event)
+{
+    // SCO Putty
+    switch(event.key.keysym.sym)
+    {
+            // \x7f = ^?  // 0x08 = ^H
+        case SDLK_KP_BACKSPACE:
+        case SDLK_BACKSPACE:
+            setInputSequence("\x7f");
+            return true;
+        case SDLK_DELETE:
+            setInputSequence("\x08");
+            return true;
+        case SDLK_INSERT:   // insert
+            setInputSequence("\x1b[L");
+            return true;
+        case SDLK_HOME:     // home
+            setInputSequence("\x1b[H");
+            return true;
+        case SDLK_END:      // end
+            setInputSequence("\x1b[F");
+            return true;
+        case SDLK_PAGEUP:   // page up
+            setInputSequence("\x1b[I");
+            return true;
+        case SDLK_PAGEDOWN: // page down
+            setInputSequence("\x1b[G");
+            return true;
+
+            // Handle KeyPad Keys without NumLock
+            // NumLock Numbers are read by Text Input already.
+        case SDLK_KP_PERIOD: // Delete
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x08");
+                return true;
+            }
+            break;
+        case SDLK_KP_0: // INS
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[L");
+                return true;
+            }
+            break;
+        case SDLK_KP_1: // END
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[F");
+                return true;
+            }
+            break;
+        case SDLK_KP_3: // PGDN
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[G");
+                return true;
+            }
+            break;
+        case SDLK_KP_5: // Empty, space?
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+
+            }
+            break;
+        case SDLK_KP_7: // HOME
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[H");
+                return true;
+            }
+            break;
+        case SDLK_KP_9: // PAGEUP
+            if(!(event.key.keysym.mod & KMOD_NUM))
+            {
+                setInputSequence("\x1b[I");
+                return true;
+            }
+            break;
+
+            // Function Keys
+        case SDLK_F1:
+            setInputSequence("\x1b[[M");
+            return true;
+        case SDLK_F2:
+            setInputSequence("\x1b[[N");
+            return true;
+        case SDLK_F3:
+            setInputSequence("\x1b[[O");
+            return true;
+        case SDLK_F4:
+            setInputSequence("\x1b[[P");
+            return true;
+        case SDLK_F5:
+            setInputSequence("\x1b[[Q");
+            return true;
+        case SDLK_F6:
+            setInputSequence("\x1b[[R");
+            return true;
+        case SDLK_F7:
+            setInputSequence("\x1b[[S");
+            return true;
+        case SDLK_F8:
+            setInputSequence("\x1b[[T");
+            return true;
+        case SDLK_F9:
+            setInputSequence("\x1b[[U");
+            return true;
+        case SDLK_F10:
+            setInputSequence("\x1b[[V");
+            return true;
+        case SDLK_F11:
+            setInputSequence("\x1b[[W");
+            return true;
+        case SDLK_F12:
+            setInputSequence("\x1b[[X");
+            return true;
+
+        default:
+            break;
+    }
+    return false;
+}
+
+bool InputHandler::handleKeyDownEvents(SDL_Event &event)
+{
     TheTerminal::SystemConnection sysConection;
     sysConection = TheTerminal::Instance()->getSystemConnection();
 
@@ -413,648 +1008,90 @@ bool InputHandler::update()
     if(sysConection.keyMap == "")
         sysConection.keyMap = "ANSI";
 
-    //Handle events on queue
+    // Handle Shift + CTRL + _
+    if(event.key.keysym.mod & KMOD_SHIFT &&
+            event.key.keysym.mod & KMOD_CTRL)
+    {
+        return handleShiftControlKeys(event);
+    }
+    // Handle CTRL + KEY
+    if(event.key.keysym.mod & KMOD_CTRL)
+    {
+        return handleControlKeys(event);
+    } // END CTRL
+
+    // Handle ALT + KEY
+    else if(event.key.keysym.mod & KMOD_ALT)
+    {
+        return handleAlternateKeys(event);
+    } // End ALT
+
+    // Get remaining function keys not handled on TextInput()
+    // Then Translate to ESC Sequences for Telnet.
+    else
+    {
+        if(handleKeyPadAndFunctionKeys(event))
+            return true;
+
+        // Term specific key mappings
+        if(sysConection.keyMap == "ANSI")
+        {
+            if(handleANSIKeyMapFunctionKeys(event))
+                return true;
+        }
+        else if(sysConection.keyMap == "VT100")
+        {
+            if(handleVT100KeyMapFunctionKeys(event))
+                return true;
+        }
+        else if(sysConection.keyMap == "LINUX")
+        {
+            if(handleLINUXKeyMapFunctionKeys(event))
+                return true;
+        }
+        else if(sysConection.keyMap == "SCO")
+        {
+            if(handleSCOKeyMapFunctionKeys(event))
+                return true;
+        }
+    }
+    return false;
+}
+bool InputHandler::update()
+{
+    SDL_Event event;
+
     while(SDL_PollEvent(&event) != 0 && !isGlobalShutdown())
     {
-        //User requests quit
         switch(event.type)
         {
-                // If no Key-press check now for Window Events.
+            case SDL_QUIT:
+                return false;
+
             case SDL_WINDOWEVENT:
                 handleWindowEvents(event);
                 break;
 
             case SDL_TEXTINPUT:
-                handleTextInputEvent(event);
-                return true;
+                return (handleTextInputEvent(event));
 
-            case SDL_QUIT:
-                return false;
+            case SDL_MOUSEBUTTONDOWN:
+                return handleMouseButtonDownEvent(event);
 
-                // Mouse Release and Motion Left is how to select text.
             case SDL_MOUSEBUTTONUP:
                 handleMouseButtonUpEvent(event);
                 break;
 
             case SDL_MOUSEMOTION:
                 handleMouseMotionEvent(event);
-                break;
-
-            case SDL_MOUSEBUTTONDOWN:
-                return handleMouseButtonDownEvent(event);
+                break;            
 
             case SDL_KEYDOWN:
-                // Handle Shift + CTRL + _
-                if(event.key.keysym.mod & KMOD_SHIFT &&
-                        event.key.keysym.mod & KMOD_CTRL)
-                {
-                    return handleShiftControlKeys(event);
-                }
-                // Handle CTRL + KEY
-                if(event.key.keysym.mod & KMOD_CTRL)
-                {
-                    return handleControlKeys(event);
-                } // END CTRL
-
-                // Handle ALT + KEY
-                else if(event.key.keysym.mod & KMOD_ALT)
-                {
-                    return handleAlternateKeys(event);
-                } // End ALT
-
-                // Get remaining function keys not handled on TextInput()
-                // Then Translate to ESC Sequences for Telnet.
-                else
-                {
-                    switch(event.key.keysym.sym)
-                    {
-                            // Handle KeyPad Keys without numlock
-                            // Numlock Numbers are read by Text Input already.
-                            /* Caught by TextInput()
-                            case SDLK_KP_PERIOD:
-                                if (event.key.keysym.mod & KMOD_NUM)
-                                {
-                                    setInputSequence(".");
-                                    return true;
-                                }
-                                break;*/
-                        case SDLK_KP_8: // UP
-                            if(!(event.key.keysym.mod & KMOD_NUM))
-                            {
-                                setInputSequence("\x1b[A");
-                                return true;
-                            }
-                            break;
-                        case SDLK_KP_2: // DN
-                            if(!(event.key.keysym.mod & KMOD_NUM))
-                            {
-                                setInputSequence("\x1b[B");
-                                return true;
-                            }
-                            break;
-                        case SDLK_KP_6: // RIGHT
-                            if(!(event.key.keysym.mod & KMOD_NUM))
-                            {
-                                setInputSequence("\x1b[C");
-                                return true;
-                            }
-                            break;
-                        case SDLK_KP_4: // LEFT
-                            if(!(event.key.keysym.mod & KMOD_NUM))
-                            {
-                                setInputSequence("\x1b[D");
-                                return true;
-                            }
-                            break;
-
-                        case SDLK_ESCAPE:
-                            setInputSequence("\x1b");
-                            return true;
-
-                            // Add Toggle for Hardware Keys ESC0A etc..
-                        case SDLK_UP:
-                            if(event.key.keysym.mod & KMOD_SHIFT)
-                                setInputSequence("\x1b[1;2A");
-                            else
-                                setInputSequence("\x1b[A");
-                            return true;
-                        case SDLK_DOWN:
-                            if(event.key.keysym.mod & KMOD_SHIFT)
-                                setInputSequence("\x1b[1;2B");
-                            else
-                                setInputSequence("\x1b[B");
-                            return true;
-                        case SDLK_RIGHT:
-                            if(event.key.keysym.mod & KMOD_SHIFT)
-                                setInputSequence("\x1b[1;2C");
-                            else
-                                setInputSequence("\x1b[C");
-                            return true;
-                        case SDLK_LEFT:
-                            if(event.key.keysym.mod & KMOD_SHIFT)
-                                setInputSequence("\x1b[1;2D");
-                            else
-                                setInputSequence("\x1b[D");
-                            return true;
-                        case SDLK_RETURN:
-                        case SDLK_KP_ENTER:
-                            setInputSequence("\r");
-                            return true;
-
-                            // Add Swap for BS and DEL (Win vs Nix Terms)
-                        case SDLK_TAB:
-                            if(event.key.keysym.mod & KMOD_SHIFT)
-                                setInputSequence("\x1b[Z");
-                            else
-                                setInputSequence("\t");
-                            return true;
-
-                        default:
-                            break;
-                    }
-
-                    // Term specific key mappings
-                    if(sysConection.keyMap == "ANSI")
-                    {
-                        // screen2|old VT 100/ANSI X3.64 virtual terminal:
-                        // Used By Synchronet/Mystic and DOS Type Systems!
-                        switch(event.key.keysym.sym)
-                        {
-                            case SDLK_KP_BACKSPACE:
-                            case SDLK_BACKSPACE:
-                                setInputSequence("\x08");
-                                return true;
-                            case SDLK_DELETE:
-                                setInputSequence("\x7f");
-                                return true;
-
-                            case SDLK_INSERT:   // insert
-                                setInputSequence("\x1b[@");
-                                return true;
-                            case SDLK_HOME:     // home
-                                setInputSequence("\x1b[H");
-                                return true;
-                            case SDLK_END:      // end
-                                setInputSequence("\x1b[K");
-                                return true;
-                            case SDLK_PAGEUP:   // page up
-                                setInputSequence("\x1b[V");
-                                return true;
-                            case SDLK_PAGEDOWN: // page down
-                                setInputSequence("\x1b[U");
-                                return true;
-
-                                // Handle KeyPad Keys without Numlock
-                                // Numlock Numbers are read by Text Input already.
-                            case SDLK_KP_PERIOD: // Delete
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x7f");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_0: // INS
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[@");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_1: // END
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[K");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_3: // PGDN
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[U");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_5: // Empty, space?
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-
-                                }
-                                break;
-                            case SDLK_KP_7: // HOME
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[H");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_9: // PAGEUP
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[V");
-                                    return true;
-                                }
-                                break;
-
-                                // Function Keys
-                            case SDLK_F1:
-                                setInputSequence("\x1b[OP");
-                                return true;
-                            case SDLK_F2:
-                                setInputSequence("\x1b[OQ");
-                                return true;
-                            case SDLK_F3:
-                                setInputSequence("\x1b[OR");
-                                return true;
-                            case SDLK_F4:
-                                setInputSequence("\x1b[OS");
-                                return true;
-                            case SDLK_F5:
-                                // Windows Console Telnet \\x1b[[15~
-                                setInputSequence("\x1b[OT");
-                                return true;
-                            case SDLK_F6:
-                                setInputSequence("\x1b[[17~");
-                                return true;
-                            case SDLK_F7:
-                                setInputSequence("\x1b[[18~");
-                                return true;
-                            case SDLK_F8:
-                                setInputSequence("\x1b[[19~");
-                                return true;
-                            case SDLK_F9:
-                                setInputSequence("\x1b[[20~");
-                                return true;
-                            case SDLK_F10:
-                                setInputSequence("\x1b[[21~");
-                                return true;
-                            case SDLK_F11:
-                                setInputSequence("\x1b[[23~");
-                                return true;
-                            case SDLK_F12:
-                                setInputSequence("\x1b[[24~");
-                                return true;
-
-                            default:
-                                break;
-                        }
-                    }
-                    else if(sysConection.keyMap == "VT100")
-                    {
-                        // VT-100 Putty
-                        switch(event.key.keysym.sym)
-                        {
-                                // \x7f = ^?  // 0x08 = ^H
-                            case SDLK_KP_BACKSPACE:
-                            case SDLK_BACKSPACE:
-                                setInputSequence("\x7f");
-                                return true;
-                            case SDLK_DELETE:
-                                setInputSequence("\x1b[3~");
-                                return true;
-
-                            case SDLK_INSERT:   // insert
-                                setInputSequence("\x1b[2~");
-                                return true;
-                            case SDLK_HOME:     // home
-                                setInputSequence("\x1b[1~");
-                                return true;
-                            case SDLK_END:      // end
-                                setInputSequence("\x1b[4~");
-                                return true;
-                            case SDLK_PAGEUP:   // page up
-                                setInputSequence("\x1b[5~");
-                                return true;
-                            case SDLK_PAGEDOWN: // page down
-                                setInputSequence("\x1b[6~");
-                                return true;
-
-                                // Handle KeyPad Keys without NumLock
-                                // NumLock Numbers are read by Text Input already.
-                            case SDLK_KP_PERIOD: // Delete
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[3~");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_0: // INS
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[2~");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_1: // END
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[4~");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_3: // PGDN
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[6~");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_5: // Empty, space?
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-
-                                }
-                                break;
-                            case SDLK_KP_7: // HOME
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[1~");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_9: // PAGEUP
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[5~");
-                                    return true;
-                                }
-                                break;
-
-                                // Function Keys
-                            case SDLK_F1:
-                                setInputSequence("\x1b[OP");
-                                return true;
-                            case SDLK_F2:
-                                setInputSequence("\x1b[OQ");
-                                return true;
-                            case SDLK_F3:
-                                setInputSequence("\x1b[OR");
-                                return true;
-                            case SDLK_F4:
-                                setInputSequence("\x1b[OS");
-                                return true;
-                            case SDLK_F5:
-                                setInputSequence("\x1b[OT");
-                                return true;
-                            case SDLK_F6:
-                                setInputSequence("\x1b[OU");
-                                return true;
-                            case SDLK_F7:
-                                setInputSequence("\x1b[OV");
-                                return true;
-                            case SDLK_F8:
-                                setInputSequence("\x1b[OW");
-                                return true;
-                            case SDLK_F9:
-                                setInputSequence("\x1b[OX");
-                                return true;
-                            case SDLK_F10:
-                                setInputSequence("\x1b[OY");
-                                return true;
-                            case SDLK_F11:
-                                setInputSequence("\x1b[OZ");
-                                return true;
-                            case SDLK_F12:
-                                setInputSequence("\x1b[O[");
-                                return true;
-
-                            default:
-                                break;
-                        }
-                    }
-                    else if(sysConection.keyMap == "LINUX")
-                    {
-                        // Linux Terminal Putty
-                        switch(event.key.keysym.sym)
-                        {
-                                // \x7f = ^?  // 0x08 = ^H
-                            case SDLK_KP_BACKSPACE:
-                            case SDLK_BACKSPACE:
-                                setInputSequence("\x7f");
-                                return true;
-                            case SDLK_DELETE:
-                                setInputSequence("\x1b[3~");
-                                return true;
-
-                            case SDLK_INSERT:   // insert
-                                setInputSequence("\x1b[2~");
-                                return true;
-                            case SDLK_HOME:     // home
-                                setInputSequence("\x1b[1~");
-                                return true;
-                            case SDLK_END:      // end
-                                setInputSequence("\x1b[4~");
-                                return true;
-                            case SDLK_PAGEUP:   // page up
-                                setInputSequence("\x1b[5~");
-                                return true;
-                            case SDLK_PAGEDOWN: // page down
-                                setInputSequence("\x1b[6~");
-                                return true;
-
-                                // Handle KeyPad Keys without NumLock
-                                // NumLock Numbers are read by Text Input already.
-                            case SDLK_KP_PERIOD: // Delete
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[3~");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_0: // INS
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[2~");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_1: // END
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[4~");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_3: // PGDN
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[6~");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_5: // Empty, space?
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-
-                                }
-                                break;
-                            case SDLK_KP_7: // HOME
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[1~");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_9: // PAGEUP
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[5~");
-                                    return true;
-                                }
-                                break;
-
-                                // Function Keys
-                            case SDLK_F1:
-                                setInputSequence("\x1b[[A");
-                                return true;
-                            case SDLK_F2:
-                                setInputSequence("\x1b[[B");
-                                return true;
-                            case SDLK_F3:
-                                setInputSequence("\x1b[[C");
-                                return true;
-                            case SDLK_F4:
-                                setInputSequence("\x1b[[D");
-                                return true;
-                            case SDLK_F5:
-                                setInputSequence("\x1b[[E");
-                                return true;
-                            case SDLK_F6:
-                                setInputSequence("\x1b[[17~");
-                                return true;
-                            case SDLK_F7:
-                                setInputSequence("\x1b[[18~");
-                                return true;
-                            case SDLK_F8:
-                                setInputSequence("\x1b[[19~");
-                                return true;
-                            case SDLK_F9:
-                                setInputSequence("\x1b[[20~");
-                                return true;
-                            case SDLK_F10:
-                                setInputSequence("\x1b[[21~");
-                                return true;
-                            case SDLK_F11:
-                                setInputSequence("\x1b[[23~");
-                                return true;
-                            case SDLK_F12:
-                                setInputSequence("\x1b[[24~");
-                                return true;
-
-                            default:
-                                break;
-                        }
-                    }
-                    else if(sysConection.keyMap == "SCO")
-                    {
-                        // SCO Putty
-                        switch(event.key.keysym.sym)
-                        {
-                                // \x7f = ^?  // 0x08 = ^H
-                            case SDLK_KP_BACKSPACE:
-                            case SDLK_BACKSPACE:
-                                setInputSequence("\x7f");
-                                return true;
-                            case SDLK_DELETE:
-                                setInputSequence("\x08");
-                                return true;
-                            case SDLK_INSERT:   // insert
-                                setInputSequence("\x1b[L");
-                                return true;
-                            case SDLK_HOME:     // home
-                                setInputSequence("\x1b[H");
-                                return true;
-                            case SDLK_END:      // end
-                                setInputSequence("\x1b[F");
-                                return true;
-                            case SDLK_PAGEUP:   // page up
-                                setInputSequence("\x1b[I");
-                                return true;
-                            case SDLK_PAGEDOWN: // page down
-                                setInputSequence("\x1b[G");
-                                return true;
-
-                                // Handle KeyPad Keys without NumLock
-                                // NumLock Numbers are read by Text Input already.
-                            case SDLK_KP_PERIOD: // Delete
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x08");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_0: // INS
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[L");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_1: // END
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[F");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_3: // PGDN
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[G");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_5: // Empty, space?
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-
-                                }
-                                break;
-                            case SDLK_KP_7: // HOME
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[H");
-                                    return true;
-                                }
-                                break;
-                            case SDLK_KP_9: // PAGEUP
-                                if(!(event.key.keysym.mod & KMOD_NUM))
-                                {
-                                    setInputSequence("\x1b[I");
-                                    return true;
-                                }
-                                break;
-
-                                // Function Keys
-                            case SDLK_F1:
-                                setInputSequence("\x1b[[M");
-                                return true;
-                            case SDLK_F2:
-                                setInputSequence("\x1b[[N");
-                                return true;
-                            case SDLK_F3:
-                                setInputSequence("\x1b[[O");
-                                return true;
-                            case SDLK_F4:
-                                setInputSequence("\x1b[[P");
-                                return true;
-                            case SDLK_F5:
-                                setInputSequence("\x1b[[Q");
-                                return true;
-                            case SDLK_F6:
-                                setInputSequence("\x1b[[R");
-                                return true;
-                            case SDLK_F7:
-                                setInputSequence("\x1b[[S");
-                                return true;
-                            case SDLK_F8:
-                                setInputSequence("\x1b[[T");
-                                return true;
-                            case SDLK_F9:
-                                setInputSequence("\x1b[[U");
-                                return true;
-                            case SDLK_F10:
-                                setInputSequence("\x1b[[V");
-                                return true;
-                            case SDLK_F11:
-                                setInputSequence("\x1b[[W");
-                                return true;
-                            case SDLK_F12:
-                                setInputSequence("\x1b[[X");
-                                return true;
-
-                            default:
-                                break;
-                        }
-                    }
-                }
-                break;
+                return handleKeyDownEvents(event);
 
             default:
                 break;
-
-        } // End Switch event.type
-    }// End While
-
-    // If we get here, then there is no input!
+        }
+    }
     return false;
 }

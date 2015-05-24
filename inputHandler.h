@@ -139,14 +139,19 @@ private:
     // First Break Up into Seperate Functions,
     // Later Map Enum and and setup commands for the following.
     void handleWindowEvents(SDL_Event &event);
-    void handleTextInputEvent(SDL_Event &event);
+    bool handleTextInputEvent(SDL_Event &event);
     void handleMouseButtonUpEvent(SDL_Event &event);
     void handleMouseMotionEvent(SDL_Event &event);
     bool handleMouseButtonDownEvent(SDL_Event &event);
     bool handleShiftControlKeys(SDL_Event &event);
     bool handleControlKeys(SDL_Event &event);
     bool handleAlternateKeys(SDL_Event &event);
-
+    bool handleKeyPadAndFunctionKeys(SDL_Event &event);
+    bool handleANSIKeyMapFunctionKeys(SDL_Event &event);
+    bool handleVT100KeyMapFunctionKeys(SDL_Event &event);
+    bool handleLINUXKeyMapFunctionKeys(SDL_Event &event);
+    bool handleSCOKeyMapFunctionKeys(SDL_Event &event);
+    bool handleKeyDownEvents(SDL_Event &event);
 };
 typedef InputHandler TheInputHandler;
 
