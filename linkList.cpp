@@ -4,47 +4,42 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "linkList.h"
-#include "menuFunction.h"
-#include "mainMenuState.h"
-#include "ansiParser.h"
+#include "linkList.hpp"
+#include "menuFunction.hpp"
+#include "sequenceManager.hpp"
 
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <string>
 
-using namespace std;
-
 /**
  * MenuFunction Link List Class
  */
-LinkList::LinkList()
-{
-    headNode          = 0;
-    currentNode       = 0;
-    lastNode          = 0;
-    currentRow        = 1;
-    topMargin         = 1;
-    bottomMargin      = 1;
-    totalLines        = 1;
-    currnetLineNumber = 1;
-    currentPage       = 1;
-    totalPages        = 0;
-    rowsPerPage       = 0;               // # of Rows on Last Page with Scroll-down
-}
+LinkList::LinkList() :
+    m_currentRow(1),
+    m_topMargin(0),
+    m_bottomMargin(0),
+    m_totalLines(1),
+    m_currnetLineNumber(1),
+    m_currentPage(1),
+    m_totalPages(0),
+    m_rowsPerPage(0),
+    m_currentSelection(0)
+{ }
 
 LinkList::~LinkList()
 {
+    std::vector<list_bar>().swap(m_listing);
 }
 
 /**
  * Copy message from link lists to <vector> buffer
  */
-void LinkList::getVectorList(vector<list_bar> listbar)
+void LinkList::getVectorList(std::vector<list_bar> listbar)
 {
     // Swap passed with Global
-    listing.swap(listbar);
+    m_listing.swap(listbar);
 }
 
 /**
@@ -52,19 +47,7 @@ void LinkList::getVectorList(vector<list_bar> listbar)
  */
 void LinkList::clearVectorList()
 {
-    LineRec *tmp;
-    currentNode = headNode;
-    while(currentNode != 0)
-    {
-        tmp = currentNode;
-        if(currentNode->previousNodeLink == 0) break;
-        currentNode = currentNode->previousNodeLink;
-        delete tmp;
-        tmp = 0;
-    }
-    currentNode = 0;
-    headNode = 0;
-    lastNode = 0;
+    std::vector<list_bar>().swap(m_listing);
 }
 
 /**
@@ -76,25 +59,31 @@ void LinkList::drawVectorList(unsigned long page, unsigned long list)
 {
     std::string stringBuilder;
     char capture[200]= {0};
-    currentPage = page;
+    m_currentPage = page;
 
     // Calculate Box Size and Total Pages
-    int boxsize = bottomMargin - topMargin; // Fist Get Box Size
-    totalLines = listing.size();
-    totalPages = totalLines / boxsize;
-    if(totalLines % boxsize > 0)
+    if (m_bottomMargin == 0 && m_topMargin == 0)
     {
-        ++totalPages;
+        std::cout << "Error: LinkList Margins not set!" << std::endl;
+        return;
     }
-    if(totalLines <= boxsize)
-        totalPages = 1;
+    int boxsize = m_bottomMargin - m_topMargin; // Fist Get Box Size
+    m_totalLines = m_listing.size();
+    m_totalPages = m_totalLines / boxsize;
 
-    if(totalPages > 1)
+    if(m_totalLines % boxsize > 0)
+    {
+        ++m_totalPages;
+    }
+    if(m_totalLines <= boxsize)
+        m_totalPages = 1;
+
+    if(m_totalPages > 1)
     {
         //Now clear the box First
         for(int t = 0; t < boxsize; t++)
         {
-            sprintf(capture, "\x1b[%i;%iH\x1b[K", (topMargin)+t, 1);
+            sprintf(capture, "\x1b[%i;%iH\x1b[K", (m_topMargin)+t, 1);
             stringBuilder += capture;
         }
     }
@@ -102,23 +91,27 @@ void LinkList::drawVectorList(unsigned long page, unsigned long list)
     // Now Grab as many lines as will fit in the box
     for(int i = 1; i < boxsize+1; i++)
     {
-        if(((boxsize*currentPage)+i)-1 >= (signed)listing.size())
+        if(((boxsize*m_currentPage)+i)-1 >= (signed)m_listing.size())
             break;
 
         // If Area has new message rotate output to new light bars.
-        if((signed)list+1 == (boxsize*currentPage)+i)
+        if((signed)list+1 == (boxsize*m_currentPage)+i)
         {
-            currentSelection = topMargin+i-1; // Get current place in box to display.
-            sprintf(capture, "\x1b[%i;%iH%s", topMargin+i-1, 1, (char *)listing[((boxsize*currentPage)+i)-1].ansiString2.c_str());
+            m_currentSelection = m_topMargin+i-1; // Get current place in box to display.
+            sprintf(capture, "\x1b[%i;%iH%s", m_topMargin+i-1, 1,
+                (char *)m_listing[((boxsize*m_currentPage)+i)-1]
+                    .ansiString2.c_str());
         }
         else
         {
-            sprintf(capture, "\x1b[%i;%iH%s", topMargin+i-1, 1, (char *)listing[((boxsize*currentPage)+i)-1].ansiString1.c_str());
+            sprintf(capture, "\x1b[%i;%iH%s", m_topMargin+i-1, 1,
+                (char *)m_listing[((boxsize*m_currentPage)+i)-1]
+                    .ansiString1.c_str());
         }
         stringBuilder += capture;
     }
     // Write out Box.
-    sprintf(capture, "\x1b[%i;%iH", currentRow+topMargin-1, 1);
+    sprintf(capture, "\x1b[%i;%iH", m_currentRow+m_topMargin-1, 1);
     stringBuilder += capture;
-    MenuFunction::sequenceToAnsi((char *)stringBuilder.c_str());
+    MenuFunction::sequenceToAnsi(stringBuilder);
 }

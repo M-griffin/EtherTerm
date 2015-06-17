@@ -7,6 +7,8 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
+#include "screenBuffer.hpp"
+
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
 #elif _WIN32
@@ -19,15 +21,16 @@
 #include <string>
 #include <vector>
 
-class AnsiParser
+class SequenceParser :
+    public ScreenBuffer
 {
 public:
 
-    static AnsiParser* Instance()
+    static SequenceParser* Instance()
     {
-        if(globalInstance == 0)
+        if(!globalInstance)
         {
-            globalInstance = new AnsiParser();
+            globalInstance = new SequenceParser();
         }
         return globalInstance;
     }
@@ -35,36 +38,13 @@ public:
     // Release And Clear the Singleton
     static void ReleaseInstance()
     {
-        if(globalInstance != 0)
+        if(globalInstance)
         {
             delete globalInstance;
-            globalInstance = 0;
+            globalInstance = nullptr;
         }
         return;
     }
-
-    // Holds Screen Buffer Structure
-    // We want each character as a string for multi-byte UTF8 characters.
-    struct myScreen
-    {
-        myScreen();
-        myScreen(std::string sequence, SDL_Color fg, SDL_Color bg);
-        std::string characterSequence;
-        SDL_Color foreground;
-        SDL_Color background;
-    };
-
-    // Screen Array.
-    myScreen sequenceBuffer;
-    std::vector<myScreen> screenBuffer;
-
-    // Function for populating the Screen Buffer
-    void setScreenBuffer(std::string mySequence);
-    void scrollScreenBuffer();
-    void clearScreenBufferRange(int start, int end);
-    void clearScreenBuffer();
-    void getScreenBufferText();
-    void bufferToClipboard(int startx, int starty, int numChar, int numRows);
 
     const  char ESC   = '\x1b';
     // This needs to be passed from TheTerminal instance eventually
@@ -109,9 +89,6 @@ public:
     ESC [ 25 l     Hide text cursor.
     */
 
-    int  x_position;
-    int  y_position;
-
     // Handles Character Repeats.
     unsigned char preceedingSequence;
 
@@ -146,15 +123,17 @@ public:
         BG_CYAN            = 46,
         BG_WHITE           = 47
     };
+
     // Reset Static Variables values for the class
     void reset();
     // Parses Straight Text input with no control sequences
-    void textInput(std::string buffer);
+    void textInput(const std::string &buffer);
     // Parses Control sequences passed in vector. (sequenceParser)
     void sequenceCursorAndDisplay();
     void sequenceGraphicsModeDisplay();
     void sequenceResetAndResponses();
-    void sequenceInput(std::vector<int> sequenceParameters);
+    // Handles Browk Down ESC Sequences.
+    void sequenceInput(std::vector<int> &sequenceParameters);
 
     bool isCursorActive()
     {
@@ -172,8 +151,6 @@ private:
     std::string textBuffer;
 
     int max_x_position;
-    int characters_per_line;
-    int position;
     int saved_cursor_x;
     int saved_cursor_y;
     int saved_attribute;
@@ -188,14 +165,14 @@ private:
     SDL_Color savedForegroundColor;
     SDL_Color savedBackgroundColor;
 
-    AnsiParser();
-    ~AnsiParser();
-    AnsiParser(const AnsiParser&);
-    AnsiParser& operator=(const AnsiParser&);
+    SequenceParser();
+    ~SequenceParser();
+    SequenceParser(const SequenceParser&);
+    SequenceParser& operator=(const SequenceParser&);
 
-    static AnsiParser* globalInstance;
+    static SequenceParser* globalInstance;
 };
 
-typedef AnsiParser TheAnsiParser;
+typedef SequenceParser TheSequenceParser;
 
 #endif

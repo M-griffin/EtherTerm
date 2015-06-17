@@ -24,7 +24,7 @@
 #endif
 #endif
 
-#include "termStateMachine.h"
+#include "termStateMachine.hpp"
 #include <vector>
 
 class Terminal
@@ -33,21 +33,21 @@ public:
 
     static Terminal* Instance()
     {
-        if(globalInstance == 0)
+        if(!m_globalInstance)
         {
-            globalInstance = new Terminal();
-            return globalInstance;
+            m_globalInstance = new Terminal();
+            return m_globalInstance;
         }
-        return globalInstance;
+        return m_globalInstance;
     }
 
     // Release And Clear the Singleton
     static void ReleaseInstance()
     {
-        if(globalInstance != 0)
+        if(m_globalInstance)
         {
-            delete globalInstance;
-            globalInstance = 0;
+            delete m_globalInstance;
+            m_globalInstance = nullptr;
         }
         return;
     }
@@ -63,23 +63,23 @@ public:
 
     void setProgramPath(std::string _programPath)
     {
-        programPath = _programPath;
+        m_programPath = _programPath;
     }
     std::string getProgramPath() const
     {
-        return programPath;
+        return m_programPath;
     }
     SDL_Renderer* getRenderer() const
     {
-        return globalRenderer;
+        return m_globalRenderer;
     }
     SDL_Window* getWindow()   const
     {
-        return globalWindow;
+        return m_globalWindow;
     }
     TermStateMachine* getStateMachine()
     {
-        return globalTermStateMachine;
+        return m_globalTermStateMachine;
     }
 
     // Holds current connection
@@ -98,75 +98,75 @@ public:
 
     SystemConnection getSystemConnection() const
     {
-        return systemConnection;
+        return m_systemConnection;
     }
-    void setSystemConnection(SystemConnection _systemConnection)
+    void setSystemConnection(SystemConnection systemConnection)
     {
-        systemConnection = _systemConnection;
+        m_systemConnection = systemConnection;
     }
     void clearSystemConnection()
     {
-        systemConnection.name.erase();
-        systemConnection.ip.erase();
-        systemConnection.port=0;
-        systemConnection.protocol.erase();
-        systemConnection.login.erase();
-        systemConnection.password.erase();
-        systemConnection.font.erase();
-        systemConnection.keyMap.erase();
+        m_systemConnection.name.erase();
+        m_systemConnection.ip.erase();
+        m_systemConnection.port=0;
+        m_systemConnection.protocol.erase();
+        m_systemConnection.login.erase();
+        m_systemConnection.password.erase();
+        m_systemConnection.font.erase();
+        m_systemConnection.keyMap.erase();
     }
 
     bool running()
     {
-        return isRunning;
+        return m_isRunning;
     }
     void quit()
     {
-        isRunning = false;
+        m_isRunning = false;
     }
     int getSurfaceWidth() const
     {
-        return surfaceWidth;
+        return m_surfaceWidth;
     }
     int getSurfaceHeight() const
     {
-        return surfaceHeight;
+        return m_surfaceHeight;
     }
     void setWindowWidth(int width)
     {
-        windowWidth = width;
+        m_windowWidth = width;
     }
     void setWindowHeight(int height)
     {
-        windowHeight = height;
+        m_windowHeight = height;
     }
     int getWindowWidth() const
     {
-        return windowWidth;
+        return m_windowWidth;
     }
     int getWindowHeight() const
     {
-        return windowHeight;
+        return m_windowHeight;
     }
     bool changingState()
     {
-        return isChangingState;
+        return m_isChangingState;
     }
     void changingState(bool cs)
     {
-        isChangingState = cs;
+        m_isChangingState = cs;
     }
     void setCurrentFont(std::string font)
     {
-        currentFont = font;
+        m_currentFont = font;
     }
     std::string getCurrentFont() const
     {
-        return currentFont;
+        return m_currentFont;
     }
     bool didFontChange() const
     {
-        return (currentFont != previousFont);
+        return (m_currentFont != m_previousFont);
     }
 
 
@@ -211,63 +211,64 @@ public:
 
     std::vector<std::string> getFontFiles()
     {
-        return globalFontFiles;
+        return m_globalFontFiles;
     }
 
     // Matched Colors with Pablo Draw.
-    SDL_Color black;
-    SDL_Color blue;
-    SDL_Color green;
-    SDL_Color cyan;
-    SDL_Color red;
-    SDL_Color magenta;
-    SDL_Color brown;
+    SDL_Color BLACK;
+    SDL_Color BLUE;
+    SDL_Color GREEN;
+    SDL_Color CYAN;
+    SDL_Color RED;
+    SDL_Color MAGENTA;
+    SDL_Color BROWN;
 
-    SDL_Color grey;
-    SDL_Color darkGrey;
-    SDL_Color lightBlue;
-    SDL_Color lightGreen;
-    SDL_Color lightCyan;
-    SDL_Color lightRed;
-    SDL_Color lightMagenta;
-    SDL_Color yellow;
-    SDL_Color white;
+    SDL_Color GREY;
+    SDL_Color DARK_GREY;
+    SDL_Color LIGHT_BLUE;
+    SDL_Color LIGHT_GREEN;
+    SDL_Color LIGHT_CYAN;
+    SDL_Color LIGHT_RED;
+    SDL_Color LIGHT_MAGENTA;
+    SDL_Color YELLOW;
+    SDL_Color WHITE;
 
-    SDL_Color currentFGColor;
-    SDL_Color currentBGColor;
+    SDL_Color m_currentFGColor;
+    SDL_Color m_currentBGColor;
 
     // Scrolling Region
-    bool scrollRegionActive;
-    int  topMargin;
-    int  bottomMargin;
+    bool m_scrollRegionActive;
+    int  m_topMargin;
+    int  m_bottomMargin;
 
 private:
 
-    SystemConnection systemConnection;
-    std::string    programPath;
-    std::string    windowTitle;
-    std::string    currentFont;
-    std::string    previousFont;
+    SystemConnection m_systemConnection;
+    std::string    m_programPath;
+    std::string    m_windowTitle;
+    std::string    m_currentFont;
+    std::string    m_previousFont;
 
-    SDL_Window*    globalWindow;
-    SDL_Renderer*  globalRenderer;
+    SDL_Window*    m_globalWindow;
+    SDL_Renderer*  m_globalRenderer;
 
     // Surfaces
-    SDL_Surface*   tmpSurface;        // Char Cell
-    SDL_Surface*   cursorOnSurface;   // Char Cell for the cursor.
-    SDL_Surface*   cursorOffSurface;  // Char Cell for the cursor.
-    SDL_Surface*   screenSurface;     // Internal Screen Buffer
-    SDL_Surface*   bottomSurface;     // Last Line Buffer
-    SDL_Surface*   cachedSurface;    // Cached Font Surface
+    SDL_Surface*   m_tmpSurface;        // Char Cell
+    SDL_Surface*   m_cursorOnSurface;   // Char Cell for the cursor.
+    SDL_Surface*   m_cursorOffSurface;  // Char Cell for the cursor.
+    SDL_Surface*   m_screenSurface;     // Internal Screen Buffer
+    SDL_Surface*   m_bottomSurface;     // Last Line Buffer
+    SDL_Surface*   m_cachedSurface;    // Cached Font Surface
 
     // Textures
-    SDL_Texture*   globalTexture;     // Texture for User Screen
-    SDL_Texture*   selectionTexture;  // For Copy Text Selection
+    SDL_Texture*   m_globalTexture;     // Texture for User Screen
+    SDL_Texture*   m_selectionTexture;  // For Copy Text Selection
 
-    std::vector<SDL_Surface *> surfaceList;
+    std::vector<SDL_Surface *> m_surfaceList;
 
     // Handle Surface Alias
-    enum {
+    enum
+    {
         TEMP_SURFACE = 0,
         CURSOR_ON_SURFACE,
         CURSOR_OFF_SURFACE,
@@ -277,7 +278,8 @@ private:
     };
 
     // Handle Texture Alias
-    enum {
+    enum
+    {
         GLOBAL_TEXTURE = 0,
         SELECTION_TEXTURE
     };
@@ -286,29 +288,32 @@ private:
     TTF_Font*      trueTypeFont;      // UTF-8 Fonts.
 #endif
 
-    TermStateMachine* globalTermStateMachine;
-    Uint32 redMask, greenMask, blueMask, alphaMask;
+    TermStateMachine* m_globalTermStateMachine;
+    Uint32 m_redMask,
+           m_greenMask,
+           m_blueMask,
+           m_alphaMask;
 
-    int surfaceWidth;
-    int surfaceHeight;
-    int windowWidth;
-    int windowHeight;
-    int surfaceBits;
+    int m_surfaceWidth;
+    int m_surfaceHeight;
+    int m_windowWidth;
+    int m_windowHeight;
+    int m_surfaceBits;
 
-    SDL_Rect displayRect;
-    SDL_Rect rectBackground;
+    SDL_Rect m_displayRect;
+    SDL_Rect m_rectBackground;
 
-    int  characterWidth;
-    int  characterHeight;
-    int  cursorXPosition;
-    int  cursorYPosition;
+    int  m_characterWidth;
+    int  m_characterHeight;
+    int  m_cursorXPosition;
+    int  m_cursorYPosition;
 
-    bool isChangingState;
-    bool isRunning;
-    bool isUTF8Output;
+    bool m_isChangingState;
+    bool m_isRunning;
+    bool m_isUTF8Output;
 
-    static Terminal* globalInstance;
-    std::vector<std::string> globalFontFiles;
+    static Terminal* m_globalInstance;
+    std::vector<std::string> m_globalFontFiles;
 
     Terminal();
     ~Terminal();

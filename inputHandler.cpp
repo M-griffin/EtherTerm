@@ -5,25 +5,25 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "inputHandler.h"
-#include "socketHandler.h"
-#include "ansiParser.h"
-#include "terminal.h"
+#include "inputHandler.hpp"
+#include "socketHandler.hpp"
+#include "sequenceParser.hpp"
+#include "terminal.hpp"
 
 #include <iostream>
 #include <string>
 
-InputHandler* InputHandler::globalInstance = 0;
+InputHandler* InputHandler::m_globalInstance = nullptr;
 
 InputHandler::InputHandler() :
-    globalShutdown(false),
-    isWindowMode(false),
-    fullScreenWindowSize(0),
-    isMouseSelected(false),
-    mouseSourceXPosition(0),
-    mouseSourceYPosition(0),
-    mouseReleaseXPosition(0),
-    mouseReleaseYPosition(0)
+    m_globalShutdown(false),
+    m_isWindowMode(false),
+    m_isMouseSelected(false),
+    m_mouseSourceXPosition(0),
+    m_mouseSourceYPosition(0),
+    m_mouseReleaseXPosition(0),
+    m_mouseReleaseYPosition(0),
+    m_fullScreenWindowSize(0)
 {
     SDL_StartTextInput();
 }
@@ -102,7 +102,7 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_CLOSE:
-            globalShutdown = true;
+            m_globalShutdown = true;
             SDL_Log("Window %d closed by user!", event.window.windowID);
             break;
 
@@ -153,20 +153,20 @@ void InputHandler::handleMouseButtonUpEvent(SDL_Event &event)
     //If the left mouse button was released
     if(event.button.button == SDL_BUTTON_LEFT)
     {
-        isMouseSelected = false;
+        m_isMouseSelected = false;
         // Get the mouse offsets
-        mouseReleaseXPosition = event.button.x;
-        mouseReleaseYPosition = event.button.y;
+        m_mouseReleaseXPosition = event.button.x;
+        m_mouseReleaseYPosition = event.button.y;
 
         // Clear the screen of the selection box.
         TheTerminal::Instance()->drawTextureScreen();
         // Copy Selected Text to Clipboard. Make sure click
         // in window with no movement is not considered a selection
-        if(mouseReleaseXPosition != mouseSourceXPosition &&
-                mouseReleaseYPosition != mouseSourceYPosition)
+        if(m_mouseReleaseXPosition != m_mouseSourceXPosition &&
+                m_mouseReleaseYPosition != m_mouseSourceYPosition)
         {
             TheTerminal::Instance()->pullSelectionBuffer(
-                mouseReleaseXPosition, mouseReleaseYPosition);
+                m_mouseReleaseXPosition, m_mouseReleaseYPosition);
         }
         // Needed for Windows Full Screen Mode Switches, otherwise it doesn't
         // Repopulate properly.  Clear so texture is refreshed each selection
@@ -178,7 +178,7 @@ void InputHandler::handleMouseButtonUpEvent(SDL_Event &event)
 void InputHandler::handleMouseMotionEvent(SDL_Event &event)
 {
     if(event.button.button == SDL_BUTTON_LEFT
-            && isMouseSelected)
+            && m_isMouseSelected)
     {
         /* debugging
         std::cout << "Mouse moved by: "
@@ -199,16 +199,16 @@ bool InputHandler::handleMouseButtonDownEvent(SDL_Event &event)
     if(event.button.button == SDL_BUTTON_LEFT)
     {
         //Get the mouse offsets
-        mouseSourceXPosition = event.button.x;
-        mouseSourceYPosition = event.button.y;
+        m_mouseSourceXPosition = event.button.x;
+        m_mouseSourceYPosition = event.button.y;
 
         //std::cout << "Mouse pressed at: " << mouseSourceXPosition << ","
         //    << mouseSourceYPosition << std::endl;
 
         // Fix for clicking on title bar, 0 pixels will not register
         // for text selection
-        if(mouseSourceXPosition > 0 && mouseSourceYPosition > 0)
-            isMouseSelected = true;
+        if(m_mouseSourceXPosition > 0 && m_mouseSourceYPosition > 0)
+            m_isMouseSelected = true;
 
         //SDL_Log("SDL_MOUSEBUTTONDOWN %d shown", event.button.button);
         return false;
@@ -219,16 +219,16 @@ bool InputHandler::handleMouseButtonDownEvent(SDL_Event &event)
     {
         std::cout << "Paste Clipboard. " << std::endl;
         SDL_StartTextInput();
-        inputText = SDL_GetClipboardText();
+        m_inputText = SDL_GetClipboardText();
         // Some input filtering
         std::string::size_type id1 = 0;
         while(1)
         {
             // Replace \r\n with \r
-            id1 = inputText.find("\r\n", 0);
+            id1 = m_inputText.find("\r\n", 0);
             if(id1 != std::string::npos)
             {
-                inputText.erase(id1+1,1);
+                m_inputText.erase(id1+1,1);
             }
             else break;
         }
@@ -237,24 +237,24 @@ bool InputHandler::handleMouseButtonDownEvent(SDL_Event &event)
             // Replace Tabs with (4) Spaces.
             // Need Toggle in INI for \t or 4 spaces
             // On Paste, not all systems handle \t.
-            id1 = inputText.find("\t", 0);
+            id1 = m_inputText.find("\t", 0);
             if(id1 != std::string::npos)
             {
-                inputText.replace(id1,1,"    ");
+                m_inputText.replace(id1,1,"    ");
             }
             else break;
         }
         while(1)
         {
             // Change \n to \r
-            id1 = inputText.find("\n", 0);
+            id1 = m_inputText.find("\n", 0);
             if(id1 != std::string::npos)
             {
-                inputText[id1] = '\r';
+                m_inputText[id1] = '\r';
             }
             else break;
         }
-        setInputSequence(inputText);
+        setInputSequence(m_inputText);
         return true;
     }
     return false;
@@ -292,7 +292,7 @@ bool InputHandler::handleControlKeys(SDL_Event &event)
             (event.key.keysym.sym <= (Uint16)'z'))
     {
         // Translate Letter to CTRL Letter value
-        ch = CTRLKEYTABLE[ch-97];
+        ch = CTRL_KEY_TABLE[ch-97];
         sequence = ch;
         setInputSequence(sequence);
         return true;
@@ -311,7 +311,7 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
 
         case SDLK_RETURN:
             // If not Full Screen Then Toggle to Next Mode.
-            if(!isWindowMode)
+            if(!m_isWindowMode)
             {
                 //TheTerminal::Instance()->setWindowWidth(640);
                 //TheTerminal::Instance()->setWindowHeight(400);
@@ -331,8 +331,8 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
                 SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(), SDL_WINDOW_FULLSCREEN_DESKTOP);
 #endif
                 SDL_Log("Setting window to FULLSCREEN.");
-                isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
-                fullScreenWindowSize = 0;
+                m_isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
+                m_fullScreenWindowSize = 0;
                 TheTerminal::Instance()->clearScreen();
                 SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
                 TheTerminal::Instance()->drawTextureScreen();
@@ -352,7 +352,7 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
                 }
 
                 //Toggle Between Window Sizes.
-                switch(fullScreenWindowSize)
+                switch(m_fullScreenWindowSize)
                 {
                         // Texture Filtering OFF.
                         // These (2) Resolutions work perfect for 8x16 fonts
@@ -375,7 +375,7 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
                         SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
                         TheTerminal::Instance()->drawTextureScreen();
                         SDL_Log("Setting window size to 640 x 400.");
-                        ++fullScreenWindowSize;
+                        ++m_fullScreenWindowSize;
                         break;
 
                     case 1:
@@ -392,8 +392,8 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
                         SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
                         TheTerminal::Instance()->drawTextureScreen();
                         SDL_Log("Setting window size to 1280 x 800.");
-                        ++fullScreenWindowSize;
-                        isWindowMode = false;
+                        ++m_fullScreenWindowSize;
+                        m_isWindowMode = false;
                         break;
                 }
                 return false;
@@ -1084,7 +1084,7 @@ bool InputHandler::update()
 
             case SDL_MOUSEMOTION:
                 handleMouseMotionEvent(event);
-                break;            
+                break;
 
             case SDL_KEYDOWN:
                 return handleKeyDownEvents(event);

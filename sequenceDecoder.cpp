@@ -1,52 +1,34 @@
-/* Terminal Control Sequence Parser
- * (c) Michael Griffin <mrmisticismo@hotmail.com>
- * 12/27/2014
- * Runs through passed string data to parse text and control sequences
- * Handle the most basic terminal and a majority of Xterm Control Sequences.
- * Window Text and String sequences are not handeled.
- *
- * The job of this class is to seperate text and control sequences,
- * When control sequences are present they are parameterized into a vector
- * with the sequence terminator as the first parameter and following
- * paramerters incrimented to the next slot in the vector.
- *
- * ex.. ESC[0;21;30m would be broken up into:
- * [0] m
- * [1] 0
- * [2] 21
- * [3] 30
- *
- * Then passed to the Screen Parser for drawing to the screen.
- */
 
-#include "sequenceParser.h"
-#include "ansiParser.h"
-#include "terminal.h"
+// EtherTerm SVN: $Id$
+// Source: $HeadURL$
+// $LastChangedDate$
+// $LastChangedRevision$
+// $LastChangedBy$
+
+#include "sequenceDecoder.hpp"
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <sstream>
 
-// Init the Global Instance
-SequenceParser* SequenceParser::globalInstance = 0;
-
 // Initialize Class Variables
-SequenceParser::SequenceParser() :
-    sequenceState(SEQ_NORMAL),
-    sequence(0),
-    parameter(0),
-    foundSequence(false),
-    foundParameters(false),
-    invalidSequence(false),
-    sequenceCompleted(false),
-    sequenceLevel(0)
-    { }
+SequenceDecoder::SequenceDecoder() :
+    m_sequenceState(SEQ_NORMAL),
+    m_sequence(0),
+    m_parameter(0),
+    m_foundSequence(false),
+    m_foundParameters(false),
+    m_isInvalidSequence(false),
+    m_isSequenceCompleted(false),
+    m_sequenceLevel(0)
+{ }
 
-SequenceParser::~SequenceParser()
+SequenceDecoder::~SequenceDecoder()
 {
-    std::vector<int>().swap(params); // Clear
-    std::cout << "SequenceParser Released" << std::endl;
+    std::vector<int>().swap(m_sequenceParams);   // Clear Parameters
+    m_messageQueue.clear();               // Clear Message Structure
+    m_sequenceQueue.clear();              // Clear Any Remaining Data.
 }
 
 /*
@@ -54,14 +36,14 @@ SequenceParser::~SequenceParser()
  * Supported in Xterm that a server might send.
  * Switch Statement catches the Start of a Valid Sequence.
  */
-void SequenceParser::processLevel0()
+void SequenceDecoder::processSequenceLevel0()
 {
-    switch (sequence)
+    switch(m_sequence)
     {
         case '[': // Control Sequence Introduction ( CSI is 0x9b).
             break;
 
-        // Xterm Sequences Not implemented, pass through
+            // Xterm Sequences Not implemented, pass through
         case ' ':
             //ESC SP F 7-bit controls (S7C1T).
             //ESC SP G 8-bit controls (S8C1T).
@@ -104,7 +86,7 @@ void SequenceParser::processLevel0()
             // Set/Reset Modes
             // Invalid, should have CSI = ESC[ preceding ?
 
-        // Xterm C1 (8-Bit) Control Characters
+            // Xterm C1 (8-Bit) Control Characters
         case 'D':  // Index ( IND is 0x84).
         case 'E':  // Next Line ( NEL is 0x85).
         case 'H':  // Tab Set ( HTS is 0x88).
@@ -153,15 +135,15 @@ void SequenceParser::processLevel0()
         case '~':  // ESC ~ Invoke the G1 Character Set as GR (LS1R).
         case '\0':   // Catch any NULL characters after ESC
         case '\x1b': // catch any double ESC's from bad servers
-            invalidSequence = true;
+            m_isInvalidSequence = true;
             break;
 
         default:
             // Nothing Matched, Shouldn't get here.
-            invalidSequence = true;
+            m_isInvalidSequence = true;
 #ifdef _DEBUG
             std::cout << "CSI parser exception: received ESC: "
-                << sequence <<  std::endl;
+                      << m_sequence <<  std::endl;
 #endif
             break;
     }
@@ -175,30 +157,29 @@ void SequenceParser::processLevel0()
  * Any non-supported sequences can have certain characters after the CSI
  * and These are parsed so that they are skipped and marked Invalid.
  */
- void SequenceParser::processLevel1()
+void SequenceDecoder::processSequenceLevel1()
 {
     // If we get here, only valid Sequences are ESC [ Then next Character.
     // First Check for Parameters in Sequence
-    if (std::isdigit(sequence)) // Mark for Parameter
+    if(std::isdigit(m_sequence))  // Mark for Parameter
     {
         // Continue to next sequence
 #ifdef _DEBUG
-        std::cout << "Is a Number: " << sequence << std::endl;
+        std::cout << "Is a Number: " << m_sequence << std::endl;
 #endif
         return;
     }
-    else
-    if (sequence == ';') // Mark for Multi-Parameter
+    else if(m_sequence == ';') // Mark for Multi-Parameter
     {
         // Continue to Next Sequence
 #ifdef _DEBUG
-        std::cout << "Is a Separator: " << sequence << std::endl;
+        std::cout << "Is a Separator: " << m_sequence << std::endl;
 #endif
         return;
     }
 
     // Catch Valid ESC Sequence Terminators.
-    switch (sequence)
+    switch(m_sequence)
     {
         case '@': // Insert P s (Blank) Character(s) (default = 1) (ICH).
         case 'A': // Cursor Up P s Times (default = 1) (CUU)
@@ -513,7 +494,7 @@ void SequenceParser::processLevel0()
             //P n = 0 ← STP flags.
         case '!':  // Soft terminal reset (DECSTR).
             // Valid Sequences Ended.
-            sequenceCompleted = true;
+            m_isSequenceCompleted = true;
             break;
 
             // Unsupported Text and Keyboard Modifiers.
@@ -522,21 +503,21 @@ void SequenceParser::processLevel0()
         case '$':
         case '"':
         case '*':
-            invalidSequence = true;
+            m_isInvalidSequence = true;
             break;
 
         case '?': // -- Switch to next sequenceLevel
-                  // Ie.. handle ESC[?7h, ESC[?7l, and other ? DEC Sequences.
-                  // These Sequences DEC Level Sequences and need extra Parsing.
+            // Ie.. handle ESC[?7h, ESC[?7l, and other ? DEC Sequences.
+            // These Sequences DEC Level Sequences and need extra Parsing.
         case ' ': // Need to Precheck SyncTerm Font switching ' D' Space D.
-            ++sequenceLevel;
+            ++m_sequenceLevel;
             break;
         default:
             // Nothing Matched, Shouldn't get here.
-            invalidSequence = true;
+            m_isInvalidSequence = true;
 #ifdef _DEBUG
             std::cout << "CSI parser exception: received ESC: "
-                << sequence <<  std::endl;
+                      << m_sequence <<  std::endl;
 #endif
             break;
     }
@@ -553,44 +534,43 @@ void SequenceParser::processLevel0()
  * Any non-supported sequences can have certain characters after the CSI
  * and These are parsed so that they are skipped and marked Invalid.
  */
-void SequenceParser::processLevel2()
+void SequenceDecoder::processSequenceLevel2()
 {
     // If the last addition to sequence is a space and we are now here.
     // The only valid terminator = 'D' for Sycnterm Font Switching.
 #ifdef _DEBUG
-    std::cout << "bad sequence check: '" << sequenceBuilder[sequenceBuilder.size()-2] << "' " << sequence << std::endl;
+    std::cout << "bad sequence check: '" << m_sequenceBuilder[m_sequenceBuilder.size()-2] << "' " << m_sequence << std::endl;
 #endif
-    if (sequenceBuilder[sequenceBuilder.size()-2] == ' ' && sequence != 'D')
+    if(m_sequenceBuilder[m_sequenceBuilder.size()-2] == ' ' && m_sequence != 'D')
     {
 #ifdef _DEBUG
-    std::cout << "Invalid space found in sequence!" << std::endl;
+        std::cout << "Invalid space found in sequence!" << std::endl;
 #endif
-        invalidSequence = true;
+        m_isInvalidSequence = true;
         return;
     }
 
     // If we get here, only valid Sequences are ESC [ Then next Character.
     // First Check for Parameters in Sequence
-    if (std::isdigit(sequence)) // Mark for Parameter
+    if(std::isdigit(m_sequence))  // Mark for Parameter
     {
         // Continue to next sequence
 #ifdef _DEBUG
-        std::cout << "Is a Number: " << sequence << std::endl;
+        std::cout << "Is a Number: " << m_sequence << std::endl;
 #endif
         return;
     }
-    else
-    if (sequence == ';') // Mark for Multi-Parameter
+    else if(m_sequence == ';') // Mark for Multi-Parameter
     {
         // Continue to Next Sequence
 #ifdef _DEBUG
-        std::cout << "Is a Separator: " << sequence << std::endl;
+        std::cout << "Is a Separator: " << m_sequence << std::endl;
 #endif
         return;
     }
 
     // Catch Valid ESC Sequence Terminators.
-    switch (sequence)
+    switch(m_sequence)
     {
         case 'D':
             // SyncTerm Font Switching Sequences
@@ -598,7 +578,7 @@ void SequenceParser::processLevel2()
             // If a space is found, the sequence is passed from the previous level.
             // ESC [0;0 D
 
-        // First we are catching DEC Style ESC[? Parameters here.
+            // First we are catching DEC Style ESC[? Parameters here.
         case 'J':
             // Erase in Display (ED). - DECSED has ESC[?J
             //P s = 0 → Erase Below (default).
@@ -770,7 +750,7 @@ void SequenceParser::processLevel2()
         case 's':  // Save DEC Private Mode Values. P s values are the same as for DECSET.
         case '!':  // Soft terminal reset (DECSTR).
             // Valid Sequences Ended.
-            sequenceCompleted = true;
+            m_isSequenceCompleted = true;
             break;
 
             // Unsupported Text and Keyboard Modifiers.
@@ -780,42 +760,28 @@ void SequenceParser::processLevel2()
         case '"':
         case '*':
         case ' ':
-            invalidSequence = true;
+            m_isInvalidSequence = true;
             break;
 
         default:
             // Nothing Matched, Shouldn't get here.
-            invalidSequence = true;
+            m_isInvalidSequence = true;
 #ifdef _DEBUG
             std::cout << "CSI parser exception: received ESC: "
-                << sequence << std::endl;
+                      << m_sequence << std::endl;
 #endif
             break;
     }
 }
 
 /*
- * Validate Complete ESC Control Sequences
- * Break up the parameters into a Vector
- * For easier pre-parsing of Screen Display.
+ * Handle SyncTerm Font Change Sequences
  */
-void SequenceParser::validateSequence()
+void SequenceDecoder::handleFontChangeSequences()
 {
-#ifdef _DEBUG
-    std::cout << "Validate Sequence: " << sequenceBuilder << std::endl;
-#endif
-    int sequenceTerminator = 0;
-
-    // Check and clear vector for fresh sequence
-    // We only Validate on complete sequences, so we can clear here
-    // to make sure each run.
-    if (params.size() > 0)
-        std::vector<int>().swap(params);
-
-    // Handle SyncTerm Font Switching sequences here.
-    // Makes it quicker to no go through extra parsing.
-    // Default CP437 VGA8x16
-
+    /* Actual Font Switching should not be done in the Decoder!.
+     *
+     *
     if (sequenceBuilder == "\x1b[0;0 D")
     {
         std::cout << std::endl << "Switched to CP437 Font" << std::endl;
@@ -881,38 +847,63 @@ void SequenceParser::validateSequence()
     //    sequenceState = SEQ_NORMAL; // Reset to pass-through
     //    return;
     }
+    */
+}
+/*
+ * Validate Complete ESC Control Sequences
+ * Break up the parameters into a Vector
+ * For decoding of Screen Display.
+ */
+void SequenceDecoder::validateSequence()
+{
+#ifdef _DEBUG
+    std::cout << "Validate Sequence: " << m_sequenceBuilder << std::endl;
+#endif
+    int sequenceTerminator = 0;
+
+    // Check and clear vector for fresh sequence
+    // We only Validate on complete sequences, so we can clear here
+    // to make sure each run.
+    if(m_sequenceParams.size() > 0)
+        std::vector<int>().swap(m_sequenceParams);
+
+    // Handle SyncTerm Font Switching sequences here.
+    // Makes it quicker to no go through extra parsing.
+    // Default CP437 VGA8x16
+    handleFontChangeSequences();
 
 #ifdef _DEBUG
-    std::cout << "Params Size(): " << params.size() << std::endl;
+    std::cout << "Params Size(): " << m_sequenceParams.size() << std::endl;
 #endif
     // If we get there, we have full CSI with possible ; ; separators.
     try
     {
-        sequenceBuilder.erase(0,2);                      // Remove ESC [
-        sequenceTerminator =                            // Get Terminator
-            sequenceBuilder[sequenceBuilder.size()-1];
+        // Remove ESC [ then get Terminator
+        m_sequenceBuilder.erase(0,2);
+        sequenceTerminator =
+            m_sequenceBuilder[m_sequenceBuilder.size()-1];
 
         // First Parameter is always the Sequence Terminator.
-        params.push_back(sequenceTerminator);
+        m_sequenceParams.push_back(sequenceTerminator);
 
         // Remove Sequence Terminator from string to text for parameters.
-        sequenceBuilder.erase(sequenceBuilder.size()-1,1);
+        m_sequenceBuilder.erase(m_sequenceBuilder.size()-1,1);
     }
-    catch (std::exception e)
+    catch(std::exception &e)
     {
         std::cout << "Exception removing ESC and Terminator Sequences: "
-            << e.what() << std::endl;
+                  << e.what() << std::endl;
     }
 
     // Split String by ';' character to separate parameters if it exists.
-    if (sequenceBuilder.size() == 0)
+    if(m_sequenceBuilder.empty())
     {
         // We have no parameters, just terminator for single sequence.
 #ifdef _DEBUG
         std::cout << "No params Vector: " << std::endl;
         int ii = 1;
         std::vector<int>::iterator it;
-        for(it = params.begin(); it != params.end(); ++it)
+        for(it = m_sequenceParams.begin(); it != m_sequenceParams.end(); ++it)
         {
             std::cout << ii++ << " " << *it << " " << static_cast<char>(*it) << std::endl;
         }
@@ -921,10 +912,10 @@ void SequenceParser::validateSequence()
     }
 
     // If we have a parameter separator, then tokenize the parameters.
-    std::string::size_type result = sequenceBuilder.find(";",0);
-    if (result != std::string::npos)
+    std::string::size_type result = m_sequenceBuilder.find(";",0);
+    if(result != std::string::npos)
     {
-        std::istringstream inStream(sequenceBuilder);
+        std::istringstream inStream(m_sequenceBuilder);
         std::istringstream tokenStream;
         std::string token;
 
@@ -937,7 +928,7 @@ void SequenceParser::validateSequence()
         while(std::getline(inStream, token, ';'))
         {
             tokenStream.clear();
-            if (token.size() == 0)
+            if(token.size() == 0)
             {
 #ifdef _DEBUG
                 std::cout << "Empty " << std::flush;
@@ -948,46 +939,46 @@ void SequenceParser::validateSequence()
             std::cout << ii++ << " " << "Token: " << token << std::endl;
 #endif
             tokenStream.str(token);                   // Token to Stream
-            if ((tokenStream >> parameter).fail())    // String to Int
+            if((tokenStream >> m_parameter).fail())   // String to Int
             {
                 // Skip this character.
                 std::cout << "Exception String to Int Parameter Failure."
-                    << std::endl;
+                          << std::endl;
                 continue;
             }
-            params.push_back(parameter); // Add to Parameters Vector.
+            m_sequenceParams.push_back(m_parameter); // Add to Parameters Vector.
         }
     }
     else
     {
         // First check for ? DEC Sequence Starter
-        if (sequenceBuilder[0] == '?')
+        if(m_sequenceBuilder[0] == '?')
         {
 #ifdef _DEBUG
             std::cout << "removing ? from sequence" << std::endl;
 #endif
             try
             {
-                params.push_back('?');      // Add to Parameters Vector.
-                sequenceBuilder.erase(0,1); // Remove ?
+                m_sequenceParams.push_back('?');  // Add to Parameters Vector.
+                m_sequenceBuilder.erase(0,1);     // Remove ?
             }
-            catch (std::exception e)
+            catch(std::exception &e)
             {
                 std::cout << "Exception removing ? sequence starter: "
-                    << e.what() << std::endl;
+                          << e.what() << std::endl;
             }
         }
         // No separator, translate the 1-3 digit code that should be present.
         std::istringstream tokenStream;
-        tokenStream.str(sequenceBuilder);         // String to Stream
-        if ((tokenStream >> parameter).fail())    // String to Int
+        tokenStream.str(m_sequenceBuilder);         // String to Stream
+        if((tokenStream >> m_parameter).fail())     // String to Int
         {
             // Skip this character.
             std::cout << "Exception String to Int Parameter Failure."
-                << std::endl;
+                      << std::endl;
         }
         else
-            params.push_back(parameter); // Add to Parameters Vector.
+            m_sequenceParams.push_back(m_parameter); // Add to Parameters Vector.
     }
 
 #ifdef _DEBUG
@@ -995,7 +986,7 @@ void SequenceParser::validateSequence()
     std::cout << "Vector: " << std::endl;
     int ii = 1;
     std::vector<int>::iterator it;
-    for(it = params.begin(); it != params.end(); ++it)
+    for(it = m_sequenceParams.begin(); it != m_sequenceParams.end(); ++it)
     {
         std::cout << ii++ << " " << *it << " " << static_cast<char>(*it) << std::endl;
     }
@@ -1007,14 +998,17 @@ void SequenceParser::validateSequence()
  * State machine stays actives waiting for complete control sequences
  * before pushing any actions forwards.  Normal Text data is passed through.
  */
-void SequenceParser::processSequence(std::string inputString)
+void SequenceDecoder::decodeEscSequenceData(std::string inputString)
 {
+    // Clear Queue out for each run.
+    m_messageQueue.clear();
+
     //Parse entire string and remove any double ESC Sequences.
     std::string::size_type result = 0;
-    while (result != std::string::npos)
+    while(result != std::string::npos)
     {
         result = inputString.find("\x1b\x1b");
-        if (result != std::string::npos)
+        if(result != std::string::npos)
         {
 #ifdef _DEBUG
             std::cout << "Found Double ESC!" << std::endl;
@@ -1025,77 +1019,83 @@ void SequenceParser::processSequence(std::string inputString)
                 // Pass through, remove double ESC!
                 inputString.replace(result,1,"");
             }
-            catch (std::exception e)
+            catch(std::exception &e)
             {
                 std::cout << "Exception replacing double ESC characters: "
-                    << e.what() << std::endl;
-                sequenceState = SEQ_ERROR; // Reset The State
+                          << e.what() << std::endl;
+                m_sequenceState = SEQ_ERROR; // Reset The State
             }
         }
     }
 
     // Now loop entire string and find valid escape sequences.
-    for (std::string::size_type i = 0; i < inputString.size(); i++)
+    for(std::string::size_type i = 0; i < inputString.size(); i++)
     {
 #ifdef _DEBUG
-        std::cout << "sequenceState: " << sequenceState << std::endl;
+        std::cout << "sequenceState: " << m_sequenceState << std::endl;
 #endif
         // Get next Input Sequence
-        sequence = inputString[i];
+        m_sequence = inputString[i];
 
         // Remove Bell from displaying. Annoying in Shell!
         // When not displaying, we'll push this to console so it beeps!
-        if (sequence == '\x07')
+        if(m_sequence == '\x07')
             continue;
 
         // Check for Start of Sequence, if we hit a sequence we then need
         // To send all Valid Output that Proceeds this sequence so everything
         // is FIFO with regards to how incoming data is handled.
-        if (sequence == '\x1b')
+        if(m_sequence == '\x1b')
         {
-            sequenceState = SEQ_START;
+            m_sequenceState = SEQ_START;
         }
+
         // Pre-Handle the Parser State
-        switch(sequenceState)
+        switch(m_sequenceState)
         {
-            // Normal Text Data, Append to Buffer
+                // Normal Text Data, Append to Buffer
             case SEQ_NORMAL:
-                validOutputData += sequence;
+                m_validOutputData += m_sequence;
                 break;
 
-            // Start of Sequence, Push ValidOutputData Buffer Through
-            // Then switch to Processing State, So we have FIFO Data
-            // Parsing.
+                // Start of Sequence, Push ValidOutputData Buffer Through
+                // Then switch to Processing State, So we have FIFO Data
+                // Parsing.
             case SEQ_START:
-                TheAnsiParser::Instance()->textInput(validOutputData);
-                validOutputData.erase();
-                sequenceState = SEQ_PROCESSING;
-                sequenceBuilder += sequence;
+                //TheAnsiParser::Instance()->textInput(validOutputData);
+                // Build a Message Queue with PassThrough Text Data.
+                m_messageQueue.m_text = m_validOutputData;
+                m_sequenceQueue.enqueue(m_messageQueue);
+                m_messageQueue.clear();
+
+                m_validOutputData.erase();
+                m_sequenceState = SEQ_PROCESSING;
+                m_sequenceBuilder += m_sequence;
                 break;
 
             case SEQ_PROCESSING:
                 // Were in the middle of processing a control sequence
                 // Keep is going till we get DONE!
-                sequenceBuilder += sequence;
+                m_sequenceBuilder += m_sequence;
                 break;
 
             case SEQ_ERROR:
                 // Validating the Sequence Bombed, Clear the vector and continue.
-                std::vector<int>().swap(params); // Clear for next run.
-                sequenceBuilder.erase();         // Clear Any Prebuilt.
-                sequenceState = SEQ_NORMAL;
+                std::vector<int>().swap(m_sequenceParams); // Clear for next run.
+                m_sequenceBuilder.erase();         // Clear Any Prebuilt.
+                m_sequenceState = SEQ_NORMAL;
                 continue;
         }
 
-        if (sequence == '\x1b' && !sequenceCompleted)
+        if(m_sequence == '\x1b' && !m_isSequenceCompleted)
         {
             // Error Checking, If were in the middle of an incomplete sequence
             // Then we shouldn't get an ESC before we complete the sequence!
-            if (foundSequence)
+            if(m_foundSequence)
             {
 #ifdef _DEBUG
                 std::cout << "Invalid Sequence, ESC in current sequence"
-                    << std::endl;
+                          << std::endl;
 #endif
                 // We now determine the preceding sequence is invalid
                 // And remove the ESC, then proceed with the current sequence
@@ -1119,48 +1119,48 @@ void SequenceParser::processSequence(std::string inputString)
 #ifdef _DEBUG
             std::cout << "ESC starting new sequence parsing" << std::endl;
 #endif
-            escapePosition = i;
-            foundSequence = true;
+            m_escapePosition = i;
+            m_foundSequence = true;
             continue;
         }
 
         // Each Level is the next character after the ESC
         // Check the first few levels to make sure we have a valid CSI
-        if (foundSequence && !invalidSequence)
+        if(m_foundSequence && !m_isInvalidSequence)
         {
-            switch(sequenceLevel)
+            switch(m_sequenceLevel)
             {
                 case 0: // Process first char after ESC '['
 #ifdef _DEBUG
-                    std::cout << "sequenceLevel: " << sequenceLevel << " : "
-                        << sequence << std::endl;
+                    std::cout << "sequenceLevel: " << m_sequenceLevel << " : "
+                              << m_sequence << std::endl;
 #endif
-                    processLevel0();
+                    processSequenceLevel0();
                     // Move to next Level if valid.
-                    if (!invalidSequence)
-                        ++sequenceLevel;
+                    if(!m_isInvalidSequence)
+                        ++m_sequenceLevel;
                     break;
 
                 case 1: // Process second char after ESC [ 'c'
 #ifdef _DEBUG
-                    std::cout << "sequenceLevel: " << sequenceLevel << " : "
-                        << sequence << std::endl;
+                    std::cout << "sequenceLevel: " << m_sequenceLevel << " : "
+                              << m_sequence << std::endl;
 #endif
-                    processLevel1();
+                    processSequenceLevel1();
                     break;
 
                 case 2: // Process 2nd char after ESC [ '?' DEC Sequences
 #ifdef _DEBUG
-                    std::cout << "sequenceLevel: " << sequenceLevel << " : "
-                        << sequence << std::endl;
+                    std::cout << "sequenceLevel: " << m_sequenceLevel << " : "
+                              << m_sequence << std::endl;
 #endif
-                    processLevel2();
+                    processSequenceLevel2();
                     break;
             }
         }
 
         // Handle Completed Control Sequences
-        if (sequenceCompleted)
+        if(m_isSequenceCompleted)
         {
 #ifdef _DEBUG
             std::cout << "SequenceCompleted!" << std::endl;
@@ -1174,25 +1174,25 @@ void SequenceParser::processSequence(std::string inputString)
                 // Break up the sequence into separate parameters for
                 // The Screen Parser.
                 validateSequence();
-                sequenceState = SEQ_DONE;
+                m_sequenceState = SEQ_DONE;
             }
-            catch (std::exception e)
+            catch(std::exception &e)
             {
                 std::cout << "Exception substring on escapeSequence: "
-                    << e.what() << std::endl;
-                sequenceState = SEQ_ERROR;
+                          << e.what() << std::endl;
+                m_sequenceState = SEQ_ERROR;
             }
 
             // If the sequence is completed, The Parse the parameters and
             // Setup for ANSI Parser and Drawing to Screen.
-            sequenceCompleted = false;
-            foundSequence     = false;
-            invalidSequence   = false;
-            sequenceLevel     = 0;
+            m_isSequenceCompleted = false;
+            m_foundSequence     = false;
+            m_isInvalidSequence   = false;
+            m_sequenceLevel     = 0;
         }
         // Invalid Sequences, Replace ESC with ^ characters for display
         // Then move on.
-        if (invalidSequence)
+        if(m_isInvalidSequence)
         {
 #ifdef _DEBUG
             std::cout << " *** SequenceInvalid!" << std::endl;
@@ -1212,9 +1212,9 @@ void SequenceParser::processSequence(std::string inputString)
                 sequenceState = SEQ_ERROR; // Reset The State
             }*/
 
-            foundSequence   = false;
-            invalidSequence = false;
-            sequenceLevel   = 0;
+            m_foundSequence   = false;
+            m_isInvalidSequence = false;
+            m_sequenceLevel   = 0;
 
             // First grab the entire sequence parsed so far, from ESC position
             // Place it into validOutputData to display on the screen,
@@ -1222,21 +1222,21 @@ void SequenceParser::processSequence(std::string inputString)
             // so we grab all characters parsed so far.
             try
             {
-                validOutputData += sequenceBuilder;
-                sequenceBuilder.erase();
+                m_validOutputData += m_sequenceBuilder;
+                m_sequenceBuilder.erase();
                 //inputString.substr(escapePosition, (i+1) - escapePosition);
             }
-            catch (std::exception e)
+            catch(std::exception &e)
             {
                 std::cout << "Exception substring on ESC Position: "
-                    << e.what() << std::endl;
+                          << e.what() << std::endl;
             }
             // Reset the State
-            sequenceState = SEQ_ERROR;
+            m_sequenceState = SEQ_ERROR;
         }
 
         // Post-Handle the Parser State
-        switch(sequenceState)
+        switch(m_sequenceState)
         {
             case SEQ_NORMAL:
                 // If we are reset to this state, reset the level
@@ -1249,47 +1249,47 @@ void SequenceParser::processSequence(std::string inputString)
 
             case SEQ_DONE:
                 // We hit an entire sequence, pass the vector
-                TheAnsiParser::Instance()->sequenceInput(params);
-                std::vector<int>().swap(params); // Clear for next run.
-                sequenceState = SEQ_NORMAL; // Reset The State
-                sequenceBuilder.erase();
+                /*
+                 * Build Message Queue Broken Down Sequences
+                 */
+                //TheAnsiParser::Instance()->sequenceInput(params);
+                m_messageQueue.m_queueParams.swap(m_sequenceParams);
+                m_sequenceQueue.enqueue(m_messageQueue);
+                m_messageQueue.clear();
+
+                std::vector<int>().swap(m_sequenceParams); // Clear for next run.
+                m_sequenceState = SEQ_NORMAL; // Reset The State
+                m_sequenceBuilder.erase();
                 break;
 
             case SEQ_ERROR:
                 // Validating the Sequence Bombed, Clear the vector and continue.
-                std::vector<int>().swap(params); // Clear for next run.
-                sequenceState = SEQ_NORMAL; // Reset The State
-                sequenceBuilder.erase();
+                std::vector<int>().swap(m_sequenceParams); // Clear for next run.
+                m_sequenceState = SEQ_NORMAL; // Reset The State
+                m_sequenceBuilder.erase();
                 break;
         }
     }
 #ifdef _DEBUG
     // Test Display Valid Output Data
     std::cout << std::endl
-        << "==========================================================="
-        << std::endl;
-    std::cout << std::endl << "valid data: " << validOutputData
-        << std::endl << std::endl;
+              << "==========================================================="
+              << std::endl;
+    std::cout << std::endl << "valid data: " << m_validOutputData
+              << std::endl << std::endl;
 #endif
     // Catch any echo'ed input that passed through with no sequences
-    if (sequenceState == SEQ_NORMAL && validOutputData.size() > 0)
+    if(m_sequenceState == SEQ_NORMAL && m_validOutputData.size() > 0)
     {
-        TheAnsiParser::Instance()->textInput(validOutputData);
-        validOutputData.erase();
-    }    
-
-    // Display final screen.
-    TheTerminal::Instance()->renderScreen();
-    TheTerminal::Instance()->drawTextureScreen();
-
-    // When no data received, this is when we want to show the cursor!
-    // Setup cursor in current x/y position Cursor.
-    if (TheAnsiParser::Instance()->isCursorActive())
-    {
-        TheTerminal::Instance()->setupCursorChar();
-        TheTerminal::Instance()->renderCursorOnScreen();
-        TheTerminal::Instance()->drawTextureScreen();
-    }
+        //TheAnsiParser::Instance()->textInput(validOutputData);
+        /*
+         * Build Queue with Passthrough Message Test
+         */
+        m_messageQueue.m_text = m_validOutputData;
+        m_sequenceQueue.enqueue(m_messageQueue);
+        m_messageQueue.clear();
+        m_validOutputData.erase();
+    }   
 }
 
 // Test Cases for Class.

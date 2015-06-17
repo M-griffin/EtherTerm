@@ -8,7 +8,7 @@
 // $LastChangedBy$
 
 #include <iostream>
-#include "socketState.h"
+#include "socketState.hpp"
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
@@ -25,7 +25,7 @@ public:
 
     static SocketHandler* Instance()
     {
-        if(globalInstance == 0)
+        if(!globalInstance)
         {
             globalInstance = new SocketHandler();
         }
@@ -36,10 +36,10 @@ public:
     // Release And Clear the Singleton
     static void ReleaseInstance()
     {
-        if(globalInstance != 0)
+        if(globalInstance)
         {
             delete globalInstance;
-            globalInstance = 0;
+            globalInstance = nullptr;
         }
         return;
     }

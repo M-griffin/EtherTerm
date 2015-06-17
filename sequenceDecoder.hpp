@@ -7,38 +7,32 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
+#include "safeQueue.hpp"
+#include "messageQueue.hpp"
+
 #include <string>
 #include <vector>
 
-class SequenceParser
+class SequenceDecoder
 {
 public:
 
-    //  Instantiate the Singleton
-    static SequenceParser* Instance()
-    {
-        if(globalInstance == 0)
-        {
-            globalInstance = new SequenceParser();
-            return globalInstance;
-        }
-        return globalInstance;
-    }
+    SequenceDecoder();
+    ~SequenceDecoder();
 
-    // Release And Clear the Singleton
-    static void ReleaseInstance()
-    {
-        if(globalInstance != 0)
-        {
-            delete globalInstance;
-            globalInstance = 0;
-        }
-        return;
-    }
-    // Parser String data for ESC Sequence.
-    void processSequence(std::string inputString);
+    // Vector<int> holds the broken down squeue,
+    // Vector<int> Empty, holds std::string or Text Data passed.
+    SafeQueue<MessageQueue> m_sequenceQueue;
+
+    // {Main Execution Method}
+    // Valide and Decode ESC Sequences
+    void decodeEscSequenceData(std::string inputString);
+
 
 private:
+
+    // Holds Indivdual Sequences
+    MessageQueue m_messageQueue;
 
     // Sequence Parser State
     enum
@@ -50,48 +44,39 @@ private:
         SEQ_ERROR      = 4  // Bad Sequence, Kill it!
     };
 
-    int sequenceState;
+    int m_sequenceState;
     unsigned
-    char sequence;
-    int  parameter;
-    bool foundSequence;
-    bool foundParameters;
-    bool invalidSequence;
-    bool sequenceCompleted;
-    int  sequenceLevel;
+    char m_sequence;
+    int  m_parameter;
+    bool m_foundSequence;
+    bool m_foundParameters;
+    bool m_isInvalidSequence;
+    bool m_isSequenceCompleted;
+    int  m_sequenceLevel;
 
-    void processLevel0();
-    void processLevel1();
-    void processLevel2();
+    void processSequenceLevel0();
+    void processSequenceLevel1();
+    void processSequenceLevel2();
+
+    void handleFontChangeSequences();
     void validateSequence();
 
     // Holds the intern data while we build the sequence,
     // This is needed if inputString doesn't have a complete sequence
     // Then we need to append so that the string will have the
     // Original first half of the already parsed sequence.
-    std::string sequenceBuilder;
+    std::string m_sequenceBuilder;
 
     //Holds the breakdown of the entire sequence
-    std::vector<int> params;
+    std::vector<int> m_sequenceParams;
 
     // This string contains normal data passed through the sequence
     // Parser, At the end of a processing loop, this data is passed
     // for writing to the screen.
-    std::string validOutputData;
-    std::string::size_type
-         escapePosition;
+    std::string m_validOutputData;
+    std::string::size_type m_escapePosition;
 
-    static SequenceParser* globalInstance;
-
-    SequenceParser();
-    ~SequenceParser();
-
-    SequenceParser(const SequenceParser&);
-    SequenceParser& operator=(const SequenceParser&);
 
 };
-
-//Setup the Class Type
-typedef SequenceParser TheSequenceParser;
 
 #endif

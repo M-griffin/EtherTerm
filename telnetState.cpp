@@ -5,31 +5,20 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "telnetState.h"
-#include "mainMenuState.h"
-#include "inputHandler.h"
-#include "ansiParser.h"
-#include "sequenceParser.h"
-#include "terminal.h"
-#include "socketHandler.h"
+#include "telnet.hpp"
+#include "telnetState.hpp"
+#include "mainMenuState.hpp"
+#include "inputHandler.hpp"
+#include "sequenceParser.hpp"
+#include "sequenceManager.hpp"
+#include "terminal.hpp"
+#include "socketHandler.hpp"
 
 #include <cstdio>
 #include <fstream>
 
 const std::string TelnetState::telnetID = "TELNET";
 
-TelnetState::TelnetState() :
-    stage(0),
-    cmd(0),
-    isSGA(false),
-    isBIN(false),
-    isECHO(true),  // Default to True for MUD'S etc.
-    didSGA(false),
-    didTERM(false),
-    didNAWS(false),
-    didBIN(false),
-    didECHO(false)
-{ }
 /*
  * Handles Reading the Socket for Data, then Parsing the Data.
  */
@@ -49,7 +38,7 @@ void TelnetState::handleSession()
     if(len < 0)
     {
         // Error - Lost Connection
-        shutdown = true;
+        m_isShutdown = true;
         return;
     }
 
@@ -106,8 +95,8 @@ void TelnetState::handleSession()
     if(output.size() > 0)
     {
         // Parse Incoming Screen Data
-        TheSequenceParser::Instance()->processSequence(output);
-    }    
+        TheSequenceManager::Instance()->decode(output);
+    }
     output.erase();
 }
 
@@ -122,11 +111,11 @@ void TelnetState::update()
     // For input, add a slight Delay in the loop so were not hogging CPU Usage.
     // reset the count when we get data or type input.
     static int inputCount = 0;
-    if(shutdown || TheInputHandler::Instance()->isGlobalShutdown())
+    if(m_isShutdown || TheInputHandler::Instance()->isGlobalShutdown())
     {
         std::cout << "TelnetState::shutdown - changeState(new MainMenuState()" << std::endl;
         TheTerminal::Instance()->getStateMachine()->changeState(new MainMenuState());
-        shutdown = false;
+        m_isShutdown = false;
         return;
     }
 
@@ -142,15 +131,15 @@ void TelnetState::update()
             // Server is not echoing input back to us, we need to do it ourselves.
             // Jump into LINE MODE Editing here.
             //***
-            if(isECHO)
+            if(m_isECHOCompleted)
             {
-                TheSequenceParser::Instance()->processSequence(inputSequence);
+                TheSequenceManager::Instance()->decode(inputSequence);
             }
         }
         else
         {
             std::cout << "ERROR !TheSocketHandler::Instance()->isActive()" << std::endl;
-            shutdown = true;
+            m_isShutdown = true;
         }
     }
 
@@ -176,7 +165,7 @@ void TelnetState::update()
             case -1:
                 // Lost connection, return to mainMenu. Maybe Prompt or freeze?
                 inputCount = 0;
-                shutdown = true;
+                m_isShutdown = true;
                 break;
             default:
                 // received data, process it.
@@ -188,15 +177,15 @@ void TelnetState::update()
     else
     {
         std::cout << "ERROR TelnetState::update() >isActive()" << std::endl;
-        shutdown = true;
+        m_isShutdown = true;
     }
 }
 
 bool TelnetState::onEnter()
 {
-    TheAnsiParser::Instance()->setCursorActive(true);
+    TheSequenceParser::Instance()->setCursorActive(true);
     std::cout << "entering TelnetState\n";
-    shutdown = false;
+    m_isShutdown = false;
     //char host[255]= {"entropybbs.co.nz"};
     //char host[255]= {"montereybbs.ath.cx"};
     //char host[255]= {"1984.ws"};
@@ -235,7 +224,7 @@ bool TelnetState::onEnter()
         MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
         SDL_Delay(1000);
         std::cout << "Error Connecting!" << std::endl;
-        shutdown = true;
+        m_isShutdown = true;
     }
     else
     {
@@ -249,7 +238,7 @@ bool TelnetState::onEnter()
     TheTerminal::Instance()->clearScreenSurface();
     TheTerminal::Instance()->renderScreen();
     TheTerminal::Instance()->drawTextureScreen();
-    TheAnsiParser::Instance()->reset();
+    TheSequenceParser::Instance()->reset();
     return true;
 }
 
@@ -258,16 +247,16 @@ bool TelnetState::onExit()
     std::cout << "TelnetState::onExit()" << std::endl;
     // reset the handler(s)
     TheInputHandler::Instance()->reset();
-    TheAnsiParser::Instance()->reset();
+    TheSequenceParser::Instance()->reset();
     TheSocketHandler::Instance()->reset();
-    shutdown = true;
+    m_isShutdown = true;
     std::cout << "exiting TelnetState" << std::endl;
     return true;
 }
 
+/*
 void TelnetState::setCallbacks(const std::vector<Callback>& callbacks)
 {
-    /*
     // go through the game objects
     if(!termObjects.empty())
     {
@@ -280,9 +269,9 @@ void TelnetState::setCallbacks(const std::vector<Callback>& callbacks)
                 pButton->setCallback(callbacks[pButton->getCallbackID()]);
             }
         }
-    }*/
+    }
 }
-
+*/
 
 // Telnet State Functions
 unsigned char TelnetState::telnetOptionAcknowledge(unsigned char cmd)
@@ -335,7 +324,7 @@ void TelnetState::telnetOptionNawsReply()
     else
     {
         std::cout << "ERROR TelnetState::telnet_build_NAWS_reply() (INPUT) ->isActive()" << std::endl;
-        shutdown = true;
+        m_isShutdown = true;
     }
 }
 
@@ -356,7 +345,7 @@ void TelnetState::telnetOptionTerminalTypeReply()
     else
     {
         std::cout << "ERROR TelnetState::telnet_build_NAWS_reply() (INPUT) ->isActive()" << std::endl;
-        shutdown = true;
+        m_isShutdown = true;
     }
 }
 
@@ -377,7 +366,7 @@ void TelnetState::telnetSendIAC(unsigned char command, unsigned char option)
     else
     {
         std::cout << "ERROR TelnetState::telnet_build_NAWS_reply() (INPUT) ->isActive()" << std::endl;
-        shutdown = true;
+        m_isShutdown = true;
     }
 }
 
@@ -389,7 +378,7 @@ void TelnetState::telnetSendIAC(unsigned char command, unsigned char option)
 unsigned char TelnetState::telnetOptionParse(unsigned char c)
 {
     // TEL-OPT Parser
-    switch(stage)
+    switch(m_teloptStage)
     {
             // Find IAC
         case 0:
@@ -404,7 +393,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                 // Sequence Found with IAC, set to next Stage.
                 //printf("\r\n ========================================== \r\n");
                 //printf("\r\n Received #255 = IAC \r\n");
-                stage++;
+                m_teloptStage++;
             }
             break;
 
@@ -418,7 +407,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                 // Char 255.  But this doesn't equal any text in ExtASCII
                 // So we going to stuff it.
                 //std::cout << "\r\n Got double IAC!!\r\n" << std::endl;
-                stage = 0;
+                m_teloptStage = 0;
                 return IAC;
             }
             if(c != IAC)
@@ -442,14 +431,14 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                     case xEOF:  //     236        /* End of file: EOF is already used... */
                         // Pass Through commands that don't need Response.
                         printf("\r\n [IAC][%d] 'PASS-THROUGH' \r\n", c);
-                        stage = 0;
+                        m_teloptStage = 0;
                         break;
 
                     default:
                         // Move to Command Parsing.
                         printf("\r\n [IAC][%d] \r\n", c);
-                        cmd = c;
-                        stage++;
+                        m_teloptCommand = c;
+                        m_teloptStage++;
                         break;
                 }
             }
@@ -457,18 +446,18 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
 
             // Find Option
         case 2:
-            stage = 0;
+            m_teloptStage = 0;
             // Catch if were getting Invalid Commands.
-            if(TELCMD_OK(cmd))
-                printf("\r\n [*****] [IAC][%i][%i] \r\n", cmd,c);
+            if(TELCMD_OK(m_teloptCommand))
+                printf("\r\n [*****] [IAC][%i][%i] \r\n", m_teloptCommand,c);
             else
             {
                 // Hopefully won't get here!
-                printf("\r\n [*** BAD ***] [IAC][%i][%i] \r\n", cmd,c);
-                stage = 0;
+                printf("\r\n [*** BAD ***] [IAC][%i][%i] \r\n", m_teloptCommand,c);
+                m_teloptStage = 0;
                 break;
             }
-            switch(cmd)
+            switch(m_teloptCommand)
             {
                     // No responses needed, just stuff these.
                 case DONT:
@@ -476,13 +465,13 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                     switch(c)
                     {
                         case IAC :
-                            stage = 1;
+                            m_teloptStage = 1;
                             break;
 
                         default:
                             printf("\r\n [DONT - responded WONT %i] \r\n",c);
-                            telnetSendIAC(telnetOptionAcknowledge(cmd),c);
-                            stage = 0;
+                            telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
+                            m_teloptStage = 0;
                             break;
                     }
                     break;
@@ -493,36 +482,36 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                     {
                         case TELOPT_ECHO:
                             printf("\r\n [DO - TELOPT_ECHO responded WILL] \r\n");
-                            telnetSendIAC(telnetOptionDeny(cmd),c);
-                            didECHO = true;
-                            isECHO = true;
+                            telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
+                            m_finishedECHO = true;
+                            m_isECHOCompleted = true;
                             break;
 
                         case TELOPT_BINARY:
                             printf("\r\n [DO - TELOPT_BINARY responded WILL] \r\n");
-                            telnetSendIAC(telnetOptionAcknowledge(cmd),c);
-                            isBIN = true;
-                            didBIN = true;
+                            telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
+                            m_isBINCompleted = true;
+                            m_finishedBIN = true;
                             break;
 
                         case TELOPT_SGA:
                             printf("\r\n [DO - TELOPT_SGA responded WILL] \r\n");
-                            telnetSendIAC(telnetOptionAcknowledge(cmd),c);
-                            isSGA = true;
-                            didSGA = true;
+                            telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
+                            m_isSGACompleted = true;
+                            m_finishedSGA = true;
                             break;
 
                         case TELOPT_TTYPE:
                             printf("\r\n [DO - TELOPT_TTYPE responded WILL] \r\n");
-                            telnetSendIAC(telnetOptionAcknowledge(cmd),c);
-                            didTERM = true;
+                            telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
+                            m_finishedTTYPE = true;
                             break;
 
                         case TELOPT_NAWS:
                             printf("\r\n [DO - TELOPT_NAWS responded WILL] \r\n");
-                            telnetSendIAC(telnetOptionAcknowledge(cmd),c);
+                            telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
                             telnetOptionNawsReply();
-                            didNAWS = true;
+                            m_finishedNAWS = true;
                             break;
                             /*
                             case IAC :
@@ -533,10 +522,10 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
 
                         default:
                             printf("\r\n [DO - responded WONT %i] \r\n",c);
-                            telnetSendIAC(telnetOptionDeny(cmd),c);
+                            telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
                             break;
                     }
-                    stage = 0;
+                    m_teloptStage = 0;
                     break;
 
                     // WILL means the Server Will DO IT!
@@ -547,32 +536,32 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                     switch(c)
                     {
                         case TELOPT_ECHO:
-                            if(!didECHO)
+                            if(!m_finishedECHO)
                             {
                                 printf("\r\n [WILL - TELOPT_ECHO responded DO] \r\n");
-                                telnetSendIAC(telnetOptionAcknowledge(cmd),c);
-                                didECHO = true;
-                                isECHO = false;
+                                telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
+                                m_finishedECHO = true;
+                                m_isECHOCompleted = false;
                             }
                             break;
 
                         case TELOPT_BINARY :
-                            if(!didBIN)
+                            if(!m_finishedBIN)
                             {
                                 printf("\r\n [WILL - TELOPT_BINARY responded DO] \r\n");
-                                telnetSendIAC(telnetOptionAcknowledge(cmd),c);
-                                didBIN = true;
-                                isBIN = true;
+                                telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
+                                m_finishedBIN = true;
+                                m_isBINCompleted = true;
                             }
                             break;
 
                         case TELOPT_SGA :
-                            if(!didSGA)
+                            if(!m_finishedSGA)
                             {
                                 printf("\r\n [WILL - TELOPT_SGA responded DO] \r\n");
-                                telnetSendIAC(telnetOptionAcknowledge(cmd),c);
-                                didSGA = true;
-                                isSGA = true;
+                                telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
+                                m_finishedSGA = true;
+                                m_isSGACompleted = true;
                             }
                             break;
                             /*
@@ -581,19 +570,19 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                                 return 255;
                             */
                         default :
-                            telnetSendIAC(telnetOptionDeny(cmd),c);
+                            telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
                             printf("\r\n [WILL - responded DONT %i] \r\n",c);
                             break;
                     }
-                    stage = 0;
+                    m_teloptStage = 0;
                     break;
 
                 case WONT:
                     // Don't respond to WONT
                     printf("\r\n [WONT telnet request received] \r\n");
-                    telnetSendIAC(telnetOptionAcknowledge(cmd),c);
+                    telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
                     printf("\r\n [WONT - responded DONT %i] \r\n",c);
-                    stage = 0;
+                    m_teloptStage = 0;
                     break;
 
                     // Start of Sub Negotiations and Stages 3 - 4
@@ -601,39 +590,39 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                     printf("\r\n [TELNET_STATE_SB ENTERED] \r\n");
                     if(c == TELOPT_TTYPE)
                     {
-                        opt = c;
-                        stage = 3;
+                        m_currentOption = c;
+                        m_teloptStage = 3;
                     }
                     else
                     {
                         printf("\r\n [TELNET_STATE_SB LEAVING] \r\n");
                         // Invalid, reset back.
-                        stage = 0;
+                        m_teloptStage = 0;
                     }
                     break;
 
                 default:
                     // Options or Commands Not Parsed, RESET.
-                    printf("\r\n [*****] DEFAULT CMD - %i / %i \r\n", cmd,c);
-                    stage = 0;
+                    printf("\r\n [*****] DEFAULT CMD - %i / %i \r\n", m_teloptCommand,c);
+                    m_teloptStage = 0;
                     break;
             }
             break;
 
         case 3:
-            printf("\r\n [Stage 3] - %i, %i \r\n",opt, c);
+            printf("\r\n [Stage 3] - %i, %i \r\n",m_currentOption, c);
             //Options will be 1 After SB
             //IAC SB TTYPE SEND IAC SE
-            switch(opt)
+            switch(m_currentOption)
             {
                 case TELOPT_TTYPE:
                     if(c == TELQUAL_SEND)  // SEND
                     {
                         printf("\r\n [Stage 3 - TELQUAL_SEND] goto Stage 4");
-                        stage = 4;
+                        m_teloptStage = 4;
                     }
                     else
-                        stage = 0;
+                        m_teloptStage = 0;
                     break;
 
                 default:
@@ -641,12 +630,12 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
                     if(c == SE)
                     {
                         printf("\r\n [TELNET_STATE_SB SE] \r\n");
-                        stage = 0;
+                        m_teloptStage = 0;
                     }
                     else
                     {
                         // reset
-                        stage = 0;
+                        m_teloptStage = 0;
                     }
                     break;
             }
@@ -666,7 +655,7 @@ unsigned char TelnetState::telnetOptionParse(unsigned char c)
 
                     // Send TTYPE After End of Complete Sequence is Registered.
                     telnetOptionTerminalTypeReply();
-                    stage = 0;
+                    m_teloptStage = 0;
                     break;
             }
             break;

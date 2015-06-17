@@ -7,21 +7,24 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "termState.h"
-#include "socketState.h"
+#include "termState.hpp"
+#include "socketState.hpp"
 
-class MenuState : public TermState
+class MenuState :
+    public TermState
 {
 public:
-    
+
     virtual ~MenuState() {}
-    
+
 protected:
-    
+
+/*
     typedef void(*Callback)();
     virtual void setCallbacks(const std::vector<Callback>& callbacks) = 0;
-    
+
     std::vector<Callback> callbacks;
+*/
 };
 
 

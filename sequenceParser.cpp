@@ -5,195 +5,20 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "sequenceParser.h"
-#include "socketHandler.h"
-#include "inputHandler.h"
-#include "ansiParser.h"
-#include "terminal.h"
+#include "sequenceDecoder.hpp"
+#include "socketHandler.hpp"
+#include "inputHandler.hpp"
+#include "sequenceParser.hpp"
+#include "terminal.hpp"
 
 #include <iostream>
 #include <sstream>
 
-using namespace std;
+SequenceParser* SequenceParser::globalInstance = nullptr;
 
-// Screen Buffer Vector Constructors
-AnsiParser::myScreen::myScreen()
-{
-    characterSequence = "";
-}
-
-AnsiParser::myScreen::myScreen(std::string sequence, SDL_Color fg, SDL_Color bg)
-: characterSequence(sequence), foreground(fg), background(bg) { }
-
-/**
- * handle screen buffer, Keeps track of all data
- * Plotted through the ANSI Parser so we can pull
- * Text and or redraw screens at anytime.
- */    
-void AnsiParser::setScreenBuffer(std::string mySequence)
-{
-    // Keep track of the longest line in buffer for Centering screen.
-    // NOT IN USE CURRENTLY
-    //if (x_position > max_x_position)
-    //    max_x_position = x_position;
-    sequenceBuffer.characterSequence = mySequence;
-    sequenceBuffer.foreground = TheTerminal::Instance()->currentFGColor;
-    sequenceBuffer.background = TheTerminal::Instance()->currentBGColor;
-
-    // Setup current position in the screen buffer. 1 based for 0 based.
-    position = ((y_position-1) * characters_per_line) + (x_position-1);
-
-    // Add Sequence to Screen Buffer
-    try
-    {
-        if ((unsigned)position < screenBuffer.size())
-            screenBuffer.at(position) = sequenceBuffer;
-        else
-        {
-            std::cout << "Xposition: " << x_position-1 << std::endl;
-        }
-    }
-    catch (std::exception e)
-    {
-        std::cout << "Exception setScreenBuffer: " << e.what() << std::endl;
-        std::cout << "Server sent data that exceeds screen dimensions." << std::endl;
-    }
-    // Clear for next sequences.
-    sequenceBuffer.characterSequence.erase();
-}
-
-/*
- * Moves the Screen Buffer Up a line to match the internal SDL_Surface
- */
-void AnsiParser::scrollScreenBuffer()
-{
-    //*** IMPORTANT (WIP), must add check for region scrolling only!
-    //TheTerminal::Instance()->scrollRegionActive &&
-    //                 y_position > TheTerminal::Instance()->bottomMargin))
-
-    // Theory, Erase Line at Top margin, then add a new line bottom margin
-    // To move it back down.  That way only the middle is scrolled up.
-
-    // This remove the top line to scroll the screen up
-    // And follow the SDL Surface!  later on add history for scroll back.
-    try
-    {
-        screenBuffer.erase(
-            screenBuffer.begin(), screenBuffer.begin() + characters_per_line);
-    }
-    catch (std::exception e)
-    {
-        std::cout << "Exception scrollScreenBuffer: " << e.what() << std::endl;
-    }
-    // Readd The last Line back to the buffer.
-    screenBuffer.resize( TERM_HEIGHT * TERM_WIDTH );
-}
-
-/*
- * Clear Range of Screen Buffer for Erase Sequences.
- */
-void AnsiParser::clearScreenBufferRange(int start, int end)
-{
-    int startPosition = ((y_position-1) * characters_per_line) + (start);
-    int endPosition = startPosition + (end - start);
-
-    //std::cout << "start " << start << " end " << end
-    // << std::endl;
-    //std::cout << "startPosition " << startPosition << " endPosition " << endPosition
-    // << std::endl;
-
-    // Clear out entire line.
-    for(int i = startPosition; i < endPosition; i++)
-    {
-        try
-        {
-            screenBuffer[i].characterSequence.erase();
-        }
-        catch (std::exception e)
-        {
-            std::cout << "Exception clearScreenBufferRange: " << e.what() << std::endl;
-        }
-    }
-    // Debugging
-    //getScreenBufferText();
-}
-/*
- * When the Screen/Surface is cleared, we also clear the buffer
- */
-void AnsiParser::clearScreenBuffer()
-{
-    // Allocate the Size
-    screenBuffer.clear();
-    screenBuffer.resize( TERM_HEIGHT * TERM_WIDTH );
-}
-
-// Debug to console.
-void AnsiParser::getScreenBufferText()
-{
-    //std::cout << "* getScreenBufferText" << std::endl; // Start Fresh line.
-    for (auto &it : screenBuffer)
-    {
-        if (it.characterSequence != "")
-            std::cout << it.characterSequence << std::flush;
-        else
-            std::cout << " " << std::flush;
-    }
-}
-
-/*
- * Gets Coordinates from the screen already translated to
- * Screen Buffer Positions, Now we pull the position and throw the
- * Text data into the Clipboard.
- */
-void AnsiParser::bufferToClipboard(int startx, int starty, int numChar, int numRows)
-{
-    std::string textBuffer = "";
-    int startPosition = ((starty) * characters_per_line) + (startx);
-    int endPosition   = startPosition + (numChar);
-
-    // Loop the Number of Rows to Grab
-    for (int ot = 0; ot < numRows; ot++)
-    {
-        // Grab each line per Row.
-        for (int it = startPosition; it < endPosition; it++ )
-        {
-            try
-            {
-                if (screenBuffer[it].characterSequence != "")
-                {
-                    textBuffer += screenBuffer[it].characterSequence;
-                }
-                else
-                {
-                    textBuffer += " ";
-                }
-            }
-            catch (std::exception e)
-            {
-                std::cout << "Exception bufferToClipboard: " << e.what() << std::endl;
-            }
-        }
-        // Add Newline at the end of each row.
-        textBuffer += "\r\n";
-
-        // Reset start/end position to next Row.
-        startPosition += characters_per_line;
-        endPosition   += characters_per_line;
-    }
-    // Copy Resulting text to the Clipboard.
-    SDL_SetClipboardText(textBuffer.c_str());
-}
-
-
-AnsiParser* AnsiParser::globalInstance = 0;
-
-AnsiParser::AnsiParser() :
-    x_position(1),
-    y_position(1),
+SequenceParser::SequenceParser() :
     preceedingSequence('\0'),
     max_x_position(0),
-    characters_per_line(80),
-    position(0),
     saved_cursor_x(1),
     saved_cursor_y(1),
     saved_attribute(0),
@@ -204,33 +29,28 @@ AnsiParser::AnsiParser() :
     cleared_the_screen(false),
     isCursorShown(true)
 {
-    //Set the default size of the vector screen buffer
-    //Then Fill each element with defaults
-    screenBuffer.reserve( TERM_HEIGHT * TERM_WIDTH );
-    screenBuffer.resize( TERM_HEIGHT * TERM_WIDTH );
-
     // Set Default Region to Off!
     TheTerminal::Instance()->setScrollRegion(0, 0, TERM_HEIGHT);
 }
 
-AnsiParser::~AnsiParser()
+SequenceParser::~SequenceParser()
 {
-    std::cout << "AnsiParser Released" << std::endl;
+    std::cout << "SequenceParser Released" << std::endl;
     try
     {
         std::vector<myScreen>().swap(screenBuffer); // Clear
     }
-    catch (std::exception e)
+    catch(std::exception &e)
     {
         std::cout << "Exception std::vector<myScreen>().swap(screenBuffer): "
-            << e.what() << std::endl;
+                  << e.what() << std::endl;
     }
 }
 
 /*
  * Reset AnsiParser Specific Class Attributes
  */
-void AnsiParser::reset()
+void SequenceParser::reset()
 {
     x_position = 1;
     y_position = 1;
@@ -243,11 +63,12 @@ void AnsiParser::reset()
     prev_color_attribute = 0;
     cleared_the_screen = false;
     line_wrapped = false;
+    std::vector<int>().swap(parameters);
     //isCursorShown = true; // States will override this.
 
     // Reset Default Colors.
-    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->grey;
-    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->black;
+    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREY;
+    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
 
     // Turn off Scrolling Region
     TheTerminal::Instance()->setScrollRegion(0, 0, TERM_HEIGHT);
@@ -256,7 +77,7 @@ void AnsiParser::reset()
 /*
  * Handles parsing Text and formatting to the screen buffer
  */
-void AnsiParser::textInput(std::string buffer)
+void SequenceParser::textInput(const std::string &buffer)
 {
     // Char Sequence for Parsing.
     unsigned char sequence = 0;
@@ -276,18 +97,18 @@ void AnsiParser::textInput(std::string buffer)
         // CRLF combinations.
         try
         {
-            if (i+1 < buffer.size())
+            if(i+1 < buffer.size())
                 nextSequence = buffer[i+1];
         }
-        catch (std::exception e)
+        catch(std::exception &e)
         {
             std::cout << "Exception AnsiParser::textInput: "
-                << e.what() << std::endl;
+                      << e.what() << std::endl;
         }
 
         // Debugging!
         //std::cout << "sequence: " << sequence << " "
-          //  << static_cast<int>(sequence) << std::endl;
+        //  << static_cast<int>(sequence) << std::endl;
 
         // Back Space
         if(sequence == '\b')
@@ -302,24 +123,10 @@ void AnsiParser::textInput(std::string buffer)
         if(sequence == '\r' && nextSequence == '\n')
         {
             // std::cout << std::endl << "CRLF xpos: " << x_position << std::endl;
-            // If we receive a new line, any existing text on the same line
-            // After the cursor position should be cleared.
-            // -- need more testing.
-            /* This isn't confirmed behavior yet, doesn't work on oddnetwork.
-             * Bad ANSI or bad behavior?
-             *
-            if (x_position < 81)
-            {
-                TheTerminal::Instance()->renderClearLineScreen(y_position-1,
-                            x_position-1, characters_per_line); // test removed -1
-
-                clearScreenBufferRange(x_position-1, characters_per_line);
-            }*/
-
             // Stupid fix for expected behavior.  If were on col 81
             // And we get a newline, then were suppose to wrap to next line
             // But also move down a second line!
-            if (x_position == 81)
+            if(x_position == 81)
             {
                 ++y_position;
             }
@@ -336,8 +143,8 @@ void AnsiParser::textInput(std::string buffer)
             }
             // Check here if we need to scroll the screen up 1 row.
             if(y_position > NUM_LINES ||
-                    (TheTerminal::Instance()->scrollRegionActive &&
-                     y_position > TheTerminal::Instance()->bottomMargin))
+                    (TheTerminal::Instance()->m_scrollRegionActive &&
+                     y_position > TheTerminal::Instance()->m_bottomMargin))
             {
                 // If we cleared the screen and hit bottom row, then
                 // The very first time we want to spit out the entire screen
@@ -349,10 +156,10 @@ void AnsiParser::textInput(std::string buffer)
                     TheTerminal::Instance()->drawTextureScreen();  // Draw Texture to Screen
                     TheTerminal::Instance()->scrollScreenUp();     // Scroll the surface up
                     scrollScreenBuffer();
-                    if(!TheTerminal::Instance()->scrollRegionActive)
+                    if(!TheTerminal::Instance()->m_scrollRegionActive)
                         y_position = NUM_LINES;
                     else
-                        y_position = TheTerminal::Instance()->bottomMargin;
+                        y_position = TheTerminal::Instance()->m_bottomMargin;
                     cleared_the_screen = false;
                 }
                 else
@@ -361,10 +168,10 @@ void AnsiParser::textInput(std::string buffer)
                     TheTerminal::Instance()->drawTextureScreen();    // Texture to Screen
                     TheTerminal::Instance()->scrollScreenUp();       // Scroll up for next line.
                     scrollScreenBuffer();
-                    if(!TheTerminal::Instance()->scrollRegionActive)
+                    if(!TheTerminal::Instance()->m_scrollRegionActive)
                         y_position = NUM_LINES;
                     else
-                        y_position = TheTerminal::Instance()->bottomMargin;
+                        y_position = TheTerminal::Instance()->m_bottomMargin;
                 }
             }
             //printf("\r\n xpos %i, ypos %i \r\n",x_position, y_position);
@@ -376,7 +183,7 @@ void AnsiParser::textInput(std::string buffer)
             // Stupid fix for expected behavior.  If were on col 81
             // And we get a newline, then were suppose to wrap to next line
             // But also move down a second line!
-            if (x_position == 81)
+            if(x_position == 81)
             {
                 ++y_position;
             }
@@ -392,30 +199,14 @@ void AnsiParser::textInput(std::string buffer)
         }
         else if(sequence == '\n')
         {
-            // std::cout << std::endl << "LF xpos: " << x_position << std::endl;
-
-            // If we receive a new line, any existing text on the same line
-            // After the cursor position should be cleared.
-            // -- need more testing.
-            /* This isn't confirmed behavior yet, doesn't work on oddnetwork.
-             * Bad ANSI or bad behavior?
-             *
-            if (x_position < 81)
-            {
-                TheTerminal::Instance()->renderClearLineScreen(y_position-1,
-                            x_position-1, characters_per_line); // test removed -1
-                clearScreenBufferRange(x_position-1, characters_per_line);
-            }*/
-
             // Stupid fix for expected behavior.  If were on col 81
             // And we get a newline, then were suppose to wrap to next line
             // But also move down a second line!
-            if (x_position == 81)
+            if(x_position == 81)
             {
                 ++y_position;
             }
 
-            //printf("LF");
             // Set position 0, cause next check increments to 1.
             x_position = 1;
             ++y_position;
@@ -428,8 +219,8 @@ void AnsiParser::textInput(std::string buffer)
             }
             // Check here if we need to scroll the screen.
             if(y_position > NUM_LINES ||
-                    (TheTerminal::Instance()->scrollRegionActive &&
-                     y_position > TheTerminal::Instance()->bottomMargin))
+                    (TheTerminal::Instance()->m_scrollRegionActive &&
+                     y_position > TheTerminal::Instance()->m_bottomMargin))
             {
                 // If we cleared the screen and hit bottom row, then
                 // The very first time we want to spit out the entire screen
@@ -440,10 +231,10 @@ void AnsiParser::textInput(std::string buffer)
                     TheTerminal::Instance()->drawTextureScreen();  // Draw Texture to Screen
                     TheTerminal::Instance()->scrollScreenUp();     // Scroll the surface up
                     scrollScreenBuffer();
-                    if(!TheTerminal::Instance()->scrollRegionActive)
+                    if(!TheTerminal::Instance()->m_scrollRegionActive)
                         y_position = NUM_LINES;
                     else
-                        y_position = TheTerminal::Instance()->bottomMargin;
+                        y_position = TheTerminal::Instance()->m_bottomMargin;
                     cleared_the_screen = false;
                 }
                 else
@@ -455,10 +246,10 @@ void AnsiParser::textInput(std::string buffer)
                     TheTerminal::Instance()->drawTextureScreen();    // Texture to Screen
                     TheTerminal::Instance()->scrollScreenUp();       // Scroll up for next line.
                     scrollScreenBuffer();
-                    if(!TheTerminal::Instance()->scrollRegionActive)
+                    if(!TheTerminal::Instance()->m_scrollRegionActive)
                         y_position = NUM_LINES;
                     else
-                        y_position = TheTerminal::Instance()->bottomMargin;
+                        y_position = TheTerminal::Instance()->m_bottomMargin;
                 }
             }
             continue;
@@ -470,7 +261,7 @@ void AnsiParser::textInput(std::string buffer)
             // Move to next line
             // If were in scroll region,
             // Then we'll test specifically to scroll the region only.
-            if(!TheTerminal::Instance()->scrollRegionActive)
+            if(!TheTerminal::Instance()->m_scrollRegionActive)
             {
                 x_position = 1;
                 ++y_position;
@@ -484,8 +275,8 @@ void AnsiParser::textInput(std::string buffer)
         // if we need to scroll the screen up 1 line.
         // This last check is for normal text being pushed to the screen,
         // NO CR/LR so check if we gone past the bottom margin of the screen.
-        if(y_position > NUM_LINES || (TheTerminal::Instance()->scrollRegionActive &&
-                                      y_position >= TheTerminal::Instance()->bottomMargin &&
+        if(y_position > NUM_LINES || (TheTerminal::Instance()->m_scrollRegionActive &&
+                                      y_position >= TheTerminal::Instance()->m_bottomMargin &&
                                       x_position > characters_per_line))
         {
             // If we cleared the screen and hit bottom row, then
@@ -493,15 +284,15 @@ void AnsiParser::textInput(std::string buffer)
             if(cleared_the_screen)
             {
                 // test if scrolling region is active and were drawing in it.
-                if(TheTerminal::Instance()->scrollRegionActive &&
-                        y_position >= TheTerminal::Instance()->topMargin &&
-                        y_position <= TheTerminal::Instance()->bottomMargin)
+                if(TheTerminal::Instance()->m_scrollRegionActive &&
+                        y_position >= TheTerminal::Instance()->m_topMargin &&
+                        y_position <= TheTerminal::Instance()->m_bottomMargin)
                 {
                     TheTerminal::Instance()->renderScreen();       // Surface to Texture
                     TheTerminal::Instance()->drawTextureScreen();  // Draw Texture to Screen
                     TheTerminal::Instance()->scrollScreenUp();     // Scroll the surface up
                     scrollScreenBuffer();
-                    y_position = TheTerminal::Instance()->bottomMargin;
+                    y_position = TheTerminal::Instance()->m_bottomMargin;
                     cleared_the_screen = false;
                     // Reset to beginning of line.
                     if(x_position > characters_per_line)
@@ -523,9 +314,9 @@ void AnsiParser::textInput(std::string buffer)
                 // Move the last line to the Texture, then
                 // Re display the screen.
                 // test if scrolling region is active and were drawing in it.
-                if(TheTerminal::Instance()->scrollRegionActive &&
-                        y_position >= TheTerminal::Instance()->topMargin &&
-                        y_position <= TheTerminal::Instance()->bottomMargin)
+                if(TheTerminal::Instance()->m_scrollRegionActive &&
+                        y_position >= TheTerminal::Instance()->m_topMargin &&
+                        y_position <= TheTerminal::Instance()->m_bottomMargin)
                 {
                     TheTerminal::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
                     TheTerminal::Instance()->drawTextureScreen();    // Texture to Screen
@@ -534,7 +325,7 @@ void AnsiParser::textInput(std::string buffer)
                     // Reset to beginning of line.
                     if(x_position > characters_per_line)
                         x_position = 1;
-                    y_position = TheTerminal::Instance()->bottomMargin;
+                    y_position = TheTerminal::Instance()->m_bottomMargin;
                 }
                 else if(y_position > NUM_LINES)
                 {
@@ -566,23 +357,23 @@ void AnsiParser::textInput(std::string buffer)
 /*
  * Handle Screen Position and Display Erase
  */
-void AnsiParser::sequenceCursorAndDisplay()
+void SequenceParser::sequenceCursorAndDisplay()
 {
     // Switch on Sequence Terminator
     switch(parameters[0])
     {
-        // WIP
+            // WIP
         case DELETE_CHARACTER:  // ESC[P
             // Deletes the character at the current position by shifting all characters
             // from the current column + p1 left to the current column.  Opened blanks
             // at the end of the line are filled with the current attribute.
-            if (parameters.size() == 1) // Erase current position, move left
+            if(parameters.size() == 1)  // Erase current position, move left
             {
                 TheTerminal::Instance()->renderDeleteCharScreen(
                     x_position -1, y_position -1, 1);
                 break;
             }
-            if (parameters.size() == 2) // Erase current position, move left x
+            if(parameters.size() == 2)  // Erase current position, move left x
             {
                 TheTerminal::Instance()->renderDeleteCharScreen(
                     x_position -1, y_position -1, parameters[1]);
@@ -592,13 +383,13 @@ void AnsiParser::sequenceCursorAndDisplay()
 
         case REPEAT_CHARACTER: // ESC[b
             // Repeat the preceding graphic character P s times (REP).
-            if (parameters.size() == 1) // Repeat Once.
+            if(parameters.size() == 1)  // Repeat Once.
             {
                 std::string stringBuilder(1, (char)preceedingSequence);
                 textInput(stringBuilder);
                 break;
             }
-            if (parameters.size() == 2)
+            if(parameters.size() == 2)
             {
                 std::string stringBuilder(parameters[1], (char)preceedingSequence);
                 textInput(stringBuilder);
@@ -608,13 +399,13 @@ void AnsiParser::sequenceCursorAndDisplay()
 
         case LINE_POS_ABSOLUTE: // ESC[d
             // Line Position Absolute [row] (default = [1,column]) (VPA).
-            if (parameters.size() == 1) // Repeat Once.
+            if(parameters.size() == 1)  // Repeat Once.
             {
                 x_position = 1;
                 y_position = 1;
                 break;
             }
-            if (parameters.size() == 2)
+            if(parameters.size() == 2)
             {
                 x_position = 1;
                 y_position = parameters[1];
@@ -756,8 +547,8 @@ void AnsiParser::sequenceCursorAndDisplay()
             saved_cursor_y  = y_position;
             saved_attribute = color_attribute;
             saved_prev_attr = prev_color_attribute;
-            savedForegroundColor = TheTerminal::Instance()->currentFGColor;
-            savedBackgroundColor = TheTerminal::Instance()->currentBGColor;
+            savedForegroundColor = TheTerminal::Instance()->m_currentFGColor;
+            savedBackgroundColor = TheTerminal::Instance()->m_currentBGColor;
             break;
 
         case RESTORE_CURSOR_POS:
@@ -765,8 +556,8 @@ void AnsiParser::sequenceCursorAndDisplay()
             y_position = saved_cursor_y;
             color_attribute = saved_attribute;
             prev_color_attribute = saved_prev_attr;
-            TheTerminal::Instance()->currentFGColor = savedForegroundColor;
-            TheTerminal::Instance()->currentBGColor = savedBackgroundColor;
+            TheTerminal::Instance()->m_currentFGColor = savedForegroundColor;
+            TheTerminal::Instance()->m_currentBGColor = savedBackgroundColor;
             break;
 
         case CURSOR_X_POSITION: // XTERM
@@ -815,7 +606,7 @@ void AnsiParser::sequenceCursorAndDisplay()
                 x_position = 1;
                 y_position = 1;
                 break;
-            }            
+            }
             break;
 
         case ERASE_TO_EOL:
@@ -850,7 +641,7 @@ void AnsiParser::sequenceCursorAndDisplay()
  * Handle Switching Graphics Mode
  * Colors and Cursor modes.
  */
-void AnsiParser::sequenceGraphicsModeDisplay()
+void SequenceParser::sequenceGraphicsModeDisplay()
 {
     // Switch on Sequence Terminator
     switch(parameters[0])
@@ -863,7 +654,7 @@ void AnsiParser::sequenceGraphicsModeDisplay()
             // Inversion flips colors, however light foreground is translated to dark background.
             // Blinking flips colors, however light foreground is translated to light background
             // Have to double check how iCE colors are supposed to be handled here with blinking.
-            
+
             //esc_sequence.erase(); // Ignore ESC in color, we get that separately.
             current_color.clear();
 
@@ -872,8 +663,8 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                 //current_color = "\x1b[m";
                 prev_color_attribute = 0;
                 color_attribute = 0;
-                TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->grey;
-                TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->black;
+                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREY;
+                TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
                 //screen_buff.color_sequence += current_color;
                 //std::cout << "\r\nESC[M\r\n" << std::endl;
                 break;
@@ -898,8 +689,8 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             //std::cout << "Color_Attribute: " << color_attribute << endl;
                             ////printf("\r\nAll Attributes off: %s:%i", esc_sequence.c_str(), color_attribute);
                             // Set default till it's overridden
-                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->grey;
-                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->black;
+                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREY;
+                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
                             break;
 
                         case 1: // BOLD_ON (increase intensity)
@@ -907,22 +698,22 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             color_attribute = 1;
                             //std::cout << "Color_Attribute: " << color_attribute << endl;
                             // If current color is dark, flip it to light.
-                            if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->currentFGColor,TheTerminal::Instance()->black))
-                                TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->darkGrey;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->currentFGColor,TheTerminal::Instance()->red))
-                                TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightRed;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->currentFGColor,TheTerminal::Instance()->green))
-                                TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightGreen;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->currentFGColor,TheTerminal::Instance()->brown))
-                                TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->yellow;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->currentFGColor,TheTerminal::Instance()->blue))
-                                TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightBlue;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->currentFGColor,TheTerminal::Instance()->magenta))
-                                TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightMagenta;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->currentFGColor,TheTerminal::Instance()->cyan))
-                                TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightCyan;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->currentFGColor,TheTerminal::Instance()->grey))
-                                TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->white;
+                            if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->BLACK))
+                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->DARK_GREY;
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->RED))
+                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_RED;
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->GREEN))
+                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_GREEN;
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->BROWN))
+                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->YELLOW;
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->BLUE))
+                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_BLUE;
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->MAGENTA))
+                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_MAGENTA;
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->CYAN))
+                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_CYAN;
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->GREY))
+                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->WHITE;
                             break;
 
                         case 2: // FAINT (decreased intensity) (Not widely used).
@@ -945,9 +736,9 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             //std::cout << "Color_Attribute: " << color_attribute << endl;
                             // Flip Colors for Ice Colors.
                             SDL_Color tempColor;
-                            tempColor = TheTerminal::Instance()->currentFGColor;
-                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->currentBGColor;
-                            TheTerminal::Instance()->currentBGColor = tempColor;
+                            tempColor = TheTerminal::Instance()->m_currentFGColor;
+                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->m_currentBGColor;
+                            TheTerminal::Instance()->m_currentBGColor = tempColor;
                             break;
 
                         case 6: // BLINK RAPID MS-DOS ANSI.SYS; 150 per minute or more; not widely supported
@@ -958,9 +749,9 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                         case 7: // REVERSE_VIDEO_ON
                             color_attribute = 7;
                             //std::cout << "Color_Attribute: " << color_attribute << endl;
-                            tempColor = TheTerminal::Instance()->currentFGColor;
-                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->currentBGColor;
-                            TheTerminal::Instance()->currentBGColor = tempColor;
+                            tempColor = TheTerminal::Instance()->m_currentFGColor;
+                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->m_currentBGColor;
+                            TheTerminal::Instance()->m_currentBGColor = tempColor;
                             break;
 
                         case 8: // CONCEALED_ON
@@ -992,9 +783,9 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             //current_color += "27";
                             color_attribute = 0;
                             //std::cout << "Color_Attribute: INVERSE OFF " << color_attribute << endl;
-                            tempColor = TheTerminal::Instance()->currentFGColor;
-                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->currentBGColor;
-                            TheTerminal::Instance()->currentBGColor = tempColor;
+                            tempColor = TheTerminal::Instance()->m_currentFGColor;
+                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->m_currentBGColor;
+                            TheTerminal::Instance()->m_currentBGColor = tempColor;
                             break;
 
                         case 28: // CONCEALED_OFF
@@ -1010,7 +801,7 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->black;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->BLACK;
                                     break;
 
                                 case BLINK_ON:
@@ -1018,13 +809,13 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->black;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->darkGrey;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->DARK_GREY;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->black;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
                                             break;
                                     }
                                     break;
@@ -1034,19 +825,19 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->black;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->darkGrey;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->DARK_GREY;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->black;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->darkGrey;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->DARK_GREY;
                                     break;
                             }
                             break;
@@ -1055,7 +846,7 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->red;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->RED;
                                     break;
 
                                 case BLINK_ON:
@@ -1063,13 +854,13 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->red;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->RED;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->lightRed;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_RED;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->red;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->RED;
                                             break;
                                     }
                                     break;
@@ -1079,19 +870,19 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->red;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->RED;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->lightRed;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_RED;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->red;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->RED;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightRed;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_RED;
                                     break;
                             }
                             break;
@@ -1101,7 +892,7 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->green;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREEN;
                                     break;
 
                                 case BLINK_ON:
@@ -1109,13 +900,13 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->green;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREEN;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->lightGreen;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_GREEN;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->green;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREEN;
                                             break;
                                     }
                                     break;
@@ -1125,19 +916,19 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->green;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREEN;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->lightGreen;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_GREEN;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->green;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREEN;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightGreen;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_GREEN;
                                     break;
                             }
                             break;
@@ -1146,7 +937,7 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->brown;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->BROWN;
                                     break;
 
                                 case BLINK_ON:
@@ -1154,13 +945,13 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->brown;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BROWN;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->yellow;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->YELLOW;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->brown;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BROWN;
                                             break;
                                     }
                                     break;
@@ -1170,19 +961,19 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->brown;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BROWN;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->yellow;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->YELLOW;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->brown;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BROWN;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->yellow;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->YELLOW;
                                     break;
                             }
                             break;
@@ -1191,7 +982,7 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->blue;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->BLUE;
                                     break;
 
                                 case BLINK_ON:
@@ -1199,13 +990,13 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->blue;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLUE;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->lightBlue;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_BLUE;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->blue;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLUE;
                                             break;
                                     }
                                     break;
@@ -1215,19 +1006,19 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->blue;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLUE;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->lightBlue;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_BLUE;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->blue;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLUE;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightBlue;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_BLUE;
                                     break;
                             }
                             break;
@@ -1236,7 +1027,7 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->magenta;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->MAGENTA;
                                     break;
 
                                 case BLINK_ON:
@@ -1244,13 +1035,13 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->magenta;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->MAGENTA;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->lightMagenta;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_MAGENTA;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->magenta;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->MAGENTA;
                                             break;
                                     }
                                     break;
@@ -1260,19 +1051,19 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->magenta;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->MAGENTA;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->lightMagenta;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_MAGENTA;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->magenta;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->MAGENTA;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightMagenta;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_MAGENTA;
                                     break;
                             }
                             break;
@@ -1281,7 +1072,7 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->cyan;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->CYAN;
                                     break;
 
                                 case BLINK_ON:
@@ -1289,13 +1080,13 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->cyan;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->CYAN;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->lightCyan;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_CYAN;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->cyan;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->CYAN;
                                             break;
                                     }
                                     break;
@@ -1305,19 +1096,19 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->cyan;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->CYAN;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->lightCyan;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_CYAN;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->cyan;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->CYAN;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightCyan;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_CYAN;
                                     break;
                             }
                             break;
@@ -1326,7 +1117,7 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->grey;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREY;
                                     break;
 
                                 case BLINK_ON:
@@ -1334,13 +1125,13 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->grey;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREY;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->white;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->WHITE;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->grey;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREY;
                                             break;
                                     }
                                     break;
@@ -1350,19 +1141,19 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->grey;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREY;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->white;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->WHITE;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->grey;
+                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREY;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->white;
+                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->WHITE;
                                     break;
                             }
                             break;
@@ -1372,17 +1163,17 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->black;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
                                     break;
 
                                 case BLINK_ON:
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->black; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->darkGrey; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLACK; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->DARKGREY; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->darkGrey;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->DARK_GREY;
                                             break;
                                     }
                                     break;
@@ -1391,16 +1182,16 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->black; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->darkGrey; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLACK; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->DARKGREY; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->black;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->BLACK;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->black;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
                                     break;
                             }
                             break;
@@ -1409,17 +1200,17 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->red;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->RED;
                                     break;
 
                                 case BLINK_ON:
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->red; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->lightRed; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->RED; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTRED; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightRed;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_RED;
                                             break;
                                     }
                                     break;
@@ -1428,16 +1219,16 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->red; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->lightRed; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->RED; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTRED; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->red;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->RED;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->red;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->RED;
                                     break;
                             }
                             break;
@@ -1446,17 +1237,17 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->green;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREEN;
                                     break;
 
                                 case BLINK_ON:
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->green; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->lightGreen; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREEN; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTGREEN; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightGreen;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_GREEN;
                                             break;
                                     }
                                     break;
@@ -1465,16 +1256,16 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->green; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->lightGreen; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREEN; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTGREEN; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->green;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREEN;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->green;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREEN;
                                     break;
                             }
                             break;
@@ -1483,17 +1274,17 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->brown;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BROWN;
                                     break;
 
                                 case BLINK_ON:
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->brown; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->yellow; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BROWN; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->YELLOW; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->yellow;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->YELLOW;
                                             break;
                                     }
                                     break;
@@ -1502,16 +1293,16 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->brown; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->yellow; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BROWN; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->YELLOW; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->brown;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->BROWN;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->brown;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BROWN;
                                     break;
                             }
                             break;
@@ -1520,17 +1311,17 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->blue;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLUE;
                                     break;
 
                                 case BLINK_ON:
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->blue; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->lightBlue; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLUE; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTBLUE; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightBlue;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_BLUE;
                                             break;
                                     }
                                     break;
@@ -1539,16 +1330,16 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->blue; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->lightBlue; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLUE; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTBLUE; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->blue;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->BLUE;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->blue;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLUE;
                                     break;
                             }
                             break;
@@ -1557,16 +1348,16 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->magenta;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->MAGENTA;
                                     break;
 
                                 case BLINK_ON:
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->magenta; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->lightMagenta; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->MAGENTA; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTMAGENTA; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightMagenta;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_MAGENTA;
                                             break;
                                     }
                                     break;
@@ -1575,16 +1366,16 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->magenta; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->lightMagenta; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->MAGENTA; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTMAGENTA; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->magenta;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->MAGENTA;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->magenta;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->MAGENTA;
                                     break;
                             }
                             break;
@@ -1593,17 +1384,17 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->cyan;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->CYAN;
                                     break;
 
                                 case BLINK_ON:
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->cyan; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->lightCyan; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->CYAN; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTCYAN; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->lightCyan;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_CYAN;
                                             break;
                                     }
                                     break;
@@ -1612,16 +1403,16 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->cyan; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->lightCyan; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->CYAN; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTCYAN; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->cyan;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->CYAN;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->cyan;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->CYAN;
                                     break;
                             }
                             break;
@@ -1630,17 +1421,17 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->grey;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREY;
                                     break;
 
                                 case BLINK_ON:
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->grey; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->white; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREY; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->WHITE; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->white;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->WHITE;
                                             break;
                                     }
                                     break;
@@ -1649,16 +1440,16 @@ void AnsiParser::sequenceGraphicsModeDisplay()
                                     // Flip to FG = BG, and BG = FG
                                     switch(prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->grey; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->white; break;
+                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREY; break;
+                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->WHITE; break;
                                         default:
-                                            TheTerminal::Instance()->currentFGColor = TheTerminal::Instance()->grey;
+                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREY;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->currentBGColor = TheTerminal::Instance()->grey;
+                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREY;
                                     break;
                             }
                             break;
@@ -1682,14 +1473,14 @@ void AnsiParser::sequenceGraphicsModeDisplay()
 /*
  * Handle Mode Resets and Responses to Server
  */
-void AnsiParser::sequenceResetAndResponses()
+void SequenceParser::sequenceResetAndResponses()
 {
     switch(parameters[0])
     {
         case SET_MODE: // [?h
             if(parameters.size() == 3 && parameters[1] == '?')
             {
-                switch (parameters[2])
+                switch(parameters[2])
                 {
                     case 7:
                         // Wraparound Mode (DECAWM).
@@ -1710,7 +1501,7 @@ void AnsiParser::sequenceResetAndResponses()
         case RESET_MODE: // [?l
             if(parameters.size() == 3 && parameters[1] == '?')
             {
-                switch (parameters[2])
+                switch(parameters[2])
                 {
                     case 7:
                         // Wraparound Mode disabled (DECAWM).
@@ -1770,17 +1561,17 @@ void AnsiParser::sequenceResetAndResponses()
  * Broken up into (3) Functions to keep it simple and easier to track
  * and maintain. Source Data comes from sequenceParser.cpp
  */
-void AnsiParser::sequenceInput(std::vector<int> sequenceParameters)
+void SequenceParser::sequenceInput(std::vector<int> &sequenceParameters)
 {
     // Grab Parameter Control Sequence.
     try
     {
         parameters.swap(sequenceParameters);
     }
-    catch (std::exception e)
+    catch(std::exception e)
     {
         std::cout << "Exception sequenceInput parameters.swap(sequenceParameters): "
-            << e.what() << std::endl;
+                  << e.what() << std::endl;
     }
 
     // First Handle Any Cursor Movement and Re-display Attributes
@@ -1804,6 +1595,7 @@ void AnsiParser::sequenceInput(std::vector<int> sequenceParameters)
         case ERASE_DISPLAY:
         case ERASE_TO_EOL:
             sequenceCursorAndDisplay();
+            std::vector<int>().swap(parameters);
             return;
         default :
             break;
@@ -1815,6 +1607,7 @@ void AnsiParser::sequenceInput(std::vector<int> sequenceParameters)
     {
         case SET_GRAPHICS_MODE:
             sequenceGraphicsModeDisplay();
+            std::vector<int>().swap(parameters);
             return;
         default:
             break;
@@ -1828,8 +1621,14 @@ void AnsiParser::sequenceInput(std::vector<int> sequenceParameters)
         case SET_KEYBOARD_STRINGS:
         case ANSI_DETECTION:
             sequenceResetAndResponses();
+            std::vector<int>().swap(parameters);
             return;
         default:
             break;
     }
+
+    // Free and Clear!
+    std::vector<int>().swap(parameters);
 }
+
+

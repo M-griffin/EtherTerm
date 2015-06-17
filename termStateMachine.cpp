@@ -4,7 +4,7 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "termStateMachine.h"
+#include "termStateMachine.hpp"
 #include <iostream>
 
 void TermStateMachine::clean()

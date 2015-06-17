@@ -8,7 +8,7 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "terminal.h"
+#include "terminal.hpp"
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
@@ -53,12 +53,11 @@ class SDL_Socket : public SocketState
 public:
 
     SDL_Socket(std::string _host, int _port) :
+        host(_host),
+        port(_port),
         sock(nullptr),
         set(nullptr)
-    {
-        host = _host;
-        port = _port;
-    }
+    { }
 
     virtual ~SDL_Socket()
     {
@@ -88,16 +87,15 @@ public:
 
     FTP_Socket(std::string _host, int _port, std::string _user, std::string _pass)
     :
+        host(_host),
+        port(_port),
+        userId(_user),
+        password(_pass),
         controlSocket(nullptr),
         listenSocket(nullptr),
         dataSocket(nullptr),
         set(nullptr)
-    {
-        host = _host;
-        port = _port;
-        userId = _user;
-        password = _pass;
-    }
+    { }
 
     virtual ~FTP_Socket()
     {
@@ -132,14 +130,13 @@ public:
 
     SSH_Socket(std::string _host, int _port, std::string _user, std::string _pass)
     :
+        host(_host),
+        port(_port),
+        userId(_user),
+        password(_pass),
         sshChannel(nullptr),
         session(nullptr)
-    {
-        host = _host;
-        port = _port;
-        userId = _user;
-        password = _pass;
-    }
+    { }
 
     virtual  ~SSH_Socket()
     {
@@ -163,14 +160,14 @@ public:
 
 
 private:
-
-    ssh_channel sshChannel;
-    ssh_session session;
-
+    
     std::string host;
     int port;
     std::string userId;
     std::string password;
+
+    ssh_channel sshChannel;
+    ssh_session session;
 
 };
 

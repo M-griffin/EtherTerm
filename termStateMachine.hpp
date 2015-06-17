@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <vector>
-#include "termState.h"
+#include "termState.hpp"
 
 class TermStateMachine
 {

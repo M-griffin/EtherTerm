@@ -5,10 +5,10 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "socketState.h"
-#include "socketHandler.h"
-#include "inputHandler.h"
-#include "ansiParser.h"
+#include "socketState.hpp"
+#include "socketHandler.hpp"
+#include "inputHandler.hpp"
+#include "sequenceParser.hpp"
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL_net.h>

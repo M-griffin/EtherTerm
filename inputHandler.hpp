@@ -18,115 +18,121 @@
 
 #include <iostream>
 
-# define CTRLA           0x01
-# define CTRLB           0x02
-# define CTRLC           0x03
-# define CTRLD           0x04
-# define CTRLE           0x05
-# define CTRLF           0x06
-# define CTRLG           0x07
-# define CTRLH           0x08
-# define CTRLI           0x09
-# define CTRLJ           0x0a
-# define CTRLK           0x0b
-# define CTRLL           0x0c
-# define CTRLM           0x0d
-# define CTRLN           0x0e
-# define CTRLO           0x0f
-# define CTRLP           0x10
-# define CTRLQ           0x11
-# define CTRLR           0x12
-# define CTRLS           0x13
-# define CTRLT           0x14
-# define CTRLU           0x15
-# define CTRLV           0x16
-# define CTRLW           0x17
-# define CTRLX           0x18
-# define CTRLY           0x19
-# define CTRLZ           0x1a
-
 class InputHandler
 {
 public:
     static InputHandler* Instance()
     {
-        if(globalInstance == 0)
+        if(!m_globalInstance)
         {
-            globalInstance = new InputHandler();
+            m_globalInstance = new InputHandler();
         }
-        return globalInstance;
+        return m_globalInstance;
     }
 
-    // Release And Clear the Singleton
+// Release And Clear the Singleton
     static void ReleaseInstance()
     {
-        if(globalInstance != 0)
+        if(m_globalInstance)
         {
-            delete globalInstance;
-            globalInstance = 0;
+            delete m_globalInstance;
+            m_globalInstance = nullptr;
         }
         return;
     }
 
-    // keyboard events, True if Data Available.
+// keyboard events, True if Data Available.
     bool update();
     void reset()
     {
-        inputSequence.erase();
+        m_inputSequence.erase();
     }
 
     std::string getInputSequence() const
     {
-        return inputSequence;
+        return m_inputSequence;
     }
+
     bool isGlobalShutdown() const
     {
-        return globalShutdown;
+        return m_globalShutdown;
     }
 
+// mouse events
     bool isMouseSelection() const
     {
-        return isMouseSelected;
+        return m_isMouseSelected;
     }
 
-    // mouse events
     int getMouseSourceXPosition() const
     {
-        return mouseSourceXPosition;
+        return m_mouseSourceXPosition;
     }
     int getMouseSourceYPosition() const
     {
-        return mouseSourceYPosition;
+        return m_mouseSourceYPosition;
     }
 
 private:
 
     void setInputSequence(std::string sequence)
     {
-        inputSequence = sequence;
+        m_inputSequence = sequence;
     }
 
-    bool globalShutdown;
-    bool isWindowMode;
-    int fullScreenWindowSize;
-    bool isMouseSelected;
-    int mouseSourceXPosition;
-    int mouseSourceYPosition;
-    int mouseReleaseXPosition;
-    int mouseReleaseYPosition;
+    bool m_globalShutdown;
+    bool m_isWindowMode;
+    bool m_isMouseSelected;
+    int m_mouseSourceXPosition;
+    int m_mouseSourceYPosition;
+    int m_mouseReleaseXPosition;
+    int m_mouseReleaseYPosition;
+    int m_fullScreenWindowSize;
 
-    std::string inputSequence; // Keyboard Input
-    std::string inputText;     // Copy/Paste Input
+    std::string m_inputSequence; // Keyboard Input
+    std::string m_inputText;     // Copy/Paste Input
 
     InputHandler();
     ~InputHandler();
     InputHandler(const InputHandler&);
     InputHandler& operator=(const InputHandler&);
 
-    // singleton
-    static InputHandler* globalInstance;
+// singleton
+    static InputHandler* m_globalInstance;
 
-    const unsigned char CTRLKEYTABLE[26] =
+    // Control Keys.
+    enum
+    {
+        CTRLA = 0x01,
+        CTRLB = 0x02,
+        CTRLC = 0x03,
+        CTRLD = 0x04,
+        CTRLE = 0x05,
+        CTRLF = 0x06,
+        CTRLG = 0x07,
+        CTRLH = 0x08,
+        CTRLI = 0x09,
+        CTRLJ = 0x0a,
+        CTRLK = 0x0b,
+        CTRLL = 0x0c,
+        CTRLM = 0x0d,
+        CTRLN = 0x0e,
+        CTRLO = 0x0f,
+        CTRLP = 0x10,
+        CTRLQ = 0x11,
+        CTRLR = 0x12,
+        CTRLS = 0x13,
+        CTRLT = 0x14,
+        CTRLU = 0x15,
+        CTRLV = 0x16,
+        CTRLW = 0x17,
+        CTRLX = 0x18,
+        CTRLY = 0x19,
+        CTRLZ = 0x1a
+    };
+
+    const
+    unsigned char CTRL_KEY_TABLE[26] =
     {
         CTRLA, CTRLB, CTRLC, CTRLD, CTRLE,
         CTRLF, CTRLG, CTRLH, CTRLI, CTRLJ,
@@ -136,8 +142,8 @@ private:
         CTRLZ
     };
 
-    // First Break Up into Seperate Functions,
-    // Later Map Enum and and setup commands for the following.
+// First Break Up into Seperate Functions,
+// Later Map Enum and and setup commands for the following.
     void handleWindowEvents(SDL_Event &event);
     bool handleTextInputEvent(SDL_Event &event);
     void handleMouseButtonUpEvent(SDL_Event &event);
@@ -153,6 +159,7 @@ private:
     bool handleSCOKeyMapFunctionKeys(SDL_Event &event);
     bool handleKeyDownEvents(SDL_Event &event);
 };
+
 typedef InputHandler TheInputHandler;
 
 

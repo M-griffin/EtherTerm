@@ -5,15 +5,15 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "socketHandler.h"
-#include "socketState.h"
-#include "terminal.h"
-#include "inputHandler.h"
-#include "ansiParser.h"
+#include "socketHandler.hpp"
+#include "socketState.hpp"
+#include "terminal.hpp"
+#include "inputHandler.hpp"
+#include "sequenceParser.hpp"
 #include <iostream>
 #include <exception>
 
-SocketHandler* SocketHandler::globalInstance = 0;
+SocketHandler* SocketHandler::globalInstance = nullptr;
 
 SocketHandler::SocketHandler() : socket(nullptr), active(false)
 { }
@@ -57,7 +57,7 @@ int SocketHandler::update()
         }
         else if(ret == 0)  // No Data!
         {
-            if(TheAnsiParser::Instance()->isCursorActive())
+            if(TheSequenceParser::Instance()->isCursorActive())
             {
                 startBlinking = true;
                 // Setup Timer for Blinking Cursor

@@ -10,8 +10,6 @@
 #include <vector>
 #include <string>
 
-using namespace std;
-
 typedef struct list_bar
 {
     std::string ansiString1;
@@ -19,35 +17,24 @@ typedef struct list_bar
 
 } list_bar;
 
-typedef struct LineRec
-{
-    std::string data;
-    LineRec     *nextNodeLink;
-    LineRec     *previousNodeLink;
 
-} LineRec;
-
-typedef struct LinkList
+class LinkList
 {
 
-public:
-    // Main List for Holding All Data
-    LineRec *headNode;
-    LineRec *currentNode;
-    LineRec *lastNode;
+public:    
+
+    int m_currentRow;
+    int m_topMargin;
+    int m_bottomMargin;
+    int m_totalLines;
+    int m_currnetLineNumber;
+    int m_currentPage;
+    int m_totalPages;
+    int m_rowsPerPage;
+    int m_currentSelection; // Current Line in Box of Selection.
 
     // Passing Light bars between Interfaces
-    std::vector<list_bar> listing;
-
-    int currentRow;
-    int topMargin;
-    int bottomMargin;
-    int totalLines;
-    int currnetLineNumber;
-    int currentPage;
-    int totalPages;
-    int rowsPerPage;
-    int currentSelection; // Current Line in Box of Selection.
+    std::vector<list_bar> m_listing;
 
     LinkList();
     ~LinkList();
@@ -56,6 +43,6 @@ public:
     void clearVectorList();
     void drawVectorList(unsigned long page, unsigned long list);
 
-} LinkList;
+};
 
 # endif

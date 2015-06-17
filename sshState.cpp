@@ -5,14 +5,14 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "sshState.h"
-#include "mainMenuState.h"
-#include "inputHandler.h"
-#include "ansiParser.h"
-#include "sequenceParser.h"
-#include "terminal.h"
-#include "socketHandler.h"
-#include "menuFunction.h"
+#include "sshState.hpp"
+#include "mainMenuState.hpp"
+#include "inputHandler.hpp"
+#include "sequenceParser.hpp"
+#include "sequenceManager.hpp"
+#include "terminal.hpp"
+#include "socketHandler.hpp"
+#include "menuFunction.hpp"
 
 #include <cstdio>
 
@@ -36,7 +36,7 @@ void SSHState::handleSession()
     if(len < 0)
     {
         // Error - Lost Connection
-        shutdown = true;
+        b_isShutdown = true;
         return;
     }
     // Else No Data just return
@@ -72,7 +72,7 @@ void SSHState::handleSession()
     if(output.size() > 0)
     {
         // Parse Incoming Screen Data
-        TheSequenceParser::Instance()->processSequence(output);       
+        TheSequenceManager::Instance()->decode(output);
         output.erase();
     }
 }
@@ -87,11 +87,11 @@ void SSHState::update()
     // reset the count when we get data or type input.
     static int inputCount = 0;
 
-    if(shutdown || TheInputHandler::Instance()->isGlobalShutdown())
+    if(b_isShutdown || TheInputHandler::Instance()->isGlobalShutdown())
     {
         std::cout << "SSHState::shutdown - changeState(new MainMenuState()" << std::endl;
         TheTerminal::Instance()->getStateMachine()->changeState(new MainMenuState());
-        shutdown = false;
+        b_isShutdown = false;
         return;
     }
 
@@ -99,17 +99,17 @@ void SSHState::update()
     if(TheInputHandler::Instance()->update())
     {
         inputCount = 0;  // reset counter.
-        inputSequence = TheInputHandler::Instance()->getInputSequence();
+        m_inputSequence = TheInputHandler::Instance()->getInputSequence();
 
         if(TheSocketHandler::Instance()->isActive())
         {
-            ret = TheSocketHandler::Instance()->send((unsigned char *)inputSequence.c_str(), (int)inputSequence.size());
+            ret = TheSocketHandler::Instance()->send((unsigned char *)m_inputSequence.c_str(), (int)m_inputSequence.size());
             // Check return value later on on, not used at the moment.
         }
         else
         {
             std::cout << "ERROR !TheSocketHandler::Instance()->isActive()" << std::endl;
-            shutdown = true;
+            b_isShutdown = true;
         }
     }
 
@@ -136,7 +136,7 @@ void SSHState::update()
             case -1:
                 // Lost connection, return to mainMenu. Maybe Prompt or freeze?
                 inputCount = 0;
-                shutdown = true;
+                b_isShutdown = true;
                 break;
             default:
                 // received data, process it.
@@ -148,40 +148,15 @@ void SSHState::update()
     else
     {
         std::cout << "ERROR SSHState::update() >isActive()" << std::endl;
-        shutdown = true;
+        b_isShutdown = true;
     }
 }
 
 bool SSHState::onEnter()
 {
-    TheAnsiParser::Instance()->setCursorActive(true);
+    TheSequenceParser::Instance()->setCursorActive(true);
     std::cout << "entering SSHState\n";
-    shutdown = false;
-
-    // Test Systems
-    //char host[255]= {"entropybbs.co.nz"};
-    //char host[255]= {"montereybbs.ath.cx"};
-    //char host[255]= {"1984.ws"};
-    //char host[255]= {"clutch.darktech.org"};
-    //char host[255]= {"fluph.darktech.org"};
-    //char host[255]= {"oddnetwork.org"};
-    //char host[255]= {"192.168.1.131"};
-    //char host[255]= {"blackflag.acid.org"};
-    //char host[255]= {"d1st.org"};
-    //char host[255]= {"bbs.pharcyde.org"};
-    //char host[255]= {"bloodisland.ph4.se"};
-    //char host[255]= {"maze.io"};
-    //char host[255]= {"skulls.sytes.net"};
-    //char host[255]= {"cyberia.darktech.org"};
-    //char host[255]= {"eob-bbs.com"};
-    //char host[255]= {"192.168.1.126"};
-//    char host[255]= {"127.0.0.1"};
-    //char host[255]= {"192.168.1.145"}; // vmware
-    //char host[255]= {"arcade.demon.co.uk"};
-    //char host[255]= {"hq.pyffle.com"};
-    //char host[255]= {"bbs.outpostbbs.net"};
-    //char host[255]= {"htc.zapto.org"};
-    //char host[255]= {"darksorrow.us"};
+    b_isShutdown = false;
 
     TheTerminal::SystemConnection sysconn;
     sysconn = TheTerminal::Instance()->getSystemConnection();
@@ -195,13 +170,13 @@ bool SSHState::onEnter()
         MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
         MenuFunction::sequenceToAnsi((char *)"|CR|10Login credentials not found. Enter your login below.");
 
-        char loginId[1024] = {0};
+
         char rBuffer[1024] = {0};
-        sprintf(loginId, "|CR|15Use [|07ESC|15] to abort login prompts. |CR|CR|15SSH Login: ");
+        std::string loginId = "|CR|15Use [|07ESC|15] to abort login prompts. |CR|CR|15SSH Login: ";
         int len = 30;
 
         // Setup the Input Field after the Text
-        MenuFunction::inputField(loginId,len);
+        MenuFunction::inputField(loginId, len);
         MenuFunction::sequenceToAnsi(loginId);
 
         // Loop Input
@@ -211,10 +186,10 @@ bool SSHState::onEnter()
             MenuFunction::getLine(rBuffer, len);
             if (rBuffer[0] == '\x1b') // Abort
             {
-                shutdown = true;
+                b_isShutdown = true;
                 TheTerminal::Instance()->clearScreenSurface();
                 TheTerminal::Instance()->renderScreen();
-                TheAnsiParser::Instance()->reset();
+                TheSequenceParser::Instance()->reset();
                 return false;
             }
             else if (strcmp(rBuffer,"") != 0 && strcmp(rBuffer,"\n") != 0)
@@ -227,20 +202,19 @@ bool SSHState::onEnter()
         // Received Shutdown.
         if (TheInputHandler::Instance()->isGlobalShutdown())
         {
-            shutdown = true;
+            b_isShutdown = true;
             TheTerminal::Instance()->clearScreenSurface();
             TheTerminal::Instance()->renderScreen();
-            TheAnsiParser::Instance()->reset();
+            TheSequenceParser::Instance()->reset();
             return false;
         }
 
-        char passwordId[1024] = {0};
         memset(rBuffer,0,sizeof(rBuffer));
-        sprintf(passwordId,
-            "|CR|CR|03(|07Leave password blank to use public key authentication|03)|CR|15SSH Password: ");
+        std::string passwordId =
+            "|CR|CR|03(|07Leave password blank to use public key authentication|03)|CR|15SSH Password: ";
 
         // Setup the Input Field after the Text
-        MenuFunction::inputField(passwordId,len);
+        MenuFunction::inputField(passwordId, len);
         MenuFunction::sequenceToAnsi(passwordId);
 
         // Loop Input
@@ -250,10 +224,10 @@ bool SSHState::onEnter()
             MenuFunction::getLine(rBuffer, len, 0, true);
             if (rBuffer[0] == '\x1b') // Abort
             {
-                shutdown = true;
+                b_isShutdown = true;
                 TheTerminal::Instance()->clearScreenSurface();
                 TheTerminal::Instance()->renderScreen();
-                TheAnsiParser::Instance()->reset();
+                TheSequenceParser::Instance()->reset();
                 return false;
             }
             else if (strcmp(rBuffer,"\n") != 0)
@@ -276,10 +250,10 @@ bool SSHState::onEnter()
     // Received Shutdown.
     if (TheInputHandler::Instance()->isGlobalShutdown())
     {
-        shutdown = true;
+        b_isShutdown = true;
         TheTerminal::Instance()->clearScreenSurface();
         TheTerminal::Instance()->renderScreen();
-        TheAnsiParser::Instance()->reset();
+        TheSequenceParser::Instance()->reset();
         return false;
     }
 
@@ -304,39 +278,38 @@ bool SSHState::onEnter()
         MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
         MenuFunction::getKey();
 
-        std::cout << "Error Connecting!" << std::endl;        
-        shutdown = true;
+        std::cout << "Error Connecting!" << std::endl;
+        b_isShutdown = true;
         TheTerminal::Instance()->clearScreenSurface();
         TheTerminal::Instance()->renderScreen();
-        TheAnsiParser::Instance()->reset();
+        TheSequenceParser::Instance()->reset();
         return false;
     }
- 
+
     // Clear Renderer and ANSI Parser for Fresh Connection.
     TheTerminal::Instance()->clearScreenSurface();
     TheTerminal::Instance()->renderScreen();
-    TheAnsiParser::Instance()->reset();
+    TheSequenceParser::Instance()->reset();
     return true;
 }
 
 bool SSHState::onExit()
 {
     std::cout << "SSHState::onExit()" << std::endl;
-    
+
     // reset the handler(s)
     TheInputHandler::Instance()->reset();
-    TheAnsiParser::Instance()->reset();
+    TheSequenceParser::Instance()->reset();
     TheSocketHandler::Instance()->reset();
 
-    shutdown = true;
+    b_isShutdown = true;
     std::cout << "exiting SSHState" << std::endl;
     return true;
 }
 
+/*
 void SSHState::setCallbacks(const std::vector<Callback>& callbacks)
 {
-
-    /*
     // go through the game objects
     if(!termObjects.empty())
     {
@@ -349,5 +322,6 @@ void SSHState::setCallbacks(const std::vector<Callback>& callbacks)
                 pButton->setCallback(callbacks[pButton->getCallbackID()]);
             }
         }
-    }*/
+    }
 }
+*/

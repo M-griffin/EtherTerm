@@ -13,14 +13,14 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "socketState.h"
-#include "telnetState.h"
-#include "terminal.h"
+//#include "socketState.hpp"
+//#include "telnetState.hpp"
+#include "terminal.hpp"
 // Needed for Clean Shutdown
-#include "ansiParser.h"
-#include "sequenceParser.h"
-#include "inputHandler.h"
-#include "socketHandler.h"
+#include "sequenceParser.hpp"
+#include "sequenceManager.hpp"
+#include "inputHandler.hpp"
+#include "socketHandler.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -54,15 +54,13 @@
 #include <iostream>
 #include <exception>
 
-using namespace std;
-
 /**
  * Reads in ANSI file into Buffer Only
  * For Testing the ANSI Parser.
  */
 void readinAnsi(std::string FileName, std::string &buff)
 {
-    #ifdef _WIN32
+#ifdef _WIN32
     std::string path = "assets\\";
 #else
     std::string path = "assets/";
@@ -94,11 +92,13 @@ void cleanup()
     // Cleanup Surfaces and Textures
     TheTerminal::Instance()->clean();
 
-    //Release Instances
-    TheAnsiParser::ReleaseInstance();
-    TheSequenceParser::ReleaseInstance();
     TheSocketHandler::ReleaseInstance();
     TheInputHandler::ReleaseInstance();
+
+    //Release Instances
+    TheSequenceParser::ReleaseInstance();
+    TheSequenceManager::ReleaseInstance();
+
     TheTerminal::ReleaseInstance();
     std::cout << "Shutdown complete." << std::endl;
     // Pause to check shutdown messages before window closes.
@@ -113,53 +113,79 @@ void cleanup()
 void runTestScreenCases()
 {
 
-// OK!
+    /*
+    // OK!
     // Insert * at 11y 40x.
     std::string seq("\x1b[11;40H*");
     TheSequenceParser::Instance()->processSequence(seq);
 
-// OK!
+    // OK!
     // Line 11 Erase All Text After *, then All Text Before. Leaving only *
     seq = "\x1b[K\x1b[2D\x1b[1K";
     TheSequenceParser::Instance()->processSequence(seq);
 
-// OK!
+    // OK!
     // Line 13 Erase Entire line.
     seq = "\x1b[13;40H*\x1b[2K";
     TheSequenceParser::Instance()->processSequence(seq);
 
-// OK!
+    // OK!
     //Delete all text after and below.
     seq = "\x1b[23;40H*\x1b[J";
     TheSequenceParser::Instance()->processSequence(seq);
 
-// OK!
+    // OK!
     // Delete all text before and above.
     seq = "\x1b[2;40H*\x1b[2D\x1b[1J";
     TheSequenceParser::Instance()->processSequence(seq);
 
-// OK - Works correct, might not be the correct behavior through!
+    // OK - Works correct, might not be the correct behavior through!
     // Move to Line 17, position 1, and newline erase after newline.
     seq = "\x1b[17;10H\r\n";
     TheSequenceParser::Instance()->processSequence(seq);
-
+    */
 }
+
+class argv_range
+{
+public:
+    argv_range(int argc, const char *const argv[])
+        : argc_(argc), argv_(argv)
+    { }
+    const char *const *begin() const
+    {
+        return argv_;
+    }
+    const char *const *end() const
+    {
+        return argv_ + argc_;
+    }
+
+private:
+    const int argc_;
+    const char *const *argv_;
+};
 
 /*
  *  Main Program Entrance
  */
 int main(int argc, char* argv[])
 {
+    std::cout << argc << " arguments" << std::endl;
+    for(auto *arg: argv_range(argc, argv))
+    {
+        // Do something.
+        std::cout << arg << " Parameters" << std::endl;
+    }
     // Run cleanup on exit of program
     atexit(cleanup);
-    std::string temp;
 
     // Get the Folder the Executable runs in.
     std::string realPath;
 #ifdef TARGET_OS_MAC
     char currentPath[PATH_MAX];
     uint32_t size = sizeof(currentPath);
-    if (_NSGetExecutablePath(currentPath, &size) != 0)
+    if(_NSGetExecutablePath(currentPath, &size) != 0)
     {
         std::cout << "Unable to get Program Path!" << std::endl;
     }
@@ -168,12 +194,12 @@ int main(int argc, char* argv[])
     realPath = currentPath;
     std::string::size_type position;
     position = realPath.rfind("/EtherTerm");
-    if (position != std::string::npos)
+    if(position != std::string::npos)
         realPath.erase(position+1,realPath.size()-1);
 
     // remove extra './'
     position = realPath.rfind("./");
-    if (position != std::string::npos)
+    if(position != std::string::npos)
         realPath.erase(position,2);
 
 #elif _WIN32
@@ -187,14 +213,14 @@ int main(int argc, char* argv[])
     }
 
     realPath = currentPath;
-    std::string::size_type position = realPath.rfind("\\",realPath.size()-1);    
-    if (position != std::string::npos)
+    std::string::size_type position = realPath.rfind("\\",realPath.size()-1);
+    if(position != std::string::npos)
         realPath.erase(position+1);
 #else
 
     char exePath[PATH_MAX] = {0};
-    ssize_t result = readlink("/proc/self/exe", exePath, PATH_MAX );
-    if (result < 0)
+    ssize_t result = readlink("/proc/self/exe", exePath, PATH_MAX);
+    if(result < 0)
     {
         std::cout << "Unable to get Program Path!" << std::endl;
         return 1;
@@ -208,7 +234,7 @@ int main(int argc, char* argv[])
     // Remove Executable
     std::string::size_type position;
     position = realPath.rfind("/EtherTerm");
-    if (position != std::string::npos)
+    if(position != std::string::npos)
         realPath.erase(position+1,realPath.size()-1);
 
 #endif
@@ -234,7 +260,7 @@ int main(int argc, char* argv[])
 
                 // Display intro ANSI Screen
                 TheTerminal::Instance()->clearScreenSurface();
-                TheAnsiParser::Instance()->reset();
+                TheSequenceParser::Instance()->reset();
 
                 while(TheTerminal::Instance()->running())
                 {
@@ -245,21 +271,28 @@ int main(int argc, char* argv[])
 
 #ifdef _DEBUG
                     // Test-Case ANSI Cursor Functions
-                    readinAnsi("testcase.ans",temp);
+                    /*
+                    std::string temp;
+                    readinAnsi("testcase.ans", temp);
                     TheSequenceParser::Instance()->processSequence(temp);
                     runTestScreenCases();
                     break;
+                    */
 #endif
 
-                    // Main Loop
+                    // Main Loop, Handle update per State Machine
                     TheTerminal::Instance()->update();
-                }                
+
+                    // Proces Any incoming Data from the State
+                    // Process and send to Screen for Updates.
+                    TheSequenceManager::Instance()->update();
+                }
             }
             else
             {
                 std::cout << "Error Loading Font." << SDL_GetError() << "\n";
                 SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                    "Closed Session", "Error Loading Font.", nullptr);
+                                         "Closed Session", "Error Loading Font.", nullptr);
                 return -1;
             }
         }
@@ -267,7 +300,7 @@ int main(int argc, char* argv[])
         {
             std::cout << "Term init failure: allocating surfaces." << SDL_GetError() << "\n";
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                "Closed Session", "Term init failure: allocating surfaces.", nullptr);
+                                     "Closed Session", "Term init failure: allocating surfaces.", nullptr);
             return -1;
         }
     }
@@ -275,12 +308,12 @@ int main(int argc, char* argv[])
     {
         std::cout << "Term init failure: SDL Init()." << SDL_GetError() << "\n";
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-            "Closed Session", "Term init failure: SDL Init().", nullptr);
+                                 "Closed Session", "Term init failure: SDL Init().", nullptr);
         return -1;
     }
-    
+
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-        "Closed Session", "User has closed the program.", nullptr);
+                             "Closed Session", "User has closed the program.", nullptr);
 
     return 0;
 }
