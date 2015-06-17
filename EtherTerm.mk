@@ -1,6 +1,6 @@
 ##
 ## Auto Generated makefile by CodeLite IDE
-## any manual changes will be erased
+## any manual changes will be erased      
 ##
 ## Release
 ProjectName            :=EtherTerm
@@ -13,30 +13,30 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=02/22/15
+Date                   :=17/06/2015
 CodeLitePath           :="C:\Program Files (x86)\CodeLite"
 LinkerName             :=C:/MinGW-4.8.1/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-4.8.1/bin/g++.exe -shared -fPIC
 ObjectSuffix           :=.o
 DependSuffix           :=.o.d
 PreprocessSuffix       :=.i
-DebugSwitch            :=-g
+DebugSwitch            :=-g 
 IncludeSwitch          :=-I
 LibrarySwitch          :=-l
-OutputSwitch           :=-o
+OutputSwitch           :=-o 
 LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
-SourceSwitch           :=-c
+SourceSwitch           :=-c 
 OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
-Preprocessors          :=
-ObjectSwitch           :=-o
-ArchiveOutputSwitch    :=
+Preprocessors          :=$(PreprocessorSwitch)NDEBUG 
+ObjectSwitch           :=-o 
+ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
 ObjectsFileList        :="EtherTerm.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=makedir
 RcCmpOptions           := 
-RcCompilerName         :=C:/MinGW-4.8.1/bin/windres.exe 
+RcCompilerName         :=C:/MinGW-4.8.1/bin/windres.exe
 LinkOptions            :=  
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)C:/Users/Blue/Downloads/SDL2-devel-2.0.3-mingw/SDL2-2.0.3/include $(IncludeSwitch)C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2 $(IncludeSwitch)C:/Users/Blue/Downloads/libssh-0.6.4/include $(IncludeSwitch)C:/Users/Blue/Downloads/SDL2_ttf-2.0.12/i686-w64-mingw32/include/SDL2 
 IncludePCH             := 
@@ -50,12 +50,12 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:/Users/Blu
 ## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
 ##
 AR       := C:/MinGW-4.8.1/bin/ar.exe rcu
-CXX      := C:/MinGW-4.8.1/bin/g++.exe 
-CC       := C:/MinGW-4.8.1/bin/gcc.exe 
-CXXFLAGS :=  -O2 -Wall -std=gnu++0x $(Preprocessors)
-CFLAGS   :=  -O2 -Wall -std=gnu++0x $(Preprocessors)
+CXX      := C:/MinGW-4.8.1/bin/g++.exe
+CC       := C:/MinGW-4.8.1/bin/gcc.exe
+CXXFLAGS :=  -Wfatal-errors -O2 -pedantic -W -std=c++11 -Wall  $(Preprocessors)
+CFLAGS   :=  -Wfatal-errors -O2 -pedantic -W -std=c++11 -Wall  $(Preprocessors)
 ASFLAGS  := 
-AS       := C:/MinGW-4.8.1/bin/as.exe 
+AS       := C:/MinGW-4.8.1/bin/as.exe
 
 
 ##
@@ -63,21 +63,21 @@ AS       := C:/MinGW-4.8.1/bin/as.exe
 ##
 CodeLiteDir:=C:\Program Files (x86)\CodeLite
 UNIT_TEST_PP_SRC_DIR:=C:\UnitTest++-1.3
-Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/termStateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/termObjectFactory.cpp$(ObjectSuffix) $(IntermediateDirectory)/mainMenuState.cpp$(ObjectSuffix) $(IntermediateDirectory)/inputHandler.cpp$(ObjectSuffix) $(IntermediateDirectory)/stateParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinystr.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinyxml.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinyxmlerror.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinyxmlparser.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/telnetState.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketSSH.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketTelnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketHandler.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuFunction.cpp$(ObjectSuffix) $(IntermediateDirectory)/ansiParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/linkList.cpp$(ObjectSuffix) $(IntermediateDirectory)/sshState.cpp$(ObjectSuffix) $(IntermediateDirectory)/terminal.cpp$(ObjectSuffix) $(IntermediateDirectory)/sequenceParser.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/socketFTP.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketICMP.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/termStateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/inputHandler.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinystr.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinyxml.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinyxmlerror.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinyxmlparser.cpp$(ObjectSuffix) $(IntermediateDirectory)/telnetState.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketSSH.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketTelnet.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/socketHandler.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuFunction.cpp$(ObjectSuffix) $(IntermediateDirectory)/linkList.cpp$(ObjectSuffix) $(IntermediateDirectory)/sshState.cpp$(ObjectSuffix) $(IntermediateDirectory)/terminal.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketFTP.cpp$(ObjectSuffix) $(IntermediateDirectory)/termManager.cpp$(ObjectSuffix) $(IntermediateDirectory)/sequenceDecoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/sequenceParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/mainMenuState.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/screenBuffer.cpp$(ObjectSuffix) $(IntermediateDirectory)/sequenceManager.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuIO.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuManager.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuConfig.cpp$(ObjectSuffix) 
 
 
 
-Objects=$(Objects0)
+Objects=$(Objects0) 
 
 ##
-## Main Build Targets
+## Main Build Targets 
 ##
 .PHONY: all clean PreBuild PrePreBuild PostBuild
 all: $(OutputFile)
 
-$(OutputFile): $(IntermediateDirectory)/.d $(Objects)
+$(OutputFile): $(IntermediateDirectory)/.d $(Objects) 
 	@$(MakeDirCommand) $(@D)
 	@echo "" > $(IntermediateDirectory)/.d
 	@echo $(Objects0)  > $(ObjectsFileList)
@@ -108,22 +108,6 @@ $(IntermediateDirectory)/termStateMachine.cpp$(DependSuffix): termStateMachine.c
 $(IntermediateDirectory)/termStateMachine.cpp$(PreprocessSuffix): termStateMachine.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/termStateMachine.cpp$(PreprocessSuffix) "termStateMachine.cpp"
 
-$(IntermediateDirectory)/termObjectFactory.cpp$(ObjectSuffix): termObjectFactory.cpp $(IntermediateDirectory)/termObjectFactory.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/termObjectFactory.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/termObjectFactory.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/termObjectFactory.cpp$(DependSuffix): termObjectFactory.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/termObjectFactory.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/termObjectFactory.cpp$(DependSuffix) -MM "termObjectFactory.cpp"
-
-$(IntermediateDirectory)/termObjectFactory.cpp$(PreprocessSuffix): termObjectFactory.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/termObjectFactory.cpp$(PreprocessSuffix) "termObjectFactory.cpp"
-
-$(IntermediateDirectory)/mainMenuState.cpp$(ObjectSuffix): mainMenuState.cpp $(IntermediateDirectory)/mainMenuState.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/mainMenuState.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/mainMenuState.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/mainMenuState.cpp$(DependSuffix): mainMenuState.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/mainMenuState.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/mainMenuState.cpp$(DependSuffix) -MM "mainMenuState.cpp"
-
-$(IntermediateDirectory)/mainMenuState.cpp$(PreprocessSuffix): mainMenuState.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/mainMenuState.cpp$(PreprocessSuffix) "mainMenuState.cpp"
-
 $(IntermediateDirectory)/inputHandler.cpp$(ObjectSuffix): inputHandler.cpp $(IntermediateDirectory)/inputHandler.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/inputHandler.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/inputHandler.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/inputHandler.cpp$(DependSuffix): inputHandler.cpp
@@ -131,14 +115,6 @@ $(IntermediateDirectory)/inputHandler.cpp$(DependSuffix): inputHandler.cpp
 
 $(IntermediateDirectory)/inputHandler.cpp$(PreprocessSuffix): inputHandler.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/inputHandler.cpp$(PreprocessSuffix) "inputHandler.cpp"
-
-$(IntermediateDirectory)/stateParser.cpp$(ObjectSuffix): stateParser.cpp $(IntermediateDirectory)/stateParser.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/stateParser.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/stateParser.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/stateParser.cpp$(DependSuffix): stateParser.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/stateParser.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/stateParser.cpp$(DependSuffix) -MM "stateParser.cpp"
-
-$(IntermediateDirectory)/stateParser.cpp$(PreprocessSuffix): stateParser.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/stateParser.cpp$(PreprocessSuffix) "stateParser.cpp"
 
 $(IntermediateDirectory)/tinystr.cpp$(ObjectSuffix): tinystr.cpp $(IntermediateDirectory)/tinystr.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/tinystr.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/tinystr.cpp$(ObjectSuffix) $(IncludePath)
@@ -212,14 +188,6 @@ $(IntermediateDirectory)/menuFunction.cpp$(DependSuffix): menuFunction.cpp
 $(IntermediateDirectory)/menuFunction.cpp$(PreprocessSuffix): menuFunction.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/menuFunction.cpp$(PreprocessSuffix) "menuFunction.cpp"
 
-$(IntermediateDirectory)/ansiParser.cpp$(ObjectSuffix): ansiParser.cpp $(IntermediateDirectory)/ansiParser.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/ansiParser.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/ansiParser.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/ansiParser.cpp$(DependSuffix): ansiParser.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/ansiParser.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/ansiParser.cpp$(DependSuffix) -MM "ansiParser.cpp"
-
-$(IntermediateDirectory)/ansiParser.cpp$(PreprocessSuffix): ansiParser.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/ansiParser.cpp$(PreprocessSuffix) "ansiParser.cpp"
-
 $(IntermediateDirectory)/linkList.cpp$(ObjectSuffix): linkList.cpp $(IntermediateDirectory)/linkList.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/linkList.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/linkList.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/linkList.cpp$(DependSuffix): linkList.cpp
@@ -244,14 +212,6 @@ $(IntermediateDirectory)/terminal.cpp$(DependSuffix): terminal.cpp
 $(IntermediateDirectory)/terminal.cpp$(PreprocessSuffix): terminal.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/terminal.cpp$(PreprocessSuffix) "terminal.cpp"
 
-$(IntermediateDirectory)/sequenceParser.cpp$(ObjectSuffix): sequenceParser.cpp $(IntermediateDirectory)/sequenceParser.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/sequenceParser.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/sequenceParser.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/sequenceParser.cpp$(DependSuffix): sequenceParser.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/sequenceParser.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/sequenceParser.cpp$(DependSuffix) -MM "sequenceParser.cpp"
-
-$(IntermediateDirectory)/sequenceParser.cpp$(PreprocessSuffix): sequenceParser.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/sequenceParser.cpp$(PreprocessSuffix) "sequenceParser.cpp"
-
 $(IntermediateDirectory)/socketFTP.cpp$(ObjectSuffix): socketFTP.cpp $(IntermediateDirectory)/socketFTP.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/socketFTP.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/socketFTP.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/socketFTP.cpp$(DependSuffix): socketFTP.cpp
@@ -260,13 +220,77 @@ $(IntermediateDirectory)/socketFTP.cpp$(DependSuffix): socketFTP.cpp
 $(IntermediateDirectory)/socketFTP.cpp$(PreprocessSuffix): socketFTP.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/socketFTP.cpp$(PreprocessSuffix) "socketFTP.cpp"
 
-$(IntermediateDirectory)/socketICMP.cpp$(ObjectSuffix): socketICMP.cpp $(IntermediateDirectory)/socketICMP.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/socketICMP.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/socketICMP.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/socketICMP.cpp$(DependSuffix): socketICMP.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/socketICMP.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/socketICMP.cpp$(DependSuffix) -MM "socketICMP.cpp"
+$(IntermediateDirectory)/termManager.cpp$(ObjectSuffix): termManager.cpp $(IntermediateDirectory)/termManager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/termManager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/termManager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/termManager.cpp$(DependSuffix): termManager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/termManager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/termManager.cpp$(DependSuffix) -MM "termManager.cpp"
 
-$(IntermediateDirectory)/socketICMP.cpp$(PreprocessSuffix): socketICMP.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/socketICMP.cpp$(PreprocessSuffix) "socketICMP.cpp"
+$(IntermediateDirectory)/termManager.cpp$(PreprocessSuffix): termManager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/termManager.cpp$(PreprocessSuffix) "termManager.cpp"
+
+$(IntermediateDirectory)/sequenceDecoder.cpp$(ObjectSuffix): sequenceDecoder.cpp $(IntermediateDirectory)/sequenceDecoder.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/sequenceDecoder.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/sequenceDecoder.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/sequenceDecoder.cpp$(DependSuffix): sequenceDecoder.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/sequenceDecoder.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/sequenceDecoder.cpp$(DependSuffix) -MM "sequenceDecoder.cpp"
+
+$(IntermediateDirectory)/sequenceDecoder.cpp$(PreprocessSuffix): sequenceDecoder.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/sequenceDecoder.cpp$(PreprocessSuffix) "sequenceDecoder.cpp"
+
+$(IntermediateDirectory)/sequenceParser.cpp$(ObjectSuffix): sequenceParser.cpp $(IntermediateDirectory)/sequenceParser.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/sequenceParser.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/sequenceParser.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/sequenceParser.cpp$(DependSuffix): sequenceParser.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/sequenceParser.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/sequenceParser.cpp$(DependSuffix) -MM "sequenceParser.cpp"
+
+$(IntermediateDirectory)/sequenceParser.cpp$(PreprocessSuffix): sequenceParser.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/sequenceParser.cpp$(PreprocessSuffix) "sequenceParser.cpp"
+
+$(IntermediateDirectory)/mainMenuState.cpp$(ObjectSuffix): mainMenuState.cpp $(IntermediateDirectory)/mainMenuState.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/mainMenuState.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/mainMenuState.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/mainMenuState.cpp$(DependSuffix): mainMenuState.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/mainMenuState.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/mainMenuState.cpp$(DependSuffix) -MM "mainMenuState.cpp"
+
+$(IntermediateDirectory)/mainMenuState.cpp$(PreprocessSuffix): mainMenuState.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/mainMenuState.cpp$(PreprocessSuffix) "mainMenuState.cpp"
+
+$(IntermediateDirectory)/screenBuffer.cpp$(ObjectSuffix): screenBuffer.cpp $(IntermediateDirectory)/screenBuffer.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/screenBuffer.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/screenBuffer.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/screenBuffer.cpp$(DependSuffix): screenBuffer.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/screenBuffer.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/screenBuffer.cpp$(DependSuffix) -MM "screenBuffer.cpp"
+
+$(IntermediateDirectory)/screenBuffer.cpp$(PreprocessSuffix): screenBuffer.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/screenBuffer.cpp$(PreprocessSuffix) "screenBuffer.cpp"
+
+$(IntermediateDirectory)/sequenceManager.cpp$(ObjectSuffix): sequenceManager.cpp $(IntermediateDirectory)/sequenceManager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/sequenceManager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/sequenceManager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/sequenceManager.cpp$(DependSuffix): sequenceManager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/sequenceManager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/sequenceManager.cpp$(DependSuffix) -MM "sequenceManager.cpp"
+
+$(IntermediateDirectory)/sequenceManager.cpp$(PreprocessSuffix): sequenceManager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/sequenceManager.cpp$(PreprocessSuffix) "sequenceManager.cpp"
+
+$(IntermediateDirectory)/menuIO.cpp$(ObjectSuffix): menuIO.cpp $(IntermediateDirectory)/menuIO.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/menuIO.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/menuIO.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/menuIO.cpp$(DependSuffix): menuIO.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/menuIO.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/menuIO.cpp$(DependSuffix) -MM "menuIO.cpp"
+
+$(IntermediateDirectory)/menuIO.cpp$(PreprocessSuffix): menuIO.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/menuIO.cpp$(PreprocessSuffix) "menuIO.cpp"
+
+$(IntermediateDirectory)/menuManager.cpp$(ObjectSuffix): menuManager.cpp $(IntermediateDirectory)/menuManager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/menuManager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/menuManager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/menuManager.cpp$(DependSuffix): menuManager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/menuManager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/menuManager.cpp$(DependSuffix) -MM "menuManager.cpp"
+
+$(IntermediateDirectory)/menuManager.cpp$(PreprocessSuffix): menuManager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/menuManager.cpp$(PreprocessSuffix) "menuManager.cpp"
+
+$(IntermediateDirectory)/menuConfig.cpp$(ObjectSuffix): menuConfig.cpp $(IntermediateDirectory)/menuConfig.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/menuConfig.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/menuConfig.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/menuConfig.cpp$(DependSuffix): menuConfig.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/menuConfig.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/menuConfig.cpp$(DependSuffix) -MM "menuConfig.cpp"
+
+$(IntermediateDirectory)/menuConfig.cpp$(PreprocessSuffix): menuConfig.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/menuConfig.cpp$(PreprocessSuffix) "menuConfig.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
@@ -274,11 +298,6 @@ $(IntermediateDirectory)/socketICMP.cpp$(PreprocessSuffix): socketICMP.cpp
 ## Clean
 ##
 clean:
-	$(RM) ./Release/*$(ObjectSuffix)
-	$(RM) ./Release/*$(DependSuffix)
-	$(RM) $(OutputFile)
-	$(RM) $(OutputFile).exe
-	$(RM) ./EtherTerm
-
+	$(RM) -r ./Release/
 
 
