@@ -126,13 +126,16 @@ public:
 
     // Reset Static Variables values for the class
     void reset();
+
     // Parses Straight Text input with no control sequences
     void textInput(const std::string &buffer);
+
     // Parses Control sequences passed in vector. (sequenceParser)
     void sequenceCursorAndDisplay();
     void sequenceGraphicsModeDisplay();
     void sequenceResetAndResponses();
-    // Handles Browk Down ESC Sequences.
+
+    // Handles parameterized ESC Sequences.
     void sequenceInput(std::vector<int> &sequenceParameters);
 
     bool isCursorActive()

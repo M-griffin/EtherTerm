@@ -1568,7 +1568,7 @@ void SequenceParser::sequenceInput(std::vector<int> &sequenceParameters)
     {
         parameters.swap(sequenceParameters);
     }
-    catch(std::exception e)
+    catch(std::exception &e)
     {
         std::cout << "Exception sequenceInput parameters.swap(sequenceParameters): "
                   << e.what() << std::endl;

@@ -407,7 +407,9 @@ void MenuFunction::menuReload()
 
 /**
  * Check if Menu Exists
- */
+ *
+ * Not used at this time
+ *
 int MenuFunction::menuExists()
 {
     std::string path = setupMenuPath();
@@ -429,6 +431,7 @@ int MenuFunction::menuExists()
     }
     return true;
 }
+*/
 
 /**
  * Function to Read in a Menu set in the class

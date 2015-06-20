@@ -79,7 +79,9 @@ void MenuManager::readDirectoryListing()
 
 /**
  * Dial-directory - Change ANSI Template Theme
- */
+ *
+ * Not Used At this Time.
+ *
 bool MenuManager::changeTheme(int index)
 {
     if(!ddirectory_parse(index))
@@ -91,6 +93,7 @@ bool MenuManager::changeTheme(int index)
     m_linkList.m_bottomMargin = BOTTOM_MARGIN;
     return true;
 }
+*/
 
 /**
  * Build Phone-book with List of Systems

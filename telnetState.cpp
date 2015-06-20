@@ -9,8 +9,8 @@
 #include "telnetState.hpp"
 #include "mainMenuState.hpp"
 #include "inputHandler.hpp"
-#include "sequenceParser.hpp"
 #include "sequenceManager.hpp"
+#include "sequenceParser.hpp"
 #include "terminal.hpp"
 #include "socketHandler.hpp"
 

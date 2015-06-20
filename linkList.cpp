@@ -30,6 +30,7 @@ LinkList::LinkList() :
 
 LinkList::~LinkList()
 {
+    // Clear
     std::vector<list_bar>().swap(m_listing);
 }
 
@@ -44,11 +45,14 @@ void LinkList::getVectorList(std::vector<list_bar> listbar)
 
 /**
  * Wipe Out List Completely & Free Memory.
- */
+ *
+ * Not used at This Time
+ *
 void LinkList::clearVectorList()
 {
     std::vector<list_bar>().swap(m_listing);
 }
+*/
 
 /**
  * New Faster Full Screen Interface for Light-bars and Lists

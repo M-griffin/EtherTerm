@@ -25,6 +25,9 @@ void TermStateMachine::update()
     }
 }
 
+/*
+ * Not Used at This Time
+ *
 void TermStateMachine::pushState(TermState *theState)
 {
     TermStates.push_back(theState);
@@ -40,6 +43,7 @@ void TermStateMachine::popState()
     }
     TermStates.back()->resume();
 }
+*/
 
 void TermStateMachine::changeState(TermState *theState)
 {

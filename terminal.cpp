@@ -519,10 +519,12 @@ void Terminal::freeSurfaceTextures()
 /*
  * Store Images later in a zip file.
  * Not in use at this time!
- */
+ *
+ * Not used at this time
+ *
 bool Terminal::loadBitmapImageFromPak()
 {
-    /* Require minizip lib.
+    // Require minizip lib.
     // useful things from zlib/unzip.h
     unzFile            zip;
     unz_file_info    info;
@@ -583,9 +585,10 @@ bool Terminal::loadBitmapImageFromPak()
     free(buffer);
     SDL_FreeRW(rw);
     unzClose(zip);
-    */
+
     return m_cachedSurface != nullptr;
 }
+*/
 
 /**
 * Loads the Bitmap Font Image
@@ -1840,69 +1843,6 @@ void Terminal::renderCursorOffScreen()
     }
 }
 
-/*
- * This hints or highlights the current screen
- * Doesn't exactly change Gama, was just testing!
- * Could be used lateron for something.
- */
-void Terminal::drawGamaTextureScreen()
-{
-    // Next create a texture to overlay for highlighting
-    // Create Initial Texture if it doesn't exist.
-    if(!m_selectionTexture)
-    {
-        createTexture(SELECTION_TEXTURE, m_screenSurface);
-        if(!m_selectionTexture)
-        {
-            SDL_Log("drawGamaTextureScreen() SDL_CreateTexture selectionTexture: %s",
-                    SDL_GetError());
-            assert(m_selectionTexture);
-        }
-    }
-
-    // Set Render Target to the Texture.
-    if(SDL_SetRenderTarget(m_globalRenderer, m_selectionTexture) < 0)
-    {
-        SDL_Log("drawGamaTextureScreen() SDL_SetRenderTarget selectionTexture: %s",
-                SDL_GetError());
-    }
-    // Clear the Texture
-    if(SDL_RenderClear(m_globalRenderer) < 0)
-    {
-        SDL_Log("drawGamaTextureScreen() SDL_RenderClear selectionTexture: %s",
-                SDL_GetError());
-    }
-    // Fill new texture with Cyan Highlight.
-    if(SDL_SetRenderDrawColor(m_globalRenderer, 255 , 255 , 255,  1) < 0)
-    {
-        SDL_Log("drawGamaTextureScreen() SDL_SetRenderDrawColor selectionTexture: %s",
-                SDL_GetError());
-    }
-    // Can test filling to RECT to speed this up after it's working!
-    if(SDL_RenderFillRect(m_globalRenderer, nullptr) < 0)
-    {
-        SDL_Log("drawGamaTextureScreen() SDL_RenderFillRect NULL: %s",
-                SDL_GetError());
-    }
-    //Reset back to Global Render, then push update over current texture
-    if(SDL_SetRenderTarget(m_globalRenderer, nullptr) < 0)
-    {
-        SDL_Log("drawGamaTextureScreen() SDL_SetRenderTarget NULL: %s",
-                SDL_GetError());
-    }
-    // Render final update
-    if(SDL_RenderCopy(m_globalRenderer, m_selectionTexture, nullptr, nullptr) < 0)
-    {
-        SDL_Log("drawGamaTextureScreen() SDL_RenderCopy globalRenderer: %s",
-                SDL_GetError());
-    }
-
-    // Reset don't need it?
-    //SDL_SetRenderDrawColor(globalRenderer, 0x00, 0x00, 0x00, 0xFF);
-    SDL_RenderPresent(m_globalRenderer);
-}
-
-
 /**
  * Transfers the Buffer to a Texture and
  * Renders the Screen
@@ -2158,19 +2098,20 @@ void Terminal::drawChar(int X, int Y, int asciicode)
  * If String is longer then screen will wrap to next line.
  * NOTE Add scrolling if hits bottom of page,
  * But this will most likely be done in the ANSI Parser.
- */
+ *
+ * Not Used at this time
 void Terminal::drawString(int X, int Y, char text[])
 {
     SDL_Rect area;
 
     int i = 0;
-    int asciiCode;
+    int asciiCode = 0;
     area.x = X;
     area.y = Y;
 
     for(i = 0; i < (signed)strlen(text); i++)
     {
-        asciiCode = std::char_traits<char>().to_int_type(text[i]);
+        asciiCode = std::char_traits<unsigned char>().to_int_type(text[i]);
         drawChar(area.x / m_characterWidth, area.y / m_characterHeight, asciiCode);
         area.x += m_characterWidth;
         if(area.x >= m_surfaceWidth-5)
@@ -2180,17 +2121,20 @@ void Terminal::drawString(int X, int Y, char text[])
         }
     }
 }
+*/
 
 /**
  * Draws Character Set of each Character Cells to x/y location on screen surface.
  * If String is longer then screen will wrap to next line.
  * Mainly for testing all characters loaded from Bitmap Image.
- */
+ *
+ * Not used at this time
+ *
 void Terminal::drawCharSet(int X, int Y)
 {
     SDL_Rect area;
     int i = 0;
-    int asciiCode;
+    int asciiCode = 0;
     area.x = X * m_characterWidth;
     area.y = Y * m_characterHeight;
 
@@ -2212,3 +2156,4 @@ void Terminal::drawCharSet(int X, int Y)
         }
     }
 }
+*/

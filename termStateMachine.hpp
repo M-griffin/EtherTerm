@@ -18,9 +18,9 @@ public:
     TermStateMachine() {}
     ~TermStateMachine() { std::cout << "TermStateMachine Released" << std::endl; }
     void update();
-    void pushState(TermState* theState);
+    //void pushState(TermState* theState);
     void changeState(TermState* theState);
-    void popState();
+    //void popState();
     void clean();
     std::vector<TermState*>& getTermStates() { return TermStates; }
 

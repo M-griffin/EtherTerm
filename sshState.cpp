@@ -23,13 +23,9 @@ const std::string SSHState::sshID = "SSH";
  */
 void SSHState::handleSession()
 {
-    std::string ansiret;
-    std::string output;
-
     int len = 0;
-    char msgBuffer[8193]= {'\0'};
-    std::string newstring;
-    unsigned char ch;
+    char msgBuffer[8193] = {'\0'};
+    std::string output;
 
     // Get Socket Data From Server
     len = TheSocketHandler::Instance()->recv(msgBuffer);
@@ -43,8 +39,8 @@ void SSHState::handleSession()
     else if(len == 0)
         return;
 
-    //std::cout << "Received SSH Socket Data: " << msgBuffer << std::endl;
     // Loop through data remove any nulls.
+    unsigned char ch;
     for(int i = 0; i < len; i++)
     {
         ch = msgBuffer[i];

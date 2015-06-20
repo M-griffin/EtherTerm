@@ -859,7 +859,7 @@ void SequenceDecoder::validateSequence()
 #ifdef _DEBUG
     std::cout << "Validate Sequence: " << m_sequenceBuilder << std::endl;
 #endif
-    int sequenceTerminator = 0;
+
 
     // Check and clear vector for fresh sequence
     // We only Validate on complete sequences, so we can clear here
@@ -880,7 +880,7 @@ void SequenceDecoder::validateSequence()
     {
         // Remove ESC [ then get Terminator
         m_sequenceBuilder.erase(0,2);
-        sequenceTerminator =
+        int sequenceTerminator =
             m_sequenceBuilder[m_sequenceBuilder.size()-1];
 
         // First Parameter is always the Sequence Terminator.

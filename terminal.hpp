@@ -177,7 +177,7 @@ public:
     void clearSelectionTexture();
     void renderSelectionScreen(int x, int y);
     void freeSurfaceTextures();
-    bool loadBitmapImageFromPak();
+    //bool loadBitmapImageFromPak();
     bool loadBitmapImage(std::string fontName);
 
     void createTexture(int textureType, SDL_Surface *surface);
@@ -199,15 +199,14 @@ public:
     void renderCharScreen(int x, int y);
     void renderCursorOnScreen();
     void renderCursorOffScreen();
-    void drawGamaTextureScreen();
     void drawTextureScreen();
     void clearScreen();
     int  compareSDL_Colors(SDL_Color &src, SDL_Color &dest);
     void replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 background);
     void setupCursorChar();
     void drawChar(int X, int Y, int asciicode);
-    void drawString(int X, int Y, char text[]);
-    void drawCharSet(int X, int Y);
+    //void drawString(int X, int Y, char text[]);
+    //void drawCharSet(int X, int Y);
 
     std::vector<std::string> getFontFiles()
     {

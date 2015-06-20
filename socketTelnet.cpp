@@ -52,13 +52,13 @@ int SDL_Socket::recvSocket(char *message)
 
     result = SDLNet_TCP_Recv(sock, message, 8192);
     // Testing, grab 1 char at a time.
-#ifdef _DEBUG
+/*
     result = SDLNet_TCP_Recv(sock, message, 1);
     if (message[0] == '\n')
         std::cout << std::endl;
     else
         std::cout << message << std::flush;
-#endif
+*/
     if(result <= 0)
     {
         // -1 is Error 0 is Server Closed Connection

@@ -40,7 +40,7 @@ public:
     ~LinkList();
 
     void getVectorList(std::vector<list_bar> listbar);
-    void clearVectorList();
+    //void clearVectorList();
     void drawVectorList(unsigned long page, unsigned long list);
 
 };

@@ -49,7 +49,6 @@ int FTP_Socket::sendSocket(unsigned char *buf, Uint32 len)
 int FTP_Socket::recvSocket(char *message)
 {
     Uint32 result;
-    std::string buf;
 
     /* get the string buffer over the socket */
     result = SDLNet_TCP_Recv(controlSocket, message, 8192);

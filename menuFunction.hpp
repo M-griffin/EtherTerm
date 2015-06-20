@@ -100,7 +100,7 @@ public:
     // Read in / Load Menu and Commands
     void menuReadCommands();
     void menuReload();
-    int  menuExists();
+    //int  menuExists();
     void menuStart(std::string curentMenu);
     void menuClearObjects();
 

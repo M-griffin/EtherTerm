@@ -320,6 +320,9 @@ int SSH_Socket::verify_knownhost()
     return 0;
 }
 
+/*
+ * Not Used At this Time.
+ *
 int SSH_Socket::authenticate_kbdint()
 {
     int rc;
@@ -374,7 +377,7 @@ int SSH_Socket::authenticate_kbdint()
     }
     return rc;
 }
-
+*/
 
 int SSH_Socket::authenticate_console()
 {

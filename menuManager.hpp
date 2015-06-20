@@ -53,7 +53,7 @@ public:
     std::vector<list_bar> buildDialList();
     void  readinAnsi(std::string FileName, std::string &buff);
     void  parseHeader(std::string FileName);
-    bool  changeTheme(int idx);
+    //bool  changeTheme(int idx);
     void  readDirectoryListing();
 
     bool  readDialDirectory();

@@ -13,8 +13,6 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-//#include "socketState.hpp"
-//#include "telnetState.hpp"
 #include "terminal.hpp"
 // Needed for Clean Shutdown
 #include "sequenceParser.hpp"
@@ -47,42 +45,15 @@
 #include <cstring>
 #include <climits>
 #include <string>
-#include <cstdlib>
-#include <sstream>
-#include <fstream>
-
 #include <iostream>
-#include <exception>
+//#include <cstdlib>
+//#include <sstream>
+//#include <fstream>
 
-/**
- * Reads in ANSI file into Buffer Only
- * For Testing the ANSI Parser.
- */
-void readinAnsi(std::string FileName, std::string &buff)
-{
-#ifdef _WIN32
-    std::string path = "assets\\";
-#else
-    std::string path = "assets/";
-#endif
-    path += FileName;
-    FILE *fp;
 
-    int c = 0;
-    if((fp = fopen(path.c_str(), "r+")) ==  nullptr)
-    {
-        printf("\r\n*** ANSI not found\r\n");
-        return;
-    }
-    do
-    {
-        c = getc(fp);
-        if(c != EOF)
-            buff += c;
-    }
-    while(c != EOF);
-    fclose(fp);
-}
+//#include <exception>
+
+
 
 /*
  * Shutdown Procedures
@@ -101,50 +72,8 @@ void cleanup()
 
     TheTerminal::ReleaseInstance();
     std::cout << "Shutdown complete." << std::endl;
-    // Pause to check shutdown messages before window closes.
-    //char ch;
-    //std::cin.get(ch);
 }
 
-/*
- * Screen Test Cases to make sure
- * EOL and Screen Erasing functions are working properly.
- */
-void runTestScreenCases()
-{
-
-    /*
-    // OK!
-    // Insert * at 11y 40x.
-    std::string seq("\x1b[11;40H*");
-    TheSequenceParser::Instance()->processSequence(seq);
-
-    // OK!
-    // Line 11 Erase All Text After *, then All Text Before. Leaving only *
-    seq = "\x1b[K\x1b[2D\x1b[1K";
-    TheSequenceParser::Instance()->processSequence(seq);
-
-    // OK!
-    // Line 13 Erase Entire line.
-    seq = "\x1b[13;40H*\x1b[2K";
-    TheSequenceParser::Instance()->processSequence(seq);
-
-    // OK!
-    //Delete all text after and below.
-    seq = "\x1b[23;40H*\x1b[J";
-    TheSequenceParser::Instance()->processSequence(seq);
-
-    // OK!
-    // Delete all text before and above.
-    seq = "\x1b[2;40H*\x1b[2D\x1b[1J";
-    TheSequenceParser::Instance()->processSequence(seq);
-
-    // OK - Works correct, might not be the correct behavior through!
-    // Move to Line 17, position 1, and newline erase after newline.
-    seq = "\x1b[17;10H\r\n";
-    TheSequenceParser::Instance()->processSequence(seq);
-    */
-}
 
 class argv_range
 {
@@ -268,17 +197,6 @@ int main(int argc, char* argv[])
                     if(TheTerminal::Instance()->didFontChange())
                         TheTerminal::Instance()->loadBitmapImage(
                             TheTerminal::Instance()->getCurrentFont());
-
-#ifdef _DEBUG
-                    // Test-Case ANSI Cursor Functions
-                    /*
-                    std::string temp;
-                    readinAnsi("testcase.ans", temp);
-                    TheSequenceParser::Instance()->processSequence(temp);
-                    runTestScreenCases();
-                    break;
-                    */
-#endif
 
                     // Main Loop, Handle update per State Machine
                     TheTerminal::Instance()->update();

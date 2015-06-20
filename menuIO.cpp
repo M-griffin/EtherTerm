@@ -63,7 +63,9 @@ void MenuIO::leftSpacing(std::string &str, int space)   // Pad Left
 
 /**
  * Mask Input
- */
+ *
+ * Not Used at This Time
+ *
 void MenuIO::maskInput(std::string &str)
 {
     std::string Line = "";
@@ -74,6 +76,7 @@ void MenuIO::maskInput(std::string &str)
         Line += '*';
     str = Line;
 }
+*/
 
 /**
  * Sets up input field with background color
@@ -211,7 +214,9 @@ int MenuIO::getKey()
 
 /*
  * Get Single Key Input (Non-Blocking)
- */
+ *
+ * Not Used At this time.
+ *
 int MenuIO::checkKey()
 {
     std::string inputSequence;
@@ -230,6 +235,7 @@ int MenuIO::checkKey()
     }
     return inputSequence[0];
 }
+*/
 
 /*
  * Get Input up to <ENTER>
@@ -379,8 +385,6 @@ void MenuIO::getLine(char *line,     // Returns Input into Line
         // on VT100 Terms 127 DEL == BS!
         // Since we have no DELETE in this, delete on 1 liens will works like BS.
         else if((int)sequence == 0x08 ||
-                (int)sequence == 127  ||
-                (int)sequence == 8    ||
                 (int)sequence == 207  ||
                 (int)sequence == 0x7f)
         {
