@@ -77,7 +77,7 @@ To add new systems or remove, you must edit the ``assets/dialdirectory.xml`` fil
 Downloads
 =========
 
-- `Windows 2.6 Preview <https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.6.zip>`_
+- `Windows 2.7 Preview <https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.7.zip>`_
 
 For all other systems, you must build from the project folder.
 
@@ -148,11 +148,22 @@ Arch Linux
 Changelog
 =========
 
+**v2.7**
+
+- Reworking of the internal systems
+- Added buffering for input sequences
+- Updated make file for better optimizations and error checking.
+
+**v2.4 - 2.6**
+
+- Reworking of the internal systems and various fixes
+- fixes for public key authentication
+
 **v2.3**
 
 - ``ALT + H`` for quick disconnection ("hangup")
 - SSH login/password prompts when not specified in ``assets/dialdirectory.xml``
-- selection of various input key mappings (VT100, ANSI, etc.)
+- Selection of various input key mappings (VT100, ANSI, etc.)
 
 TODO
 ====
@@ -165,7 +176,6 @@ TODO
 - alternative window sizes, currently limited to only 80x25.
 - attempting to reach compliance with terminal type 'xterm-256color'.
 - transfer protocols (x, y, and z-modem).
-- ssh pubkey authentication.
 - ftp client support.
 - utf-8 encoding.
 
