@@ -123,23 +123,25 @@ void TelnetState::update()
     if(TheInputHandler::Instance()->update())
     {
         inputCount = 0;  // reset counter.
-        inputSequence = TheInputHandler::Instance()->getInputSequence();
-        if(TheSocketHandler::Instance()->isActive())
+        if (TheInputHandler::Instance()->getInputSequence(inputSequence))
         {
-            ret = TheSocketHandler::Instance()->send((unsigned char *)inputSequence.c_str(), (int)inputSequence.size());
-            // Check return value later on on, not used at the moment.
-            // Server is not echoing input back to us, we need to do it ourselves.
-            // Jump into LINE MODE Editing here.
-            //***
-            if(m_isECHOCompleted)
+            if(TheSocketHandler::Instance()->isActive())
             {
-                TheSequenceManager::Instance()->decode(inputSequence);
+                ret = TheSocketHandler::Instance()->send((unsigned char *)inputSequence.c_str(), (int)inputSequence.size());
+                // Check return value later on on, not used at the moment.
+                // Server is not echoing input back to us, we need to do it ourselves.
+                // Jump into LINE MODE Editing here.
+                //***
+                if(m_isECHOCompleted)
+                {
+                    TheSequenceManager::Instance()->decode(inputSequence);
+                }
             }
-        }
-        else
-        {
-            std::cout << "ERROR !TheSocketHandler::Instance()->isActive()" << std::endl;
-            m_isShutdown = true;
+            else
+            {
+                std::cout << "ERROR !TheSocketHandler::Instance()->isActive()" << std::endl;
+                m_isShutdown = true;
+            }
         }
     }
 

@@ -742,8 +742,12 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
 
             case 'A': // About
                 parseHeader((char *)"about.ans");
+
+                // Get input (Blocking!) This should be rewritten later on.
                 MenuFunction::getKey();
                 parseHeader((char *)"about2.ans");
+
+                // Get input (Blocking!) This should be rewritten later on.
                 MenuFunction::getKey();
                 parseHeader((char *)"et2.ans"); // Re-display Display ANSI
                 m_linkList.drawVectorList(m_currentPage,LIGHTBAR_POSITION);

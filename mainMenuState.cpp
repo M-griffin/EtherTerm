@@ -49,45 +49,50 @@ void MainMenuState::update()
 
     if(TheInputHandler::Instance()->update())
     {
-        std::string inputSequence = TheInputHandler::Instance()->getInputSequence();
-        int ret = m_menuManager.handleMenuUpdates(inputSequence);
-        m_menuManager.updateDialDirectory();
+        std::string inputSequence;
+        int ret = 0;
 
-        TheTerminal::SystemConnection sysCon;
-        if(!TheInputHandler::Instance()->isGlobalShutdown())
+        if (TheInputHandler::Instance()->getInputSequence(inputSequence))
         {
-            switch(ret)
+            ret = m_menuManager.handleMenuUpdates(inputSequence);
+            m_menuManager.updateDialDirectory();
+
+            TheTerminal::SystemConnection sysCon;
+            if(!TheInputHandler::Instance()->isGlobalShutdown())
             {
-                case EOF:
-                    // default.
-                    TheTerminal::Instance()->setCurrentFont("vga8x16.bmp");
-                    if(TheTerminal::Instance()->didFontChange())
-                        TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
-
-                    MenuFunction::displayAnsiFile("outro.ans");
-                    SDL_Delay(1500);
-                    TheTerminal::Instance()->quit();
-                    break;
-
-                default:
-                    sysCon = TheTerminal::Instance()->getSystemConnection();
-                    if(sysCon.protocol == "TELNET")
-                    {
-                        TheTerminal::Instance()->setCurrentFont(sysCon.font);
+                switch(ret)
+                {
+                    case EOF:
+                        // default.
+                        TheTerminal::Instance()->setCurrentFont("vga8x16.bmp");
                         if(TheTerminal::Instance()->didFontChange())
                             TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
-                        // Switch to Telnet State
-                        menuStartTelnet();
-                    }
-                    else if(sysCon.protocol == "SSH")
-                    {
-                        TheTerminal::Instance()->setCurrentFont(sysCon.font);
-                        if(TheTerminal::Instance()->didFontChange())
-                            TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
-                        // Switch to SSH State
-                        menuStartSSH();
-                    }
-                    break;
+
+                        MenuFunction::displayAnsiFile("outro.ans");
+                        SDL_Delay(1500);
+                        TheTerminal::Instance()->quit();
+                        break;
+
+                    default:
+                        sysCon = TheTerminal::Instance()->getSystemConnection();
+                        if(sysCon.protocol == "TELNET")
+                        {
+                            TheTerminal::Instance()->setCurrentFont(sysCon.font);
+                            if(TheTerminal::Instance()->didFontChange())
+                                TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
+                            // Switch to Telnet State
+                            menuStartTelnet();
+                        }
+                        else if(sysCon.protocol == "SSH")
+                        {
+                            TheTerminal::Instance()->setCurrentFont(sysCon.font);
+                            if(TheTerminal::Instance()->didFontChange())
+                                TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
+                            // Switch to SSH State
+                            menuStartSSH();
+                        }
+                        break;
+                }
             }
         }
     }

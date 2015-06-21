@@ -7,6 +7,8 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
+//#include "safeQueue.hpp"
+
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
 #elif _WIN32
@@ -17,6 +19,15 @@
 #endif
 
 #include <iostream>
+#include <string>
+
+/*
+ * WIP - Were going to make a SafeQueue of SDL_Events
+ * On Pool, we'll loop all events per frame,
+ * Save them into the queue, then cycle them so
+ * we don't look any on actions.  Might need to revisit
+ * how actions are taken, if they should be queued instead!
+ */
 
 class InputHandler
 {
@@ -48,9 +59,17 @@ public:
         m_inputSequence.erase();
     }
 
-    std::string getInputSequence() const
+    // Input Suequence Appends untill it's ready to be pulled
+    // Then it's moved and cleared.
+    bool getInputSequence(std::string &sequence)
     {
-        return m_inputSequence;
+        if (!m_inputSequence.empty())
+        {
+            sequence = std::move(m_inputSequence);
+            m_inputSequence.erase();
+            return true;
+        }
+        return false;
     }
 
     bool isGlobalShutdown() const
@@ -75,9 +94,10 @@ public:
 
 private:
 
+    // Append Input Events until data is read to be pulled.
     void setInputSequence(std::string sequence)
     {
-        m_inputSequence = sequence;
+        m_inputSequence += sequence;
     }
 
     bool m_globalShutdown;
@@ -90,7 +110,6 @@ private:
     int m_fullScreenWindowSize;
 
     std::string m_inputSequence; // Keyboard Input
-    std::string m_inputText;     // Copy/Paste Input
 
     InputHandler();
     ~InputHandler();

@@ -95,17 +95,18 @@ void SSHState::update()
     if(TheInputHandler::Instance()->update())
     {
         inputCount = 0;  // reset counter.
-        m_inputSequence = TheInputHandler::Instance()->getInputSequence();
-
-        if(TheSocketHandler::Instance()->isActive())
+        if (TheInputHandler::Instance()->getInputSequence(m_inputSequence))
         {
-            ret = TheSocketHandler::Instance()->send((unsigned char *)m_inputSequence.c_str(), (int)m_inputSequence.size());
-            // Check return value later on on, not used at the moment.
-        }
-        else
-        {
-            std::cout << "ERROR !TheSocketHandler::Instance()->isActive()" << std::endl;
-            b_isShutdown = true;
+            if(TheSocketHandler::Instance()->isActive())
+            {
+                ret = TheSocketHandler::Instance()->send((unsigned char *)m_inputSequence.c_str(), (int)m_inputSequence.size());
+                // Check return value later on on, not used at the moment.
+            }
+            else
+            {
+                std::cout << "ERROR !TheSocketHandler::Instance()->isActive()" << std::endl;
+                b_isShutdown = true;
+            }
         }
     }
 
@@ -272,6 +273,8 @@ bool SSHState::onEnter()
         std::string initConnection = "|CR|CR|08[|07*|08] |12Unable to connect!";
         initConnection += "|CR|CR|15Hit any key to continue.";
         MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
+
+        // Get input (Blocking!) This should be rewritten later on.
         MenuFunction::getKey();
 
         std::cout << "Error Connecting!" << std::endl;

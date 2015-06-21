@@ -196,6 +196,8 @@ void InputHandler::handleMouseMotionEvent(SDL_Event &event)
 
 bool InputHandler::handleMouseButtonDownEvent(SDL_Event &event)
 {
+    std::string inputText;     // Copy/Paste Input
+
     if(event.button.button == SDL_BUTTON_LEFT)
     {
         //Get the mouse offsets
@@ -219,16 +221,16 @@ bool InputHandler::handleMouseButtonDownEvent(SDL_Event &event)
     {
         std::cout << "Paste Clipboard. " << std::endl;
         SDL_StartTextInput();
-        m_inputText = SDL_GetClipboardText();
+        inputText = SDL_GetClipboardText();
         // Some input filtering
         std::string::size_type id1 = 0;
         while(1)
         {
             // Replace \r\n with \r
-            id1 = m_inputText.find("\r\n", 0);
+            id1 = inputText.find("\r\n", 0);
             if(id1 != std::string::npos)
             {
-                m_inputText.erase(id1+1,1);
+                inputText.erase(id1+1,1);
             }
             else break;
         }
@@ -237,24 +239,25 @@ bool InputHandler::handleMouseButtonDownEvent(SDL_Event &event)
             // Replace Tabs with (4) Spaces.
             // Need Toggle in INI for \t or 4 spaces
             // On Paste, not all systems handle \t.
-            id1 = m_inputText.find("\t", 0);
+            id1 = inputText.find("\t", 0);
             if(id1 != std::string::npos)
             {
-                m_inputText.replace(id1,1,"    ");
+                inputText.replace(id1,1,"    ");
             }
             else break;
         }
         while(1)
         {
             // Change \n to \r
-            id1 = m_inputText.find("\n", 0);
+            id1 = inputText.find("\n", 0);
             if(id1 != std::string::npos)
             {
-                m_inputText[id1] = '\r';
+                inputText[id1] = '\r';
             }
             else break;
         }
-        setInputSequence(m_inputText);
+        setInputSequence(inputText);
+        inputText.erase();
         return true;
     }
     return false;
@@ -1073,10 +1076,12 @@ bool InputHandler::update()
                 break;
 
             case SDL_TEXTINPUT:
-                return (handleTextInputEvent(event));
+                handleTextInputEvent(event);
+                break;
 
             case SDL_MOUSEBUTTONDOWN:
-                return handleMouseButtonDownEvent(event);
+                handleMouseButtonDownEvent(event);
+                break;
 
             case SDL_MOUSEBUTTONUP:
                 handleMouseButtonUpEvent(event);
@@ -1087,11 +1092,18 @@ bool InputHandler::update()
                 break;
 
             case SDL_KEYDOWN:
-                return handleKeyDownEvents(event);
+                handleKeyDownEvents(event);
+                break;
 
             default:
                 break;
         }
     }
+
+    // If Input was received return true.
+    // Otherwise events are handled here.
+    if (!m_inputSequence.empty())
+        return true;
+
     return false;
 }
