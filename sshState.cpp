@@ -46,11 +46,11 @@ void SSHState::handleSession()
         ch = msgBuffer[i];
 
 #ifdef _DEBUG
-        if (ch == '\r')
+        if(ch == '\r')
             std::cout << "^r" << std::flush;
-        else if (ch == '\n')
+        else if(ch == '\n')
             std::cout << "^n" << std::flush;
-        else if (ch == '\0')
+        else if(ch == '\0')
             std::cout << "^0" << std::flush;
         else
             std::cout << ch << std::flush;
@@ -95,11 +95,13 @@ void SSHState::update()
     if(TheInputHandler::Instance()->update())
     {
         inputCount = 0;  // reset counter.
-        if (TheInputHandler::Instance()->getInputSequence(m_inputSequence))
+        if(TheInputHandler::Instance()->getInputSequence(m_inputSequence))
         {
             if(TheSocketHandler::Instance()->isActive())
             {
-                ret = TheSocketHandler::Instance()->send((unsigned char *)m_inputSequence.c_str(), (int)m_inputSequence.size());
+                ret = TheSocketHandler::Instance()->send(
+                          (unsigned char *)m_inputSequence.c_str(),
+                          (int)m_inputSequence.size());
                 // Check return value later on on, not used at the moment.
             }
             else
@@ -159,7 +161,7 @@ bool SSHState::onEnter()
     sysconn = TheTerminal::Instance()->getSystemConnection();
 
     // Check if we need to Ask for User-name before starting SSH Connection
-    if (sysconn.login == "")
+    if(sysconn.login == "")
     {
         std::string initConnection = "|CS|15|16Initiating connection to: [|07";
         initConnection += sysconn.name + "|15]";
@@ -181,7 +183,7 @@ bool SSHState::onEnter()
         {
             // Ask for Users Real Name
             MenuFunction::getLine(rBuffer, len);
-            if (rBuffer[0] == '\x1b') // Abort
+            if(rBuffer[0] == '\x1b')  // Abort
             {
                 b_isShutdown = true;
                 TheTerminal::Instance()->clearScreenSurface();
@@ -189,7 +191,7 @@ bool SSHState::onEnter()
                 TheSequenceParser::Instance()->reset();
                 return false;
             }
-            else if (strcmp(rBuffer,"") != 0 && strcmp(rBuffer,"\n") != 0)
+            else if(strcmp(rBuffer,"") != 0 && strcmp(rBuffer,"\n") != 0)
             {
                 sysconn.login = rBuffer;
                 break;
@@ -197,7 +199,7 @@ bool SSHState::onEnter()
         }
 
         // Received Shutdown.
-        if (TheInputHandler::Instance()->isGlobalShutdown())
+        if(TheInputHandler::Instance()->isGlobalShutdown())
         {
             b_isShutdown = true;
             TheTerminal::Instance()->clearScreenSurface();
@@ -219,7 +221,7 @@ bool SSHState::onEnter()
         {
             // Ask for Users Real Name
             MenuFunction::getLine(rBuffer, len, 0, true);
-            if (rBuffer[0] == '\x1b') // Abort
+            if(rBuffer[0] == '\x1b')  // Abort
             {
                 b_isShutdown = true;
                 TheTerminal::Instance()->clearScreenSurface();
@@ -227,7 +229,7 @@ bool SSHState::onEnter()
                 TheSequenceParser::Instance()->reset();
                 return false;
             }
-            else if (strcmp(rBuffer,"\n") != 0)
+            else if(strcmp(rBuffer,"\n") != 0)
             {
                 // Enter, Completed!
                 sysconn.password = rBuffer;
@@ -245,7 +247,7 @@ bool SSHState::onEnter()
     }
 
     // Received Shutdown.
-    if (TheInputHandler::Instance()->isGlobalShutdown())
+    if(TheInputHandler::Instance()->isGlobalShutdown())
     {
         b_isShutdown = true;
         TheTerminal::Instance()->clearScreenSurface();
@@ -260,7 +262,7 @@ bool SSHState::onEnter()
     SDL_Delay(100);
 
     if(TheSocketHandler::Instance()->initSSH(sysconn.ip, sysconn.port, sysconn.login, sysconn.password)
-        && !TheInputHandler::Instance()->isGlobalShutdown())
+            && !TheInputHandler::Instance()->isGlobalShutdown())
     {
         // Connection Success.
         std::string initConnection = "|CR|CR|08[|07*|08] |10Connection Successful!";

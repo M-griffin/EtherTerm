@@ -54,6 +54,7 @@ void TermStateMachine::changeState(TermState *theState)
             return; // do nothing
         }
         TermStates.back()->onExit();
+        //delete TermStates.back();  // Memory not freed!  needs rewrite!
         TermStates.pop_back();
     }
 

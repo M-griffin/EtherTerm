@@ -159,6 +159,7 @@ bool SocketHandler::initSSH(std::string host, int port,
             {
                 SDL_Log("Unable to initialize SSH Socket.");
                 active = false;
+                socket = nullptr;
                 return false;
             }
         }
@@ -166,6 +167,9 @@ bool SocketHandler::initSSH(std::string host, int port,
         {
             std::cerr << "exception creating SSH_Socket: "
                       << e.what() << std::endl;
+
+            active = false;
+            socket = nullptr;
             return false;
         }
     }
@@ -195,5 +199,6 @@ void SocketHandler::reset()
     catch(std::exception& e)
     {
         std::cerr << "exception caught: " << e.what() << '\n';
+        socket = nullptr;
     }
 }

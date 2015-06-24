@@ -15,7 +15,9 @@ class MenuState :
 {
 public:
 
-    virtual ~MenuState() {}
+    // Make sure we Clean up the State!!
+    virtual ~MenuState()
+    { }
 
 protected:
 

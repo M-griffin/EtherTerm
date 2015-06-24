@@ -253,6 +253,9 @@ bool TelnetState::onExit()
     TheSocketHandler::Instance()->reset();
     m_isShutdown = true;
     std::cout << "exiting TelnetState" << std::endl;
+
+    // Test
+    TheSocketHandler::ReleaseInstance();
     return true;
 }
 
