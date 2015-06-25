@@ -5,6 +5,7 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
+#include "terminal.hpp"
 #include "sequenceDecoder.hpp"
 
 #include <iostream>
@@ -780,9 +781,9 @@ void SequenceDecoder::processSequenceLevel2()
 void SequenceDecoder::handleFontChangeSequences()
 {
     /* Actual Font Switching should not be done in the Decoder!.
-     *
-     *
-    if (sequenceBuilder == "\x1b[0;0 D")
+     * Need to Rework this out.
+     */
+    if (m_sequenceBuilder == "\x1b[0;0 D")
     {
         std::cout << std::endl << "Switched to CP437 Font" << std::endl;
         TheTerminal::Instance()->setCurrentFont("vga8x16.bmp");
@@ -797,7 +798,7 @@ void SequenceDecoder::handleFontChangeSequences()
     }
     //37 - P0T NOoDLE (Amiga)
     else
-    if (sequenceBuilder == "\x1b[0;37 D")
+    if (m_sequenceBuilder == "\x1b[0;37 D")
     {
         std::cout << std::endl << "Switched to Pot-Noodle Font" << std::endl;
         TheTerminal::Instance()->setCurrentFont("potNoodle-8x16.bmp");
@@ -810,7 +811,7 @@ void SequenceDecoder::handleFontChangeSequences()
     }
     //38 - mO'sOul (Amiga)
     else
-    if (sequenceBuilder == "\x1b[0;38 D")
+    if (m_sequenceBuilder == "\x1b[0;38 D")
     {
         std::cout << std::endl << "Switched to mO'sOul Font" << std::endl;
         TheTerminal::Instance()->setCurrentFont("mo'soul-8x16.bmp");
@@ -823,7 +824,7 @@ void SequenceDecoder::handleFontChangeSequences()
     }
     //39 - MicroKnight (Amiga)
     else
-    if (sequenceBuilder == "\x1b[0;39 D")
+    if (m_sequenceBuilder == "\x1b[0;39 D")
     {
         std::cout << std::endl << "Switched to Micro-Knight+ Font" << std::endl;
         TheTerminal::Instance()->setCurrentFont("microKnightPlus-8x16.bmp");
@@ -836,7 +837,7 @@ void SequenceDecoder::handleFontChangeSequences()
     }
     //40 - Topaz (Amiga)
     else
-    if (sequenceBuilder == "\x1b[0;40 D")
+    if (m_sequenceBuilder == "\x1b[0;40 D")
     {
         std::cout << std::endl << "Switched to Topaz+ Font" << std::endl;
         TheTerminal::Instance()->setCurrentFont("topazPlus-8x16.bmp");
@@ -847,7 +848,7 @@ void SequenceDecoder::handleFontChangeSequences()
     //    sequenceState = SEQ_NORMAL; // Reset to pass-through
     //    return;
     }
-    */
+
 }
 /*
  * Validate Complete ESC Control Sequences

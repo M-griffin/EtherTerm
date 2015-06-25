@@ -141,6 +141,8 @@ void SequenceParser::textInput(const std::string &buffer)
                 //screen_buff.color_sequence += "\x1b[40m";
                 //screenbuffer('\r');
             }
+
+
             // Check here if we need to scroll the screen up 1 row.
             if(y_position > NUM_LINES ||
                     (TheTerminal::Instance()->m_scrollRegionActive &&
@@ -207,7 +209,7 @@ void SequenceParser::textInput(const std::string &buffer)
                 ++y_position;
             }
 
-            // Set position 0, cause next check increments to 1.
+            // Reset to Begining of next Line.
             x_position = 1;
             ++y_position;
 
@@ -698,21 +700,21 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             color_attribute = 1;
                             //std::cout << "Color_Attribute: " << color_attribute << endl;
                             // If current color is dark, flip it to light.
-                            if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->BLACK))
+                            if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->BLACK))
                                 TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->DARK_GREY;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->RED))
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->RED))
                                 TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_RED;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->GREEN))
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->GREEN))
                                 TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_GREEN;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->BROWN))
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->BROWN))
                                 TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->YELLOW;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->BLUE))
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->BLUE))
                                 TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_BLUE;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->MAGENTA))
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->MAGENTA))
                                 TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_MAGENTA;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->CYAN))
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->CYAN))
                                 TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_CYAN;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor,TheTerminal::Instance()->GREY))
+                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->GREY))
                                 TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->WHITE;
                             break;
 
@@ -1566,7 +1568,8 @@ void SequenceParser::sequenceInput(std::vector<int> &sequenceParameters)
     // Grab Parameter Control Sequence.
     try
     {
-        parameters.swap(sequenceParameters);
+        //parameters.swap(sequenceParameters);
+        parameters = std::move(sequenceParameters);
     }
     catch(std::exception &e)
     {

@@ -196,9 +196,9 @@ int MenuIO::getKey()
     {
         if(TheInputHandler::Instance()->update())
         {
-            if (TheInputHandler::Instance()->getInputSequence(inputSequence))
+            if(TheInputHandler::Instance()->getInputSequence(inputSequence))
                 break;
-        }    
+        }
         SDL_Delay(10);
     }
 
@@ -273,14 +273,14 @@ void MenuIO::getLine(char *line,     // Returns Input into Line
     while(!TheInputHandler::Instance()->isGlobalShutdown())
     {
         if(TheInputHandler::Instance()->update() &&
-            !TheInputHandler::Instance()->isGlobalShutdown())
+                !TheInputHandler::Instance()->isGlobalShutdown())
         {
             // We got data, turn off the cursor!
             ttime = SDL_GetTicks();
             startBlinking = false;
             cursorBlink = 0;
             // Get the Sequence.
-            if (TheInputHandler::Instance()->getInputSequence(inputSequence))
+            if(TheInputHandler::Instance()->getInputSequence(inputSequence))
             {
                 // Check for Abort, single ESC character.
                 if(inputSequence == "\x1b" && inputSequence.size() == 1)
