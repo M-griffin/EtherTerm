@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=17/06/2015
+Date                   :=26/06/2015
 CodeLitePath           :="C:\Program Files (x86)\CodeLite"
 LinkerName             :=C:/MinGW-4.8.1/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-4.8.1/bin/g++.exe -shared -fPIC
@@ -64,8 +64,8 @@ AS       := C:/MinGW-4.8.1/bin/as.exe
 CodeLiteDir:=C:\Program Files (x86)\CodeLite
 UNIT_TEST_PP_SRC_DIR:=C:\UnitTest++-1.3
 Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/termStateMachine.cpp$(ObjectSuffix) $(IntermediateDirectory)/inputHandler.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinystr.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinyxml.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinyxmlerror.cpp$(ObjectSuffix) $(IntermediateDirectory)/tinyxmlparser.cpp$(ObjectSuffix) $(IntermediateDirectory)/telnetState.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketSSH.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketTelnet.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/socketHandler.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuFunction.cpp$(ObjectSuffix) $(IntermediateDirectory)/linkList.cpp$(ObjectSuffix) $(IntermediateDirectory)/sshState.cpp$(ObjectSuffix) $(IntermediateDirectory)/terminal.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketFTP.cpp$(ObjectSuffix) $(IntermediateDirectory)/termManager.cpp$(ObjectSuffix) $(IntermediateDirectory)/sequenceDecoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/sequenceParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/mainMenuState.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/screenBuffer.cpp$(ObjectSuffix) $(IntermediateDirectory)/sequenceManager.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuIO.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuManager.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuConfig.cpp$(ObjectSuffix) 
+	$(IntermediateDirectory)/socketHandler.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuFunction.cpp$(ObjectSuffix) $(IntermediateDirectory)/linkList.cpp$(ObjectSuffix) $(IntermediateDirectory)/sshState.cpp$(ObjectSuffix) $(IntermediateDirectory)/socketFTP.cpp$(ObjectSuffix) $(IntermediateDirectory)/termManager.cpp$(ObjectSuffix) $(IntermediateDirectory)/sequenceDecoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/sequenceParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/mainMenuState.cpp$(ObjectSuffix) $(IntermediateDirectory)/screenBuffer.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/sequenceManager.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuIO.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuManager.cpp$(ObjectSuffix) $(IntermediateDirectory)/menuConfig.cpp$(ObjectSuffix) $(IntermediateDirectory)/queueManager.cpp$(ObjectSuffix) $(IntermediateDirectory)/renderer.cpp$(ObjectSuffix) 
 
 
 
@@ -204,14 +204,6 @@ $(IntermediateDirectory)/sshState.cpp$(DependSuffix): sshState.cpp
 $(IntermediateDirectory)/sshState.cpp$(PreprocessSuffix): sshState.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/sshState.cpp$(PreprocessSuffix) "sshState.cpp"
 
-$(IntermediateDirectory)/terminal.cpp$(ObjectSuffix): terminal.cpp $(IntermediateDirectory)/terminal.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/terminal.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/terminal.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/terminal.cpp$(DependSuffix): terminal.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/terminal.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/terminal.cpp$(DependSuffix) -MM "terminal.cpp"
-
-$(IntermediateDirectory)/terminal.cpp$(PreprocessSuffix): terminal.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/terminal.cpp$(PreprocessSuffix) "terminal.cpp"
-
 $(IntermediateDirectory)/socketFTP.cpp$(ObjectSuffix): socketFTP.cpp $(IntermediateDirectory)/socketFTP.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/socketFTP.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/socketFTP.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/socketFTP.cpp$(DependSuffix): socketFTP.cpp
@@ -291,6 +283,22 @@ $(IntermediateDirectory)/menuConfig.cpp$(DependSuffix): menuConfig.cpp
 
 $(IntermediateDirectory)/menuConfig.cpp$(PreprocessSuffix): menuConfig.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/menuConfig.cpp$(PreprocessSuffix) "menuConfig.cpp"
+
+$(IntermediateDirectory)/queueManager.cpp$(ObjectSuffix): queueManager.cpp $(IntermediateDirectory)/queueManager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/queueManager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/queueManager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/queueManager.cpp$(DependSuffix): queueManager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/queueManager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/queueManager.cpp$(DependSuffix) -MM "queueManager.cpp"
+
+$(IntermediateDirectory)/queueManager.cpp$(PreprocessSuffix): queueManager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/queueManager.cpp$(PreprocessSuffix) "queueManager.cpp"
+
+$(IntermediateDirectory)/renderer.cpp$(ObjectSuffix): renderer.cpp $(IntermediateDirectory)/renderer.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/renderer.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/renderer.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/renderer.cpp$(DependSuffix): renderer.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/renderer.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/renderer.cpp$(DependSuffix) -MM "renderer.cpp"
+
+$(IntermediateDirectory)/renderer.cpp$(PreprocessSuffix): renderer.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/renderer.cpp$(PreprocessSuffix) "renderer.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
