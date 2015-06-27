@@ -77,7 +77,7 @@ To add new systems or remove, you must edit the ``assets/dialdirectory.xml`` fil
 Downloads
 =========
 
-- `Windows 2.7 Preview <https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.7.zip>`_
+- `Windows 2.8 Preview <https://dl.dropboxusercontent.com/u/92792939/EtherTerm%20Demo2.8.zip>`_
 
 For all other systems, you must build from the project folder.
 
@@ -147,6 +147,12 @@ Arch Linux
 
 Changelog
 =========
+
+**v2.8**
+
+- Several fixes after the large re-factoring of code.
+- Updates for memory handling and data queue.
+- more fixes and restructing of the internals, no new features yet.
 
 **v2.7**
 
