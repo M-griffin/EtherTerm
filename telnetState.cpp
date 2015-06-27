@@ -5,7 +5,13 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
+#ifdef TARGET_OS_MAC
 #include <SDL_net.h>
+#elif _WIN32
+#include <SDL_net.h>
+#else // LINUX
+#include <SDL2/SDL_net.h>
+#endif
 
 #include "telnet.hpp"
 #include "telnetState.hpp"
