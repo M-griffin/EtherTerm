@@ -9,9 +9,10 @@
 
 #include "safeQueue.hpp"
 #include "sequenceDecoder.hpp"
+#include <iostream>
 
 class SequenceManager :
-    public SequenceDecoder
+    private SequenceDecoder
 {
 public:
 

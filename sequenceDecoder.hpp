@@ -20,13 +20,9 @@ public:
     SequenceDecoder();
     ~SequenceDecoder();
 
-    // Vector<int> holds the broken down squeue,
-    // Vector<int> Empty, holds std::string or Text Data passed.
-    SafeQueue<MessageQueue> m_sequenceQueue;
-
     // {Main Execution Method}
     // Valide and Decode ESC Sequences
-    void decodeEscSequenceData(std::string inputString);
+    void decodeEscSequenceData(std::string &inputString);
 
 
 private:

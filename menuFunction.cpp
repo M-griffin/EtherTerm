@@ -9,7 +9,7 @@
 # include "sequenceManager.hpp"
 # include "linkList.hpp"
 # include "sequenceParser.hpp"
-# include "terminal.hpp"
+# include "renderer.hpp"
 
 # include <cstdio>
 # include <cstdlib>
@@ -57,7 +57,7 @@ MenuFunction::~MenuFunction()
  */
 std::string MenuFunction::setupMenuPath()
 {
-    std::string path = TheTerminal::Instance()->getProgramPath();
+    std::string path = TheRenderer::Instance()->getProgramPath();
 #ifdef _WIN32
     path += "assets\\";
 #else
@@ -159,13 +159,9 @@ int MenuFunction::menuReadData(std::string MenuName)
     }
 
     std::string cfgdata;
-    while(!iFS.eof())
+    while(std::getline(iFS,cfgdata,'\n'))
     {
-        std::getline(iFS,cfgdata,'\n');
-        if(iFS.eof())
-            break;
-        else if(menuParseData(cfgdata) == true)
-            break;
+        menuParseData(cfgdata);
     }
     iFS.close();
     return true;
@@ -303,12 +299,10 @@ int MenuFunction::commandsExist(std::string MenuName, int idx)
     // Loop Through and Find the The Command
     sprintf(sText,"[CommandRec%.03d]",idx);
     std::string cfgdata;
-    for(;;)
+    while(std::getline(iFS2,cfgdata,'\n'))
     {
-        std::getline(iFS2,cfgdata,'\n');
         if(cfgdata.find(sText,0) != std::string::npos)
             ret = true;
-        if(iFS2.eof()) break;
     }
     iFS2.close();
     return ret;

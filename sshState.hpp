@@ -19,7 +19,7 @@
 #define NUM_LINES 25
 
 #include <vector>
-#include "menuState.hpp"
+#include "termState.hpp"
 //#include "termObject.h"
 #include "socketState.hpp"
 
@@ -28,7 +28,7 @@
  * Parsing Socket Data and Sending Through to ANSI Parser.
  */
 class SSHState :
-    public MenuState
+    public TermState
 {
 public:
 

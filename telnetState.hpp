@@ -19,7 +19,7 @@
 #endif
 
 #include <vector>
-#include "menuState.hpp"
+#include "termState.hpp"
 #include "socketState.hpp"
 
 /*
@@ -28,7 +28,7 @@
  */
 
 class TelnetState :
-    public MenuState
+    public TermState
 {
 public:
 
@@ -48,7 +48,7 @@ public:
     { }
     virtual ~TelnetState()
     {
-        std::cout << "Shutting Down TelnetState" << std::endl;
+        std::cout << "Shutting Down ~TelnetState" << std::endl;
     }
     virtual void update();
     virtual bool onEnter();

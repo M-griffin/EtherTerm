@@ -60,7 +60,7 @@ public:
 
     ~SafeQueue(void)
     {
-        // Probably not needed!
+        std::cout << "~SafeQueue" << std::endl;
         std::queue<T>().swap(q);
     }
 

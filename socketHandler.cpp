@@ -7,7 +7,7 @@
 
 #include "socketHandler.hpp"
 #include "socketState.hpp"
-#include "terminal.hpp"
+#include "renderer.hpp"
 #include "inputHandler.hpp"
 #include "sequenceParser.hpp"
 #include <iostream>
@@ -67,8 +67,8 @@ int SocketHandler::update()
                     ttime2 = SDL_GetTicks();
                     if(startBlinking && (ttime2 - ttime) > 400)
                     {
-                        TheTerminal::Instance()->renderCursorOffScreen();
-                        TheTerminal::Instance()->drawTextureScreen();
+                        TheRenderer::Instance()->renderCursorOffScreen();
+                        TheRenderer::Instance()->drawTextureScreen();
                         --cursorBlink;
                         ttime = SDL_GetTicks();
                     }
@@ -78,8 +78,8 @@ int SocketHandler::update()
                     ttime2 = SDL_GetTicks();
                     if(startBlinking && (ttime2 - ttime) > 400)
                     {
-                        TheTerminal::Instance()->renderCursorOnScreen();
-                        TheTerminal::Instance()->drawTextureScreen();
+                        TheRenderer::Instance()->renderCursorOnScreen();
+                        TheRenderer::Instance()->drawTextureScreen();
                         ++cursorBlink;
                         ttime = SDL_GetTicks();
                     }

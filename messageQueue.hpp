@@ -7,11 +7,19 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
+#include <iostream>
+#include <vector>
+#include <string>
+
 class MessageQueue
 {
 public:
     MessageQueue() {}
-    ~MessageQueue() {}
+    ~MessageQueue()
+    {
+        std::vector<int>().swap(m_queueParams);
+        m_text.erase();
+    }
 
     std::vector<int> m_queueParams;
     std::string m_text;

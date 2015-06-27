@@ -24,18 +24,19 @@
 #endif
 #endif
 
-#include "termStateMachine.hpp"
+#include <iostream>
+#include <string>
 #include <vector>
 
-class Terminal
+class Renderer
 {
 public:
 
-    static Terminal* Instance()
+    static Renderer* Instance()
     {
         if(!m_globalInstance)
         {
-            m_globalInstance = new Terminal();
+            m_globalInstance = new Renderer();
             return m_globalInstance;
         }
         return m_globalInstance;
@@ -58,7 +59,6 @@ public:
               int wwidth, int wheight,
               int fwidth, int fheight);
 
-    void update();
     void clean();
 
     void setProgramPath(std::string _programPath)
@@ -77,10 +77,7 @@ public:
     {
         return m_globalWindow;
     }
-    TermStateMachine* getStateMachine()
-    {
-        return m_globalTermStateMachine;
-    }
+
 
     // Holds current connection
     typedef struct SystemConnection
@@ -158,6 +155,7 @@ public:
     }
     void setCurrentFont(std::string font)
     {
+        std::cout << "*** setCurrentFont: " << font << std::endl;
         m_currentFont = font;
     }
     std::string getCurrentFont() const
@@ -208,10 +206,11 @@ public:
     //void drawString(int X, int Y, char text[]);
     //void drawCharSet(int X, int Y);
 
+/*
     std::vector<std::string> getFontFiles()
     {
         return m_globalFontFiles;
-    }
+    }*/
 
     // Matched Colors with Pablo Draw.
     SDL_Color BLACK;
@@ -287,7 +286,6 @@ private:
     TTF_Font*      trueTypeFont;      // UTF-8 Fonts.
 #endif
 
-    TermStateMachine* m_globalTermStateMachine;
     Uint32 m_redMask,
            m_greenMask,
            m_blueMask,
@@ -311,15 +309,15 @@ private:
     bool m_isRunning;
     bool m_isUTF8Output;
 
-    static Terminal* m_globalInstance;
-    std::vector<std::string> m_globalFontFiles;
+    static Renderer* m_globalInstance;
+    //std::vector<std::string> m_globalFontFiles;
 
-    Terminal();
-    ~Terminal();
-    Terminal(const Terminal&);
-    Terminal& operator=(const Terminal&);
+    Renderer();
+    ~Renderer();
+    Renderer(const Renderer&);
+    Renderer& operator=(const Renderer&);
 };
 
-typedef Terminal TheTerminal;
+typedef Renderer TheRenderer;
 
 #endif

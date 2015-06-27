@@ -8,7 +8,7 @@
 #include "inputHandler.hpp"
 #include "socketHandler.hpp"
 #include "sequenceParser.hpp"
-#include "terminal.hpp"
+#include "renderer.hpp"
 
 #include <iostream>
 #include <string>
@@ -64,7 +64,7 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             //SDL_Log("Window %d exposed", event.window.windowID);
             //TheTerminal::Instance()->clearScreen();
             //SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
-            TheTerminal::Instance()->drawTextureScreen();
+            TheRenderer::Instance()->drawTextureScreen();
             break;
 
         case SDL_WINDOWEVENT_MOVED:
@@ -80,7 +80,7 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
                 SDL_Log("Window %d resized to %dx%d",
                         event.window.windowID, event.window.data1,
                         event.window.data2);*/
-            TheTerminal::Instance()->drawTextureScreen();
+            TheRenderer::Instance()->drawTextureScreen();
             break;
 
         case SDL_WINDOWEVENT_MINIMIZED:
@@ -91,14 +91,14 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             //SDL_Log("Window %d maximized", event.window.windowID);
             //TheTerminal::Instance()->clearScreen();
             //SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
-            TheTerminal::Instance()->drawTextureScreen();
+            TheRenderer::Instance()->drawTextureScreen();
             break;
 
         case SDL_WINDOWEVENT_RESTORED:
             //SDL_Log("Window %d restored", event.window.windowID);
             //TheTerminal::Instance()->clearScreen();
             //SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
-            TheTerminal::Instance()->drawTextureScreen();
+            TheRenderer::Instance()->drawTextureScreen();
             break;
 
         case SDL_WINDOWEVENT_CLOSE:
@@ -159,18 +159,18 @@ void InputHandler::handleMouseButtonUpEvent(SDL_Event &event)
         m_mouseReleaseYPosition = event.button.y;
 
         // Clear the screen of the selection box.
-        TheTerminal::Instance()->drawTextureScreen();
+        TheRenderer::Instance()->drawTextureScreen();
         // Copy Selected Text to Clipboard. Make sure click
         // in window with no movement is not considered a selection
         if(m_mouseReleaseXPosition != m_mouseSourceXPosition &&
                 m_mouseReleaseYPosition != m_mouseSourceYPosition)
         {
-            TheTerminal::Instance()->pullSelectionBuffer(
+            TheRenderer::Instance()->pullSelectionBuffer(
                 m_mouseReleaseXPosition, m_mouseReleaseYPosition);
         }
         // Needed for Windows Full Screen Mode Switches, otherwise it doesn't
         // Repopulate properly.  Clear so texture is refreshed each selection
-        TheTerminal::Instance()->clearSelectionTexture();
+        TheRenderer::Instance()->clearSelectionTexture();
     }
 }
 
@@ -189,7 +189,7 @@ void InputHandler::handleMouseMotionEvent(SDL_Event &event)
         */
         // Process the Mouse Position from the Origin
         // To Highlight the selected screen segment.
-        TheTerminal::Instance()->renderSelectionScreen(
+        TheRenderer::Instance()->renderSelectionScreen(
             event.motion.x, event.motion.y);
     }
 }
@@ -327,18 +327,18 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
                 // And Renderer and recreated them in our desired resolutions
                 // Due to SDL being retarded on different platforms.
 #ifndef _WIN32
-                TheTerminal::Instance()->restartWindowSize(true);
-                TheTerminal::Instance()->restartWindowRenderer("1");
+                TheRenderer::Instance()->restartWindowSize(true);
+                TheRenderer::Instance()->restartWindowRenderer("1");
 #else
-                TheTerminal::Instance()->restartWindowRenderer("1");
-                SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(), SDL_WINDOW_FULLSCREEN_DESKTOP);
+                TheRenderer::Instance()->restartWindowRenderer("1");
+                SDL_SetWindowFullscreen(TheRenderer::Instance()->getWindow(), SDL_WINDOW_FULLSCREEN_DESKTOP);
 #endif
                 SDL_Log("Setting window to FULLSCREEN.");
                 m_isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
                 m_fullScreenWindowSize = 0;
-                TheTerminal::Instance()->clearScreen();
-                SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
-                TheTerminal::Instance()->drawTextureScreen();
+                TheRenderer::Instance()->clearScreen();
+                SDL_RenderPresent(TheRenderer::Instance()->getRenderer());
+                TheRenderer::Instance()->drawTextureScreen();
                 return false;
             }
             else
@@ -347,7 +347,7 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
                 // OSX Doesn't do full-screen properly!
                 // Reset Texture Filtering when in windowed mode.
                 // Set Window Mode
-                if(SDL_SetWindowFullscreen(TheTerminal::Instance()->getWindow(), 0) < 0)
+                if(SDL_SetWindowFullscreen(TheRenderer::Instance()->getWindow(), 0) < 0)
                 {
                     SDL_Log(
                         "Error setting window to Windowed Mode: %s", SDL_GetError());
@@ -364,36 +364,36 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
                         // WE use these multiple to keep shaded blocks with
                         // Correct looking pixel size and layout.
                     case 0:
-                        TheTerminal::Instance()->setWindowWidth(640);
-                        TheTerminal::Instance()->setWindowHeight(400);
-                        SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
+                        TheRenderer::Instance()->setWindowWidth(640);
+                        TheRenderer::Instance()->setWindowHeight(400);
+                        SDL_SetWindowSize(TheRenderer::Instance()->getWindow(), 640, 400);
 
 #ifndef _WIN32
-                        TheTerminal::Instance()->restartWindowSize(false);
-                        TheTerminal::Instance()->restartWindowRenderer("0");
+                        TheRenderer::Instance()->restartWindowSize(false);
+                        TheRenderer::Instance()->restartWindowRenderer("0");
 #else
-                        TheTerminal::Instance()->restartWindowRenderer("0");
+                        TheRenderer::Instance()->restartWindowRenderer("0");
 #endif
-                        TheTerminal::Instance()->clearScreen();
-                        SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
-                        TheTerminal::Instance()->drawTextureScreen();
+                        TheRenderer::Instance()->clearScreen();
+                        SDL_RenderPresent(TheRenderer::Instance()->getRenderer());
+                        TheRenderer::Instance()->drawTextureScreen();
                         SDL_Log("Setting window size to 640 x 400.");
                         ++m_fullScreenWindowSize;
                         break;
 
                     case 1:
-                        TheTerminal::Instance()->setWindowWidth(1280);
-                        TheTerminal::Instance()->setWindowHeight(800);
-                        SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 1280, 800);
+                        TheRenderer::Instance()->setWindowWidth(1280);
+                        TheRenderer::Instance()->setWindowHeight(800);
+                        SDL_SetWindowSize(TheRenderer::Instance()->getWindow(), 1280, 800);
 #ifndef _WIN32
-                        TheTerminal::Instance()->restartWindowSize(false);
-                        TheTerminal::Instance()->restartWindowRenderer("0");
+                        TheRenderer::Instance()->restartWindowSize(false);
+                        TheRenderer::Instance()->restartWindowRenderer("0");
 #else
-                        TheTerminal::Instance()->restartWindowRenderer("0");
+                        TheRenderer::Instance()->restartWindowRenderer("0");
 #endif
-                        TheTerminal::Instance()->clearScreen();
-                        SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
-                        TheTerminal::Instance()->drawTextureScreen();
+                        TheRenderer::Instance()->clearScreen();
+                        SDL_RenderPresent(TheRenderer::Instance()->getRenderer());
+                        TheRenderer::Instance()->drawTextureScreen();
                         SDL_Log("Setting window size to 1280 x 800.");
                         ++m_fullScreenWindowSize;
                         m_isWindowMode = false;
@@ -1003,8 +1003,8 @@ bool InputHandler::handleSCOKeyMapFunctionKeys(SDL_Event &event)
 
 bool InputHandler::handleKeyDownEvents(SDL_Event &event)
 {
-    TheTerminal::SystemConnection sysConection;
-    sysConection = TheTerminal::Instance()->getSystemConnection();
+    TheRenderer::SystemConnection sysConection;
+    sysConection = TheRenderer::Instance()->getSystemConnection();
 
     // Set default Key-mapping when there is no connection
     // ie.. Dialing Directory for Menu System.

@@ -6,7 +6,7 @@
 // $LastChangedBy$
 
 #include "menuConfig.hpp"
-#include "terminal.hpp"
+#include "renderer.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -21,11 +21,11 @@
  */
 std::string MenuConfig::SetupThePath()
 {
-    std::string path = TheTerminal::Instance()->getProgramPath();
+    std::string path = TheRenderer::Instance()->getProgramPath();
 #ifdef _WIN32
-    path += "assets\\";
+    path.append("assets\\");
 #else
-    path += "assets/";
+    path.append("assets/");
 #endif
     return path;
 }
@@ -74,10 +74,9 @@ void MenuConfig::ddirectory_create()
 /**
  * Parse Helper
  */
-void MenuConfig::ddirectory_chkpar(std::string &data)
+std::string MenuConfig::ddirectory_chkpar(const std::string &data)
 {
-    //std::cout << "ddirectory_chkpar()" << std::endl;
-    std::string temp1;
+    std::string temp1 = "";
     std::string::size_type st1 = 0;
     std::string::size_type st2 = 0;
     std::string::size_type  ct = 0;
@@ -89,7 +88,8 @@ void MenuConfig::ddirectory_chkpar(std::string &data)
     ct = st2 - st1;
     if(temp1.length() > ct)
         temp1.erase(ct,temp1.length());
-    data = temp1;
+
+    return temp1;
 }
 
 /**
@@ -99,81 +99,83 @@ void MenuConfig::ddirectory_check(std::string &cfgdata)
 {
     //std::cout << "ddirectory_check()" << std::endl;
     std::string::size_type id1 = 0;
-    if(cfgdata[0] == '#')
-        return;
+    std::string result;
 
+    if(cfgdata[0] == '#') { }
     else if(cfgdata.find("set TOP ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        id1 = atoi(cfgdata.c_str());
+        result = std::move(ddirectory_chkpar(cfgdata));
+        id1 = atoi(result.c_str());
         TOP_MARGIN = id1;
     }
     else if(cfgdata.find("set BOT ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        id1 = atoi(cfgdata.c_str());
+        result = std::move(ddirectory_chkpar(cfgdata));
+        id1 = atoi(result.c_str());
         BOTTOM_MARGIN = id1;
     }
     else if(cfgdata.find("set THEME_NAME ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        THEME_NAME = cfgdata;
+        result = std::move(ddirectory_chkpar(cfgdata));
+        THEME_NAME = std::move(result);
     }
     else if(cfgdata.find("set FONT_SET ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        FONT_SET = cfgdata;
+        result = std::move(ddirectory_chkpar(cfgdata));
+        FONT_SET = std::move(result);
+        std::cout << " $$$ FONT_SET " << FONT_SET << std::endl;
     }
     else if(cfgdata.find("set ANSI_FILE ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        ANSI_FILE = cfgdata;
+        result = std::move(ddirectory_chkpar(cfgdata));
+        ANSI_FILE = std::move(result);
     }
     else if(cfgdata.find("set MENU_PROMPT ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        MENU_PROMPT_TEXT = cfgdata;
+        result = std::move(ddirectory_chkpar(cfgdata));
+        MENU_PROMPT_TEXT = std::move(result);
     }
     else if(cfgdata.find("set PAGENUM ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        PAGE_NUMBER = cfgdata;
+        result = std::move(ddirectory_chkpar(cfgdata));
+        PAGE_NUMBER = std::move(result);
     }
     else if(cfgdata.find("set PAGETOTAL ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        PAGE_TOTAL = cfgdata;
+        result = std::move(ddirectory_chkpar(cfgdata));
+        PAGE_TOTAL = std::move(result);
     }
     else if(cfgdata.find("set MOREMSG_ON ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        MORE_MESSAGE_ON = cfgdata;
+        result = std::move(ddirectory_chkpar(cfgdata));
+        MORE_MESSAGE_ON = std::move(result);
     }
     else if(cfgdata.find("set MOREMSG_WORD_ON ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        MORE_MESSAGE_TEXT_ON = cfgdata;
+        result = std::move(ddirectory_chkpar(cfgdata));
+        MORE_MESSAGE_TEXT_ON = std::move(result);
     }
     else if(cfgdata.find("set MOREMSG_OFF ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        MORE_MESSAGE_OFF = cfgdata;
+        result = std::move(ddirectory_chkpar(cfgdata));
+        MORE_MESSAGE_OFF = std::move(result);
     }
     else if(cfgdata.find("set MOREMSG_WORD_OFF ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        MORE_MESSAGE_TEXT_OFF = cfgdata;
+        result = std::move(ddirectory_chkpar(cfgdata));
+        MORE_MESSAGE_TEXT_OFF = std::move(result);
     }
     else if(cfgdata.find("set TEXT_COLOR ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        TEXT_COLOR = cfgdata;
+        result = std::move(ddirectory_chkpar(cfgdata));
+        TEXT_COLOR = std::move(result);
     }
     else if(cfgdata.find("set MAX_AREAS ", 0) != std::string::npos)
     {
-        ddirectory_chkpar(cfgdata);
-        MAX_SYSTEMS = cfgdata;
+        result = std::move(ddirectory_chkpar(cfgdata));
+        MAX_SYSTEMS = std::move(result);
     }
+    cfgdata.erase();
 }
 
 /**
@@ -193,8 +195,8 @@ bool MenuConfig::ddirectory_parse(int index)
     std::string path = SetupThePath();
 
     // Set for Theme, check index number for themes,.
-    sprintf(name, "%s%s", path.c_str(), INI_NAME);
-    sprintf(name2,"%s%s%i.ini", path.c_str(), INI_NAME, index);
+    sprintf(name, "%s%s", path.c_str(), INI_NAME.c_str());
+    sprintf(name2,"%s%s%i.ini", path.c_str(), INI_NAME.c_str(), index);
     if(index != 0) strcpy(name, name2);
     // Check if Theme Exists, if not return FALSE.
 
@@ -218,11 +220,9 @@ bool MenuConfig::ddirectory_parse(int index)
     }
 
     std::string cfgdata;
-    for(;;)
+    while(std::getline(inStream, cfgdata, '\n'))
     {
-        std::getline(inStream,cfgdata,'\n');
         ddirectory_check(cfgdata);
-        if(inStream.eof()) break;
     }
     inStream.close();
     return true;

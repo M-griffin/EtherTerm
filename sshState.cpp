@@ -10,9 +10,10 @@
 #include "inputHandler.hpp"
 #include "sequenceParser.hpp"
 #include "sequenceManager.hpp"
-#include "terminal.hpp"
+#include "renderer.hpp"
 #include "socketHandler.hpp"
 #include "menuFunction.hpp"
+#include "termStateMachine.hpp"
 
 #include <cstdio>
 
@@ -86,7 +87,7 @@ void SSHState::update()
     if(b_isShutdown || TheInputHandler::Instance()->isGlobalShutdown())
     {
         std::cout << "SSHState::shutdown - changeState(new MainMenuState()" << std::endl;
-        TheTerminal::Instance()->getStateMachine()->changeState(new MainMenuState());
+        TheStateMachine::Instance()->changeState(new MainMenuState());
         b_isShutdown = false;
         return;
     }
@@ -157,8 +158,22 @@ bool SSHState::onEnter()
     std::cout << "entering SSHState\n";
     b_isShutdown = false;
 
-    TheTerminal::SystemConnection sysconn;
-    sysconn = TheTerminal::Instance()->getSystemConnection();
+    TheRenderer::SystemConnection sysconn;
+    sysconn = TheRenderer::Instance()->getSystemConnection();
+
+    TheRenderer::Instance()->setCurrentFont(sysconn.font);
+    if(TheRenderer::Instance()->didFontChange())
+    {
+        std::cout << "SSHState: font: " << TheRenderer::Instance()->getCurrentFont() << std::endl;
+        if (!TheRenderer::Instance()->loadBitmapImage(
+            TheRenderer::Instance()->getCurrentFont()))
+            {
+                SDL_Delay(1500);
+                TheRenderer::Instance()->quit();
+                std::cout << "SSHState: Error Changeing Font in syscon!" << std::endl;
+                return false;
+            }
+    }
 
     // Check if we need to Ask for User-name before starting SSH Connection
     if(sysconn.login == "")
@@ -186,8 +201,8 @@ bool SSHState::onEnter()
             if(rBuffer[0] == '\x1b')  // Abort
             {
                 b_isShutdown = true;
-                TheTerminal::Instance()->clearScreenSurface();
-                TheTerminal::Instance()->renderScreen();
+                TheRenderer::Instance()->clearScreenSurface();
+                TheRenderer::Instance()->renderScreen();
                 TheSequenceParser::Instance()->reset();
                 return false;
             }
@@ -202,8 +217,8 @@ bool SSHState::onEnter()
         if(TheInputHandler::Instance()->isGlobalShutdown())
         {
             b_isShutdown = true;
-            TheTerminal::Instance()->clearScreenSurface();
-            TheTerminal::Instance()->renderScreen();
+            TheRenderer::Instance()->clearScreenSurface();
+            TheRenderer::Instance()->renderScreen();
             TheSequenceParser::Instance()->reset();
             return false;
         }
@@ -224,8 +239,8 @@ bool SSHState::onEnter()
             if(rBuffer[0] == '\x1b')  // Abort
             {
                 b_isShutdown = true;
-                TheTerminal::Instance()->clearScreenSurface();
-                TheTerminal::Instance()->renderScreen();
+                TheRenderer::Instance()->clearScreenSurface();
+                TheRenderer::Instance()->renderScreen();
                 TheSequenceParser::Instance()->reset();
                 return false;
             }
@@ -250,8 +265,8 @@ bool SSHState::onEnter()
     if(TheInputHandler::Instance()->isGlobalShutdown())
     {
         b_isShutdown = true;
-        TheTerminal::Instance()->clearScreenSurface();
-        TheTerminal::Instance()->renderScreen();
+        TheRenderer::Instance()->clearScreenSurface();
+        TheRenderer::Instance()->renderScreen();
         TheSequenceParser::Instance()->reset();
         return false;
     }
@@ -281,15 +296,15 @@ bool SSHState::onEnter()
 
         std::cout << "Error Connecting!" << std::endl;
         b_isShutdown = true;
-        TheTerminal::Instance()->clearScreenSurface();
-        TheTerminal::Instance()->renderScreen();
+        TheRenderer::Instance()->clearScreenSurface();
+        TheRenderer::Instance()->renderScreen();
         TheSequenceParser::Instance()->reset();
         return false;
     }
 
     // Clear Renderer and ANSI Parser for Fresh Connection.
-    TheTerminal::Instance()->clearScreenSurface();
-    TheTerminal::Instance()->renderScreen();
+    TheRenderer::Instance()->clearScreenSurface();
+    TheRenderer::Instance()->renderScreen();
     TheSequenceParser::Instance()->reset();
     return true;
 }

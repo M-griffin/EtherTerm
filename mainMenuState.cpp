@@ -10,6 +10,7 @@
 #include "sshState.hpp"
 #include "inputHandler.hpp"
 #include "sequenceParser.hpp"
+#include "termStateMachine.hpp"
 
 #include <cstdio>
 #include <iostream>
@@ -20,12 +21,12 @@ const std::string MainMenuState::m_menuID = "MENU";
 // Callbacks
 void MainMenuState::menuStartTelnet()
 {
-    TheTerminal::Instance()->getStateMachine()->changeState(new TelnetState());
+    TheStateMachine::Instance()->changeState(new TelnetState());
 }
 
 void MainMenuState::menuStartSSH()
 {
-    TheTerminal::Instance()->getStateMachine()->changeState(new SSHState());
+    TheStateMachine::Instance()->changeState(new SSHState());
 }
 // end callbacks
 
@@ -37,61 +38,78 @@ void MainMenuState::menuStartSSH()
  */
 void MainMenuState::update()
 {
-    // Draw Updates for Page changes etc..
-    // Should run this easily after changes received.
-    if (TheInputHandler::Instance()->isGlobalShutdown())
+    // Make sure the System has been reloaded before
+    // checking for updates.
+    if (isActive)
     {
-        MenuFunction::displayAnsiFile("outro.ans");
-        SDL_Delay(1500);
-        TheTerminal::Instance()->quit();
-        return;
-    }
-
-    if(TheInputHandler::Instance()->update())
-    {
-        std::string inputSequence;
-        int ret = 0;
-
-        if (TheInputHandler::Instance()->getInputSequence(inputSequence))
+        // Draw Updates for Page changes etc..
+        // Should run this easily after changes received.
+        if (TheInputHandler::Instance()->isGlobalShutdown())
         {
-            ret = m_menuManager.handleMenuUpdates(inputSequence);
-            m_menuManager.updateDialDirectory();
+            MenuFunction::displayAnsiFile("outro.ans");
+            SDL_Delay(1500);
+            TheRenderer::Instance()->quit();
+            return;
+        }
 
-            TheTerminal::SystemConnection sysCon;
-            if(!TheInputHandler::Instance()->isGlobalShutdown())
+        if(TheInputHandler::Instance()->update())
+        {
+            std::string inputSequence;
+            int ret = 0;
+
+            if (TheInputHandler::Instance()->getInputSequence(inputSequence))
             {
-                switch(ret)
+                ret = handleMenuUpdates(inputSequence);
+                updateDialDirectory();
+
+                TheRenderer::SystemConnection sysCon;
+                if(!TheInputHandler::Instance()->isGlobalShutdown())
                 {
-                    case EOF:
-                        // default.
-                        TheTerminal::Instance()->setCurrentFont("vga8x16.bmp");
-                        if(TheTerminal::Instance()->didFontChange())
-                            TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
+                    switch(ret)
+                    {
+                        case EOF:
+                            // default.
+                            TheRenderer::Instance()->setCurrentFont("vga8x16.bmp");
+                            if(TheRenderer::Instance()->didFontChange())
+                            {
+                                if (!TheRenderer::Instance()->loadBitmapImage(TheRenderer::Instance()->getCurrentFont()))
+                                { }
+                                    // On exit Anyways!
+                            }
 
-                        MenuFunction::displayAnsiFile("outro.ans");
-                        SDL_Delay(1500);
-                        TheTerminal::Instance()->quit();
-                        break;
 
-                    default:
-                        sysCon = TheTerminal::Instance()->getSystemConnection();
-                        if(sysCon.protocol == "TELNET")
-                        {
-                            TheTerminal::Instance()->setCurrentFont(sysCon.font);
-                            if(TheTerminal::Instance()->didFontChange())
-                                TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
-                            // Switch to Telnet State
-                            menuStartTelnet();
-                        }
-                        else if(sysCon.protocol == "SSH")
-                        {
-                            TheTerminal::Instance()->setCurrentFont(sysCon.font);
-                            if(TheTerminal::Instance()->didFontChange())
-                                TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
-                            // Switch to SSH State
-                            menuStartSSH();
-                        }
-                        break;
+                            MenuFunction::displayAnsiFile("outro.ans");
+                            SDL_Delay(1500);
+                            TheRenderer::Instance()->quit();
+                            break;
+
+                        default:
+                            sysCon = TheRenderer::Instance()->getSystemConnection();
+                            if(sysCon.protocol == "TELNET")
+                            {
+                                // Switch to Telnet State
+                                menuStartTelnet();
+                                return;
+                            }
+                            else if(sysCon.protocol == "SSH")
+                            {
+                                TheRenderer::Instance()->setCurrentFont(sysCon.font);
+                                if(TheRenderer::Instance()->didFontChange())
+                                {
+                                    if (!TheRenderer::Instance()->loadBitmapImage(
+                                        TheRenderer::Instance()->getCurrentFont()))
+                                        {
+                                            SDL_Delay(1500);
+                                            TheRenderer::Instance()->quit();
+                                            break;
+                                        }
+                                }
+                                // Switch to SSH State
+                                menuStartSSH();
+                                return;
+                            }
+                            break;
+                    }
                 }
             }
         }
@@ -110,13 +128,15 @@ bool MainMenuState::onEnter()
     // Set Render to Ready so we draw menu, Once it's drawn we toggle
     // This off, so it doesn't keep looping since it's not a game
     // with animation, this saves cpu usage.
-    TheTerminal::Instance()->clearSystemConnection();
+    TheRenderer::Instance()->clearSystemConnection();
 
     // Startup the Dialing directory system
-    m_menuManager.setupDialDirectory();
+    setupDialDirectory();
 
     // Draw the inital Lightbar Listing
-    m_menuManager.updateDialDirectory();
+    updateDialDirectory();
+
+    isActive = true;
     return true;
 }
 
@@ -125,6 +145,7 @@ bool MainMenuState::onExit()
     // reset the input handler
     TheInputHandler::Instance()->reset();
     std::cout << "exiting MainMenuState\n";
+    isActive = false;
     return true;
 }
 

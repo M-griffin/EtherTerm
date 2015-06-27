@@ -13,12 +13,15 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "terminal.hpp"
+#include "renderer.hpp"
 // Needed for Clean Shutdown
 #include "sequenceParser.hpp"
 #include "sequenceManager.hpp"
 #include "inputHandler.hpp"
 #include "socketHandler.hpp"
+#include "mainMenuState.hpp"
+#include "termStateMachine.hpp"
+#include "queueManager.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -26,17 +29,17 @@
 #ifdef TARGET_OS_MAC
 #include <SDL.h>
 #include <SDL_Main.h>
-#include <SDL_net.h>
+//#include <SDL_net.h>
 #include <mach-o/dyld.h>
 #elif _WIN32
 #include <windows.h>
 #include <SDL.h>
 #include <SDL_Main.h>
-#include <SDL_net.h>
+//#include <SDL_net.h>
 #else // LINUX
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_main.h>
-#include <SDL2/SDL_net.h>
+//#include <SDL2/SDL_net.h>
 #endif
 
 #include <libssh/libssh.h>
@@ -46,22 +49,17 @@
 #include <climits>
 #include <string>
 #include <iostream>
-//#include <cstdlib>
-//#include <sstream>
-//#include <fstream>
-
-
-//#include <exception>
-
-
-
+#include <unistd.h>
 /*
  * Shutdown Procedures
  */
 void cleanup()
 {
+    // cleanup theState.
+    TheStateMachine::ReleaseInstance();
+
     // Cleanup Surfaces and Textures
-    TheTerminal::Instance()->clean();
+    TheRenderer::Instance()->clean();
 
     TheSocketHandler::ReleaseInstance();
     TheInputHandler::ReleaseInstance();
@@ -69,43 +67,28 @@ void cleanup()
     //Release Instances
     TheSequenceParser::ReleaseInstance();
     TheSequenceManager::ReleaseInstance();
+    TheQueueManager::ReleaseInstance();
 
-    TheTerminal::ReleaseInstance();
+    TheRenderer::ReleaseInstance();
     std::cout << "Shutdown complete." << std::endl;
 }
-
-
-class argv_range
-{
-public:
-    argv_range(int argc, const char *const argv[])
-        : argc_(argc), argv_(argv)
-    { }
-    const char *const *begin() const
-    {
-        return argv_;
-    }
-    const char *const *end() const
-    {
-        return argv_ + argc_;
-    }
-
-private:
-    const int argc_;
-    const char *const *argv_;
-};
 
 /*
  *  Main Program Entrance
  */
 int main(int argc, char* argv[])
 {
-    std::cout << argc << " arguments" << std::endl;
-    for(auto *arg: argv_range(argc, argv))
+    // Not used at this time!!
+    int c = 0;
+    while ((c = getopt (argc, argv, "c:b:a:")) != -1)
     {
-        // Do something.
-        std::cout << arg << " Parameters" << std::endl;
+        switch(c) {
+            default:
+                break;
+        }
     }
+
+
     // Run cleanup on exit of program
     atexit(cleanup);
 
@@ -168,38 +151,46 @@ int main(int argc, char* argv[])
 
 #endif
     std::cout << "Working directory is: " << realPath << std::endl;
-    TheTerminal::Instance()->setProgramPath(realPath);
+    TheRenderer::Instance()->setProgramPath(realPath);
 
     // Initialize Renderer and Window with default sizes.
     // We define 680 instead of 640 because we clip the extract off
     // in Screen->Texture.  We do this because when Texture filtering is used
     // Pixels on the last line tend to bleed from blending. This clips off the
     // Bleeding Leaving a nice screen.
-    if(TheTerminal::Instance()->init("EtherTerm v2.7 alpha preview", 680, 480, 1280, 800, 8, 16))
+    if(TheRenderer::Instance()->init("EtherTerm v2.8 alpha preview", 680, 480, 1280, 800, 8, 16))
     {
         // Setup the Surfaces
-        if(TheTerminal::Instance()->initSurfaceTextures())
+        if(TheRenderer::Instance()->initSurfaceTextures())
         {
+
+
             std::cout << "Surface & Textures Initialized. " << std::endl;
             // Load Font Texture to Surface
-            if(TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont()))
+            if( TheRenderer::Instance()->loadBitmapImage(TheRenderer::Instance()->getCurrentFont()) )
             {
                 std::cout << "Term init success!\n";
-                TheTerminal::Instance()->clearScreen();
+                TheRenderer::Instance()->clearScreen();
 
                 // Display intro ANSI Screen
-                TheTerminal::Instance()->clearScreenSurface();
+                TheRenderer::Instance()->clearScreenSurface();
                 TheSequenceParser::Instance()->reset();
 
-                while(TheTerminal::Instance()->running())
+                // Setup main menu state
+                // Load into Main Menu System (Dialing Directory)
+               //std::shared_ptr<MainMenuState> ms(new MainMenuState());
+               //TheTerminal::Instance()->getStateMachine()->changeState(ms);
+               TheStateMachine::Instance()->changeState(new MainMenuState());
+
+                while(TheRenderer::Instance()->running())
                 {
                     // If the font changed, then load the new image.
-                    if(TheTerminal::Instance()->didFontChange())
-                        TheTerminal::Instance()->loadBitmapImage(
-                            TheTerminal::Instance()->getCurrentFont());
+                    if(TheRenderer::Instance()->didFontChange())
+                        TheRenderer::Instance()->loadBitmapImage(
+                            TheRenderer::Instance()->getCurrentFont());
 
                     // Main Loop, Handle update per State Machine
-                    TheTerminal::Instance()->update();
+                    TheStateMachine::Instance()->update();
 
                     // Proces Any incoming Data from the State
                     // Process and send to Screen for Updates.

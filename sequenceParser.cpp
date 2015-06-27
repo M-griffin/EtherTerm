@@ -9,7 +9,7 @@
 #include "socketHandler.hpp"
 #include "inputHandler.hpp"
 #include "sequenceParser.hpp"
-#include "terminal.hpp"
+#include "renderer.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -30,21 +30,13 @@ SequenceParser::SequenceParser() :
     isCursorShown(true)
 {
     // Set Default Region to Off!
-    TheTerminal::Instance()->setScrollRegion(0, 0, TERM_HEIGHT);
+    TheRenderer::Instance()->setScrollRegion(0, 0, TERM_HEIGHT);
 }
 
 SequenceParser::~SequenceParser()
 {
     std::cout << "SequenceParser Released" << std::endl;
-    try
-    {
-        std::vector<myScreen>().swap(screenBuffer); // Clear
-    }
-    catch(std::exception &e)
-    {
-        std::cout << "Exception std::vector<myScreen>().swap(screenBuffer): "
-                  << e.what() << std::endl;
-    }
+    std::vector<myScreen>().swap(screenBuffer); // Clear
 }
 
 /*
@@ -67,11 +59,11 @@ void SequenceParser::reset()
     //isCursorShown = true; // States will override this.
 
     // Reset Default Colors.
-    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREY;
-    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
+    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->GREY;
+    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLACK;
 
     // Turn off Scrolling Region
-    TheTerminal::Instance()->setScrollRegion(0, 0, TERM_HEIGHT);
+    TheRenderer::Instance()->setScrollRegion(0, 0, TERM_HEIGHT);
 }
 
 /*
@@ -145,8 +137,8 @@ void SequenceParser::textInput(const std::string &buffer)
 
             // Check here if we need to scroll the screen up 1 row.
             if(y_position > NUM_LINES ||
-                    (TheTerminal::Instance()->m_scrollRegionActive &&
-                     y_position > TheTerminal::Instance()->m_bottomMargin))
+                    (TheRenderer::Instance()->m_scrollRegionActive &&
+                     y_position > TheRenderer::Instance()->m_bottomMargin))
             {
                 // If we cleared the screen and hit bottom row, then
                 // The very first time we want to spit out the entire screen
@@ -154,26 +146,26 @@ void SequenceParser::textInput(const std::string &buffer)
                 // Row by Row.
                 if(cleared_the_screen)
                 {
-                    TheTerminal::Instance()->renderScreen();       // Surface to Texture
-                    TheTerminal::Instance()->drawTextureScreen();  // Draw Texture to Screen
-                    TheTerminal::Instance()->scrollScreenUp();     // Scroll the surface up
+                    TheRenderer::Instance()->renderScreen();       // Surface to Texture
+                    TheRenderer::Instance()->drawTextureScreen();  // Draw Texture to Screen
+                    TheRenderer::Instance()->scrollScreenUp();     // Scroll the surface up
                     scrollScreenBuffer();
-                    if(!TheTerminal::Instance()->m_scrollRegionActive)
+                    if(!TheRenderer::Instance()->m_scrollRegionActive)
                         y_position = NUM_LINES;
                     else
-                        y_position = TheTerminal::Instance()->m_bottomMargin;
+                        y_position = TheRenderer::Instance()->m_bottomMargin;
                     cleared_the_screen = false;
                 }
                 else
                 {
-                    TheTerminal::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
-                    TheTerminal::Instance()->drawTextureScreen();    // Texture to Screen
-                    TheTerminal::Instance()->scrollScreenUp();       // Scroll up for next line.
+                    TheRenderer::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
+                    TheRenderer::Instance()->drawTextureScreen();    // Texture to Screen
+                    TheRenderer::Instance()->scrollScreenUp();       // Scroll up for next line.
                     scrollScreenBuffer();
-                    if(!TheTerminal::Instance()->m_scrollRegionActive)
+                    if(!TheRenderer::Instance()->m_scrollRegionActive)
                         y_position = NUM_LINES;
                     else
-                        y_position = TheTerminal::Instance()->m_bottomMargin;
+                        y_position = TheRenderer::Instance()->m_bottomMargin;
                 }
             }
             //printf("\r\n xpos %i, ypos %i \r\n",x_position, y_position);
@@ -221,22 +213,22 @@ void SequenceParser::textInput(const std::string &buffer)
             }
             // Check here if we need to scroll the screen.
             if(y_position > NUM_LINES ||
-                    (TheTerminal::Instance()->m_scrollRegionActive &&
-                     y_position > TheTerminal::Instance()->m_bottomMargin))
+                    (TheRenderer::Instance()->m_scrollRegionActive &&
+                     y_position > TheRenderer::Instance()->m_bottomMargin))
             {
                 // If we cleared the screen and hit bottom row, then
                 // The very first time we want to spit out the entire screen
                 // Since nothing has been drawn yet before we scroll the screen.
                 if(cleared_the_screen)
                 {
-                    TheTerminal::Instance()->renderScreen();       // Surface to Texture
-                    TheTerminal::Instance()->drawTextureScreen();  // Draw Texture to Screen
-                    TheTerminal::Instance()->scrollScreenUp();     // Scroll the surface up
+                    TheRenderer::Instance()->renderScreen();       // Surface to Texture
+                    TheRenderer::Instance()->drawTextureScreen();  // Draw Texture to Screen
+                    TheRenderer::Instance()->scrollScreenUp();     // Scroll the surface up
                     scrollScreenBuffer();
-                    if(!TheTerminal::Instance()->m_scrollRegionActive)
+                    if(!TheRenderer::Instance()->m_scrollRegionActive)
                         y_position = NUM_LINES;
                     else
-                        y_position = TheTerminal::Instance()->m_bottomMargin;
+                        y_position = TheRenderer::Instance()->m_bottomMargin;
                     cleared_the_screen = false;
                 }
                 else
@@ -244,14 +236,14 @@ void SequenceParser::textInput(const std::string &buffer)
                     // Else we want to just append to the last line
                     // Move the last line to the Texture, then
                     // Re-display the screen.
-                    TheTerminal::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
-                    TheTerminal::Instance()->drawTextureScreen();    // Texture to Screen
-                    TheTerminal::Instance()->scrollScreenUp();       // Scroll up for next line.
+                    TheRenderer::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
+                    TheRenderer::Instance()->drawTextureScreen();    // Texture to Screen
+                    TheRenderer::Instance()->scrollScreenUp();       // Scroll up for next line.
                     scrollScreenBuffer();
-                    if(!TheTerminal::Instance()->m_scrollRegionActive)
+                    if(!TheRenderer::Instance()->m_scrollRegionActive)
                         y_position = NUM_LINES;
                     else
-                        y_position = TheTerminal::Instance()->m_bottomMargin;
+                        y_position = TheRenderer::Instance()->m_bottomMargin;
                 }
             }
             continue;
@@ -263,7 +255,7 @@ void SequenceParser::textInput(const std::string &buffer)
             // Move to next line
             // If were in scroll region,
             // Then we'll test specifically to scroll the region only.
-            if(!TheTerminal::Instance()->m_scrollRegionActive)
+            if(!TheRenderer::Instance()->m_scrollRegionActive)
             {
                 x_position = 1;
                 ++y_position;
@@ -277,8 +269,8 @@ void SequenceParser::textInput(const std::string &buffer)
         // if we need to scroll the screen up 1 line.
         // This last check is for normal text being pushed to the screen,
         // NO CR/LR so check if we gone past the bottom margin of the screen.
-        if(y_position > NUM_LINES || (TheTerminal::Instance()->m_scrollRegionActive &&
-                                      y_position >= TheTerminal::Instance()->m_bottomMargin &&
+        if(y_position > NUM_LINES || (TheRenderer::Instance()->m_scrollRegionActive &&
+                                      y_position >= TheRenderer::Instance()->m_bottomMargin &&
                                       x_position > characters_per_line))
         {
             // If we cleared the screen and hit bottom row, then
@@ -286,15 +278,15 @@ void SequenceParser::textInput(const std::string &buffer)
             if(cleared_the_screen)
             {
                 // test if scrolling region is active and were drawing in it.
-                if(TheTerminal::Instance()->m_scrollRegionActive &&
-                        y_position >= TheTerminal::Instance()->m_topMargin &&
-                        y_position <= TheTerminal::Instance()->m_bottomMargin)
+                if(TheRenderer::Instance()->m_scrollRegionActive &&
+                        y_position >= TheRenderer::Instance()->m_topMargin &&
+                        y_position <= TheRenderer::Instance()->m_bottomMargin)
                 {
-                    TheTerminal::Instance()->renderScreen();       // Surface to Texture
-                    TheTerminal::Instance()->drawTextureScreen();  // Draw Texture to Screen
-                    TheTerminal::Instance()->scrollScreenUp();     // Scroll the surface up
+                    TheRenderer::Instance()->renderScreen();       // Surface to Texture
+                    TheRenderer::Instance()->drawTextureScreen();  // Draw Texture to Screen
+                    TheRenderer::Instance()->scrollScreenUp();     // Scroll the surface up
                     scrollScreenBuffer();
-                    y_position = TheTerminal::Instance()->m_bottomMargin;
+                    y_position = TheRenderer::Instance()->m_bottomMargin;
                     cleared_the_screen = false;
                     // Reset to beginning of line.
                     if(x_position > characters_per_line)
@@ -302,9 +294,9 @@ void SequenceParser::textInput(const std::string &buffer)
                 }
                 else if(y_position > NUM_LINES)
                 {
-                    TheTerminal::Instance()->renderScreen();       // Surface to Texture
-                    TheTerminal::Instance()->drawTextureScreen();  // Draw Texture to Screen
-                    TheTerminal::Instance()->scrollScreenUp();     // Scroll the surface up
+                    TheRenderer::Instance()->renderScreen();       // Surface to Texture
+                    TheRenderer::Instance()->drawTextureScreen();  // Draw Texture to Screen
+                    TheRenderer::Instance()->scrollScreenUp();     // Scroll the surface up
                     scrollScreenBuffer();
                     y_position = NUM_LINES;
                     cleared_the_screen = false;
@@ -316,24 +308,24 @@ void SequenceParser::textInput(const std::string &buffer)
                 // Move the last line to the Texture, then
                 // Re display the screen.
                 // test if scrolling region is active and were drawing in it.
-                if(TheTerminal::Instance()->m_scrollRegionActive &&
-                        y_position >= TheTerminal::Instance()->m_topMargin &&
-                        y_position <= TheTerminal::Instance()->m_bottomMargin)
+                if(TheRenderer::Instance()->m_scrollRegionActive &&
+                        y_position >= TheRenderer::Instance()->m_topMargin &&
+                        y_position <= TheRenderer::Instance()->m_bottomMargin)
                 {
-                    TheTerminal::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
-                    TheTerminal::Instance()->drawTextureScreen();    // Texture to Screen
-                    TheTerminal::Instance()->scrollScreenUp();       // Scroll up for next line.
+                    TheRenderer::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
+                    TheRenderer::Instance()->drawTextureScreen();    // Texture to Screen
+                    TheRenderer::Instance()->scrollScreenUp();       // Scroll up for next line.
                     scrollScreenBuffer();
                     // Reset to beginning of line.
                     if(x_position > characters_per_line)
                         x_position = 1;
-                    y_position = TheTerminal::Instance()->m_bottomMargin;
+                    y_position = TheRenderer::Instance()->m_bottomMargin;
                 }
                 else if(y_position > NUM_LINES)
                 {
-                    TheTerminal::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
-                    TheTerminal::Instance()->drawTextureScreen();    // Texture to Screen
-                    TheTerminal::Instance()->scrollScreenUp();       // Scroll up for next line.
+                    TheRenderer::Instance()->renderBottomScreen();   // Surface to Texture of Bottom Row.
+                    TheRenderer::Instance()->drawTextureScreen();    // Texture to Screen
+                    TheRenderer::Instance()->scrollScreenUp();       // Scroll up for next line.
                     scrollScreenBuffer();
                     y_position = NUM_LINES;
                 }
@@ -341,15 +333,15 @@ void SequenceParser::textInput(const std::string &buffer)
         }
         //printf(" \r\n XY: %i,%i ",x_position, y_position);
         // Render Char Screen Position 0 Based from 1 Based.
-        TheTerminal::Instance()->drawChar(x_position-1, y_position-1, sequence);        // Char to Surface
+        TheRenderer::Instance()->drawChar(x_position-1, y_position-1, sequence);        // Char to Surface
 
         // Add to Screen Buffer, Right now were testing unsigned characters,
         // This will be updated to std::string[0] for ASCII characters
         // with extra checking for Unicode soon!
-        std::string tempSequence;   // Just temp for now.
-        tempSequence = (signed)sequence;
-        setScreenBuffer(tempSequence);
-        tempSequence.erase();
+       // tempSequence = (signed)sequence;
+       // setScreenBuffer(tempSequence);
+       // tempSequence.erase();
+       setScreenBuffer(sequence);
 
         // After drawing character send Cursor to Next Position forward.
         ++x_position;
@@ -371,13 +363,13 @@ void SequenceParser::sequenceCursorAndDisplay()
             // at the end of the line are filled with the current attribute.
             if(parameters.size() == 1)  // Erase current position, move left
             {
-                TheTerminal::Instance()->renderDeleteCharScreen(
+                TheRenderer::Instance()->renderDeleteCharScreen(
                     x_position -1, y_position -1, 1);
                 break;
             }
             if(parameters.size() == 2)  // Erase current position, move left x
             {
-                TheTerminal::Instance()->renderDeleteCharScreen(
+                TheRenderer::Instance()->renderDeleteCharScreen(
                     x_position -1, y_position -1, parameters[1]);
                 break;
             }
@@ -461,12 +453,12 @@ void SequenceParser::sequenceCursorAndDisplay()
             if(parameters.size() == 1)
             {
                 // Reset to Full Screen.
-                TheTerminal::Instance()->setScrollRegion(0, 0, TERM_HEIGHT);
+                TheRenderer::Instance()->setScrollRegion(0, 0, TERM_HEIGHT);
             }
             if(parameters.size() == 3)
             {
                 // Enable scrolling from row1 to row2
-                TheTerminal::Instance()->setScrollRegion(parameters[1], parameters[2], TERM_HEIGHT);
+                TheRenderer::Instance()->setScrollRegion(parameters[1], parameters[2], TERM_HEIGHT);
                 // Move the cursor to the home position
                 x_position = 1;
                 y_position = 1;
@@ -549,8 +541,8 @@ void SequenceParser::sequenceCursorAndDisplay()
             saved_cursor_y  = y_position;
             saved_attribute = color_attribute;
             saved_prev_attr = prev_color_attribute;
-            savedForegroundColor = TheTerminal::Instance()->m_currentFGColor;
-            savedBackgroundColor = TheTerminal::Instance()->m_currentBGColor;
+            savedForegroundColor = TheRenderer::Instance()->m_currentFGColor;
+            savedBackgroundColor = TheRenderer::Instance()->m_currentBGColor;
             break;
 
         case RESTORE_CURSOR_POS:
@@ -558,8 +550,8 @@ void SequenceParser::sequenceCursorAndDisplay()
             y_position = saved_cursor_y;
             color_attribute = saved_attribute;
             prev_color_attribute = saved_prev_attr;
-            TheTerminal::Instance()->m_currentFGColor = savedForegroundColor;
-            TheTerminal::Instance()->m_currentBGColor = savedBackgroundColor;
+            TheRenderer::Instance()->m_currentFGColor = savedForegroundColor;
+            TheRenderer::Instance()->m_currentBGColor = savedBackgroundColor;
             break;
 
         case CURSOR_X_POSITION: // XTERM
@@ -579,21 +571,21 @@ void SequenceParser::sequenceCursorAndDisplay()
             // Erase Current Line and Below. ESC[J
             if(parameters.size() == 1)
             {
-                TheTerminal::Instance()->renderClearLineBelowScreen(
+                TheRenderer::Instance()->renderClearLineBelowScreen(
                     y_position-1, x_position-1);
                 break;
             }
             // Erase Current Line and Below. ESC[0J
             if(parameters.size() == 2 && parameters[1] == 0)
             {
-                TheTerminal::Instance()->renderClearLineBelowScreen(
+                TheRenderer::Instance()->renderClearLineBelowScreen(
                     y_position-1, x_position-1);
                 break;
             }
             // Erase Current Line and Above.
             if(parameters.size() == 2 && parameters[1] == 1)
             {
-                TheTerminal::Instance()->renderClearLineAboveScreen(
+                TheRenderer::Instance()->renderClearLineAboveScreen(
                     y_position-1, x_position-1);
                 break;
             }
@@ -602,7 +594,7 @@ void SequenceParser::sequenceCursorAndDisplay()
             {
                 // If background not 0m, we should probably fill
                 // The screen with background color per the spec?
-                TheTerminal::Instance()->clearScreenSurface();
+                TheRenderer::Instance()->clearScreenSurface();
                 clearScreenBuffer();
                 cleared_the_screen = true;
                 x_position = 1;
@@ -616,19 +608,19 @@ void SequenceParser::sequenceCursorAndDisplay()
             if(parameters.size() == 1)  // Cursor to End of line
             {
                 //printf("\r\n EOL xpos %i, ypos %i \r\n", x_position, y_position);
-                TheTerminal::Instance()->renderClearLineScreen(y_position-1,
+                TheRenderer::Instance()->renderClearLineScreen(y_position-1,
                         x_position-1, characters_per_line); // test removed -1
                 clearScreenBufferRange(x_position-1, characters_per_line);
             }
             else if(parameters.size() == 2 && parameters[1] == 1) // Start of Line to Cursor
             {
-                TheTerminal::Instance()->renderClearLineScreen(
+                TheRenderer::Instance()->renderClearLineScreen(
                     y_position-1, 0, x_position);
                 clearScreenBufferRange(0, x_position);
             }
             else if(parameters.size() == 2 && parameters[1] == 2) // Entire Line
             {
-                TheTerminal::Instance()->renderClearLineScreen(
+                TheRenderer::Instance()->renderClearLineScreen(
                     y_position-1, 0, characters_per_line);
                 clearScreenBufferRange(0, characters_per_line);
             }
@@ -665,8 +657,8 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                 //current_color = "\x1b[m";
                 prev_color_attribute = 0;
                 color_attribute = 0;
-                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREY;
-                TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
+                TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->GREY;
+                TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLACK;
                 //screen_buff.color_sequence += current_color;
                 //std::cout << "\r\nESC[M\r\n" << std::endl;
                 break;
@@ -691,8 +683,8 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             //std::cout << "Color_Attribute: " << color_attribute << endl;
                             ////printf("\r\nAll Attributes off: %s:%i", esc_sequence.c_str(), color_attribute);
                             // Set default till it's overridden
-                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREY;
-                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
+                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->GREY;
+                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLACK;
                             break;
 
                         case 1: // BOLD_ON (increase intensity)
@@ -700,22 +692,22 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             color_attribute = 1;
                             //std::cout << "Color_Attribute: " << color_attribute << endl;
                             // If current color is dark, flip it to light.
-                            if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->BLACK))
-                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->DARK_GREY;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->RED))
-                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_RED;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->GREEN))
-                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_GREEN;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->BROWN))
-                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->YELLOW;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->BLUE))
-                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_BLUE;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->MAGENTA))
-                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_MAGENTA;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->CYAN))
-                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_CYAN;
-                            else if(TheTerminal::Instance()->compareSDL_Colors(TheTerminal::Instance()->m_currentFGColor, TheTerminal::Instance()->GREY))
-                                TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->WHITE;
+                            if(TheRenderer::Instance()->compareSDL_Colors(TheRenderer::Instance()->m_currentFGColor, TheRenderer::Instance()->BLACK))
+                                TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->DARK_GREY;
+                            else if(TheRenderer::Instance()->compareSDL_Colors(TheRenderer::Instance()->m_currentFGColor, TheRenderer::Instance()->RED))
+                                TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_RED;
+                            else if(TheRenderer::Instance()->compareSDL_Colors(TheRenderer::Instance()->m_currentFGColor, TheRenderer::Instance()->GREEN))
+                                TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_GREEN;
+                            else if(TheRenderer::Instance()->compareSDL_Colors(TheRenderer::Instance()->m_currentFGColor, TheRenderer::Instance()->BROWN))
+                                TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->YELLOW;
+                            else if(TheRenderer::Instance()->compareSDL_Colors(TheRenderer::Instance()->m_currentFGColor, TheRenderer::Instance()->BLUE))
+                                TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_BLUE;
+                            else if(TheRenderer::Instance()->compareSDL_Colors(TheRenderer::Instance()->m_currentFGColor, TheRenderer::Instance()->MAGENTA))
+                                TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_MAGENTA;
+                            else if(TheRenderer::Instance()->compareSDL_Colors(TheRenderer::Instance()->m_currentFGColor, TheRenderer::Instance()->CYAN))
+                                TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_CYAN;
+                            else if(TheRenderer::Instance()->compareSDL_Colors(TheRenderer::Instance()->m_currentFGColor, TheRenderer::Instance()->GREY))
+                                TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->WHITE;
                             break;
 
                         case 2: // FAINT (decreased intensity) (Not widely used).
@@ -738,9 +730,9 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             //std::cout << "Color_Attribute: " << color_attribute << endl;
                             // Flip Colors for Ice Colors.
                             SDL_Color tempColor;
-                            tempColor = TheTerminal::Instance()->m_currentFGColor;
-                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->m_currentBGColor;
-                            TheTerminal::Instance()->m_currentBGColor = tempColor;
+                            tempColor = TheRenderer::Instance()->m_currentFGColor;
+                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->m_currentBGColor;
+                            TheRenderer::Instance()->m_currentBGColor = tempColor;
                             break;
 
                         case 6: // BLINK RAPID MS-DOS ANSI.SYS; 150 per minute or more; not widely supported
@@ -751,9 +743,9 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                         case 7: // REVERSE_VIDEO_ON
                             color_attribute = 7;
                             //std::cout << "Color_Attribute: " << color_attribute << endl;
-                            tempColor = TheTerminal::Instance()->m_currentFGColor;
-                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->m_currentBGColor;
-                            TheTerminal::Instance()->m_currentBGColor = tempColor;
+                            tempColor = TheRenderer::Instance()->m_currentFGColor;
+                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->m_currentBGColor;
+                            TheRenderer::Instance()->m_currentBGColor = tempColor;
                             break;
 
                         case 8: // CONCEALED_ON
@@ -785,9 +777,9 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             //current_color += "27";
                             color_attribute = 0;
                             //std::cout << "Color_Attribute: INVERSE OFF " << color_attribute << endl;
-                            tempColor = TheTerminal::Instance()->m_currentFGColor;
-                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->m_currentBGColor;
-                            TheTerminal::Instance()->m_currentBGColor = tempColor;
+                            tempColor = TheRenderer::Instance()->m_currentFGColor;
+                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->m_currentBGColor;
+                            TheRenderer::Instance()->m_currentBGColor = tempColor;
                             break;
 
                         case 28: // CONCEALED_OFF
@@ -803,7 +795,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->BLACK;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->BLACK;
                                     break;
 
                                 case BLINK_ON:
@@ -811,13 +803,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLACK;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->DARK_GREY;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->DARK_GREY;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLACK;
                                             break;
                                     }
                                     break;
@@ -827,19 +819,19 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLACK;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->DARK_GREY;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->DARK_GREY;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLACK;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->DARK_GREY;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->DARK_GREY;
                                     break;
                             }
                             break;
@@ -848,7 +840,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->RED;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->RED;
                                     break;
 
                                 case BLINK_ON:
@@ -856,13 +848,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->RED;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->RED;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_RED;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->LIGHT_RED;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->RED;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->RED;
                                             break;
                                     }
                                     break;
@@ -872,19 +864,19 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->RED;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->RED;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_RED;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->LIGHT_RED;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->RED;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->RED;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_RED;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_RED;
                                     break;
                             }
                             break;
@@ -894,7 +886,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREEN;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->GREEN;
                                     break;
 
                                 case BLINK_ON:
@@ -902,13 +894,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREEN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->GREEN;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_GREEN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->LIGHT_GREEN;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREEN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->GREEN;
                                             break;
                                     }
                                     break;
@@ -918,19 +910,19 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREEN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->GREEN;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_GREEN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->LIGHT_GREEN;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREEN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->GREEN;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_GREEN;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_GREEN;
                                     break;
                             }
                             break;
@@ -939,7 +931,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->BROWN;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->BROWN;
                                     break;
 
                                 case BLINK_ON:
@@ -947,13 +939,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BROWN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BROWN;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->YELLOW;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->YELLOW;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BROWN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BROWN;
                                             break;
                                     }
                                     break;
@@ -963,19 +955,19 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BROWN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BROWN;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->YELLOW;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->YELLOW;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BROWN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BROWN;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->YELLOW;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->YELLOW;
                                     break;
                             }
                             break;
@@ -984,7 +976,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->BLUE;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->BLUE;
                                     break;
 
                                 case BLINK_ON:
@@ -992,13 +984,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLUE;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLUE;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_BLUE;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->LIGHT_BLUE;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLUE;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLUE;
                                             break;
                                     }
                                     break;
@@ -1008,19 +1000,19 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLUE;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLUE;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_BLUE;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->LIGHT_BLUE;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLUE;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLUE;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_BLUE;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_BLUE;
                                     break;
                             }
                             break;
@@ -1029,7 +1021,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->MAGENTA;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->MAGENTA;
                                     break;
 
                                 case BLINK_ON:
@@ -1037,13 +1029,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->MAGENTA;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->MAGENTA;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_MAGENTA;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->LIGHT_MAGENTA;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->MAGENTA;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->MAGENTA;
                                             break;
                                     }
                                     break;
@@ -1053,19 +1045,19 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->MAGENTA;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->MAGENTA;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_MAGENTA;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->LIGHT_MAGENTA;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->MAGENTA;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->MAGENTA;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_MAGENTA;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_MAGENTA;
                                     break;
                             }
                             break;
@@ -1074,7 +1066,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->CYAN;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->CYAN;
                                     break;
 
                                 case BLINK_ON:
@@ -1082,13 +1074,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->CYAN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->CYAN;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_CYAN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->LIGHT_CYAN;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->CYAN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->CYAN;
                                             break;
                                     }
                                     break;
@@ -1098,19 +1090,19 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->CYAN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->CYAN;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->LIGHT_CYAN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->LIGHT_CYAN;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->CYAN;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->CYAN;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_CYAN;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_CYAN;
                                     break;
                             }
                             break;
@@ -1119,7 +1111,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREY;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->GREY;
                                     break;
 
                                 case BLINK_ON:
@@ -1127,13 +1119,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREY;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->GREY;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->WHITE;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->WHITE;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREY;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->GREY;
                                             break;
                                     }
                                     break;
@@ -1143,19 +1135,19 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     switch(prev_color_attribute)
                                     {
                                         case 0:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREY;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->GREY;
                                             break;
                                         case 1:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->WHITE;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->WHITE;
                                             break;
                                         default:
-                                            TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREY;
+                                            TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->GREY;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->WHITE;
+                                    TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->WHITE;
                                     break;
                             }
                             break;
@@ -1165,7 +1157,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLACK;
                                     break;
 
                                 case BLINK_ON:
@@ -1175,7 +1167,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLACK; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->DARKGREY; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->DARK_GREY;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->DARK_GREY;
                                             break;
                                     }
                                     break;
@@ -1187,13 +1179,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLACK; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->DARKGREY; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->BLACK;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->BLACK;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLACK;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLACK;
                                     break;
                             }
                             break;
@@ -1202,7 +1194,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->RED;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->RED;
                                     break;
 
                                 case BLINK_ON:
@@ -1212,7 +1204,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->RED; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTRED; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_RED;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_RED;
                                             break;
                                     }
                                     break;
@@ -1224,13 +1216,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->RED; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTRED; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->RED;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->RED;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->RED;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->RED;
                                     break;
                             }
                             break;
@@ -1239,7 +1231,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREEN;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->GREEN;
                                     break;
 
                                 case BLINK_ON:
@@ -1249,7 +1241,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREEN; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTGREEN; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_GREEN;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_GREEN;
                                             break;
                                     }
                                     break;
@@ -1261,13 +1253,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREEN; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTGREEN; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREEN;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->GREEN;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREEN;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->GREEN;
                                     break;
                             }
                             break;
@@ -1276,7 +1268,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BROWN;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BROWN;
                                     break;
 
                                 case BLINK_ON:
@@ -1286,7 +1278,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BROWN; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->YELLOW; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->YELLOW;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->YELLOW;
                                             break;
                                     }
                                     break;
@@ -1298,13 +1290,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BROWN; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->YELLOW; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->BROWN;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->BROWN;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BROWN;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BROWN;
                                     break;
                             }
                             break;
@@ -1313,7 +1305,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLUE;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLUE;
                                     break;
 
                                 case BLINK_ON:
@@ -1323,7 +1315,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLUE; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTBLUE; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_BLUE;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_BLUE;
                                             break;
                                     }
                                     break;
@@ -1335,13 +1327,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLUE; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTBLUE; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->BLUE;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->BLUE;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->BLUE;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->BLUE;
                                     break;
                             }
                             break;
@@ -1350,7 +1342,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->MAGENTA;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->MAGENTA;
                                     break;
 
                                 case BLINK_ON:
@@ -1359,7 +1351,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->MAGENTA; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTMAGENTA; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_MAGENTA;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_MAGENTA;
                                             break;
                                     }
                                     break;
@@ -1371,13 +1363,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->MAGENTA; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTMAGENTA; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->MAGENTA;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->MAGENTA;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->MAGENTA;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->MAGENTA;
                                     break;
                             }
                             break;
@@ -1386,7 +1378,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->CYAN;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->CYAN;
                                     break;
 
                                 case BLINK_ON:
@@ -1396,7 +1388,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->CYAN; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTCYAN; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->LIGHT_CYAN;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->LIGHT_CYAN;
                                             break;
                                     }
                                     break;
@@ -1408,13 +1400,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->CYAN; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTCYAN; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->CYAN;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->CYAN;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->CYAN;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->CYAN;
                                     break;
                             }
                             break;
@@ -1423,7 +1415,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             switch(color_attribute)
                             {
                                 case ALL_ATTRIBUTES_OFF:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREY;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->GREY;
                                     break;
 
                                 case BLINK_ON:
@@ -1433,7 +1425,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREY; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->WHITE; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->WHITE;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->WHITE;
                                             break;
                                     }
                                     break;
@@ -1445,13 +1437,13 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                             //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREY; break;
                                             //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->WHITE; break;
                                         default:
-                                            TheTerminal::Instance()->m_currentFGColor = TheTerminal::Instance()->GREY;
+                                            TheRenderer::Instance()->m_currentFGColor = TheRenderer::Instance()->GREY;
                                             break;
                                     }
                                     break;
 
                                 default:
-                                    TheTerminal::Instance()->m_currentBGColor = TheTerminal::Instance()->GREY;
+                                    TheRenderer::Instance()->m_currentBGColor = TheRenderer::Instance()->GREY;
                                     break;
                             }
                             break;

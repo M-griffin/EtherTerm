@@ -9,10 +9,12 @@
 
 #include <string>
 
-typedef struct MenuConfig
+class MenuConfig
 {
-    char INI_PATH[255];
-    char INI_NAME[255];
+    public:
+
+    std::string INI_PATH;
+    std::string INI_NAME;
     int  TOP_MARGIN;
     int  BOTTOM_MARGIN;
     std::string PAGE_NUMBER;
@@ -35,10 +37,10 @@ typedef struct MenuConfig
     std::string SetupThePath();
     bool ddirectory_exists();
     void ddirectory_create();
-    void ddirectory_chkpar(std::string &data);
+    std::string ddirectory_chkpar(const std::string &data);
     void ddirectory_check(std::string &cfgdata);
-    bool ddirectory_parse(int idx=0);
+    bool ddirectory_parse(int idx = 0);
 
-} MenuSystemConfig;
+};
 
 #endif // MENUSYSTEMCONFIG_HPP

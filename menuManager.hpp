@@ -10,7 +10,7 @@
 #include "linkList.hpp"
 #include "menuFunction.hpp"
 #include "menuConfig.hpp"
-#include "terminal.hpp"
+#include "renderer.hpp"
 
 #include <string>
 #include <vector>
@@ -31,7 +31,7 @@ public:
         std::vector<list_bar>()
             .swap(m_result);
 
-        std::vector<TheTerminal::SystemConnection>()
+        std::vector<TheRenderer::SystemConnection>()
             .swap(m_systemConnection);
     }
 
@@ -47,7 +47,7 @@ public:
     MenuFunction  m_menuFunction;
 
     std::vector<list_bar> m_result;
-    std::vector<TheTerminal::SystemConnection> m_systemConnection;
+    std::vector<TheRenderer::SystemConnection> m_systemConnection;
 
     // Methods
     std::vector<list_bar> buildDialList();

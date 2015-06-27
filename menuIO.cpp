@@ -2,7 +2,7 @@
 #include "inputHandler.hpp"
 #include "sequenceManager.hpp"
 #include "sequenceParser.hpp"
-#include "terminal.hpp"
+#include "renderer.hpp"
 
 #include <cstdio>
 #include <cstdlib>
@@ -304,8 +304,8 @@ void MenuIO::getLine(char *line,     // Returns Input into Line
                     ttime2 = SDL_GetTicks();
                     if(startBlinking && (ttime2 - ttime) > 400)
                     {
-                        TheTerminal::Instance()->renderCursorOffScreen();
-                        TheTerminal::Instance()->drawTextureScreen();
+                        TheRenderer::Instance()->renderCursorOffScreen();
+                        TheRenderer::Instance()->drawTextureScreen();
                         --cursorBlink;
                         ttime = SDL_GetTicks();
                     }
@@ -315,8 +315,8 @@ void MenuIO::getLine(char *line,     // Returns Input into Line
                     ttime2 = SDL_GetTicks();
                     if(startBlinking && (ttime2 - ttime) > 400)
                     {
-                        TheTerminal::Instance()->renderCursorOnScreen();
-                        TheTerminal::Instance()->drawTextureScreen();
+                        TheRenderer::Instance()->renderCursorOnScreen();
+                        TheRenderer::Instance()->drawTextureScreen();
                         ++cursorBlink;
                         ttime = SDL_GetTicks();
                     }
@@ -734,7 +734,7 @@ void MenuIO::sequenceToAnsi(const std::string &sequence)
 void MenuIO::displayAnsiFile(const std::string &fileName)
 {
     //std::cout << "ansiPrintf" << std::endl;
-    std::string path = TheTerminal::Instance()->getProgramPath();
+    std::string path = TheRenderer::Instance()->getProgramPath();
 #ifdef _WIN32
     path += "assets\\";
 #else

@@ -6,7 +6,7 @@
 // $LastChangedBy$
 
 #include "screenBuffer.hpp"
-#include "terminal.hpp"
+#include "renderer.hpp"
 
 #include <iostream>
 
@@ -48,15 +48,20 @@ ScreenBuffer::myScreen::myScreen(
  * Plotted through the ANSI Parser so we can pull
  * Text and or redraw screens at anytime.
  */
-void ScreenBuffer::setScreenBuffer(std::string mySequence)
+void ScreenBuffer::setScreenBuffer(unsigned char mySequence)
 {
     // Keep track of the longest line in buffer for Centering screen.
     // NOT IN USE CURRENTLY
     //if (x_position > max_x_position)
     //    max_x_position = x_position;
-    sequenceBuffer.characterSequence = mySequence;
-    sequenceBuffer.foreground = TheTerminal::Instance()->m_currentFGColor;
-    sequenceBuffer.background = TheTerminal::Instance()->m_currentBGColor;
+
+    std::string sequence;
+    sequence = (signed)mySequence;
+    sequenceBuffer.characterSequence = sequence;
+    sequence.erase();
+
+    sequenceBuffer.foreground = TheRenderer::Instance()->m_currentFGColor;
+    sequenceBuffer.background = TheRenderer::Instance()->m_currentBGColor;
 
     // Setup current position in the screen buffer. 1 based for 0 based.
     position = ((y_position-1) * characters_per_line) + (x_position-1);

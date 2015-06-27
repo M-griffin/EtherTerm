@@ -5,23 +5,26 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "terminal.hpp"
+#include "renderer.hpp"
 #include "sequenceParser.hpp"
 #include "mainMenuState.hpp"
 #include "inputHandler.hpp"
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #ifdef _DEBBUG
 #include <SDL2/SDL_ttf.h>
 #endif
 #elif _WIN32
 #include <SDL.h>
+#include <SDL_net.h>
 #ifdef _DEBBUG
 #include <SDL_ttf.h>
 #endif
 #else
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #ifdef _DEBBUG
 #include <SDL2/SDL_ttf.h>
 #endif
@@ -32,9 +35,9 @@
 #include <cstdio>
 #include <assert.h>
 
-Terminal* Terminal::m_globalInstance = nullptr;
+Renderer* Renderer::m_globalInstance = nullptr;
 
-Terminal::Terminal() :
+Renderer::Renderer() :
     BLACK( {   0,   0,   0,   0 }),
        BLUE( {   0,   0, 171,   0 }),
        GREEN( {   0, 171,   0,   0 }),
@@ -67,7 +70,7 @@ Terminal::Terminal() :
        m_cachedSurface(nullptr),    // Cached Font CharacterSet
        m_globalTexture(nullptr),    // Texture for User Screen
        m_selectionTexture(nullptr), // Texture for Copy/Paste Selection
-       m_globalTermStateMachine(nullptr),
+
        // Initalize Color Masks.
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
        m_redMask(0xff000000),
@@ -103,7 +106,7 @@ Terminal::Terminal() :
 
 }
 
-Terminal::~Terminal()
+Renderer::~Renderer()
 {
     // we must clean up after ourselves to prevent memory leaks
     m_globalRenderer = nullptr;
@@ -118,7 +121,7 @@ Terminal::~Terminal()
  * SDL is broken in OSX so We need to to switch
  * The resolution and Window Sizes properly.
  */
-void Terminal::restartWindowSize(bool fullScreen)
+void Renderer::restartWindowSize(bool fullScreen)
 {
     if(m_globalWindow)
     {
@@ -167,7 +170,7 @@ void Terminal::restartWindowSize(bool fullScreen)
  * SDL is broken in OSX so We need to to switch
  * The resolution and Window Sizes properly.
  */
-void Terminal::restartWindowRenderer(std::string mode)
+void Renderer::restartWindowRenderer(std::string mode)
 {
 
 
@@ -270,7 +273,7 @@ void Terminal::restartWindowRenderer(std::string mode)
 /*
  * Terminal Startup and Init.
  */
-bool Terminal::init(const char* title,
+bool Renderer::init(const char* title,
                     int swidth, int sheight,
                     int wwidth, int wheight,
                     int fwidth, int fheight)
@@ -300,7 +303,7 @@ bool Terminal::init(const char* title,
 
     std::cout << "SDL init success" << std::endl;
 
-    /* initialize SDL_net */
+    /* initialize SDL_net
     if(SDLNet_Init() < 0)
     {
         SDL_Log(
@@ -310,6 +313,7 @@ bool Terminal::init(const char* title,
     }
 
     std::cout << "SDLNet_Init success" << std::endl;
+    */
 
 #ifdef _DEBBUG
     //Also need to init SDL_ttf
@@ -403,29 +407,20 @@ bool Terminal::init(const char* title,
     return true;
 }
 
-void Terminal::update()
-{
-    m_globalTermStateMachine->update();
-}
-
-void Terminal::clean()
+void Renderer::clean()
 {
     // Call from a private member to free properly.
     freeSurfaceTextures();
 
     // Shutdown SDL_Sockets.
+    /*
     std::cout << "Shutting Down SDL_Net" << std::endl;
     SDLNet_Quit();
+*/
 
     //globalFontFiles.clear();
     //vector<std::string>().swap(globalFontFiles);
 
-    std::cout << "Shutting Down TermStateMachine" << std::endl;
-    if(m_globalTermStateMachine)
-    {
-        m_globalTermStateMachine->clean();
-        delete m_globalTermStateMachine;
-    }
 
 #ifdef _DEBBUG
     std::cout << "TTF_Quit" << std::endl;
@@ -442,10 +437,11 @@ void Terminal::clean()
  * Seems we have to do this from a private member
  * Otherwise the program loses the pointers.
  */
-void Terminal::freeSurfaceTextures()
+void Renderer::freeSurfaceTextures()
 {
     // Clear Cached Surface.
-    std::cout << std::endl << "*** Releasing Surfaces and Textures"
+    std::cout << std::endl
+    << "*** Releasing Surfaces and Textures"
     << std::endl;
 
 
@@ -471,7 +467,7 @@ void Terminal::freeSurfaceTextures()
     }
     if(m_globalRenderer)
     {
-        std::cout << "Destroy SDL Terminal" << std::endl;
+        std::cout << "Destroy SDL Renderer" << std::endl;
         SDL_DestroyRenderer(m_globalRenderer);
         m_globalRenderer = nullptr;
     }
@@ -587,28 +583,40 @@ bool Terminal::loadBitmapImageFromPak()
 * Default fonts are White on Black, inital setup for 32 cols by 8 rows
 * of Characters Cells at 9x16.
 */
-bool Terminal::loadBitmapImage(std::string fontName)
+bool Renderer::loadBitmapImage(std::string fontName)
 {
     //std::cout << "LoadBitmap: " << path << std::endl;
     //Load image at specified path
-    std::string path = TheTerminal::Instance()->getProgramPath();
+    std::string path = TheRenderer::Instance()->getProgramPath();
+
+    std::cout << "loading Fontname -> : " << fontName << std::endl;
+
 #ifdef _WIN32
-    path += "assets\\";
+    path.append("assets\\");
 #else
-    path += "assets/";
+    path.append("assets/");
 #endif
-    path += fontName;
+    path.append(fontName);
 
     if(m_cachedSurface)
     {
         SDL_FreeSurface(m_cachedSurface);
         m_cachedSurface = nullptr;
     }
+
+    // Debugging.  1 is missing in 8x16.bmp !!!
+    std::cout << "loading Font -> current: "
+    << TheRenderer::Instance()->getCurrentFont()
+    << std::endl;
+
     m_cachedSurface = SDL_LoadBMP(path.c_str());
     if(!m_cachedSurface)
     {
-        SDL_Log("loadBitmapImage() SDL_LoadBMP font: %s",
-                m_currentFont.c_str());
+        SDL_Log("loadBitmapImage() m_cachedSurface SDL_LoadBMP font: %s",
+                path.c_str());
+
+        SDL_Delay(1500);
+        TheRenderer::Instance()->quit();
         return false;
     }
 
@@ -632,7 +640,7 @@ bool Terminal::loadBitmapImage(std::string fontName)
  * Creates a Texture from the Surfaces Passed.
  * And Sets the default Blend Mode.
  */
-void Terminal::createTexture(int textureType, SDL_Surface *surface)
+void Renderer::createTexture(int textureType, SDL_Surface *surface)
 {
     switch(textureType)
     {
@@ -688,7 +696,7 @@ void Terminal::createTexture(int textureType, SDL_Surface *surface)
 /*
  * Fill a Surfaces with Black or Clears.
  */
-void Terminal::fillSurface(SDL_Surface *surface)
+void Renderer::fillSurface(SDL_Surface *surface)
 {
     if(surface)
     {
@@ -700,7 +708,7 @@ void Terminal::fillSurface(SDL_Surface *surface)
 /*
  * Converts Surfaces to Standard Pixel Format
  */
-void Terminal::convertSurface(int surfaceType)
+void Renderer::convertSurface(int surfaceType)
 {
     // Run Through Surface Alias and Create Surface
     switch(surfaceType)
@@ -803,7 +811,7 @@ void Terminal::convertSurface(int surfaceType)
 /*
  * Creates SDL Surfaces for RGB
  */
-void Terminal::createSurface(int surfaceType)
+void Renderer::createSurface(int surfaceType)
 {
     // Run Through Surface Alias and create surface.
     switch(surfaceType)
@@ -905,7 +913,7 @@ void Terminal::createSurface(int surfaceType)
 /**
  * Initialize the Render, Loads the Fonts and Create the Surfaces.
  */
-bool Terminal::initSurfaceTextures()
+bool Renderer::initSurfaceTextures()
 {
     // Setup the Surface we will plot each character cell to.
     createSurface(SCREEN_SURFACE);
@@ -960,16 +968,6 @@ bool Terminal::initSurfaceTextures()
     // Fill the Surface with Black to initalize it.
     fillSurface(m_bottomSurface);
 
-    // start the menu state
-    m_globalTermStateMachine = new TermStateMachine();
-    if(!m_globalTermStateMachine)
-    {
-        SDL_Log("initSurfaceTextures() globalTermStateMachine TermStateMachine");
-        return false;
-    }
-
-    // Load into Main Menu System (Dialing Directory)
-    m_globalTermStateMachine->changeState(new MainMenuState());
     return true;
 }
 
@@ -979,7 +977,7 @@ bool Terminal::initSurfaceTextures()
  * Rect radius and grab all mirrowing text from the screen
  * buffer and copy it to the clip board. Copy/Paste.
  */
-void Terminal::pullSelectionBuffer(int x, int y)
+void Renderer::pullSelectionBuffer(int x, int y)
 {
     int screenWidth, screenHeight;
     SDL_GetRendererOutputSize(m_globalRenderer, &screenWidth, &screenHeight);
@@ -1103,7 +1101,7 @@ void Terminal::pullSelectionBuffer(int x, int y)
  * Repopulate properly.  Clear so texture is refreshed each selection
  * We don't want to do it each render casue that slows it down!
  */
-void Terminal::clearSelectionTexture()
+void Renderer::clearSelectionTexture()
 {
     if(m_selectionTexture)
     {
@@ -1118,7 +1116,7 @@ void Terminal::clearSelectionTexture()
  * grabbing screen buffer text.and redrawing it character by character
  * This should in effect give fast updates to the screen with mouse movement.
  */
-void Terminal::renderSelectionScreen(int x, int y)
+void Renderer::renderSelectionScreen(int x, int y)
 {
     // Redraw screen so we don't increase lighting intensitity
     // As the selection keeps redrawing!  Cool effect though!!
@@ -1311,7 +1309,7 @@ void Terminal::renderSelectionScreen(int x, int y)
 /*
  * Overrides the Scrolling region of the screen
  */
-void Terminal::setScrollRegion(int top, int bot, int terminalHeight)
+void Renderer::setScrollRegion(int top, int bot, int terminalHeight)
 {
     // If Region is larger then the Terminal,
     // Ignore it!
@@ -1342,7 +1340,7 @@ void Terminal::setScrollRegion(int top, int bot, int terminalHeight)
 /*
  * Scroll a specific set region of the screen only
  */
-void Terminal::scrollRegionUp()
+void Renderer::scrollRegionUp()
 {
     SDL_Rect area;
 
@@ -1419,7 +1417,7 @@ void Terminal::scrollRegionUp()
  * Clips out the Top Row of the Screen,
  * Then Moves Entire Screen Up one Row to Scroll it.
  */
-void Terminal::scrollScreenUp()
+void Renderer::scrollScreenUp()
 {
     if(!m_screenSurface)
     {
@@ -1486,7 +1484,7 @@ void Terminal::scrollScreenUp()
  * Updated, Now clears the surface to the current background color
  * This is for ESC[2J proper behavior.
  */
-void Terminal::clearScreenSurface()
+void Renderer::clearScreenSurface()
 {
 
     if(!m_screenSurface)
@@ -1533,7 +1531,7 @@ void Terminal::clearScreenSurface()
  * Fill entire lines with space and BLACK foreground/Background
  * Fast update to clear a row.
  */
-void Terminal::renderClearLineScreen(int y, int start, int end)
+void Renderer::renderClearLineScreen(int y, int start, int end)
 {
     // Save Background Color so we can switch back to it.
     SDL_Color originalGB = m_currentBGColor;
@@ -1554,7 +1552,7 @@ void Terminal::renderClearLineScreen(int y, int start, int end)
  * Fill entire lines with space and BLACK foreground/Background
  * Fast update to clear a row.
  */
-void Terminal::renderClearLineAboveScreen(int y, int x)
+void Renderer::renderClearLineAboveScreen(int y, int x)
 {
     std::cout << "renderClearLineAboveScreen: " << x << ";" << y << std::endl;
     // Save Background Color so we can switch back to it.
@@ -1585,7 +1583,7 @@ void Terminal::renderClearLineAboveScreen(int y, int x)
  * Fill entire lines with space and BLACK foreground/Background
  * Fast update to clear a row.
  */
-void Terminal::renderClearLineBelowScreen(int y, int x)
+void Renderer::renderClearLineBelowScreen(int y, int x)
 {
     // Save Background Color so we can switch back to it.
     SDL_Color originalGB = m_currentBGColor;
@@ -1613,7 +1611,7 @@ void Terminal::renderClearLineBelowScreen(int y, int x)
  * by moving all text on right side of cursor
  * Left x number of space, on the same line.
  */
-void Terminal::renderDeleteCharScreen(int x, int y, int num)
+void Renderer::renderDeleteCharScreen(int x, int y, int num)
 {
     SDL_Rect pick;
     SDL_Rect dest;
@@ -1664,7 +1662,7 @@ void Terminal::renderDeleteCharScreen(int x, int y, int num)
  * And not redrawing the entire screen each time. Used After Scrolling
  * The Screen up.
  */
-void Terminal::renderBottomScreen()
+void Renderer::renderBottomScreen()
 {
     SDL_Rect pick;
     SDL_Rect rect;
@@ -1737,7 +1735,7 @@ void Terminal::renderBottomScreen()
  * Basically Plots each Char to Texture
  * Updates super fast now!! oh yea!!
  */
-void Terminal::renderScreen()
+void Renderer::renderScreen()
 {
     SDL_Rect pick;
 
@@ -1777,7 +1775,7 @@ void Terminal::renderScreen()
  * Basically Plots each Char to Texture
  * Updates super fast now!! oh yea!!
  */
-void Terminal::renderCharScreen(int x, int y)
+void Renderer::renderCharScreen(int x, int y)
 {
     SDL_Rect rect;
 
@@ -1817,7 +1815,7 @@ void Terminal::renderCharScreen(int x, int y)
  * Basically Plots each Char to Texture
  * Updates super fast now!! oh yea!!
  */
-void Terminal::renderCursorOnScreen()
+void Renderer::renderCursorOnScreen()
 {
     SDL_Rect rect;
 
@@ -1865,7 +1863,7 @@ void Terminal::renderCursorOnScreen()
  * Basically Plots each Char to Texture
  * Updates super fast now!! oh yea!!
  */
-void Terminal::renderCursorOffScreen()
+void Renderer::renderCursorOffScreen()
 {
     SDL_Rect rect;
 
@@ -1913,7 +1911,7 @@ void Terminal::renderCursorOffScreen()
  * Transfers the Buffer to a Texture and
  * Renders the Screen
  */
-void Terminal::drawTextureScreen()
+void Renderer::drawTextureScreen()
 {
     SDL_Rect rect;
     int screenWidth, screenHeight;
@@ -1965,7 +1963,7 @@ void Terminal::drawTextureScreen()
  * Clears the Terminal Screen for Fresh Redraw.
  * Renders the Screen
  */
-void Terminal::clearScreen()
+void Renderer::clearScreen()
 {
     if(m_globalRenderer)
     {
@@ -1993,7 +1991,7 @@ void Terminal::clearScreen()
  * Compares (2) SDL Colors to determine if they are the same
  * Without conversions.
  */
-int Terminal::compareSDL_Colors(SDL_Color &src, SDL_Color &dest)
+int Renderer::compareSDL_Colors(SDL_Color &src, SDL_Color &dest)
 {
     return (src.r == dest.r &&
             src.g == dest.g &&
@@ -2003,7 +2001,7 @@ int Terminal::compareSDL_Colors(SDL_Color &src, SDL_Color &dest)
 /**
  * Replace Foreground and Background colors per character cell by pixel.
  */
-void Terminal::replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 background)
+void Renderer::replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 background)
 {
     if(!src)
     {
@@ -2047,7 +2045,7 @@ void Terminal::replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 backgrou
  * This grabs the current cell of the cursor position
  * Then builder on and off character surfaces.
  */
-void Terminal::setupCursorChar()
+void Renderer::setupCursorChar()
 {
     if(!m_tmpSurface || !m_cachedSurface)
     {
@@ -2153,15 +2151,15 @@ void Terminal::setupCursorChar()
     // Render the initial cursor only if it's exposed!
     if(TheSequenceParser::Instance()->isCursorActive())
     {
-        TheTerminal::Instance()->renderCursorOnScreen();
-        TheTerminal::Instance()->drawTextureScreen();
+        TheRenderer::Instance()->renderCursorOnScreen();
+        TheRenderer::Instance()->drawTextureScreen();
     }
 }
 
 /**
  * Draws a Char Cell to x/y location on screen surface.
  */
-void Terminal::drawChar(int X, int Y, int asciicode)
+void Renderer::drawChar(int X, int Y, int asciicode)
 {
     SDL_Rect pick, area;
 
@@ -2182,6 +2180,9 @@ void Terminal::drawChar(int X, int Y, int asciicode)
     {
         SDL_Log("drawChar() m_tmpSurface error: %s",
                 SDL_GetError());
+
+        // Create it, shouldn't be free!
+        createSurface(TEMP_SURFACE);
         return;
     }
 

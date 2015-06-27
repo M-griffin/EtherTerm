@@ -36,10 +36,12 @@ public:
 
     // Holds Screen Buffer Structure
     // We want each character as a string for multi-byte UTF8 characters.
-    struct myScreen
+    class myScreen
     {
+        public:
         myScreen();
         myScreen(std::string sequence, SDL_Color fg, SDL_Color bg);
+        ~myScreen() {  characterSequence.erase(); }
         std::string characterSequence;
         SDL_Color foreground;
         SDL_Color background;
@@ -50,7 +52,7 @@ public:
     std::vector<myScreen> screenBuffer;
 
     // Function for populating the Screen Buffer
-    void setScreenBuffer(std::string mySequence);
+    void setScreenBuffer(unsigned char mySequence);
     void scrollScreenBuffer();
     void clearScreenBufferRange(int start, int end);
     void clearScreenBuffer();

@@ -5,8 +5,9 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "terminal.hpp"
+#include "renderer.hpp"  // Need to move this out!!
 #include "sequenceDecoder.hpp"
+#include "queueManager.hpp"
 
 #include <iostream>
 #include <string>
@@ -27,9 +28,10 @@ SequenceDecoder::SequenceDecoder() :
 
 SequenceDecoder::~SequenceDecoder()
 {
+    std::cout << "~SequenceDecoder" << std::endl;
+    // Add's memory up! ?!?!?
     std::vector<int>().swap(m_sequenceParams);   // Clear Parameters
-    m_messageQueue.clear();               // Clear Message Structure
-    m_sequenceQueue.clear();              // Clear Any Remaining Data.
+    m_messageQueue.clear();                      // Clear Message Structure
 }
 
 /*
@@ -781,15 +783,14 @@ void SequenceDecoder::processSequenceLevel2()
 void SequenceDecoder::handleFontChangeSequences()
 {
     /* Actual Font Switching should not be done in the Decoder!.
-     * Need to Rework this out.
      */
     if (m_sequenceBuilder == "\x1b[0;0 D")
     {
         std::cout << std::endl << "Switched to CP437 Font" << std::endl;
-        TheTerminal::Instance()->setCurrentFont("vga8x16.bmp");
-        if (TheTerminal::Instance()->didFontChange())
-            TheTerminal::Instance()->loadBitmapImage(
-                TheTerminal::Instance()->getCurrentFont());
+        TheRenderer::Instance()->setCurrentFont("vga8x16.bmp");
+        if (TheRenderer::Instance()->didFontChange())
+            TheRenderer::Instance()->loadBitmapImage(
+                TheRenderer::Instance()->getCurrentFont());
 
         //std::cout << "sequenceBuilder.erase();" << std::endl;
     //    sequenceBuilder.erase();
@@ -801,10 +802,10 @@ void SequenceDecoder::handleFontChangeSequences()
     if (m_sequenceBuilder == "\x1b[0;37 D")
     {
         std::cout << std::endl << "Switched to Pot-Noodle Font" << std::endl;
-        TheTerminal::Instance()->setCurrentFont("potNoodle-8x16.bmp");
-        if (TheTerminal::Instance()->didFontChange())
-            TheTerminal::Instance()->loadBitmapImage(
-                TheTerminal::Instance()->getCurrentFont());
+        TheRenderer::Instance()->setCurrentFont("potNoodle-8x16.bmp");
+        if (TheRenderer::Instance()->didFontChange())
+            TheRenderer::Instance()->loadBitmapImage(
+                TheRenderer::Instance()->getCurrentFont());
     //    sequenceBuilder.erase();
     //    sequenceState = SEQ_NORMAL; // Reset to pass-through
     //    return;
@@ -814,10 +815,10 @@ void SequenceDecoder::handleFontChangeSequences()
     if (m_sequenceBuilder == "\x1b[0;38 D")
     {
         std::cout << std::endl << "Switched to mO'sOul Font" << std::endl;
-        TheTerminal::Instance()->setCurrentFont("mo'soul-8x16.bmp");
-        if (TheTerminal::Instance()->didFontChange())
-            TheTerminal::Instance()->loadBitmapImage(
-                TheTerminal::Instance()->getCurrentFont());
+        TheRenderer::Instance()->setCurrentFont("mo'soul-8x16.bmp");
+        if (TheRenderer::Instance()->didFontChange())
+            TheRenderer::Instance()->loadBitmapImage(
+                TheRenderer::Instance()->getCurrentFont());
     //    sequenceBuilder.erase();
     //    sequenceState = SEQ_NORMAL; // Reset to pass-through
     //    return;
@@ -827,10 +828,10 @@ void SequenceDecoder::handleFontChangeSequences()
     if (m_sequenceBuilder == "\x1b[0;39 D")
     {
         std::cout << std::endl << "Switched to Micro-Knight+ Font" << std::endl;
-        TheTerminal::Instance()->setCurrentFont("microKnightPlus-8x16.bmp");
-        if (TheTerminal::Instance()->didFontChange())
-            TheTerminal::Instance()->loadBitmapImage(
-                TheTerminal::Instance()->getCurrentFont());
+        TheRenderer::Instance()->setCurrentFont("microKnightPlus-8x16.bmp");
+        if (TheRenderer::Instance()->didFontChange())
+            TheRenderer::Instance()->loadBitmapImage(
+                TheRenderer::Instance()->getCurrentFont());
     //    sequenceBuilder.erase();
     //    sequenceState = SEQ_NORMAL; // Reset to pass-through
     //    return;
@@ -840,15 +841,14 @@ void SequenceDecoder::handleFontChangeSequences()
     if (m_sequenceBuilder == "\x1b[0;40 D")
     {
         std::cout << std::endl << "Switched to Topaz+ Font" << std::endl;
-        TheTerminal::Instance()->setCurrentFont("topazPlus-8x16.bmp");
-        if (TheTerminal::Instance()->didFontChange())
-            TheTerminal::Instance()->loadBitmapImage(
-                TheTerminal::Instance()->getCurrentFont());
+        TheRenderer::Instance()->setCurrentFont("topazPlus-8x16.bmp");
+        if (TheRenderer::Instance()->didFontChange())
+            TheRenderer::Instance()->loadBitmapImage(
+                TheRenderer::Instance()->getCurrentFont());
     //    sequenceBuilder.erase();
     //    sequenceState = SEQ_NORMAL; // Reset to pass-through
     //    return;
     }
-
 }
 /*
  * Validate Complete ESC Control Sequences
@@ -999,7 +999,7 @@ void SequenceDecoder::validateSequence()
  * State machine stays actives waiting for complete control sequences
  * before pushing any actions forwards.  Normal Text data is passed through.
  */
-void SequenceDecoder::decodeEscSequenceData(std::string inputString)
+void SequenceDecoder::decodeEscSequenceData(std::string &inputString)
 {
     // Clear Queue out for each run.
     m_messageQueue.clear();
@@ -1066,7 +1066,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string inputString)
                 //TheAnsiParser::Instance()->textInput(validOutputData);
                 // Build a Message Queue with PassThrough Text Data.
                 m_messageQueue.m_text = m_validOutputData;
-                m_sequenceQueue.enqueue(m_messageQueue);
+                TheQueueManager::Instance()->m_queue.enqueue(m_messageQueue);
                 m_messageQueue.clear();
 
                 m_validOutputData.erase();
@@ -1255,7 +1255,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string inputString)
                  */
                 //TheAnsiParser::Instance()->sequenceInput(params);
                 m_messageQueue.m_queueParams.swap(m_sequenceParams);
-                m_sequenceQueue.enqueue(m_messageQueue);
+                TheQueueManager::Instance()->m_queue.enqueue(m_messageQueue);
                 m_messageQueue.clear();
 
                 std::vector<int>().swap(m_sequenceParams); // Clear for next run.
@@ -1287,7 +1287,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string inputString)
          * Build Queue with Passthrough Message Test
          */
         m_messageQueue.m_text = m_validOutputData;
-        m_sequenceQueue.enqueue(m_messageQueue);
+        TheQueueManager::Instance()->m_queue.enqueue(m_messageQueue);
         m_messageQueue.clear();
         m_validOutputData.erase();
     }   

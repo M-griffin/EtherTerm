@@ -56,11 +56,25 @@ void MenuManager::parseHeader(std::string FileName)
     std::cout << "sFONT_SET: " << FONT_SET << std::endl;
 
     // Set the font type for the menu being displayed.
-    TheTerminal::Instance()->setCurrentFont(FONT_SET);
+    TheRenderer::Instance()->setCurrentFont(FONT_SET);
+
+    std::cout << "currnet after set: "
+              << TheRenderer::Instance()->getCurrentFont()
+              << std::endl;
+
 
     // Test if font changed, if so, then re-load it.
-    if(TheTerminal::Instance()->didFontChange())
-        TheTerminal::Instance()->loadBitmapImage(TheTerminal::Instance()->getCurrentFont());
+    if(TheRenderer::Instance()->didFontChange())
+    {
+        // loadBitmapImage
+        if(!TheRenderer::Instance()->loadBitmapImage(
+                    TheRenderer::Instance()->getCurrentFont()))
+        {
+            SDL_Delay(1500);
+            TheRenderer::Instance()->quit();
+            return;
+        }
+    }
 
     TheSequenceParser::Instance()->reset();
     MenuFunction::displayAnsiFile(FileName);
@@ -71,7 +85,7 @@ void MenuManager::parseHeader(std::string FileName)
  */
 void MenuManager::readDirectoryListing()
 {
-    sprintf(INI_NAME,"%s",(char *)"dialdirectory.ini");
+    INI_NAME = "dialdirectory.ini";
     ddirectory_parse();
     m_directoryTopMargin = TOP_MARGIN;
     m_directoryBottomMargin = BOTTOM_MARGIN;
@@ -387,20 +401,24 @@ std::vector<list_bar> MenuManager::buildDialList()
  */
 bool MenuManager::readDialDirectory()
 {
-    TheTerminal::SystemConnection sysconn;
+    TheRenderer::SystemConnection sysconn;
     std::string path = SetupThePath();
     path += "dialdirectory.xml";
     TiXmlDocument doc(path.c_str());
-    if(!doc.LoadFile()) return false;
+    if(!doc.LoadFile())
+    {
+        std::cout << "Error Reading dialdirectory.xml" << std::endl;
+        return false;
+    }
     TiXmlHandle hDoc(&doc);
     TiXmlElement* pElem;
     TiXmlHandle hRoot(0);
 
     // If vector already populated then clear to refresh it.
-    if(m_systemConnection.size() >0)
+    if(m_systemConnection.size() > 0)
     {
         m_systemConnection.clear();
-        std::vector<TheTerminal::SystemConnection>().swap(m_systemConnection);
+        std::vector<TheRenderer::SystemConnection>().swap(m_systemConnection);
     }
     // block: EtherTerm
     {
@@ -549,7 +567,7 @@ void MenuManager::setupDialDirectory()
     /*
      * Build And populate the dialing directory into a list.
      */
-    m_result = buildDialList();
+    m_result = std::move(buildDialList());
     m_linkList.getVectorList(m_result);
 
     // Loop Light bar Interface.
@@ -610,7 +628,7 @@ int MenuManager::handleMenuUpdates(const std::string &inputSequence)
     m_menuFunction.menuProcess(returnParameters, inputSequence, LIGHTBAR_POSITION);
 
     // If we got a passthrough command back, then execute it!
-    if (strlen(returnParameters) > 0)
+    if(strlen(returnParameters) > 0)
     {
         std::string sequence = returnParameters;
         return(handleMenuActions(sequence));
@@ -629,7 +647,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
 
     if(inputSequence[0] == '!')
     {
-        switch(toupper( inputSequence[1] ))
+        switch(toupper(inputSequence[1]))
         {
             case 'U': // Page Up
                 if(m_currentPage != 0)
@@ -657,7 +675,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 //std::vector<list_bar>().swap(m_result); // Free Vector Up.
                 // Pass the selected system to the TERM Instance so we can
                 // Pull it inside the TelnetState.
-                TheTerminal::Instance()->setSystemConnection(m_systemConnection[LIGHTBAR_POSITION]);
+                TheRenderer::Instance()->setSystemConnection(m_systemConnection[LIGHTBAR_POSITION]);
                 return LIGHTBAR_POSITION;
 
             case '+': // Next Message - Move Down
@@ -674,15 +692,15 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 {
                     // Low-light Current, then Highlight Next.
                     sprintf(stringBuffer, "\x1b[%i;%iH|16%s",
-                        m_linkList.m_currentSelection, 1,
-                        (char *)m_linkList.m_listing[LIGHTBAR_POSITION-1].ansiString1.c_str());
+                            m_linkList.m_currentSelection, 1,
+                            (char *)m_linkList.m_listing[LIGHTBAR_POSITION-1].ansiString1.c_str());
 
                     outputBuffer += stringBuffer;
                     m_linkList.m_currentSelection += 1;
 
                     sprintf(stringBuffer, "\x1b[%i;%iH|16%s",
-                        m_linkList.m_currentSelection, 1,
-                        (char *)m_linkList.m_listing[LIGHTBAR_POSITION].ansiString2.c_str());
+                            m_linkList.m_currentSelection, 1,
+                            (char *)m_linkList.m_listing[LIGHTBAR_POSITION].ansiString2.c_str());
 
                     outputBuffer += stringBuffer;
                     MenuFunction::sequenceToAnsi(outputBuffer);
@@ -711,12 +729,12 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                     // Still on Same Page
                     // Low-light Current, then Highlight Next.
                     sprintf(stringBuffer, "\x1b[%i;%iH|16%s", m_linkList.m_currentSelection, 1,
-                        (char *)m_linkList.m_listing[LIGHTBAR_POSITION+1].ansiString1.c_str());
+                            (char *)m_linkList.m_listing[LIGHTBAR_POSITION+1].ansiString1.c_str());
                     outputBuffer = stringBuffer;
                     m_linkList.m_currentSelection -= 1;
 
                     sprintf(stringBuffer, "\x1b[%i;%iH|16%s", m_linkList.m_currentSelection, 1,
-                        (char *)m_linkList.m_listing[LIGHTBAR_POSITION].ansiString2.c_str());
+                            (char *)m_linkList.m_listing[LIGHTBAR_POSITION].ansiString2.c_str());
                     outputBuffer += stringBuffer;
                     MenuFunction::sequenceToAnsi(outputBuffer);
                     outputBuffer.erase();
@@ -759,4 +777,3 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
     }
     return 0;
 }
-

@@ -8,7 +8,7 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "terminal.hpp"
+#include "renderer.hpp"
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
@@ -160,7 +160,7 @@ public:
 
 
 private:
-    
+
     std::string host;
     int port;
     std::string userId;

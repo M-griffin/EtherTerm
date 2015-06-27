@@ -5,14 +5,17 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
+#include <SDL_net.h>
+
 #include "telnet.hpp"
 #include "telnetState.hpp"
 #include "mainMenuState.hpp"
 #include "inputHandler.hpp"
 #include "sequenceManager.hpp"
 #include "sequenceParser.hpp"
-#include "terminal.hpp"
+#include "renderer.hpp"
 #include "socketHandler.hpp"
+#include "termStateMachine.hpp"
 
 #include <cstdio>
 #include <fstream>
@@ -114,7 +117,7 @@ void TelnetState::update()
     if(m_isShutdown || TheInputHandler::Instance()->isGlobalShutdown())
     {
         std::cout << "TelnetState::shutdown - changeState(new MainMenuState()" << std::endl;
-        TheTerminal::Instance()->getStateMachine()->changeState(new MainMenuState());
+        TheStateMachine::Instance()->changeState(new MainMenuState());
         m_isShutdown = false;
         return;
     }
@@ -185,9 +188,20 @@ void TelnetState::update()
 
 bool TelnetState::onEnter()
 {
-    TheSequenceParser::Instance()->setCursorActive(true);
     std::cout << "entering TelnetState\n";
     m_isShutdown = false;
+
+     /* initialize SDL_net */
+    if(SDLNet_Init() < 0)
+    {
+        SDL_Log(
+            "Terminal::init() SDLNet_Init: %s",
+            SDL_GetError());
+        return false;
+    }
+
+    std::cout << "SDLNet_Init success" << std::endl;
+
     //char host[255]= {"entropybbs.co.nz"};
     //char host[255]= {"montereybbs.ath.cx"};
     //char host[255]= {"1984.ws"};
@@ -212,21 +226,36 @@ bool TelnetState::onEnter()
     //char host[255]= {"htc.zapto.org"};
     //char host[255]= {"darksorrow.us"};
 
-    TheTerminal::SystemConnection sysconn;
-    sysconn = TheTerminal::Instance()->getSystemConnection();
+    TheRenderer::SystemConnection sysconn;
+    sysconn = TheRenderer::Instance()->getSystemConnection();
+
+    TheRenderer::Instance()->setCurrentFont(sysconn.font);
+    if(TheRenderer::Instance()->didFontChange())
+    {
+        std::cout << "TelnetState: font: " << TheRenderer::Instance()->getCurrentFont() << std::endl;
+        if (!TheRenderer::Instance()->loadBitmapImage(
+            TheRenderer::Instance()->getCurrentFont()))
+            {
+                SDL_Delay(1500);
+                TheRenderer::Instance()->quit();
+                std::cout << "TelnetState: Error Changeing Font in syscon!" << std::endl;
+                return false;
+            }
+    }
 
     std::string initConnection = "|CS|15|16Initiating connection to: [|07";
     initConnection += sysconn.name + "|15]";
 
     MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
 
-    if(!TheSocketHandler::Instance()->initTelnet(sysconn.ip,sysconn.port))
+    if(!TheSocketHandler::Instance()->initTelnet(sysconn.ip, sysconn.port))
     {
         initConnection = "|CR|CR|04|16Unable to establish connection.";
         MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
         SDL_Delay(1000);
         std::cout << "Error Connecting!" << std::endl;
         m_isShutdown = true;
+        return false;
     }
     else
     {
@@ -236,26 +265,30 @@ bool TelnetState::onEnter()
         SDL_Delay(1000);
     }
 
+    TheSequenceParser::Instance()->setCursorActive(true);
     // Clear Renderer and ANSI Parser for Fresh Connection.
-    TheTerminal::Instance()->clearScreenSurface();
-    TheTerminal::Instance()->renderScreen();
-    TheTerminal::Instance()->drawTextureScreen();
+    TheRenderer::Instance()->clearScreenSurface();
+    TheRenderer::Instance()->renderScreen();
+    TheRenderer::Instance()->drawTextureScreen();
     TheSequenceParser::Instance()->reset();
     return true;
 }
 
 bool TelnetState::onExit()
 {
-    std::cout << "TelnetState::onExit()" << std::endl;
     // reset the handler(s)
     TheInputHandler::Instance()->reset();
     TheSequenceParser::Instance()->reset();
     TheSocketHandler::Instance()->reset();
-    m_isShutdown = true;
-    std::cout << "exiting TelnetState" << std::endl;
 
-    // Test
-    TheSocketHandler::ReleaseInstance();
+    std::cout << "TelnetState::onExit()" << std::endl;
+
+    std::cout << "Shutting Down SDL_Net" << std::endl;
+    SDLNet_Quit();
+    std::cout << "SDL_Net Done." << std::endl;
+
+    std::cout << "exiting TelnetState" << std::endl;
+    m_isShutdown = true;
     return true;
 }
 

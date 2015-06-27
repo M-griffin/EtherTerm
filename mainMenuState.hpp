@@ -7,7 +7,7 @@
 // $LastChangedRevision$
 // $LastChangedBy$
 
-#include "menuState.hpp"
+#include "termState.hpp"
 #include "menuManager.hpp"
 
 #include <iostream>
@@ -19,11 +19,12 @@
  * This is where we will initiate either Telnet or SSH
  */
 class MainMenuState :
-    public MenuState
+    public TermState, MenuManager
 {
 public:
 
-    MainMenuState()
+    MainMenuState() :
+        isActive(false)
     { }
 
     virtual ~MainMenuState()
@@ -40,15 +41,15 @@ public:
 
 private:
 
-/*
-    virtual void setCallbacks(const std::vector<Callback>& callbacks);
-*/
+    /*
+        virtual void setCallbacks(const std::vector<Callback>& callbacks);
+    */
     static void menuStartTelnet();
     static void menuStartSSH();
     static const std::string m_menuID;
+    bool isActive;
 
-    // Handle to Menu System
-    MenuManager m_menuManager;
+
 
 };
 
