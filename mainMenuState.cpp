@@ -46,6 +46,14 @@ void MainMenuState::update()
         // Should run this easily after changes received.
         if (TheInputHandler::Instance()->isGlobalShutdown())
         {
+            // default. Reset the Font.
+            TheRenderer::Instance()->setCurrentFont("vga8x16.bmp");
+            if(TheRenderer::Instance()->didFontChange())
+            {
+                if (!TheRenderer::Instance()->loadBitmapImage(TheRenderer::Instance()->getCurrentFont()))
+                { }
+                    // On exit Anyways!
+            }
             MenuFunction::displayAnsiFile("outro.ans");
             SDL_Delay(1500);
             TheRenderer::Instance()->quit();
@@ -76,7 +84,6 @@ void MainMenuState::update()
                                 { }
                                     // On exit Anyways!
                             }
-
 
                             MenuFunction::displayAnsiFile("outro.ans");
                             SDL_Delay(1500);
