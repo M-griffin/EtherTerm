@@ -20,6 +20,11 @@
 const std::string SSHState::sshID = "SSH";
 
 /*
+ * Notes, Need to sepearte out manual calls to TheSequenceManager::Instance()->update();
+ * Rework this lateron for the startup dialogs.
+ */
+
+/*
  * Handles Reading the Socket for Data, then Parsing the Data.
  */
 void SSHState::handleSession()
@@ -261,6 +266,9 @@ bool SSHState::onEnter()
         MenuFunction::sequenceToAnsi((char *)"|CR|10Loading credentials from dialdirectory.xml");
     }
 
+    // Catch Screen updates when in the menu system.
+    TheSequenceManager::Instance()->update();
+
     // Received Shutdown.
     if(TheInputHandler::Instance()->isGlobalShutdown())
     {
@@ -273,6 +281,8 @@ bool SSHState::onEnter()
 
     std::string initConnection = "|CR|CR|15Establishing connection.";
     MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
+    // Catch Screen updates when in the menu system.
+    TheSequenceManager::Instance()->update();
 
     SDL_Delay(100);
 
@@ -282,6 +292,8 @@ bool SSHState::onEnter()
         // Connection Success.
         std::string initConnection = "|CR|CR|08[|07*|08] |10Connection Successful!";
         MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
+        // Catch Screen updates when in the menu system.
+        TheSequenceManager::Instance()->update();
         SDL_Delay(1000);
     }
     else
@@ -303,6 +315,11 @@ bool SSHState::onEnter()
     }
 
     // Clear Renderer and ANSI Parser for Fresh Connection.
+    // Catch Screen updates when in the menu system.
+    MenuFunction::sequenceToAnsi("|CS|07|16");
+    TheSequenceManager::Instance()->update();
+
+    // Render Reset.
     TheRenderer::Instance()->clearScreenSurface();
     TheRenderer::Instance()->renderScreen();
     TheSequenceParser::Instance()->reset();

@@ -194,6 +194,9 @@ int MenuIO::getKey()
     std::string inputSequence;
     while(!TheInputHandler::Instance()->isGlobalShutdown())
     {
+        // Cath updates when in the menu system.
+        TheSequenceManager::Instance()->update();
+
         if(TheInputHandler::Instance()->update())
         {
             if(TheInputHandler::Instance()->getInputSequence(inputSequence))
@@ -272,6 +275,9 @@ void MenuIO::getLine(char *line,     // Returns Input into Line
 
     while(!TheInputHandler::Instance()->isGlobalShutdown())
     {
+        // Catch Screen updates when in the menu system.
+        TheSequenceManager::Instance()->update();
+
         if(TheInputHandler::Instance()->update() &&
                 !TheInputHandler::Instance()->isGlobalShutdown())
         {
