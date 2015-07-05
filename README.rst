@@ -23,7 +23,7 @@ acceleration.
 Project details
 ===============
 
-EtherTerm is Public Domain Software, ``(c) 2014-2015 Michael Griffin <mrmisticismo@hotmail.com>``
+EtherTerm is Public Domain Software, (c) 2014-2015 Michael Griffin <mrmisticismo@hotmail.com>
 
 Currently, no *auto-configure* environment is provided, and build targets are
 limited to Windows, Linux, and OSX.  EtherTerm is **Alpha** software.  Please
@@ -107,7 +107,7 @@ also replace 0x with 11 on newer compilers. Usually g++ (4.7)+ or compatible
 compiler:
 
 ```
--std=gnu++0x or -std=c++0x
+-std=gnu++11 or -std=c++11
 ```
 
 To build windows you must already have a compiler and the requirements.
