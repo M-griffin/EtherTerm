@@ -1,0 +1,34 @@
+
+Change Log 3.0.2 - 2015-12-11
+        - Completed WindowManager Class
+        - WIP Surface and Texture Manager for Rendering
+
+Change Log 3.0.1 - 2015-11-17
+	- Created initial classes:
+	Window Manager  - For Sessions and Windows for each connection incuding the Dialing Directory
+	Surface Manager - Handles SDL Surface and Textures for Displaying Graphics
+	Input Handler   - Handles Local Input and SDL Window Events
+	Session         - Each Session will handle it's own socket i/o, ansi parser, window and rendering
+	Interface       - Handles Spawning sessions and outgroing connections
+	tcp_connection  - Initial socket class that spawn a new socket per session
+	
+	Initial goal to get the dialing directory up and going. Before this need to re-work
+	The previous graphic classes to new layout.  This will take sometime.
+
+Change Log 3.0.0 Started - 2015-11-16
+	Reworking Project, Replacing SDLNet for Boost ASIO for Sockets
+	Updated from SDL-2.0.3 to SDL-2.0.4
+	Updated Compiler for Windows from Mingw32 4.8.1 to 5.1.0
+	Updated C+ standard flags from x0 to x11.
+
+	Key 3.0 Update Goals:
+	- Better Design to remove singleton as an overused pattern
+	- Ability to run connections headless for automation and testing
+	- Screen Size Detection, Go full screen first, get the screen size and
+	 Then re-size to initial screen window that will fit the display best!
+	- Multiple and separate windows per concurrent connections (TABS).
+	- SSL Socket for Obv/2 XRM WFC Interface secure remote connectivity.
+	- Better Scaling with Quality and no blurring on Texture Filtering.
+	- Ability to re-size windows and auto scaling on the fly.
+	- Internal Configuration Options without editing INI file.
+	- IPv6 and IPv4 connections

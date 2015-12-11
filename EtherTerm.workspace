@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="EtherTerm" Database="">
+  <Project Name="EtherTerm" Path="EtherTerm.project" Active="Yes"/>
+  <Environment>
+    <![CDATA[]]>
+  </Environment>
+  <Project Name="UnitTests" Path="UnitTests/UnitTests.project" Active="No"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Project Name="EtherTerm" ConfigName="Debug"/>
+      <Project Name="UnitTests" ConfigName="Debug"/>
+      <Project Name="InputTest" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Project Name="EtherTerm" ConfigName="Release"/>
+      <Project Name="UnitTests" ConfigName="Release"/>
+      <Project Name="InputTest" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>

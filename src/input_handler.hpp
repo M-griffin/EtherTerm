@@ -1,59 +1,41 @@
 #ifndef __InputHandler__
 #define __InputHandler__
 
-// EtherTerm SVN: $Id$
-// Source: $HeadURL$
-// $LastChangedDate$
-// $LastChangedRevision$
-// $LastChangedBy$
-
-//#include "safeQueue.hpp"
-
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
 #elif _WIN32
-#include <windows.h>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #else // LINUX
 #include <SDL2/SDL.h>
 #endif
 
+#include "surface_manager.hpp"
+
 #include <iostream>
 #include <string>
 
-/*
- * WIP - Were going to make a SafeQueue of SDL_Events
- * On Pool, we'll loop all events per frame,
- * Save them into the queue, then cycle them so
- * we don't look any on actions.  Might need to revisit
- * how actions are taken, if they should be queued instead!
- */
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
 
+class InputHandler;
+typedef boost::shared_ptr<InputHandler> input_handler_ptr;
+
+/**
+ * @class InputHandler
+ * @author Michael Griffin
+ * @date 11/17/2015
+ * @file input_handler.hpp
+ * @brief Handing Local SDL Input Event Processing.
+ */
 class InputHandler
 {
 public:
-    static InputHandler* Instance()
-    {
-        if(!m_globalInstance)
-        {
-            m_globalInstance = new InputHandler();
-        }
-        return m_globalInstance;
-    }
 
-// Release And Clear the Singleton
-    static void ReleaseInstance()
-    {
-        if(m_globalInstance)
-        {
-            delete m_globalInstance;
-            m_globalInstance = nullptr;
-        }
-        return;
-    }
+    InputHandler(surface_manager_ptr surface_manager);
+    ~InputHandler();
 
-// keyboard events, True if Data Available.
-    bool update();
+    // keyboard events, True if Data Available.
+    bool update(SDL_Event &event);
     void reset()
     {
         m_inputSequence.erase();
@@ -77,12 +59,13 @@ public:
         return m_globalShutdown;
     }
 
-// mouse events
+    // mouse events
     bool isMouseSelection() const
     {
         return m_isMouseSelected;
     }
 
+    // mouse positions
     int getMouseSourceXPosition() const
     {
         return m_mouseSourceXPosition;
@@ -100,6 +83,9 @@ private:
         m_inputSequence += sequence;
     }
 
+    // Handles Access to Surfaces and Windows.
+    surface_manager_ptr     m_surface_manager;
+
     bool m_globalShutdown;
     bool m_isWindowMode;
     bool m_isMouseSelected;
@@ -110,14 +96,6 @@ private:
     int m_fullScreenWindowSize;
 
     std::string m_inputSequence; // Keyboard Input
-
-    InputHandler();
-    ~InputHandler();
-    InputHandler(const InputHandler&);
-    InputHandler& operator=(const InputHandler&);
-
-// singleton
-    static InputHandler* m_globalInstance;
 
     // Control Keys.
     enum
@@ -161,8 +139,8 @@ private:
         CTRLZ
     };
 
-// First Break Up into Seperate Functions,
-// Later Map Enum and and setup commands for the following.
+    // First Break Up into Seperate Functions,
+    // Later Map Enum and and setup commands for the following.
     void handleWindowEvents(SDL_Event &event);
     bool handleTextInputEvent(SDL_Event &event);
     void handleMouseButtonUpEvent(SDL_Event &event);

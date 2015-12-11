@@ -1,76 +1,59 @@
 
 /*
- *  EtherTerm (c) 2014-2015 Michael Griffin <mrmisticismo@hotmail.com>
- *  A full Telnet / SSH emulated terminal client in SDL 2.0
- *  With with CP437 Character set and ANSI Graphic Support.
+ *  EtherTerm (c) 2014-2016 Michael Griffin <mrmisticismo@hotmail.com>
+ *  An Emulated Client Terminal in SDL 2.0
+ *  With CP437 Character and ANSI Graphics Support.
  *
- *  Linker Options: -mwindows to remove Console Debug Window.
+ *  Linker Options: -mwindows to remove Console Debug Window (WIN32)
+ *
  */
 
-// EtherTerm SVN: $Id$
-// Source: $HeadURL$
-// $LastChangedDate$
-// $LastChangedRevision$
-// $LastChangedBy$
-
-#include "renderer.hpp"
-// Needed for Clean Shutdown
-#include "sequenceParser.hpp"
-#include "sequenceManager.hpp"
-#include "inputHandler.hpp"
-#include "socketHandler.hpp"
-#include "mainMenuState.hpp"
-#include "termStateMachine.hpp"
-#include "queueManager.hpp"
+#include "interface.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
 
-#ifdef TARGET_OS_MAC
+#define SDL_MAIN_HANDLED
+
+#ifdef TARGET_OS_MAC // OSX
 #include <SDL.h>
 #include <SDL_Main.h>
-//#include <SDL_net.h>
 #include <mach-o/dyld.h>
-#elif _WIN32
+
+#elif _WIN32 // Windows
+#include <SDL2/SDL.h>
+#include <winsock2.h>
 #include <windows.h>
-#include <SDL.h>
-#include <SDL_Main.h>
-//#include <SDL_net.h>
+#include <SDL2/SDL_Main.h>
+
 #else // LINUX
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_main.h>
-//#include <SDL2/SDL_net.h>
 #endif
-
-#include <libssh/libssh.h>
 
 #include <cstdio>
 #include <cstring>
 #include <climits>
+#include <unistd.h>
+
 #include <string>
 #include <iostream>
-#include <unistd.h>
-/*
- * Shutdown Procedures
+
+/**
+ * @brief Initial Startup for SDL with Video
+ * @return
  */
-void cleanup()
+bool SDLStartUp()
 {
-    // cleanup theState.
-    TheStateMachine::ReleaseInstance();
+	bool success = true;
 
-    // Cleanup Surfaces and Textures
-    TheRenderer::Instance()->clean();
-
-    TheSocketHandler::ReleaseInstance();
-    TheInputHandler::ReleaseInstance();
-
-    //Release Instances
-    TheSequenceParser::ReleaseInstance();
-    TheSequenceManager::ReleaseInstance();
-    TheQueueManager::ReleaseInstance();
-
-    TheRenderer::ReleaseInstance();
-    std::cout << "Shutdown complete." << std::endl;
+	// Initialize SDL w/ Video, Skip Sound and Controlers for now.
+	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+	{
+		std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
+		success = false;
+	}
+	return success;
 }
 
 /*
@@ -78,19 +61,29 @@ void cleanup()
  */
 int main(int argc, char* argv[])
 {
-    // Not used at this time!!
+    bool is_headless = false;
+    SDL_SetMainReady();
+
     int c = 0;
-    while ((c = getopt (argc, argv, "c:b:a:")) != -1)
+
+    /*
+     * Interfaces to be added lateron
+     * h = headless
+     * t = telnet
+     * s = seure ssl/ssh
+     * f = ftp
+     * i = irc
+     */
+    while ((c = getopt (argc, argv, "h")) != -1)
     {
         switch(c) {
+            case 'h':
+                // Headless Operation
+                is_headless = true;
             default:
                 break;
         }
     }
-
-
-    // Run cleanup on exit of program
-    atexit(cleanup);
 
     // Get the Folder the Executable runs in.
     std::string realPath;
@@ -150,21 +143,89 @@ int main(int argc, char* argv[])
         realPath.erase(position+1,realPath.size()-1);
 
 #endif
-    std::cout << "Working directory is: " << realPath << std::endl;
-    TheRenderer::Instance()->setProgramPath(realPath);
+    std::cout << "EtherTerm Working directory is: " << realPath << std::endl;
+
+    /*
+     * We want to be able to run the program headless without SDL loaded
+     * For automation and testing
+     */
+
+    // Setup the interface for spawning session windows.
+    Interface interface_spawn;
+
+    // Don't loaded menu system waiting for user input, just handle
+    // Scripts and connections or parsing functions for testing.
+    if (is_headless)
+    {
+        // Execute scripts / connections via command line
+        // Don't startup SDL since were not using the video
+        // or Waiting for Keyboard input from the window events.
+
+        // Nothing to do right now.
+        return 0;
+    }
+    else
+    {
+        // Startup the Window System and load initial menu
+        // Window with SDL initilization with window event processing.
+        if (!SDLStartUp())
+        {
+             return -1;
+        }
+
+        // Were good to go, lets get the window and initial session going.
+        std::cout << "EtherTerm Startup successful." << std::endl;
+
+        bool is_global_shutdown = false;
+        SDL_Event event;
+
+        // we need to get the window_id from the main window (menu)
+        // if this window closes, then we are done!
+        interface_spawn.startup();
+
+        // Main Loop SDL Event Polling must always be done in main thread.
+        // Along with All Rendering. This is how SDL works. Events are therefore
+        // Read, then passed through to each session to handle per instance.
+        while (!is_global_shutdown)
+        {
+            while(SDL_PollEvent(&event) != 0 && !is_global_shutdown)
+            {
+                // Send the event along for each session
+                interface_spawn.process_event(event);
+
+
+                switch(event.type)
+                {
+                    case SDL_QUIT:
+                        is_global_shutdown = true;
+                        break;
+                }
+            }
+        }
+
+        // Setup the First Window for the Startup Splash Screen and Window.
+
+        // SDL is done.
+        std::cout << "EtherTerm Shutdown completed." << std::endl;
+        SDL_Quit();
+    }
+
+/*
+ * SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+
+//    TheRenderer::Instance()->setProgramPath(realPath);
 
     // Initialize Renderer and Window with default sizes.
     // We define 680 instead of 640 because we clip the extract off
     // in Screen->Texture.  We do this because when Texture filtering is used
     // Pixels on the last line tend to bleed from blending. This clips off the
     // Bleeding Leaving a nice screen.
-    if(TheRenderer::Instance()->init("EtherTerm v2.8 alpha preview", 680, 480, 1280, 800, 8, 16))
+
+    if(TheRenderer::Instance()->init("EtherTerm v3.0 alpha preview", 680, 480, 1280, 800, 8, 16))
     {
         // Setup the Surfaces
         if(TheRenderer::Instance()->initSurfaceTextures())
         {
-
-
             std::cout << "Surface & Textures Initialized. " << std::endl;
             // Load Font Texture to Surface
             if( TheRenderer::Instance()->loadBitmapImage(TheRenderer::Instance()->getCurrentFont()) )
@@ -219,7 +280,7 @@ int main(int argc, char* argv[])
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
                                  "Closed Session", "Term init failure: SDL Init().", nullptr);
         return -1;
-    }
+    } */
 
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
                              "Closed Session", "User has closed the program.", nullptr);
