@@ -5,19 +5,10 @@
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
-#ifdef _DEBBUG
-#include <SDL2/SDL_ttf.h>
-#endif
 #elif _WIN32
 #include <SDL2/SDL.h>
-#ifdef _DEBBUG
-#include <SDL_ttf.h>
-#endif
 #else
 #include <SDL2/SDL.h>
-#ifdef _DEBBUG
-#include <SDL2/SDL_ttf.h>
-#endif
 #endif
 
 #include <iostream>
@@ -26,7 +17,6 @@
 #include <unordered_map>
 #include <assert.h>
 
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 
@@ -107,8 +97,6 @@ private:
 
 typedef boost::shared_ptr<Surfaces> surface_ptr;
 
-class SurfaceManager;
-typedef boost::shared_ptr<SurfaceManager> surface_manager_ptr;
 
 /**
  * @class SurfaceManager
@@ -118,57 +106,18 @@ typedef boost::shared_ptr<SurfaceManager> surface_manager_ptr;
  * @brief Manages SDL Surfaces and Textures
  */
 class SurfaceManager
-    : public boost::enable_shared_from_this<SurfaceManager>
 {
 public:
-    SurfaceManager(window_manager_ptr window_manager);
+    SurfaceManager(window_manager_ptr window_manager, std::string program_path);
     ~SurfaceManager();
 
     // Handle to Current Window
     window_manager_ptr     m_window_manager;
 
-    // Define ANSI Color Schemes
-    SDL_Color BLACK;
-    SDL_Color BLUE;
-    SDL_Color GREEN;
-    SDL_Color CYAN;
-    SDL_Color RED;
-    SDL_Color MAGENTA;
-    SDL_Color BROWN;
-
-    SDL_Color GREY;
-    SDL_Color DARK_GREY;
-    SDL_Color LIGHT_BLUE;
-    SDL_Color LIGHT_GREEN;
-    SDL_Color LIGHT_CYAN;
-    SDL_Color LIGHT_RED;
-    SDL_Color LIGHT_MAGENTA;
-    SDL_Color YELLOW;
-    SDL_Color WHITE;
-
-    // Active Colors
-    SDL_Color m_currentFGColor;
-    SDL_Color m_currentBGColor;
-
-    // Scrolling Region
-    bool           m_scrollRegionActive;
-    int            m_topMargin;
-    int            m_bottomMargin;
-
+   
     std::string    m_programPath;
-    std::string    m_windowTitle;
     std::string    m_currentFont;
     std::string    m_previousFont;
-
-    // Surfaces
-    /*
-    SDL_Surface*   m_tmpSurface;        // Char Cell
-    SDL_Surface*   m_cursorOnSurface;   // Char Cell for showing the cursor.
-    SDL_Surface*   m_cursorOffSurface;  // Char Cell for clearing the cursor.
-    SDL_Surface*   m_screenSurface;     // Internal Screen Surface
-    SDL_Surface*   m_bottomSurface;     // Last Line of Screen Surface for Scrolling
-    SDL_Surface*   m_fontCachedSurface; // Current Cached Font Surface
-     */
 
     // Textures
     SDL_Texture*   m_globalTexture;     // Main Rendering Texture
@@ -196,10 +145,6 @@ public:
         TEXTURE_SELECTION
     };
 
-#ifdef _DEBBUG
-    TTF_Font*      trueTypeFont;      // UTF-8 Fonts.
-#endif
-
     Uint32 m_redMask,
            m_greenMask,
            m_blueMask,
@@ -210,18 +155,8 @@ public:
     int m_windowWidth;
     int m_windowHeight;
     int m_surfaceBits;
-
-    //SDL_Rect m_displayRect;
-    //SDL_Rect m_rectBackground;
-
-    int  m_characterWidth;
-    int  m_characterHeight;
-    int  m_cursorXPosition;
-    int  m_cursorYPosition;
-
-    bool m_isChangingState;
-    bool m_isRunning;
-    bool m_isUTF8Output;
+    int m_characterWidth;
+    int m_characterHeight;
 
     /**
      * @brief Add Surface to Container
@@ -241,6 +176,18 @@ public:
      * @param value
      */
     bool surfaceExists(int value);
+
+    /**
+     * @brief Grab the Current Fontname
+     * @return
+     */
+    std::string getCurrentFont();
+
+    /**
+     * @brief Check if a new Font was Set
+     * @return
+     */
+    bool didFontChange();
 
     /**
      * @brief Loads Bitmap Fonts from Files
@@ -276,5 +223,7 @@ public:
     void createSurface(int surfaceType);
 
 };
+
+typedef boost::shared_ptr<SurfaceManager> surface_manager_ptr;
 
 #endif // SURFACE_MANAGER_HPP

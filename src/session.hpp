@@ -3,6 +3,7 @@
 
 #include "window_manager.hpp"
 #include "surface_manager.hpp"
+#include "renderer.hpp"
 #include "input_handler.hpp"
 #include "tcp_connection.hpp"
 
@@ -33,9 +34,10 @@ class Session
 public:
 
     // Still early build up on session class!
-    Session(boost::asio::io_service& io_service, connection_ptr connection, std::set<session_ptr>& sessions)
+    Session(boost::asio::io_service& io_service, connection_ptr connection, std::set<session_ptr>& sessions, std::string program_path)
         : m_window_manager(new WindowManager())
-        , m_surface_manager(new SurfaceManager(m_window_manager))
+        , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
+        , m_renderer(new Renderer(m_surface_manager, m_window_manager))
         //,m_ansi_parser;
         //,m_data_decorder;
         , m_input_handler(new InputHandler(m_surface_manager))
@@ -56,10 +58,11 @@ public:
      */
     static session_ptr create(boost::asio::io_service& io_service,
                               connection_ptr connection,
-                              std::set<session_ptr>& sessions)
+                              std::set<session_ptr>& sessions,
+                              std::string program_path)
 
     {
-        session_ptr new_session(new Session(io_service, connection, sessions));
+        session_ptr new_session(new Session(io_service, connection, sessions, program_path));
         return new_session;
     }
 
@@ -90,6 +93,9 @@ public:
 
     // Surface and Texture Manager, Handles creating surface/textures to display
     surface_manager_ptr      m_surface_manager;
+
+    // Handle to Rendering.
+    renderer_ptr             m_renderer;
 
     // Handles parsing data to create surfaces and screens
 //    ansi_parser_ptr        m_ansi_parser;

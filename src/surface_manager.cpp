@@ -22,40 +22,11 @@
 #include <cstdio>
 #include <assert.h>
 
-SurfaceManager::SurfaceManager(window_manager_ptr window_manager)
-    : m_window_manager(window_manager)
-    , BLACK({   0,   0,   0,   0 })
-    , BLUE({   0,   0, 171,   0 })
-    , GREEN({   0, 171,   0,   0 })
-    , CYAN({   0, 171, 171,   0 })
-    , RED({ 171,   0,   0,   0 })
-    , MAGENTA({ 171,   0, 171,   0 })
-    , BROWN({ 171,  87,   0,   0 })
-    , GREY({ 171, 171, 171,   0 })
-    , DARK_GREY({  87,  87,  87,   0 })
-    , LIGHT_BLUE({  87,  87, 255,   0 })
-    , LIGHT_GREEN({  87, 255,  87,   0 })
-    , LIGHT_CYAN({  87, 255, 255,   0 })
-    , LIGHT_RED({ 255,  87,  87,   0 })
-    , LIGHT_MAGENTA({ 255,  87, 255,   0 })
-    , YELLOW({ 255, 255,  87,   0 })
-    , WHITE({ 255, 255, 255,   0 })
-    , m_currentFGColor(GREY)
-    , m_currentBGColor(BLACK)
-    , m_programPath("")
-    , m_windowTitle("")
+SurfaceManager::SurfaceManager(window_manager_ptr window_manager, std::string program_path)
+    : m_window_manager(window_manager)    
+    , m_programPath(program_path)
     , m_currentFont("vga8x16.bmp")
     , m_previousFont("")
-    /*
-    , m_tmpSurface(nullptr)        // Char Cell
-    , m_cursorOnSurface(nullptr)   // Char Cell for the cursor.
-    , m_cursorOffSurface(nullptr)  // Char Cell for the cursor.
-    , m_screenSurface(nullptr)     // Internal Screen Buffer
-    , m_bottomSurface(nullptr)     // Last Line of Screen
-    , m_fontCachedSurface(nullptr) // Cached Font CharacterSet
-    , m_selectionTexture(nullptr)  // Texture for Copy/Paste Selection
-     */
-
     // Initalize Color Masks.
     #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     , m_redMask(0xff000000)
@@ -75,16 +46,20 @@ SurfaceManager::SurfaceManager(window_manager_ptr window_manager)
     , m_surfaceBits(32)
     , m_characterWidth(8)
     , m_characterHeight(16)
-    , m_cursorXPosition(0)
-    , m_cursorYPosition(0)
-    , m_isUTF8Output(false) // Default to No, if Yes Block Font Switching!
 {
 
 }
 
 SurfaceManager::~SurfaceManager()
 {
-    std::cout << "*** Term Released" << std::endl;
+    std::cout << "*** Free Textures" << std::endl;
+    SDL_DestroyTexture(m_selectionTexture);
+    m_selectionTexture = nullptr;
+
+    SDL_DestroyTexture(m_globalTexture);
+    m_globalTexture = nullptr;
+
+    std::cout << "~SurfaceManager" << std::endl;
 }
 
 /**
@@ -125,14 +100,31 @@ bool SurfaceManager::surfaceExists(int value)
 }
 
 /**
+ * @brief Grab the Current Fontname
+ * @return
+ */
+std::string SurfaceManager::getCurrentFont()
+{
+    return m_currentFont;
+}
+
+/**
+ * @brief Check if a new Font was Set
+ * @return
+ */
+bool SurfaceManager::didFontChange()
+{
+    return (m_currentFont != m_previousFont);
+}
+
+/**
  * @brief Loads Bitmap Fonts from Files
  * @param fontName
  * @return
  */
 bool SurfaceManager::loadBitmapImage(std::string fontName)
 {
-//    std::string path = TheRenderer::Instance()->getProgramPath();
-    std::string path = "";
+    std::string path = m_programPath;
     std::cout << "loading Fontname -> : " << fontName << std::endl;
 
 #ifdef _WIN32

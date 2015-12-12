@@ -1,4 +1,10 @@
 
+Change Log 3.0.4 - 2015-12-12
+	- Added Program path pass-through from main -> interface -> session -> SurfaceManager
+	  Used for loading fonts and also for assets folder location in the session
+	- Separated SurfaceManager from Renderer.
+ 	- WIP rebuilding the Renderer now to use SurfaceManager and WindowManager Objects
+
 Change Log 3.0.3 - 2015-12-12
 	- WIP Surface Manager Class
       Complete initial dynamic surface manager.

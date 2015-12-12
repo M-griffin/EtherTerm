@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
      */
 
     // Setup the interface for spawning session windows.
-    Interface interface_spawn;
+    Interface interface_spawn(realPath);
 
     // Don't loaded menu system waiting for user input, just handle
     // Scripts and connections or parsing functions for testing.

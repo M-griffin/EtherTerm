@@ -36,8 +36,9 @@ public:
 
     // Setup IO_Service polling for connections. Use Work to keep io_service active.
     // while waiting for new connections.  Only need single thread for all sockets.
-    Interface()
+    Interface(std::string program_path)
         : m_work(m_io_service)
+        , m_program_path(program_path)
     {
         // Startup worker thread of ASIO. We want socket communications in a seperate thread.
         // We only spawn a single thread for IO_Service on startup.
@@ -83,7 +84,7 @@ public:
         connection_ptr new_connection(new tcp_connection(m_io_service));
 
         // Spawn the session
-        session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list);
+        session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
 
         // Start Async Read/Writes for Session Socket Data.
         // Required only for Sessions that make connections, Local sessions do not use this.
@@ -124,7 +125,7 @@ public:
                 std::cout << "Connected" << std::endl;
 
                 // Were good, spawn the session
-                session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list);
+                session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
 
                 // Start Async Read/Writes for Session Socket Data.
                 // Required only for Sessions that make connections, Local sessions do not use this.
@@ -173,6 +174,7 @@ public:
     // Client ASIO Service Specific
     boost::asio::io_service        m_io_service;
     boost::asio::io_service::work  m_work;
+    std::string                    m_program_path;
     std::thread                    m_thread;
 
 };
