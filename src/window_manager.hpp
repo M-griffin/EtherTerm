@@ -28,6 +28,9 @@ public:
     WindowManager();
     ~WindowManager();
 
+    // Handles to Window and Renderer
+    SDL_Window *window() { return m_window; }
+    SDL_Renderer *renderer() { return m_renderer; }
     Uint32 getWindowId() const { return m_window_id; }
 
     /**

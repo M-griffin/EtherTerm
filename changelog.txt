@@ -1,7 +1,11 @@
 
+Change Log 3.0.3 - 2015-12-12
+	- WIP Surface Manager Class
+      Complete initial dynamic surface manager.
+      
 Change Log 3.0.2 - 2015-12-11
-        - Completed WindowManager Class
-        - WIP Surface and Texture Manager for Rendering
+    - Completed WindowManager Class
+    - WIP Surface and Texture Manager for Rendering
 
 Change Log 3.0.1 - 2015-11-17
 	- Created initial classes:
