@@ -178,6 +178,12 @@ public:
     bool surfaceExists(int value);
 
     /**
+     * @brief Set the Current Fontname
+     * @return
+     */
+    void setCurrentFont(std::string font);
+
+    /**
      * @brief Grab the Current Fontname
      * @return
      */

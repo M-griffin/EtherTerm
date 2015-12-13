@@ -2,19 +2,10 @@
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
-#ifdef _DEBBUG
-#include <SDL2/SDL_ttf.h>
-#endif
 #elif _WIN32
 #include <SDL2/SDL.h>
-#ifdef _DEBBUG
-#include <SDL_ttf.h>
-#endif
 #else
 #include <SDL2/SDL.h>
-#ifdef _DEBBUG
-#include <SDL2/SDL_ttf.h>
-#endif
 #endif
 
 #include <iostream>
@@ -47,7 +38,6 @@ SurfaceManager::SurfaceManager(window_manager_ptr window_manager, std::string pr
     , m_characterWidth(8)
     , m_characterHeight(16)
 {
-
 }
 
 SurfaceManager::~SurfaceManager()
@@ -97,6 +87,16 @@ bool SurfaceManager::surfaceExists(int value)
         return true;
     }
     return false;
+}
+
+/**
+ * @brief Set the Current Fontname
+ * @return
+ */
+void SurfaceManager::setCurrentFont(std::string font)
+{
+    m_previousFont = m_currentFont;
+    m_currentFont = font;
 }
 
 /**
@@ -203,7 +203,7 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                 SDL_DestroyTexture(m_globalTexture);
             }
             m_globalTexture =
-                SDL_CreateTexture(m_window_manager->renderer(),
+                SDL_CreateTexture(m_window_manager->getRenderer(),
                                   SDL_PIXELFORMAT_ARGB8888,
                                   SDL_TEXTUREACCESS_STREAMING,
                                   surface->w, surface->h);
@@ -226,7 +226,7 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                 SDL_DestroyTexture(m_selectionTexture);
             }
             m_selectionTexture =
-                SDL_CreateTexture(m_window_manager->renderer(),
+                SDL_CreateTexture(m_window_manager->getRenderer(),
                                   SDL_PIXELFORMAT_ARGB8888,
                                   SDL_TEXTUREACCESS_TARGET,
                                   surface->w, surface->h);
@@ -355,7 +355,7 @@ void SurfaceManager::createSurface(int surfaceType)
 
                 // Get the Actual size of the Renderer to match the surface for scaling.
                 int screenWidth, screenHeight;
-                SDL_GetRendererOutputSize(m_window_manager->renderer(), &screenWidth, &screenHeight);
+                SDL_GetRendererOutputSize(m_window_manager->getRenderer(), &screenWidth, &screenHeight);
 
                 // Create Surface with Smartpointer.
                 surface_ptr surface(

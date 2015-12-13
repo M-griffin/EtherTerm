@@ -37,10 +37,11 @@ public:
     Session(boost::asio::io_service& io_service, connection_ptr connection, std::set<session_ptr>& sessions, std::string program_path)
         : m_window_manager(new WindowManager())
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
-        , m_renderer(new Renderer(m_surface_manager, m_window_manager))
+        , m_input_handler(new InputHandler(m_surface_manager))
+        , m_renderer(new Renderer(m_surface_manager, m_window_manager, m_input_handler))
         //,m_ansi_parser;
         //,m_data_decorder;
-        , m_input_handler(new InputHandler(m_surface_manager))
+
         , m_connection(connection)
         , m_io_service(io_service)
         , m_session_list(sessions)
@@ -94,6 +95,9 @@ public:
     // Surface and Texture Manager, Handles creating surface/textures to display
     surface_manager_ptr      m_surface_manager;
 
+    // Handles specific input per window session
+    input_handler_ptr        m_input_handler;
+
     // Handle to Rendering.
     renderer_ptr             m_renderer;
 
@@ -103,8 +107,6 @@ public:
     // Decodes incoming data and ESC sequences into arrays for the ansi parser
 //    data_decorder_ptr      m_data_decorder;
 
-    // Handles specific input per window session
-    input_handler_ptr        m_input_handler;
 
 
     // Socket_Manager handles sockets and incomming data from the server.

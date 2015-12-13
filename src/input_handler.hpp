@@ -17,8 +17,6 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 
-class InputHandler;
-typedef boost::shared_ptr<InputHandler> input_handler_ptr;
 
 /**
  * @class InputHandler
@@ -157,7 +155,7 @@ private:
     bool handleKeyDownEvents(SDL_Event &event);
 };
 
-typedef InputHandler TheInputHandler;
+typedef boost::shared_ptr<InputHandler> input_handler_ptr;
 
 
 #endif

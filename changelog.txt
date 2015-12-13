@@ -1,4 +1,11 @@
 
+Change Log 3.0.5 - 2015-12-13
+	- Some more code cleanup.
+	- Worked more Renderer code still a WIP.
+	- WIP add TextureManager to SurfaceManger so it works the same.
+	- Added Term Height/Width variables
+	- Added InputHandler to Renderer for text selections.
+	
 Change Log 3.0.4 - 2015-12-12
 	- Added Program path pass-through from main -> interface -> session -> SurfaceManager
 	  Used for loading fonts and also for assets folder location in the session

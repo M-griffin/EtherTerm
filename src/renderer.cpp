@@ -23,31 +23,41 @@
 #include <assert.h>
 
 
-Renderer::Renderer(surface_manager_ptr surface, window_manager_ptr window)
+Renderer::Renderer(surface_manager_ptr surface,
+                   window_manager_ptr window,
+                   input_handler_ptr input)
     : m_surface_manager(surface)
     , m_window_manager(window)
-    , BLACK({   0,   0,   0,   0 })
-    , BLUE({   0,   0, 171,   0 })
-    , GREEN({   0, 171,   0,   0 })
-    , CYAN({   0, 171, 171,   0 })
-    , RED({ 171,   0,   0,   0 })
-    , MAGENTA({ 171,   0, 171,   0 })
-    , BROWN({ 171,  87,   0,   0 })
-    , GREY({ 171, 171, 171,   0 })
-    , DARK_GREY({  87,  87,  87,   0 })
-    , LIGHT_BLUE({  87,  87, 255,   0 })
-    , LIGHT_GREEN({  87, 255,  87,   0 })
-    , LIGHT_CYAN({  87, 255, 255,   0 })
-    , LIGHT_RED({ 255,  87,  87,   0 })
-    , LIGHT_MAGENTA({ 255,  87, 255,   0 })
-    , YELLOW({ 255, 255,  87,   0 })
-    , WHITE({ 255, 255, 255,   0 })
+    , m_input_handler(input)
+    , BLACK( {   0,   0,   0,   0 })
+    , BLUE( {   0,   0, 171,   0 })
+    , GREEN( {   0, 171,   0,   0 })
+    , CYAN( {   0, 171, 171,   0 })
+    , RED( { 171,   0,   0,   0 })
+    , MAGENTA( { 171,   0, 171,   0 })
+    , BROWN( { 171,  87,   0,   0 })
+    , GREY( { 171, 171, 171,   0 })
+    , DARK_GREY( {  87,  87,  87,   0 })
+    , LIGHT_BLUE( {  87,  87, 255,   0 })
+    , LIGHT_GREEN( {  87, 255,  87,   0 })
+    , LIGHT_CYAN( {  87, 255, 255,   0 })
+    , LIGHT_RED( { 255,  87,  87,   0 })
+    , LIGHT_MAGENTA( { 255,  87, 255,   0 })
+    , YELLOW( { 255, 255,  87,   0 })
+    , WHITE( { 255, 255, 255,   0 })
     , m_currentFGColor(GREY)
     , m_currentBGColor(BLACK)
+    , m_termWidth(80)
+    , m_termHeight(25)
+    , m_scrollRegionActive(false)
+    , m_topMargin(0)
+    , m_bottomMargin(0)
     , m_cursorXPosition(0)
     , m_cursorYPosition(0)
     , m_isUTF8Output(false)
 {
+    // Startup Surface and Texture Creation
+    initSurfaceTextures();
 }
 
 Renderer::~Renderer()
@@ -56,98 +66,77 @@ Renderer::~Renderer()
 }
 
 
-void Renderer::restartWindowSize(bool fullScreen)
+/**
+ * @brief Startup Creation of Screen Surfaces in Memory
+ * NOTE: Scaled Surface only screated when needed!
+ */
+void Renderer::initSurfaceTextures()
 {
-    // Temp Stub if needed for Interacting.
+    // Main Screen Surface
+    m_surface_manager->createSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
+    if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_MAIN_SCREEN))
+    {
+        SDL_Log("initSurfaceTextures() surfaceExists SURFACE_MAIN_SCREEN: %s",
+                SDL_GetError());
+        assert(false);
+    }
+
+    // Bottom Row of Main Screen Surface (Scrolling)
+    m_surface_manager->createSurface(m_surface_manager->SURFACE_BOTTOM_ROW);
+    if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_BOTTOM_ROW))
+    {
+        SDL_Log("initSurfaceTextures() surfaceExists SURFACE_BOTTOM_ROW: %s",
+                SDL_GetError());
+        assert(false);
+    }
+
+    // Indivdiual Character Cell Surface
+    m_surface_manager->createSurface(m_surface_manager->SURFACE_CHARACTER);
+    if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_CHARACTER))
+    {
+        SDL_Log("initSurfaceTextures() surfaceExists SURFACE_CHARACTER: %s",
+                SDL_GetError());
+        assert(false);
+    }
+
+    // Indivdiual Character Cell Cursor On
+    m_surface_manager->createSurface(m_surface_manager->SURFACE_CURSOR_ON);
+    if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_CURSOR_ON))
+    {
+        SDL_Log("initSurfaceTextures() surfaceExists SURFACE_CURSOR_ON: %s",
+                SDL_GetError());
+        assert(false);
+    }
+
+    // Indivdiual Character Cell Cursor Off
+    m_surface_manager->createSurface(m_surface_manager->SURFACE_CURSOR_OFF);
+    if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_CURSOR_OFF))
+    {
+        SDL_Log("initSurfaceTextures() surfaceExists SURFACE_CURSOR_OFF: %s",
+                SDL_GetError());
+        assert(false);
+    }
 }
-
-
-void Renderer::restartWindowRenderer(std::string mode)
-{
-    // Temp Stub if needed for Interacting
-}
-
 
 /**
- * Initialize the Render, Loads the Fonts and Create the Surfaces.
- */
-bool Renderer::initSurfaceTextures()
-{
-    // Setup the Surface we will plot each character cell to.
-    createSurface(SCREEN_SURFACE);
-    if(!m_screenSurface)
-    {
-        SDL_Log("initSurfaceTextures() SDL_CreateRGBSurface screenSurface: %s",
-                SDL_GetError());
-        return false;
-    }
-
-    // Fill the Surface with Black to initalize it.
-    fillSurface(m_screenSurface);
-
-    // Setup Temp Surface that the size of each Character Cell.
-    createSurface(TEMP_SURFACE);
-    if(!m_tmpSurface)
-    {
-        SDL_Log("initSurfaceTextures() SDL_CreateRGBSurface tmpSurface: %s",
-                SDL_GetError());
-        return false;
-    }
-
-    // Setup Cursor Surface that the size of a Character Cell.
-    // Holds the original Char when we overwrite it with an blinking cursor.
-    createSurface(CURSOR_ON_SURFACE);
-    if(!m_cursorOnSurface)
-    {
-        SDL_Log("initSurfaceTextures() SDL_CreateRGBSurface cursorOnSurface: %s",
-                SDL_GetError());
-        return false;
-    }
-
-    // Setup Cursor Surface that the size of a Character Cell.
-    // Holds the original Char when we overwrite it with an blinking cursor.
-    createSurface(CURSOR_OFF_SURFACE);
-    if(!m_cursorOffSurface)
-    {
-        SDL_Log("initSurfaceTextures() SDL_CreateRGBSurface cursorOffSurface: %s",
-                SDL_GetError());
-        return false;
-    }
-
-    // Setup the Surface we will plot each character cell to.
-    createSurface(BOTTOM_SURFACE);
-    if(!m_bottomSurface)
-    {
-        SDL_Log("initSurfaceTextures() SDL_CreateRGBSurface bottomSurface: %s",
-                SDL_GetError());
-        return false;
-    }
-
-    // Fill the Surface with Black to initalize it.
-    fillSurface(m_bottomSurface);
-
-    return true;
-}
-
-
-/*
- * Once we have a screen selection, we will now pull the
- * Rect radius and grab all mirrowing text from the screen
- * buffer and copy it to the clip board. Copy/Paste.
+ * @brief Translates Screen Coordinates to ScreenBuffer for Text.
+ * @param x
+ * @param y
  */
 void Renderer::pullSelectionBuffer(int x, int y)
 {
     int screenWidth, screenHeight;
-    SDL_GetRendererOutputSize(m_globalRenderer, &screenWidth, &screenHeight);
+    SDL_GetRendererOutputSize(m_window_manager->getRenderer(), &screenWidth, &screenHeight);
 
     // We need to Translate the Screen Width vs Rows and Width to
     // get actual the grid size of the Characters to snap everything correctly.
     double charWidth, charHeight;
     double value;
 
-    value = (double)screenHeight / 25.0;
+    value = (double)screenHeight / (double)m_termHeight;
     charHeight = value; //round(abs(value));
-    value = (double)screenWidth / 80.0;
+
+    value = (double)screenWidth / (double)m_termWidth;
     charWidth = value; //round(abs(value));
 
     // First we need to convert the current Screen size to 640x400
@@ -158,8 +147,8 @@ void Renderer::pullSelectionBuffer(int x, int y)
     // Display without Extra pixel borders around the screen,
     // Texture Filter results in Pixel Bleeding.
 
-    int sourceX = TheInputHandler::Instance()->getMouseSourceXPosition();
-    int sourceY = TheInputHandler::Instance()->getMouseSourceYPosition();
+    int sourceX = m_input_handler->getMouseSourceXPosition();
+    int sourceY = m_input_handler->getMouseSourceYPosition();
 
     std::cout << sourceX << ":" << x << ", ";
     std::cout << sourceY << ":" << y << std::endl;
@@ -248,8 +237,11 @@ void Renderer::pullSelectionBuffer(int x, int y)
     int numberRows  = rect.h / charHeight;
 
     // Use coords to pull screen text directly from screen buffer.
+    /*
+     * Rework once the ansi parser is reworked!
+     *
     TheSequenceParser::Instance()->bufferToClipboard(
-        startColumn, startRow, length, numberRows);
+        startColumn, startRow, length, numberRows);*/
 }
 
 /*
@@ -543,8 +535,8 @@ void Renderer::scrollRegionUp()
 
     // Clear out very last line of surface region.
     if(SDL_FillRect(m_screenSurface, &area,
-                     SDL_MapRGBA(m_screenSurface->format, 0, 0, 0, 0)) < 0)
-                    //SDL_MapRGB(m_screenSurface->format, 0, 0, 0)) < 0)
+                    SDL_MapRGBA(m_screenSurface->format, 0, 0, 0, 0)) < 0)
+        //SDL_MapRGB(m_screenSurface->format, 0, 0, 0)) < 0)
     {
         SDL_Log("scrollRegionUp() SDL_FillRect screenSurface: %s",
                 SDL_GetError());
@@ -652,9 +644,9 @@ void Renderer::clearScreenSurface()
     // Fill screen with current RGB Background colors.
     if(SDL_FillRect(m_screenSurface, nullptr,
                     SDL_MapRGBA(m_screenSurface->format,
-                               m_currentBGColor.r, m_currentBGColor.g, m_currentBGColor.b, 0)) < 0)
-                    //SDL_MapRGB(m_screenSurface->format,
-                    //           m_currentBGColor.r, m_currentBGColor.g, m_currentBGColor.b)) < 0)
+                                m_currentBGColor.r, m_currentBGColor.g, m_currentBGColor.b, 0)) < 0)
+        //SDL_MapRGB(m_screenSurface->format,
+        //           m_currentBGColor.r, m_currentBGColor.g, m_currentBGColor.b)) < 0)
     {
         SDL_Log("clearScreenSurface() SDL_FillRect screenSurface: %s",
                 SDL_GetError());
@@ -849,7 +841,7 @@ void Renderer::renderBottomScreen()
 
     if(SDL_FillRect(m_bottomSurface, nullptr,
                     SDL_MapRGBA(m_bottomSurface->format, 0, 0, 0, 0)) < 0)
-                    //SDL_MapRGB(m_bottomSurface->format, 0, 0, 0)) < 0)
+        //SDL_MapRGB(m_bottomSurface->format, 0, 0, 0)) < 0)
     {
         SDL_Log("renderBottomScreen() SDL_FillRect bottomSurface: %s",
                 SDL_GetError());

@@ -3,6 +3,7 @@
 
 #include "surface_manager.hpp"
 #include "window_manager.hpp"
+#include "input_handler.hpp"
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
@@ -27,19 +28,27 @@
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
-class Renderer;
-typedef boost::shared_ptr<Renderer> renderer_ptr;
-
+/**
+ * @class Renderer
+ * @author Michael Griffin
+ * @date 12/12/2015
+ * @file renderer.hpp
+ * @brief Handles Rendering and Building Surface/Texture Data
+ */
 class Renderer
 {
 public:
 
-    Renderer(surface_manager_ptr surface, window_manager_ptr window);
+    Renderer(surface_manager_ptr surface,
+             window_manager_ptr window,
+             input_handler_ptr input);
     ~Renderer();
 
     // Handle to Managers
     surface_manager_ptr m_surface_manager;
     window_manager_ptr  m_window_manager;
+    input_handler_ptr   m_input_handler;
+
 
     // Define ANSI Color Schemes
     SDL_Color BLACK;
@@ -64,18 +73,22 @@ public:
     SDL_Color m_currentFGColor;
     SDL_Color m_currentBGColor;
 
-    // Stubs
-    void restartWindowSize(bool fullScreen);
-    void restartWindowRenderer(std::string mode);
+    /**
+     * @brief STartup Creation of Screen Surfaces in Memory
+     */
+    void initSurfaceTextures();
 
-
-
+    /**
+     * @brief Translates Screen Coordinates to ScreenBuffer for Text.
+     * @param x
+     * @param y
+     */
     void pullSelectionBuffer(int x, int y);
 
     void clearSelectionTexture();
     void renderSelectionScreen(int x, int y);
 
-    bool initSurfaceTextures();
+
     void setScrollRegion(int top, int bot, int terminalHeight);
 
     void scrollRegionUp();
@@ -100,29 +113,31 @@ public:
     //void drawString(int X, int Y, char text[]);
     //void drawCharSet(int X, int Y);
 
+    // Term Scale
+    int         m_termWidth;
+    int         m_termHeight;
+
     // Scrolling Region
-    bool m_scrollRegionActive;
-    int  m_topMargin;
-    int  m_bottomMargin;
+    bool        m_scrollRegionActive;
+    int         m_topMargin;
+    int         m_bottomMargin;
 
 private:
 
-    std::string    m_programPath;
 
 #ifdef _DEBBUG
-    TTF_Font*      trueTypeFont;      // UTF-8 Fonts.
+    TTF_Font*   trueTypeFont;      // UTF-8 Fonts.
 #endif
 
-    SDL_Rect m_displayRect;
-    SDL_Rect m_rectBackground;
+    SDL_Rect    m_displayRect;
+    SDL_Rect    m_rectBackground;
 
-    int  m_cursorXPosition;
-    int  m_cursorYPosition;
-
-    bool m_isUTF8Output;
+    int         m_cursorXPosition;
+    int         m_cursorYPosition;
+    bool        m_isUTF8Output;
 
 };
 
-
+typedef boost::shared_ptr<Renderer> renderer_ptr;
 
 #endif
