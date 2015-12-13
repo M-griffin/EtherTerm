@@ -41,6 +41,7 @@ public:
     {
         std::cout << "surfaces: Surface Removed!" << std::endl;
         SDL_FreeSurface(m_surface);
+        m_surface = nullptr;
     }
 
     SDL_Surface *getSurface()
@@ -99,6 +100,63 @@ typedef boost::shared_ptr<Surfaces> surface_ptr;
 
 
 /**
+ * @class Textures
+ * @author Michael Griffin
+ * @date 12/11/2015
+ * @file surface_manager.hpp
+ * @brief Dynamic Container to Hold Textures
+ */
+class Textures
+{
+
+public:
+    Textures(SDL_Texture *texture)
+        : m_texture(texture)
+    {
+    }
+
+    ~Textures()
+    {
+        std::cout << "textures: Texture Removed!" << std::endl;
+        SDL_DestroyTexture(m_texture);
+        m_texture = nullptr;
+    }
+
+    SDL_Texture *getTexture()
+    {
+        if (!m_texture)
+        {
+            SDL_Log("Texture is null!");
+        }
+        return m_texture;
+    }
+
+    /**
+     * @brief Clear the Surface with all Black.
+     * @return
+     */
+    void clear()
+    {
+        //SDL_FillRect(m_surface, nullptr, SDL_MapRGBA(m_surface->format, 0, 0, 0, 0));
+    }
+
+    /**
+     * @brief Make sure Surface is not null!
+     * @return
+     */
+    bool exists()
+    {
+        return (m_texture != nullptr);
+    }
+
+private:
+    SDL_Texture *m_texture;
+
+};
+
+typedef boost::shared_ptr<Textures> texture_ptr;
+
+/**
  * @class SurfaceManager
  * @author Michael Griffin
  * @date 11/16/2015
@@ -119,12 +177,9 @@ public:
     std::string    m_currentFont;
     std::string    m_previousFont;
 
-    // Textures
-    SDL_Texture*   m_globalTexture;     // Main Rendering Texture
-    SDL_Texture*   m_selectionTexture;  // For Copy Text Selection Texture
-
     // Surface List for easier Management.
     std::unordered_map<int, surface_ptr> m_surfaceList;
+    std::unordered_map<int, texture_ptr> m_textureList;
 
     // Handle Surface Alias
     enum
@@ -141,8 +196,9 @@ public:
     // Handle Texture Alias
     enum
     {
-        TEXTURE_GLOBAL = 0,
-        TEXTURE_SELECTION
+        TEXTURE_MAIN_SCREEN = 0,
+        TEXTURE_SELECTION,
+        TEXTURE_HILIGHT
     };
 
     Uint32 m_redMask,
@@ -176,6 +232,25 @@ public:
      * @param value
      */
     bool surfaceExists(int value);
+
+    /**
+     * @brief Add Surface to Container
+     * @param value
+     * @param surface
+     */
+    void addTexture(int value, texture_ptr texture);
+
+    /**
+     * @brief Remove Surface From Container
+     * @param value
+     */
+    void delTexture(int value);
+
+    /**
+     * @brief Tests if Surface is in list.
+     * @param value
+     */
+    bool textureExists(int value);
 
     /**
      * @brief Set the Current Fontname

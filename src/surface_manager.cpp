@@ -14,22 +14,22 @@
 #include <assert.h>
 
 SurfaceManager::SurfaceManager(window_manager_ptr window_manager, std::string program_path)
-    : m_window_manager(window_manager)    
+    : m_window_manager(window_manager)
     , m_programPath(program_path)
     , m_currentFont("vga8x16.bmp")
     , m_previousFont("")
     // Initalize Color Masks.
-    #if SDL_BYTEORDER == SDL_BIG_ENDIAN
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
     , m_redMask(0xff000000)
     , m_greenMask(0x00ff0000)
     , m_blueMask(0x0000ff00)
     , m_alphaMask(0x000000ff)
-    #else
+#else
     , m_redMask(0x000000ff)
     , m_greenMask(0x0000ff00)
     , m_blueMask(0x00ff0000)
     , m_alphaMask(0xff000000)
-    #endif
+#endif
     , m_surfaceWidth(640)
     , m_surfaceHeight(400)
     , m_windowWidth(640)
@@ -42,13 +42,11 @@ SurfaceManager::SurfaceManager(window_manager_ptr window_manager, std::string pr
 
 SurfaceManager::~SurfaceManager()
 {
-    std::cout << "*** Free Textures" << std::endl;
-    SDL_DestroyTexture(m_selectionTexture);
-    m_selectionTexture = nullptr;
 
-    SDL_DestroyTexture(m_globalTexture);
-    m_globalTexture = nullptr;
-
+    // Clear All Surfaces
+    std::unordered_map<int, surface_ptr>().swap(m_surfaceList);
+    // Clear All Textures
+    std::unordered_map<int, texture_ptr>().swap(m_textureList);
     std::cout << "~SurfaceManager" << std::endl;
 }
 
@@ -88,6 +86,44 @@ bool SurfaceManager::surfaceExists(int value)
     }
     return false;
 }
+
+/**
+ * @brief Add Surface to Container
+ * @param value
+ * @param surface
+ */
+void SurfaceManager::addTexture(int value, texture_ptr texture)
+{
+    m_textureList.insert(std::make_pair(value, texture));
+}
+
+/**
+ * @brief Remove Surface From Container
+ * @param value
+ */
+void SurfaceManager::delTexture(int value)
+{
+    auto it = m_textureList.find(value);
+    if(it != m_textureList.end())
+    {
+        m_textureList.erase(it);
+    }
+}
+
+/**
+ * @brief Tests if Surface is in list.
+ * @param value
+ */
+bool SurfaceManager::textureExists(int value)
+{
+    auto it = m_textureList.find(value);
+    if(it != m_textureList.end())
+    {
+        return true;
+    }
+    return false;
+}
+
 
 /**
  * @brief Set the Current Fontname
@@ -197,48 +233,68 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
 {
     switch(textureType)
     {
-        case TEXTURE_GLOBAL:
-            if(m_globalTexture)
+        case TEXTURE_MAIN_SCREEN:
             {
-                SDL_DestroyTexture(m_globalTexture);
-            }
-            m_globalTexture =
-                SDL_CreateTexture(m_window_manager->getRenderer(),
-                                  SDL_PIXELFORMAT_ARGB8888,
-                                  SDL_TEXTUREACCESS_STREAMING,
-                                  surface->w, surface->h);
-            if(m_globalTexture)
-            {
-                if(SDL_SetTextureBlendMode(
-                            m_globalTexture,
-                            SDL_BLENDMODE_NONE) < 0)
-                    //SDL_BLENDMODE_BLEND) < 0)
+                // If Exists, Recreate it.
+                if(textureExists(textureType))
                 {
-                    SDL_Log("%s: Error Setting Blend on Texture - %s",
-                            SDL_GetError());
+                    delTexture(textureType);
                 }
+
+                // Create Surface with Smartpointer.
+                texture_ptr texture(
+                    new Textures(
+                        SDL_CreateTexture(
+                            m_window_manager->getRenderer(),
+                            SDL_PIXELFORMAT_ARGB8888,
+                            SDL_TEXTUREACCESS_STREAMING,
+                            surface->w, surface->h
+                        )
+                    )
+                );
+
+                addTexture(textureType, texture);
+
+                // Set the Blend Mode of the Texture NONE
+                if(SDL_SetTextureBlendMode(
+                                texture->getTexture(),
+                                SDL_BLENDMODE_NONE) < 0)
+                    {
+                        SDL_Log("%s: Error Setting Blend on Texture - %s", SDL_GetError());
+                    }
             }
             break;
 
         case TEXTURE_SELECTION:
-            if(m_selectionTexture)
+        case TEXTURE_HILIGHT:
             {
-                SDL_DestroyTexture(m_selectionTexture);
-            }
-            m_selectionTexture =
-                SDL_CreateTexture(m_window_manager->getRenderer(),
-                                  SDL_PIXELFORMAT_ARGB8888,
-                                  SDL_TEXTUREACCESS_TARGET,
-                                  surface->w, surface->h);
-            if(m_selectionTexture)
-            {
-                if(SDL_SetTextureBlendMode(
-                            m_selectionTexture,
-                            SDL_BLENDMODE_ADD) < 0)
+                // If Exists, Recreate it.
+                if(textureExists(textureType))
                 {
-                    SDL_Log("%s: Error Setting Blend on Texture - %s",
-                            SDL_GetError());
+                    delTexture(textureType);
                 }
+
+                // Create Surface with Smartpointer.
+                texture_ptr texture(
+                    new Textures(
+                        SDL_CreateTexture(
+                            m_window_manager->getRenderer(),
+                            SDL_PIXELFORMAT_ARGB8888,
+                            SDL_TEXTUREACCESS_STREAMING,
+                            surface->w, surface->h
+                        )
+                    )
+                );
+
+                addTexture(textureType, texture);
+
+                // Set the Blend Mode of the Texture ADD
+                if(SDL_SetTextureBlendMode(
+                                texture->getTexture(),
+                                SDL_BLENDMODE_ADD) < 0)
+                    {
+                        SDL_Log("%s: Error Setting Blend on Texture - %s", SDL_GetError());
+                    }
             }
             break;
 

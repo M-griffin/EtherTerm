@@ -1,4 +1,9 @@
 
+Change Log 3.0.6 - 2015-12-13
+	- Added Textures Class to SurfaceManager for handling Textures dynamically also.
+	- Added new TEXTURE_HILIGHT for future use in highlighting Menu Bars
+	- WIP Renderer rewrite.
+	
 Change Log 3.0.5 - 2015-12-13
 	- Some more code cleanup.
 	- Worked more Renderer code still a WIP.

@@ -252,10 +252,9 @@ void Renderer::pullSelectionBuffer(int x, int y)
  */
 void Renderer::clearSelectionTexture()
 {
-    if(m_selectionTexture)
+    if(m_surface_manager->textureExists(m_surface_manager->TEXTURE_SELECTION))
     {
-        SDL_DestroyTexture(m_selectionTexture);
-        m_selectionTexture = nullptr;
+        m_surface_manager->delTexture(m_surface_manager->TEXTURE_SELECTION);
     }
 }
 
@@ -271,7 +270,7 @@ void Renderer::renderSelectionScreen(int x, int y)
     // As the selection keeps redrawing!  Cool effect though!!
     SDL_Rect rectorig;
     int screenWidth, screenHeight;
-    SDL_GetRendererOutputSize(m_globalRenderer, &screenWidth, &screenHeight);
+    SDL_GetRendererOutputSize(m_window_manager->getRenderer(), &screenWidth, &screenHeight);
 
     // We clip off botom 80, so that we get proper 8x16
     // Display without Extra pixel borders around the screen,
