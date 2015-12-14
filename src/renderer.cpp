@@ -65,7 +65,6 @@ Renderer::~Renderer()
     std::cout << "~Renderer" << std::endl;
 }
 
-
 /**
  * @brief Startup Creation of Screen Surfaces in Memory
  * NOTE: Scaled Surface only screated when needed!
@@ -118,6 +117,87 @@ void Renderer::initSurfaceTextures()
     }
 }
 
+
+/**
+ * @brief Calcuate the Box Dimensions for Copy/Paste Selection.
+ * @param rect
+ */
+void Renderer::calcBoxSize(SDL_Rect &rect,
+                 int sourceX, int sourceY,
+                 int x, int y,
+                 double charWidth, double charHeight)
+{
+    // This is the source position that we Xy     = Source
+    //                                      []
+    // are starting our rect box at.          xy  = Motion
+
+    // Next We'll need to snap this to the nearest char height and width.
+    // Moving up on the top most region, and down on the bottom most region.
+
+    // First determine the smallest of source and current plot positions
+    // We want to make the Lowest Values our starting point so we either
+    // use source or motions depending where the mouse is for top left.
+
+    // This is the Top Region
+    if(sourceX < x)
+    {
+        // TOP Stationary -> Right ->> OK!
+        rect.x = floor((double)sourceX / charWidth) * charWidth;
+    }
+    else
+    {
+        // Top -> Left ->> OK!
+        rect.x = floor((double)x / charWidth) * charWidth;
+    }
+
+    if(sourceY < y)
+    {
+        // Top Stationary ->> OK!
+        rect.y = floor((double)sourceY / charHeight) * charHeight;
+    }
+    else
+    {
+        // Top -> Up ->> OK!
+        rect.y = floor((double)y / charHeight) * charHeight;
+    }
+
+    // Width and height are calcuated by the different from motion to source
+    // Well need to round these values to the width and height of a character!
+    // Also need to swap source for the lowest value so we can select both
+    // above and behind the starting points.
+
+    // This is the bottom Region
+    if(sourceX < x)
+    {
+        // Bottom Width RIGHT ->> OK!
+        rect.w = charWidth + (floor((double)x / charWidth) * charWidth) -  rect.x ;
+    }
+    else
+    {
+        // Bottom Stationary ->> OK!
+        rect.w = charWidth + (floor((double)sourceX / charWidth) * charWidth) - rect.x; // back
+    }
+    if(sourceY < y)
+    {
+        // Bottom -> Down ->> OK!
+        rect.h = charHeight + (floor((double)y / charHeight) * charHeight) - rect.y;
+    }
+    else
+    {
+        // Bottom -> Stationary ->> OK!
+        rect.h = charHeight + (floor((double)sourceY / charHeight) * charHeight) - rect.y; // back
+    }
+
+    // If were inbetween lines, Height = 0, then add char Height to the bottom
+    // So we always have a row!
+    if(rect.h == 0)
+        rect.h += round(charHeight);
+
+    if(rect.w == 0)
+        rect.w += round(charWidth);
+}
+
+
 /**
  * @brief Translates Screen Coordinates to ScreenBuffer for Text.
  * @param x
@@ -126,7 +206,7 @@ void Renderer::initSurfaceTextures()
 void Renderer::pullSelectionBuffer(int x, int y)
 {
     int screenWidth, screenHeight;
-    SDL_GetRendererOutputSize(m_window_manager->getRenderer(), &screenWidth, &screenHeight);
+    m_window_manager->renderOutputSize(screenWidth, screenHeight);
 
     // We need to Translate the Screen Width vs Rows and Width to
     // get actual the grid size of the Characters to snap everything correctly.
@@ -150,79 +230,8 @@ void Renderer::pullSelectionBuffer(int x, int y)
     int sourceX = m_input_handler->getMouseSourceXPosition();
     int sourceY = m_input_handler->getMouseSourceYPosition();
 
-    std::cout << sourceX << ":" << x << ", ";
-    std::cout << sourceY << ":" << y << std::endl;
-
-    // This is the source position that we Xy     = Source
-    //                                      []
-    // are starting our rect box at.          xy  = Motion
-
-    // Next We'll need to snap this to the nearest char height and width.
-    // Moving up on the top most region, and down on the bottom most region.
-
-    // First determine the smallest of source and current plot positions
-    // We want to make the Lowest Values our starting point so we either
-    // use source or motions depending where the mouse is for top left.
-
-    // This is the Top Region Snap to nearest Char Width/Height
-    // This is the Top Region
-    if(sourceX < x)
-    {
-        // TOP Stationary -> Right ->> OK!
-        rect.x = floor((double)sourceX / charWidth) * charWidth;
-    }
-    else
-    {
-        // Top -> Left ->> OK!
-        rect.x = floor((double)x / charWidth) * charWidth;
-    }
-
-    if(sourceY < y)
-    {
-        // Top Stationary ->> OK!
-        rect.y = floor((double)sourceY / charHeight) * charHeight;
-    }
-    else
-    {
-        // Top -> Up ->> OK!
-        rect.y = floor((double)y / charHeight) * charHeight;
-    }
-
-    // Width and height are calcuated by the different from motion to source
-    // Well need to round these values to the width and height of a character!
-    // Also need to swap source for the lowest value so we can select both
-    // above and behind the starting points.
-
-    // This is the bottom Region
-    if(sourceX < x)
-    {
-        // Bottom Width RIGHT ->> OK!
-        rect.w = charWidth + (floor((double)x / charWidth) * charWidth) -  rect.x ;
-    }
-    else
-    {
-        // Bottom Stationary ->> OK!
-        rect.w = charWidth + (floor((double)sourceX / charWidth) * charWidth) - rect.x; // back
-    }
-    if(sourceY < y)
-    {
-        // Bottom -> Down ->> OK!
-        //rect.h = charHeight +
-        rect.h = charHeight + (floor((double)y / charHeight) * charHeight) - rect.y;
-    }
-    else
-    {
-        // Bottom -> Stationary ->> OK!
-        rect.h = charHeight + (floor((double)sourceY / charHeight) * charHeight) - rect.y; // back
-    }
-
-    // If were inbetween lines, Height = 0, then add char Height to the bottom
-    // So we always have a row!
-    if(rect.h == 0)
-        rect.h += round(charHeight);
-
-    if(rect.w == 0)
-        rect.w += round(charWidth);
+    // Calcuate the Box Dimensions
+    calcBoxSize(rect, sourceX, sourceY, x, y, charWidth, charHeight);
 
     // Now that we have the excat coordinates of the selected text.
     // We need to translate this to the screenbuffer positions
@@ -244,11 +253,8 @@ void Renderer::pullSelectionBuffer(int x, int y)
         startColumn, startRow, length, numberRows);*/
 }
 
-/*
- * Clear the Selection Texture
- * Needed for Windows Full Screen Mode Switches, otherwise it doesn't
- * Repopulate properly.  Clear so texture is refreshed each selection
- * We don't want to do it each render casue that slows it down!
+/**
+ * @brief Clear so texture is refreshed each selection
  */
 void Renderer::clearSelectionTexture()
 {
@@ -258,11 +264,10 @@ void Renderer::clearSelectionTexture()
     }
 }
 
-/*
- * On selected mouse movement area! We want to overlay a blended texture
- * To give the affect of highlighting without having to resort to
- * grabbing screen buffer text.and redrawing it character by character
- * This should in effect give fast updates to the screen with mouse movement.
+/**
+ * @brief On selected mouse movement area! We want to overlay a blended texture
+ * @param x
+ * @param y
  */
 void Renderer::renderSelectionScreen(int x, int y)
 {
@@ -270,15 +275,23 @@ void Renderer::renderSelectionScreen(int x, int y)
     // As the selection keeps redrawing!  Cool effect though!!
     SDL_Rect rectorig;
     int screenWidth, screenHeight;
-    SDL_GetRendererOutputSize(m_window_manager->getRenderer(), &screenWidth, &screenHeight);
+
+    // Get The Actual size of the Render/Window.
+    m_window_manager->renderOutputSize(screenWidth, screenHeight);
 
     // We clip off botom 80, so that we get proper 8x16
     // Display without Extra pixel borders around the screen,
     // Texture Filter results in Pixel Bleeding.
-    rectorig.w = m_surfaceWidth  - 40; // 680 - 640 = 40
-    rectorig.h = m_surfaceHeight - 80; // 480 - 400 = 80
-    rectorig.x = 0,
-             rectorig.y = 0;
+    rectorig.w = m_surface_manager
+                 ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                 ->getSurface()->w; // - 40; // 680 - 640 = 40
+
+    rectorig.h = m_surface_manager
+                 ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                 ->getSurface()->h; // - 80; // 480 - 400 = 80
+
+    rectorig.x = 0;
+    rectorig.y = 0;
 
     // Destination
     m_displayRect.w = screenWidth;
@@ -288,58 +301,44 @@ void Renderer::renderSelectionScreen(int x, int y)
 
     // Redraw the screen between selection changes so we have nothing left
     // from previous coordinates.
-    if(SDL_RenderCopy(m_globalRenderer, m_globalTexture, &rectorig, &m_displayRect) < 0)
-    {
-        SDL_Log("renderSelectionScreen() SDL_RenderCopy globalTexture: %s",
-                SDL_GetError());
-    }
+    m_window_manager->renderCopy(
+        m_surface_manager
+        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->getTexture(),
+        &rectorig,
+        &m_displayRect
+    );
 
     // Next create a texture to overlay for highlighting
-    if(!m_selectionTexture)
+    if(!m_surface_manager->textureExists(m_surface_manager->TEXTURE_SELECTION))
     {
-        createTexture(SELECTION_TEXTURE, m_screenSurface);
-        if(!m_selectionTexture)
-        {
-            SDL_Log(
-                "renderSelectionScreen() SDL_CreateTexture selectionTexture: %s",
-                SDL_GetError());
-            assert(m_selectionTexture);
-        }
+        // Create A New Texture using the Main Screen Surface.
+        m_surface_manager->createTexture(
+            m_surface_manager->TEXTURE_SELECTION,
+            m_surface_manager
+            ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+            ->getSurface()
+        );
 
         // On need to set this the first time!!
         // Set Render Target to the Texture.
-        if(SDL_SetRenderTarget(m_globalRenderer, m_selectionTexture) < 0)
-        {
-            SDL_Log("renderSelectionScreen() SDL_SetRenderTarget selectionTexture: %s",
-                    SDL_GetError());
-        }
+        m_window_manager->setRenderTarget(
+            m_surface_manager
+            ->m_textureList[m_surface_manager->TEXTURE_SELECTION]
+            ->getTexture()
+        );
 
-        if(SDL_RenderClear(m_globalRenderer) < 0)
-        {
-            SDL_Log("renderSelectionScreen() SDL_RenderClear selectionTexture: %s",
-                    SDL_GetError());
-        }
+        // Clear The Renderer
+        m_window_manager->clearRender();
 
-        // Fill new texture with Dark Cyan Highlight.
-        if(SDL_SetRenderDrawColor(m_globalRenderer, 0, 50 , 50, 255) < 0)
-        {
-            SDL_Log("renderSelectionScreen() SDL_SetRenderDrawColor selectionTexture: %s",
-                    SDL_GetError());
-        }
+        // Set the Color of the Selection Texture
+        m_window_manager->setRenderDrawColor(0, 50 , 50, 255);
 
-        // Can test filling to RECT to speed this up after it's working!
-        if(SDL_RenderFillRect(m_globalRenderer, nullptr) < 0)
-        {
-            SDL_Log("renderSelectionScreen() SDL_RenderFillRect selectionTexture: %s",
-                    SDL_GetError());
-        }
+        // Can test if filling RECT is needed to speed this up after it's working!
+        m_window_manager->renderFill(nullptr);
 
         //Reset back to Global Render, then push update over current texture
-        if(SDL_SetRenderTarget(m_globalRenderer, nullptr) < 0)
-        {
-            SDL_Log("renderSelectionScreen() SDL_SetRenderTarget NULL: %s",
-                    SDL_GetError());
-        }
+        m_window_manager->setRenderTarget(nullptr);
     }
 
     // We need to Translate the Screen Width vs Rows and Width to
@@ -347,98 +346,30 @@ void Renderer::renderSelectionScreen(int x, int y)
     double charWidth, charHeight;
     double value;
 
-    value = (double)screenHeight / 25.0;
+    value = (double)screenHeight / double(m_termHeight);
     charHeight = value; //round(abs(value));
-    value = (double)screenWidth / 80.0;
+    value = (double)screenWidth / double(m_termWidth);
     charWidth = value; //round(abs(value));
 
     // First we need to convert the current Screen size to 640x400
     // So we can calcuate the actual pixel size of each resized character cell.
     SDL_Rect rect;
+    int sourceX = m_input_handler->getMouseSourceXPosition();
+    int sourceY = m_input_handler->getMouseSourceYPosition();
 
-    // We clip off botom 80, so that we get proper 8x16
-    // Display without Extra pixel borders around the screen,
-    // Texture Filter results in Pixel Bleeding.
-
-    int sourceX = TheInputHandler::Instance()->getMouseSourceXPosition();
-    int sourceY = TheInputHandler::Instance()->getMouseSourceYPosition();
-
-    // This is the source position that we Xy     = Source
-    //                                      []
-    // are starting our rect box at.          xy  = Motion
-
-    // Next We'll need to snap this to the nearest char height and width.
-    // Moving up on the top most region, and down on the bottom most region.
-
-    // First determine the smallest of source and current plot positions
-    // We want to make the Lowest Values our starting point so we either
-    // use source or motions depending where the mouse is for top left.
-
-    // This is the Top Region
-    if(sourceX < x)
-    {
-        // TOP Stationary -> Right ->> OK!
-        rect.x = floor((double)sourceX / charWidth) * charWidth;
-    }
-    else
-    {
-        // Top -> Left ->> OK!
-        rect.x = floor((double)x / charWidth) * charWidth;
-    }
-
-    if(sourceY < y)
-    {
-        // Top Stationary ->> OK!
-        rect.y = floor((double)sourceY / charHeight) * charHeight;
-    }
-    else
-    {
-        // Top -> Up ->> OK!
-        rect.y = floor((double)y / charHeight) * charHeight;
-    }
-
-    // Width and height are calcuated by the different from motion to source
-    // Well need to round these values to the width and height of a character!
-    // Also need to swap source for the lowest value so we can select both
-    // above and behind the starting points.
-
-    // This is the bottom Region
-    if(sourceX < x)
-    {
-        // Bottom Width RIGHT ->> OK!
-        rect.w = charWidth + (floor((double)x / charWidth) * charWidth) -  rect.x ;
-    }
-    else
-    {
-        // Bottom Stationary ->> OK!
-        rect.w = charWidth + (floor((double)sourceX / charWidth) * charWidth) - rect.x; // back
-    }
-    if(sourceY < y)
-    {
-        // Bottom -> Down ->> OK!
-        rect.h = charHeight + (floor((double)y / charHeight) * charHeight) - rect.y;
-    }
-    else
-    {
-        // Bottom -> Stationary ->> OK!
-        rect.h = charHeight + (floor((double)sourceY / charHeight) * charHeight) - rect.y; // back
-    }
-
-    // If were inbetween lines, Height = 0, then add char Height to the bottom
-    // So we always have a row!
-    if(rect.h == 0)
-        rect.h += round(charHeight);
-
-    if(rect.w == 0)
-        rect.w += round(charWidth);
+    // Calculate the Boxsize for drawing, fill rect!
+    calcBoxSize(rect, sourceX, sourceY, x, y, charWidth, charHeight);
 
     // Draw First Highlight Overlay
-    if(SDL_RenderCopy(m_globalRenderer, m_selectionTexture, nullptr, &rect) < 0)
-    {
-        SDL_Log("renderSelectionScreen() SDL_RenderCopy selectionTexture: %s",
-                SDL_GetError());
-    }
+    m_window_manager->renderCopy(
+        m_surface_manager
+        ->m_textureList[m_surface_manager->TEXTURE_SELECTION]
+        ->getTexture(),
+        nullptr,
+        &rect
+    );
 
+    // Now draw over and add a
     // 2 Pixel expanded shaded border (I like it!)
     rect.x -= 4;
     rect.y -= 4;
@@ -446,12 +377,17 @@ void Renderer::renderSelectionScreen(int x, int y)
     rect.h += 8;
 
     // Draw Border Overlay
-    if(SDL_RenderCopy(m_globalRenderer, m_selectionTexture, nullptr, &rect) < 0)
-    {
-        SDL_Log("renderSelectionScreen() SDL_RenderCopy selectionTexture (Overlay): %s",
-                SDL_GetError());
-    }
-    SDL_RenderPresent(m_globalRenderer);
+    // Draw First Highlight Overlay
+    m_window_manager->renderCopy(
+        m_surface_manager
+        ->m_textureList[m_surface_manager->TEXTURE_SELECTION]
+        ->getTexture(),
+        nullptr,
+        &rect
+    );
+
+    // Draw Out Renderer.
+    m_window_manager->renderPresent();
 }
 
 /*

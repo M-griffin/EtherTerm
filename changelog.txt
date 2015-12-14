@@ -1,6 +1,13 @@
 
+Change Log 3.0.7 - 2015-12-14
+	- Reworked SDL Rendering code into WindowManager
+	  This keeps everything in line with the active renderer
+	  and cuts down on some code.
+	- Also refactored rendering for TextureSelection 
+	  Lots of new functions to and cleanup to keep the flow easier to follow.
+
 Change Log 3.0.6 - 2015-12-13
-	- Added Textures Class to SurfaceManager for handling Textures dynamically also.
+	- Added Textures Class to SurfaceManager for handling Textures dynamicaly also.
 	- Added new TEXTURE_HILIGHT for future use in highlighting Menu Bars
 	- WIP Renderer rewrite.
 	

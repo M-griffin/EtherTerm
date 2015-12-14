@@ -241,7 +241,7 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                     delTexture(textureType);
                 }
 
-                // Create Surface with Smartpointer.
+                 // Create Texture: SDL_TEXTUREACCESS_STREAMING
                 texture_ptr texture(
                     new Textures(
                         SDL_CreateTexture(
@@ -274,13 +274,13 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                     delTexture(textureType);
                 }
 
-                // Create Surface with Smartpointer.
+                // Create Texture: SDL_TEXTUREACCESS_TARGET
                 texture_ptr texture(
                     new Textures(
                         SDL_CreateTexture(
                             m_window_manager->getRenderer(),
                             SDL_PIXELFORMAT_ARGB8888,
-                            SDL_TEXTUREACCESS_STREAMING,
+                            SDL_TEXTUREACCESS_TARGET,
                             surface->w, surface->h
                         )
                     )

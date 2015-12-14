@@ -286,4 +286,88 @@ bool WindowManager::createWindow(bool fullScreen)
     return true;
 }
 
+/**
+ * @brief Set the Texture Renderer
+ * @param texture
+ */
+void WindowManager::setRenderTarget(SDL_Texture *texture)
+{
+    if(SDL_SetRenderTarget(m_renderer, texture) < 0)
+    {
+        SDL_Log("setRenderTarget(): %s", SDL_GetError());
+    }
+}
 
+/**
+ * @brief Clears the Renderer of all Data.
+ */
+void WindowManager::clearRender()
+{
+    if (SDL_RenderClear(m_renderer) < 0)
+    {
+        SDL_Log("clearRenderer(): %s", SDL_GetError());
+    }
+}
+
+/**
+ * @brief Set the Renderer Drawing Color (4) Bits.
+ * @param R
+ * @param G
+ * @param B
+ * @param A
+ */
+void WindowManager::setRenderDrawColor(Uint32 R, Uint32 G, Uint32 B, Uint32 A)
+{
+    if (SDL_SetRenderDrawColor(m_renderer, R, G , B, A) < 0)
+    {
+        SDL_Log("setRendererDrawColor(): %s", SDL_GetError());
+    }
+}
+
+/**
+ * @brief Fill Rect Area of Renderer Display on Screen
+ * @param rect
+ */
+void WindowManager::renderFill(SDL_Rect *rect)
+{
+    if(SDL_RenderFillRect(m_renderer, rect) < 0)
+    {
+        SDL_Log("rendererFill(): %s", SDL_GetError());
+    }
+}
+
+/**
+ * @brief Copy From Texture to Renderer
+ * @param texture
+ * @param orig
+ * @param dest
+ */
+void WindowManager::renderCopy(SDL_Texture *texture, SDL_Rect *orig, SDL_Rect *dest)
+{
+    if(SDL_RenderCopy(m_renderer, texture, orig, dest) < 0)
+    {
+        SDL_Log("renderCopy(): %s", SDL_GetError());
+    }
+}
+
+/**
+ * @brief Draw Renderer to Screen
+ */
+void WindowManager::renderPresent()
+{
+    SDL_RenderPresent(m_renderer);
+}
+
+/**
+ * @brief Get the Window Dimensions of the Renderer
+ * @param screenWidth
+ * @param screenHeight
+ */
+void WindowManager::renderOutputSize(int &screenWidth, int &screenHeight)
+{
+    SDL_GetRendererOutputSize(
+        m_renderer,
+        &screenWidth,
+        &screenHeight
+    );
+}

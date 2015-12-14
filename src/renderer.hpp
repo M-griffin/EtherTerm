@@ -49,7 +49,6 @@ public:
     window_manager_ptr  m_window_manager;
     input_handler_ptr   m_input_handler;
 
-
     // Define ANSI Color Schemes
     SDL_Color BLACK;
     SDL_Color BLUE;
@@ -79,18 +78,35 @@ public:
     void initSurfaceTextures();
 
     /**
+     * @brief Calcuate the Box Dimensions for Copy/Paste Selection.
+     * @param rect
+     */
+    void calcBoxSize(SDL_Rect &rect,
+                     int sourceX, int sourceY,
+                     int x, int y,
+                     double charWidth, double charHeight);
+
+    /**
      * @brief Translates Screen Coordinates to ScreenBuffer for Text.
      * @param x
      * @param y
      */
     void pullSelectionBuffer(int x, int y);
 
+    /**
+     * @brief Clear so texture is refreshed each selection
+     */
     void clearSelectionTexture();
+
+    /**
+     * @brief On selected mouse movement area! We want to overlay a blended texture
+     * @param x
+     * @param y
+     */
     void renderSelectionScreen(int x, int y);
 
 
     void setScrollRegion(int top, int bot, int terminalHeight);
-
     void scrollRegionUp();
     void scrollScreenUp();
     void clearScreenSurface();

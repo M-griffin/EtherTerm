@@ -79,6 +79,53 @@ public:
      */
     bool createWindow(bool fullScreen);
 
+    /**
+     * @brief Set the Texture Renderer
+     * @param texture
+     */
+    void setRenderTarget(SDL_Texture *texture);
+
+    /**
+     * @brief Clears the Renderer of all Data.
+     */
+    void clearRender();
+
+    /**
+     * @brief Set the Renderer Drawing Color (4) Bits.
+     * @param R
+     * @param G
+     * @param B
+     * @param A
+     */
+    void setRenderDrawColor(Uint32 R, Uint32 G, Uint32 B, Uint32 A);
+
+
+    /**
+     * @brief Fill Rect Area of Renderer Display on Screen
+     * @param rect
+     */
+    void renderFill(SDL_Rect *rect);
+
+    /**
+     * @brief Copy From Texture to Renderer
+     * @param texture
+     * @param orig
+     * @param dest
+     */
+    void renderCopy(SDL_Texture *texture, SDL_Rect *orig, SDL_Rect *dest);
+
+    /**
+     * @brief Draw Renderer to Screen
+     */
+    void renderPresent();
+
+    /**
+     * @brief Get the Window Dimensions of the Renderer
+     * @param screenWidth
+     * @param screenHeight
+     */
+    void renderOutputSize(int &screenWidth, int &screenHeight);
+
 private:
 
     SDL_Window*    m_window;
