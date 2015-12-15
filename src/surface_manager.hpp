@@ -1,6 +1,8 @@
 #ifndef SURFACE_MANAGER_HPP
 #define SURFACE_MANAGER_HPP
 
+#include "surface.hpp"
+#include "texture.hpp"
 #include "window_manager.hpp"
 
 #ifdef TARGET_OS_MAC
@@ -19,142 +21,6 @@
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
-
-/**
- * @class Surfaces
- * @author Michael Griffin
- * @date 12/11/2015
- * @file surface_manager.hpp
- * @brief Dynamic Container to Hold Surfaces
- */
-class Surfaces
-{
-
-public:
-    Surfaces(SDL_Surface *surface)
-        : m_surface(surface)
-        , m_is_converted(false)
-    {
-    }
-
-    ~Surfaces()
-    {
-        std::cout << "surfaces: Surface Removed!" << std::endl;
-        SDL_FreeSurface(m_surface);
-        m_surface = nullptr;
-    }
-
-    SDL_Surface *getSurface()
-    {
-        if (!m_surface)
-        {
-            SDL_Log("Surface is null!");
-        }
-        return m_surface;
-    }
-
-    /**
-     * @brief Convert The Surface to match Texutre Pixel Format
-     * @return
-     */
-    bool convert()
-    {
-        if (!m_is_converted)
-        {
-            m_surface = SDL_ConvertSurfaceFormat(m_surface, SDL_PIXELFORMAT_ARGB8888, 0);
-            if(!m_surface)
-            {
-                SDL_Log("Unable to Convert Surface");
-                return false;
-            }
-            m_is_converted = true;
-        }
-        return true;
-    }
-
-    /**
-     * @brief Clear the Surface with all Black.
-     * @return
-     */
-    void clear()
-    {
-        SDL_FillRect(m_surface, nullptr, SDL_MapRGBA(m_surface->format, 0, 0, 0, 0));
-    }
-
-    /**
-     * @brief Make sure Surface is not null!
-     * @return
-     */
-    bool exists()
-    {
-        return (m_surface != nullptr);
-    }
-
-private:
-    SDL_Surface *m_surface;
-    bool         m_is_converted;
-
-};
-
-typedef boost::shared_ptr<Surfaces> surface_ptr;
-
-
-/**
- * @class Textures
- * @author Michael Griffin
- * @date 12/11/2015
- * @file surface_manager.hpp
- * @brief Dynamic Container to Hold Textures
- */
-class Textures
-{
-
-public:
-    Textures(SDL_Texture *texture)
-        : m_texture(texture)
-    {
-    }
-
-    ~Textures()
-    {
-        std::cout << "textures: Texture Removed!" << std::endl;
-        SDL_DestroyTexture(m_texture);
-        m_texture = nullptr;
-    }
-
-    SDL_Texture *getTexture()
-    {
-        if (!m_texture)
-        {
-            SDL_Log("Texture is null!");
-        }
-        return m_texture;
-    }
-
-    /**
-     * @brief Clear the Surface with all Black.
-     * @return
-     */
-    void clear()
-    {
-        //SDL_FillRect(m_surface, nullptr, SDL_MapRGBA(m_surface->format, 0, 0, 0, 0));
-    }
-
-    /**
-     * @brief Make sure Surface is not null!
-     * @return
-     */
-    bool exists()
-    {
-        return (m_texture != nullptr);
-    }
-
-private:
-    SDL_Texture *m_texture;
-
-};
-
-typedef boost::shared_ptr<Textures> texture_ptr;
 
 /**
  * @class SurfaceManager
@@ -302,6 +168,16 @@ public:
      * @param surfaceType
      */
     void createSurface(int surfaceType);
+
+    /**
+     * @brief Lock Surface to Modify Pixels
+     */
+    void lockSurface(int surfaceType);
+
+    /**
+     * @brief Unlock Surface Modify Pixels Completed.
+     */
+    void unlockSurface(int surfaceType);
 
 };
 

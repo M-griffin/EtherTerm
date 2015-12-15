@@ -68,7 +68,7 @@ void WindowManager::setWindowWidth(int value)
  */
 void WindowManager::setHintVsync(bool value)
 {
-    if (value)
+    if(value)
         m_hint_vSync = "1"; // on
     else
         m_hint_vSync = "0"; // off
@@ -103,7 +103,7 @@ void WindowManager::setTextureFilter(int value)
  */
 void WindowManager::setHintAcceleration(bool value)
 {
-    if (value)
+    if(value)
         m_hint_acceleration = "1"; // on
     else
         m_hint_acceleration = "0"; // off
@@ -164,7 +164,7 @@ void WindowManager::createRenderer()
                      SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
     if(!m_renderer)
     {
-        SDL_Log("restartWindowRenderer globalRenderer: %s",
+        SDL_Log("createRenderer globalRenderer: %s",
                 SDL_GetError());
         assert(m_renderer);
     }
@@ -172,28 +172,28 @@ void WindowManager::createRenderer()
     // Clear and Refresh the Terminal
     if(SDL_SetRenderDrawColor(m_renderer, 0x00, 0x00, 0x00, 0xFF) < 0)
     {
-        SDL_Log("restartWindowRenderer SDL_SetRenderDrawColor globalRenderer: %s",
+        SDL_Log("createRenderer SDL_SetRenderDrawColor globalRenderer: %s",
                 SDL_GetError());
         return;
     }
 
     if(SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE) < 0)
     {
-        SDL_Log("restartWindowRenderer SDL_SetRenderDrawBlendMode globalRenderer: %s",
+        SDL_Log("createRenderer SDL_SetRenderDrawBlendMode globalRenderer: %s",
                 SDL_GetError());
         return;
     }
 
     if(SDL_SetRenderTarget(m_renderer, nullptr) < 0)
     {
-        SDL_Log("restartWindowRenderer SDL_SetRenderTarget NULL: %s",
+        SDL_Log("createRenderer SDL_SetRenderTarget NULL: %s",
                 SDL_GetError());
     }
 
 
     if(SDL_RenderClear(m_renderer) < 0)
     {
-        SDL_Log("restartWindowRenderer() SDL_RenderClear globalRenderer: %s",
+        SDL_Log("createRenderer() SDL_RenderClear globalRenderer: %s",
                 SDL_GetError());
     }
 }
@@ -277,7 +277,7 @@ bool WindowManager::createWindow(bool fullScreen)
     else
     {
         std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
-        return false;
+        assert(m_window);
     }
 
     // Display and move focus to the new window.
@@ -303,7 +303,7 @@ void WindowManager::setRenderTarget(SDL_Texture *texture)
  */
 void WindowManager::clearRender()
 {
-    if (SDL_RenderClear(m_renderer) < 0)
+    if(SDL_RenderClear(m_renderer) < 0)
     {
         SDL_Log("clearRenderer(): %s", SDL_GetError());
     }
@@ -318,7 +318,7 @@ void WindowManager::clearRender()
  */
 void WindowManager::setRenderDrawColor(Uint32 R, Uint32 G, Uint32 B, Uint32 A)
 {
-    if (SDL_SetRenderDrawColor(m_renderer, R, G , B, A) < 0)
+    if(SDL_SetRenderDrawColor(m_renderer, R, G , B, A) < 0)
     {
         SDL_Log("setRendererDrawColor(): %s", SDL_GetError());
     }
@@ -370,4 +370,24 @@ void WindowManager::renderOutputSize(int &screenWidth, int &screenHeight)
         &screenWidth,
         &screenHeight
     );
+}
+
+
+/**
+ * @brief Update The Texture (Streaming)
+ * @param texture
+ * @param rect
+ * @param surface
+ */
+void WindowManager::updateTexture(SDL_Texture *texture,
+                                  SDL_Rect *rect,
+                                  SDL_Surface *surface)
+{
+    if(SDL_UpdateTexture(texture,
+                         rect,
+                         surface->pixels,
+                         surface->pitch) < 0)
+    {
+        SDL_Log("updateTexture(): %s", SDL_GetError());
+    }
 }

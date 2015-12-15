@@ -105,9 +105,16 @@ public:
      */
     void renderSelectionScreen(int x, int y);
 
-
+    /**
+     * @Brief Overrides the Scrolling region of the screen
+     */
     void setScrollRegion(int top, int bot, int terminalHeight);
+
+    /**
+     * @brief Scroll a specific set region of the screen only
+     */
     void scrollRegionUp();
+
     void scrollScreenUp();
     void clearScreenSurface();
     void renderDeleteCharScreen(int x, int y, int num);

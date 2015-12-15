@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=12/11/2015
+Date                   :=12/15/2015
 CodeLitePath           :="C:\Program Files (x86)\CodeLite"
 LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
@@ -63,7 +63,7 @@ AS       := C:/MinGW-5.1.0/mingw32/bin/as.exe
 ##
 CodeLiteDir:=C:\Program Files (x86)\CodeLite
 UNIT_TEST_PP_SRC_DIR:=C:\UnitTest++-1.3
-Objects0=$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_window_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_input_handler.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_window_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_input_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_renderer.cpp$(ObjectSuffix) 
 
 
 
@@ -125,6 +125,14 @@ $(IntermediateDirectory)/src_input_handler.cpp$(DependSuffix): src/input_handler
 
 $(IntermediateDirectory)/src_input_handler.cpp$(PreprocessSuffix): src/input_handler.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_input_handler.cpp$(PreprocessSuffix) "src/input_handler.cpp"
+
+$(IntermediateDirectory)/src_renderer.cpp$(ObjectSuffix): src/renderer.cpp $(IntermediateDirectory)/src_renderer.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/renderer.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_renderer.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_renderer.cpp$(DependSuffix): src/renderer.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_renderer.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_renderer.cpp$(DependSuffix) -MM "src/renderer.cpp"
+
+$(IntermediateDirectory)/src_renderer.cpp$(PreprocessSuffix): src/renderer.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_renderer.cpp$(PreprocessSuffix) "src/renderer.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

@@ -30,6 +30,10 @@
     <File Name="src/input_handler.cpp"/>
     <File Name="src/input_handler.hpp"/>
     <File Name="src/tcp_connection.hpp"/>
+    <File Name="src/renderer.cpp"/>
+    <File Name="src/renderer.hpp"/>
+    <File Name="src/surface.hpp"/>
+    <File Name="src/texture.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

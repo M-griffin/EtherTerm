@@ -463,3 +463,34 @@ void SurfaceManager::createSurface(int surfaceType)
             break;
     }
 }
+
+/**
+ * @brief Lock Surface to Modify Pixels
+ */
+void SurfaceManager::lockSurface(int surfaceType)
+{
+    if(SDL_MUSTLOCK(m_surfaceList[surfaceType].getSurface()))
+    {
+        if(SDL_LockSurface(m_surfaceList[surfaceType].getSurface()) < 0)
+        {
+            SDL_Log("lockSurface(): %s", SDL_GetError());
+            assert(false);
+        }
+    }
+}
+
+/**
+ * @brief Unlock Surface Modify Pixels Completed.
+ */
+void SurfaceManager::unlockSurface(int surfaceType)
+{
+    if(SDL_MUSTLOCK(m_surfaceList[surfaceType].getSurface()))
+    {
+        if(SDL_UnlockSurface(m_surfaceList[surfaceType].getSurface()) < 0)
+        {
+            SDL_Log("unlockSurface(): %s", SDL_GetError());
+            assert(false);
+        }
+    }
+}
+

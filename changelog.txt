@@ -1,4 +1,11 @@
 
+Change Log 3.0.8 - 2015-12-15
+	- Split out Surface and Texture from SurfaceManager to their own files.
+	- Added more rendering to the WindowManager Class. 
+	- Refactoring more code in the texture selection
+	- Update first couple scroll methods for new rendering.
+	- Still WIP through the Rendering file.
+
 Change Log 3.0.7 - 2015-12-14
 	- Reworked SDL Rendering code into WindowManager
 	  This keeps everything in line with the active renderer

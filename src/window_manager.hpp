@@ -29,9 +29,18 @@ public:
     ~WindowManager();
 
     // Handles to Window and Renderer
-    SDL_Window *getWindow() { return m_window; }
-    SDL_Renderer *getRenderer() { return m_renderer; }
-    Uint32 getWindowId() const { return m_window_id; }
+    SDL_Window *getWindow()
+    {
+        return m_window;
+    }
+    SDL_Renderer *getRenderer()
+    {
+        return m_renderer;
+    }
+    Uint32 getWindowId() const
+    {
+        return m_window_id;
+    }
 
     /**
      * @brief Overide default Window Height
@@ -99,7 +108,6 @@ public:
      */
     void setRenderDrawColor(Uint32 R, Uint32 G, Uint32 B, Uint32 A);
 
-
     /**
      * @brief Fill Rect Area of Renderer Display on Screen
      * @param rect
@@ -125,6 +133,16 @@ public:
      * @param screenHeight
      */
     void renderOutputSize(int &screenWidth, int &screenHeight);
+
+    /**
+     * @brief Update The Texture (Streaming)
+     * @param texture
+     * @param rect
+     * @param surface
+     */
+    void updateTexture(SDL_Texture *texture,
+                       SDL_Rect *rect,
+                       SDL_Surface *surface);
 
 private:
 
