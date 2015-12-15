@@ -301,7 +301,7 @@ void WindowManager::setRenderTarget(SDL_Texture *texture)
 /**
  * @brief Clears the Renderer of all Data.
  */
-void WindowManager::clearRender()
+void WindowManager::renderClear()
 {
     if(SDL_RenderClear(m_renderer) < 0)
     {

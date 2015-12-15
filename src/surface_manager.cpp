@@ -173,15 +173,10 @@ bool SurfaceManager::loadBitmapImage(std::string fontName)
     // Loading Bitmap first time, or reloading,  If already Exists remove it.
     if(surfaceExists(SURFACE_FONT))
     {
-
         delSurface(SURFACE_FONT);
     }
 
-    // Debugging.  1 is missing in 8x16.bmp !!!
-    //std::cout << "loading Font -> current: "
-    //          << TheRenderer::Instance()->getCurrentFont()
-    //          << std::endl;
-
+    // Load the Font into the Surface.
     surface_ptr fontSurface(
         new Surfaces(
             SDL_LoadBMP(path.c_str())
@@ -241,7 +236,7 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                     delTexture(textureType);
                 }
 
-                 // Create Texture: SDL_TEXTUREACCESS_STREAMING
+                // Create Texture: SDL_TEXTUREACCESS_STREAMING
                 texture_ptr texture(
                     new Textures(
                         SDL_CreateTexture(
@@ -257,11 +252,11 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
 
                 // Set the Blend Mode of the Texture NONE
                 if(SDL_SetTextureBlendMode(
-                                texture->getTexture(),
-                                SDL_BLENDMODE_NONE) < 0)
-                    {
-                        SDL_Log("%s: Error Setting Blend on Texture - %s", SDL_GetError());
-                    }
+                            texture->getTexture(),
+                            SDL_BLENDMODE_NONE) < 0)
+                {
+                    SDL_Log("%s: Error Setting Blend on Texture - %s", SDL_GetError());
+                }
             }
             break;
 
@@ -290,11 +285,11 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
 
                 // Set the Blend Mode of the Texture ADD
                 if(SDL_SetTextureBlendMode(
-                                texture->getTexture(),
-                                SDL_BLENDMODE_ADD) < 0)
-                    {
-                        SDL_Log("%s: Error Setting Blend on Texture - %s", SDL_GetError());
-                    }
+                            texture->getTexture(),
+                            SDL_BLENDMODE_ADD) < 0)
+                {
+                    SDL_Log("%s: Error Setting Blend on Texture - %s", SDL_GetError());
+                }
             }
             break;
 
@@ -411,7 +406,11 @@ void SurfaceManager::createSurface(int surfaceType)
 
                 // Get the Actual size of the Renderer to match the surface for scaling.
                 int screenWidth, screenHeight;
-                SDL_GetRendererOutputSize(m_window_manager->getRenderer(), &screenWidth, &screenHeight);
+                SDL_GetRendererOutputSize(
+                    m_window_manager->getRenderer(),
+                    &screenWidth,
+                    &screenHeight
+                );
 
                 // Create Surface with Smartpointer.
                 surface_ptr surface(
@@ -469,9 +468,9 @@ void SurfaceManager::createSurface(int surfaceType)
  */
 void SurfaceManager::lockSurface(int surfaceType)
 {
-    if(SDL_MUSTLOCK(m_surfaceList[surfaceType].getSurface()))
+    if(SDL_MUSTLOCK(m_surfaceList[surfaceType]->getSurface()))
     {
-        if(SDL_LockSurface(m_surfaceList[surfaceType].getSurface()) < 0)
+        if(SDL_LockSurface(m_surfaceList[surfaceType]->getSurface()) < 0)
         {
             SDL_Log("lockSurface(): %s", SDL_GetError());
             assert(false);
@@ -484,13 +483,30 @@ void SurfaceManager::lockSurface(int surfaceType)
  */
 void SurfaceManager::unlockSurface(int surfaceType)
 {
-    if(SDL_MUSTLOCK(m_surfaceList[surfaceType].getSurface()))
+    if(SDL_MUSTLOCK(m_surfaceList[surfaceType]->getSurface()))
     {
-        if(SDL_UnlockSurface(m_surfaceList[surfaceType].getSurface()) < 0)
-        {
-            SDL_Log("unlockSurface(): %s", SDL_GetError());
-            assert(false);
-        }
+        SDL_UnlockSurface(m_surfaceList[surfaceType]->getSurface());
     }
 }
 
+/**
+ * @brief Fill the Surface with the Current Color Attributes.
+ */
+void SurfaceManager::fillSurfaceColor(int surfaceType, SDL_Rect *rect, SDL_Color *color)
+{
+    // Fill screen with current RGB Background colors.
+    if(SDL_FillRect(
+                m_surfaceList[surfaceType]->getSurface(),
+                rect,
+                SDL_MapRGBA(
+                    m_surfaceList[surfaceType]->getSurface()->format,
+                    color->r,
+                    color->g,
+                    color->b,
+                    color->a
+                )) < 0)
+    {
+        SDL_Log("fillSurfaceCurrentColor(): %s", SDL_GetError());
+        assert(false);
+    }
+}

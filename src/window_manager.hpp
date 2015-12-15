@@ -97,7 +97,7 @@ public:
     /**
      * @brief Clears the Renderer of all Data.
      */
-    void clearRender();
+    void renderClear();
 
     /**
      * @brief Set the Renderer Drawing Color (4) Bits.

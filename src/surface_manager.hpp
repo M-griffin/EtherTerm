@@ -179,6 +179,11 @@ public:
      */
     void unlockSurface(int surfaceType);
 
+    /**
+     * @brief Fill the Surface with the Current Color Attributes.
+     */
+    void fillSurfaceColor(int surfaceType, SDL_Rect *rect, SDL_Color *color);
+
 };
 
 typedef boost::shared_ptr<SurfaceManager> surface_manager_ptr;

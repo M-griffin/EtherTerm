@@ -322,7 +322,7 @@ void Renderer::renderSelectionScreen(int x, int y)
         m_window_manager->setRenderTarget(texture);
 
         // Clear The Renderer
-        m_window_manager->clearRender();
+        m_window_manager->renderClear();
 
         // Set the Color of the Selection Texture
         m_window_manager->setRenderDrawColor(0, 50 , 50, 255);
@@ -460,68 +460,49 @@ void Renderer::scrollRegionUp()
     );    
 }
 
-/*
- * Clips out the Top Row of the Screen,
+/**
+ * @brief Clips out the Top Row of the Screen,
  * Then Moves Entire Screen Up one Row to Scroll it.
  */
 void Renderer::scrollScreenUp()
-{
-    if(!m_screenSurface)
-    {
-        SDL_Log("scrollScreenUp() m_screenSurface: %s",
-                SDL_GetError());
-        return;
-    }
-
+{    
     if(m_scrollRegionActive)
     {
         scrollRegionUp();
         return;
     }
 
-    int bpp = m_screenSurface->format->BytesPerPixel;
-    Uint8 *pixelNewPos = (Uint8 *)m_screenSurface->pixels;
-    Uint8 *pixelOldPos = (Uint8 *)m_screenSurface->pixels;
+    // Get handle to the Surface
+    SDL_Surface *surface = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->getSurface();
+
+    int bpp = surface->format->BytesPerPixel;
+    Uint8 *pixelNewPos = (Uint8 *)surface->pixels;
+    Uint8 *pixelOldPos = (Uint8 *)surface->pixels;
 
     // Move position to start of 2nd Line,
     // Then copying greater line down to previous.
-    pixelNewPos += (m_screenSurface->w * m_characterHeight) * bpp;
+    pixelNewPos += (surface->w * m_surface_manager->m_characterHeight) * bpp;
 
-    if(SDL_MUSTLOCK(m_screenSurface))
-    {
-        if(SDL_LockSurface(m_screenSurface) < 0)
-        {
-            SDL_Log("scrollScreenUp() SDL_LockSurface screenSurface: %s",
-                    SDL_GetError());
-            return;
-        }
-    }
-
+    // Lock the Surface
+    m_surface_manager->lockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
+    
     // Move the Entire Screen Up a 1 Row of Characters.
     memmove(pixelOldPos, pixelNewPos,
-            (m_screenSurface->w * (m_screenSurface->h - m_characterHeight)) * bpp);
+            (surface->w * (surface->h - m_surface_manager->m_characterHeight)) * bpp);
 
-    if(SDL_MUSTLOCK(m_screenSurface))
-        SDL_UnlockSurface(m_screenSurface);
+    // Unlock when modification is done.
+    m_surface_manager->unlockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
 
-    if(!m_globalTexture)
-    {
-        createTexture(GLOBAL_TEXTURE, m_screenSurface);
-        if(!m_globalTexture)
-        {
-            SDL_Log("scrollScreenUp() SDL_CreateTexture globalRenderer: %s",
-                    SDL_GetError());
-            assert(m_globalTexture);
-        }
-    }
-    // Write Scrolled screen to Texture.
-    if(SDL_UpdateTexture(m_globalTexture, nullptr,
-                         m_screenSurface->pixels,
-                         m_screenSurface->pitch) < 0)
-    {
-        SDL_Log("scrollScreenUp() SDL_UpdateTexture globalTexture: %s",
-                SDL_GetError());
-    }
+    // Update Pixels in the Texture
+    m_window_manager->updateTexture(
+        m_surface_manager
+        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->getTexture(),
+        nullptr,
+        surface
+    );        
 }
 
 /**
@@ -533,46 +514,28 @@ void Renderer::scrollScreenUp()
  */
 void Renderer::clearScreenSurface()
 {
-    if(!m_screenSurface)
-    {
-        SDL_Log("clearScreenSurface() m_screenSurface: %s",
-                SDL_GetError());
-    }
+    SDL_Surface *surface = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->getSurface();
 
     // Fill screen with current RGB Background colors.
-    if(SDL_FillRect(m_screenSurface, nullptr,
-                    SDL_MapRGBA(m_screenSurface->format,
-                                m_currentBGColor.r, m_currentBGColor.g, m_currentBGColor.b, 0)) < 0)
-        //SDL_MapRGB(m_screenSurface->format,
-        //           m_currentBGColor.r, m_currentBGColor.g, m_currentBGColor.b)) < 0)
-    {
-        SDL_Log("clearScreenSurface() SDL_FillRect screenSurface: %s",
-                SDL_GetError());
-    }
+    m_surface_manager->fillSurfaceColor(
+        m_surface_manager->SURFACE_MAIN_SCREEN,
+        nullptr,
+        &m_currentBGColor
+    );
 
-    if(!m_globalTexture)
-    {
-        createTexture(GLOBAL_TEXTURE, m_screenSurface);
-        if(!m_globalTexture)
-        {
-            SDL_Log("clearScreenSurface() SDL_CreateTexture globalRenderer: %s",
-                    SDL_GetError());
-            assert(m_globalTexture);
-        }
-    }
+    // Update the Texture Pixels
+    m_window_manager->updateTexture(
+        m_surface_manager
+        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->getTexture(),
+        nullptr,
+        surface
+    );
 
-    if(SDL_UpdateTexture(m_globalTexture, nullptr,
-                         m_screenSurface->pixels,
-                         m_screenSurface->pitch) < 0)
-    {
-        SDL_Log("clearScreenSurface() SDL_UpdateTexture globalRenderer: %s",
-                SDL_GetError());
-    }
-    if(SDL_RenderClear(m_globalRenderer) < 0)
-    {
-        SDL_Log("clearScreenSurface() SDL_RenderClear globalRenderer: %s",
-                SDL_GetError());
-    }
+    // Clear the Renderer before displaying texture.
+    m_window_manager->renderClear();   
 }
 
 /**

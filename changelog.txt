@@ -1,4 +1,8 @@
 
+Change Log 3.0.9 - 2015-12-15
+	- Little more Rendering completed.  About Half-way there now.
+	- Some more rework and optimizations (Codewise).
+
 Change Log 3.0.8 - 2015-12-15
 	- Split out Surface and Texture from SurfaceManager to their own files.
 	- Added more rendering to the WindowManager Class. 

@@ -115,7 +115,13 @@ public:
      */
     void scrollRegionUp();
 
+    /**
+     * @brief Clips out the Top Row of the Screen,
+     * Then Moves Entire Screen Up one Row to Scroll it.
+     */
     void scrollScreenUp();
+
+
     void clearScreenSurface();
     void renderDeleteCharScreen(int x, int y, int num);
     void renderClearLineAboveScreen(int y, int x);
