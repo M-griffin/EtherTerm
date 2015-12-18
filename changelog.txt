@@ -1,42 +1,57 @@
+    
+Change Log 3.0.10 - 2015-12-17 / 18
+    - More rework on the renderer class and the following.
+    - Added in SequenceParser Class which uses the renderer.
+    - Added ScreenBuffer Class for rework which used by SequenceParser
+    - Lots of items to rework and update for the new flow.
+    - Main Rework on ScreenBuffer and SequenceParser
+    - Normalized a lot of extra variables for Term Height and Width
+      Also removing hard coded variables so we can adjust through settings.
+    - Pulled in a copy of the renderer
+    - Passing the Session Instance to the Renderer now so it can
+      Access the Session->SequenceParser->Screen Buffer without 
+      Direct Circle Dependencies.    
+    - Passing the Conenction Instatnce to the SequenceParser
+      So Client can now reply with Cursor X/Y Positions
 
 Change Log 3.0.9 - 2015-12-15
-	- Little more Rendering completed.  About Half-way there now.
-	- Some more rework and optimizations (Codewise).
+    - Little more Rendering completed.  About Half-way there now.
+    - Some more rework and optimizations (Codewise).
 
 Change Log 3.0.8 - 2015-12-15
-	- Split out Surface and Texture from SurfaceManager to their own files.
-	- Added more rendering to the WindowManager Class. 
-	- Refactoring more code in the texture selection
-	- Update first couple scroll methods for new rendering.
-	- Still WIP through the Rendering file.
+    - Split out Surface and Texture from SurfaceManager to their own files.
+    - Added more rendering to the WindowManager Class. 
+    - Refactoring more code in the texture selection
+    - Update first couple scroll methods for new rendering.
+    - Still WIP through the Rendering file.
 
 Change Log 3.0.7 - 2015-12-14
-	- Reworked SDL Rendering code into WindowManager
-	  This keeps everything in line with the active renderer
-	  and cuts down on some code.
-	- Also refactored rendering for TextureSelection 
-	  Lots of new functions to and cleanup to keep the flow easier to follow.
+    - Reworked SDL Rendering code into WindowManager
+      This keeps everything in line with the active renderer
+      and cuts down on some code.
+    - Also refactored rendering for TextureSelection 
+      Lots of new functions to and cleanup to keep the flow easier to follow.
 
 Change Log 3.0.6 - 2015-12-13
-	- Added Textures Class to SurfaceManager for handling Textures dynamicaly also.
-	- Added new TEXTURE_HILIGHT for future use in highlighting Menu Bars
-	- WIP Renderer rewrite.
-	
+    - Added Textures Class to SurfaceManager for handling Textures dynamicaly also.
+    - Added new TEXTURE_HILIGHT for future use in highlighting Menu Bars
+    - WIP Renderer rewrite.
+    
 Change Log 3.0.5 - 2015-12-13
-	- Some more code cleanup.
-	- Worked more Renderer code still a WIP.
-	- WIP add TextureManager to SurfaceManger so it works the same.
-	- Added Term Height/Width variables
-	- Added InputHandler to Renderer for text selections.
-	
+    - Some more code cleanup.
+    - Worked more Renderer code still a WIP.
+    - WIP add TextureManager to SurfaceManger so it works the same.
+    - Added Term Height/Width variables
+    - Added InputHandler to Renderer for text selections.
+    
 Change Log 3.0.4 - 2015-12-12
-	- Added Program path pass-through from main -> interface -> session -> SurfaceManager
-	  Used for loading fonts and also for assets folder location in the session
-	- Separated SurfaceManager from Renderer.
- 	- WIP rebuilding the Renderer now to use SurfaceManager and WindowManager Objects
+    - Added Program path pass-through from main -> interface -> session -> SurfaceManager
+      Used for loading fonts and also for assets folder location in the session
+    - Separated SurfaceManager from Renderer.
+    - WIP rebuilding the Renderer now to use SurfaceManager and WindowManager Objects
 
 Change Log 3.0.3 - 2015-12-12
-	- WIP Surface Manager Class
+    - WIP Surface Manager Class
       Complete initial dynamic surface manager.
       
 Change Log 3.0.2 - 2015-12-11
@@ -44,31 +59,32 @@ Change Log 3.0.2 - 2015-12-11
     - WIP Surface and Texture Manager for Rendering
 
 Change Log 3.0.1 - 2015-11-17
-	- Created initial classes:
-	Window Manager  - For Sessions and Windows for each connection incuding the Dialing Directory
-	Surface Manager - Handles SDL Surface and Textures for Displaying Graphics
-	Input Handler   - Handles Local Input and SDL Window Events
-	Session         - Each Session will handle it's own socket i/o, ansi parser, window and rendering
-	Interface       - Handles Spawning sessions and outgroing connections
-	tcp_connection  - Initial socket class that spawn a new socket per session
-	
-	Initial goal to get the dialing directory up and going. Before this need to re-work
-	The previous graphic classes to new layout.  This will take sometime.
+    - Created initial classes:
+    Window Manager  - For Sessions and Windows for each connection incuding the Dialing Directory
+    Surface Manager - Handles SDL Surface and Textures for Displaying Graphics
+    Input Handler   - Handles Local Input and SDL Window Events
+    Session         - Each Session will handle it's own socket i/o, ansi parser, window and rendering
+    Interface       - Handles Spawning sessions and outgroing connections
+    tcp_connection  - Initial socket class that spawn a new socket per session
+    
+    Initial goal to get the dialing directory up and going. Before this need to re-work
+    The previous graphic classes to new layout.  This will take sometime.
 
 Change Log 3.0.0 Started - 2015-11-16
-	Reworking Project, Replacing SDLNet for Boost ASIO for Sockets
-	Updated from SDL-2.0.3 to SDL-2.0.4
-	Updated Compiler for Windows from Mingw32 4.8.1 to 5.1.0
-	Updated C+ standard flags from x0 to x11.
+    Reworking Project, Replacing SDLNet for Boost ASIO for Sockets
+    Updated from SDL-2.0.3 to SDL-2.0.4
+    Updated Compiler for Windows from Mingw32 4.8.1 to 5.1.0
+    Updated C+ standard flags from x0 to x11.
 
-	Key 3.0 Update Goals:
-	- Better Design to remove singleton as an overused pattern
-	- Ability to run connections headless for automation and testing
-	- Screen Size Detection, Go full screen first, get the screen size and
-	 Then re-size to initial screen window that will fit the display best!
-	- Multiple and separate windows per concurrent connections (TABS).
-	- SSL Socket for Obv/2 XRM WFC Interface secure remote connectivity.
-	- Better Scaling with Quality and no blurring on Texture Filtering.
-	- Ability to re-size windows and auto scaling on the fly.
-	- Internal Configuration Options without editing INI file.
-	- IPv6 and IPv4 connections
+    Key 3.0 Update Goals:
+    - Better Design to remove singleton as an overused pattern
+    - Ability to run connections headless for automation and testing
+    - Screen Size Detection, Go full screen first, get the screen size and
+     Then re-size to initial screen window that will fit the display best!
+    - Multiple and separate windows per concurrent connections (TABS).
+    - SSL Socket for Obv/2 XRM WFC Interface secure remote connectivity.
+    - Better Scaling with Quality and no blurring on Texture Filtering.
+    - Ability to re-size windows and auto scaling on the fly.
+    - Internal Configuration Options without editing INI file.
+    - IPv6 and IPv4 connections
+

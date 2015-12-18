@@ -1,4 +1,5 @@
 #include "renderer.hpp"
+#include "session.hpp"
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
@@ -24,37 +25,39 @@
 
 
 Renderer::Renderer(surface_manager_ptr surface,
-                   window_manager_ptr window,
-                   input_handler_ptr input)
+                   window_manager_ptr  window,
+                   input_handler_ptr   input,
+                   session_ptr         session)
     : m_surface_manager(surface)
     , m_window_manager(window)
     , m_input_handler(input)
+    , m_session(session)
     , BLACK( {   0,   0,   0,   0 })
-, BLUE( {   0,   0, 171,   0 })
-, GREEN( {   0, 171,   0,   0 })
-, CYAN( {   0, 171, 171,   0 })
-, RED( { 171,   0,   0,   0 })
-, MAGENTA( { 171,   0, 171,   0 })
-, BROWN( { 171,  87,   0,   0 })
-, GREY( { 171, 171, 171,   0 })
-, DARK_GREY( {  87,  87,  87,   0 })
-, LIGHT_BLUE( {  87,  87, 255,   0 })
-, LIGHT_GREEN( {  87, 255,  87,   0 })
-, LIGHT_CYAN( {  87, 255, 255,   0 })
-, LIGHT_RED( { 255,  87,  87,   0 })
-, LIGHT_MAGENTA( { 255,  87, 255,   0 })
-, YELLOW( { 255, 255,  87,   0 })
-, WHITE( { 255, 255, 255,   0 })
-, m_currentFGColor(GREY)
-, m_currentBGColor(BLACK)
-, m_termWidth(80)
-, m_termHeight(25)
-, m_scrollRegionActive(false)
-, m_topMargin(0)
-, m_bottomMargin(0)
-, m_cursorXPosition(0)
-, m_cursorYPosition(0)
-, m_isUTF8Output(false)
+    , BLUE( {   0,   0, 171,   0 })
+    , GREEN( {   0, 171,   0,   0 })
+    , CYAN( {   0, 171, 171,   0 })
+    , RED( { 171,   0,   0,   0 })
+    , MAGENTA( { 171,   0, 171,   0 })
+    , BROWN( { 171,  87,   0,   0 })
+    , GREY( { 171, 171, 171,   0 })
+    , DARK_GREY( {  87,  87,  87,   0 })
+    , LIGHT_BLUE( {  87,  87, 255,   0 })
+    , LIGHT_GREEN( {  87, 255,  87,   0 })
+    , LIGHT_CYAN( {  87, 255, 255,   0 })
+    , LIGHT_RED( { 255,  87,  87,   0 })
+    , LIGHT_MAGENTA( { 255,  87, 255,   0 })
+    , YELLOW( { 255, 255,  87,   0 })
+    , WHITE( { 255, 255, 255,   0 })
+    , m_currentFGColor(GREY)
+    , m_currentBGColor(BLACK)
+    , m_termWidth(80)
+    , m_termHeight(25)
+    , m_scrollRegionActive(false)
+    , m_topMargin(0)
+    , m_bottomMargin(0)
+    , m_cursorXPosition(0)
+    , m_cursorYPosition(0)
+    , m_isUTF8Output(false)
 {
     // Startup Surface and Texture Creation
     initSurfaceTextures();
@@ -401,7 +404,9 @@ void Renderer::setScrollRegion(int top, int bot, int terminalHeight)
         // Make sure Bottom Region
         // Is the same as our terminal length.
         if(bot > terminalHeight)
+        {
             bot = terminalHeight;
+        }
         m_scrollRegionActive = true;
     }
     // Set Scrolling Margins
@@ -441,15 +446,17 @@ void Renderer::scrollRegionUp()
     m_surface_manager->lockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
 
     // Move the Entire Screen Up a 1 Row of Characters.
-    memmove(pixelTopPos, pixelNewPos,
-            (surface->w * (m_surface_manager->m_characterHeight * (m_bottomMargin - m_topMargin))) * bpp);
+    memmove(
+        pixelTopPos,
+        pixelNewPos,
+        (surface->w * (m_surface_manager->m_characterHeight * (m_bottomMargin - m_topMargin))) * bpp);
 
     // Unlock when modification is done.
     m_surface_manager->unlockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
 
     // Clear out very last line of surface region.
     m_window_manager->renderFill(&area);
-    
+
     // Update Pixels in the Texture
     m_window_manager->updateTexture(
         m_surface_manager
@@ -457,7 +464,7 @@ void Renderer::scrollRegionUp()
         ->getTexture(),
         nullptr,
         surface
-    );    
+    );
 }
 
 /**
@@ -465,7 +472,8 @@ void Renderer::scrollRegionUp()
  * Then Moves Entire Screen Up one Row to Scroll it.
  */
 void Renderer::scrollScreenUp()
-{    
+{
+    // Check for Active Scrolling Region
     if(m_scrollRegionActive)
     {
         scrollRegionUp();
@@ -487,7 +495,7 @@ void Renderer::scrollScreenUp()
 
     // Lock the Surface
     m_surface_manager->lockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
-    
+
     // Move the Entire Screen Up a 1 Row of Characters.
     memmove(pixelOldPos, pixelNewPos,
             (surface->w * (surface->h - m_surface_manager->m_characterHeight)) * bpp);
@@ -502,14 +510,12 @@ void Renderer::scrollScreenUp()
         ->getTexture(),
         nullptr,
         surface
-    );        
+    );
 }
 
 /**
- * Clears the Surface Back Buffer, and Global Texture
- * Renders the Screen Blank for new set of data.
- *
- * Updated, Now clears the surface to the current background color
+ * @brief Clears the Surface Back Buffer, and Global Texture
+ * Clears the surface to the current background color
  * This is for ESC[2J proper behavior.
  */
 void Renderer::clearScreenSurface()
@@ -535,12 +541,15 @@ void Renderer::clearScreenSurface()
     );
 
     // Clear the Renderer before displaying texture.
-    m_window_manager->renderClear();   
+    m_window_manager->renderClear();
 }
 
 /**
- * Fill entire lines with space and BLACK foreground/Background
+ * @brief Fill entire lines with space and BLACK foreground/Background
  * Fast update to clear a row.
+ * @param y
+ * @param start
+ * @param end
  */
 void Renderer::renderClearLineScreen(int y, int start, int end)
 {
@@ -558,41 +567,37 @@ void Renderer::renderClearLineScreen(int y, int start, int end)
 }
 
 /**
- * Loops from starting y position to bottom of screen
- * Erasing all of the screen below.
- * Fill entire lines with space and BLACK foreground/Background
- * Fast update to clear a row.
+ * @brief Erasing all of the screen below.
+ * @param y
+ * @param x
  */
 void Renderer::renderClearLineAboveScreen(int y, int x)
 {
-    std::cout << "renderClearLineAboveScreen: " << x << ";" << y << std::endl;
     // Save Background Color so we can switch back to it.
     SDL_Color originalGB = m_currentBGColor;
     m_currentBGColor = BLACK;
 
-    int startPosition = x;
-
     // Clear out entire lines Up The Screen the screen.
     // Fix with term variables lateron.
-    for(int ii = y; (ii+1) > 0; ii--)
+    int startPosition = x;
+    for(int j = y; (j+1) > 0; j--)
     {
         for(int i = startPosition; (i+1) > 0; i--)
         {
             // x;y ' '
-            drawChar(i, ii, 32); // 32 space character
-            renderCharScreen(i, ii);
+            drawChar(i, j, 32); // 32 space character
+            renderCharScreen(i, j);
         }
         // Reset to starting position for following lines.
-        startPosition = 79;
+        startPosition = m_termWidth-1;
     }
     m_currentBGColor = originalGB;
 }
 
 /**
- * Loops from starting y position to bottom of screen
- * Erasing all of the screen below.
- * Fill entire lines with space and BLACK foreground/Background
- * Fast update to clear a row.
+ * @brief Erasing all of the screen below.
+ * @param y
+ * @param x
  */
 void Renderer::renderClearLineBelowScreen(int y, int x)
 {
@@ -604,13 +609,13 @@ void Renderer::renderClearLineBelowScreen(int y, int x)
 
     // Clear out entire lines down the screen.
     // Fix with term variables lateron.
-    for(int ii = y; ii < 25; ii++)
+    for(int j = y; j < m_termHeight; j++)
     {
-        for(int i = startPosition; i < 80; i++)
+        for(int i = startPosition; i < m_termWidth; i++)
         {
             // x;y ' '
-            drawChar(i, ii, 32); // 32 space character
-            renderCharScreen(i, ii);
+            drawChar(i, j, 32); // 32 space character
+            renderCharScreen(i, j);
         }
         startPosition = 0;
     }
@@ -618,35 +623,35 @@ void Renderer::renderClearLineBelowScreen(int y, int x)
 }
 
 /**
- * This will erase the current character or (s)
- * by moving all text on right side of cursor
- * Left x number of space, on the same line.
+ * @brief This will erase the current character or (s)
+ * Also moves all following text left by 1.
+ * @param x
+ * @param y
+ * @param num
  */
 void Renderer::renderDeleteCharScreen(int x, int y, int num)
 {
     SDL_Rect pick;
     SDL_Rect dest;
 
-    if(!m_screenSurface)
-    {
-        SDL_Log("renderDeleteCharScreen() m_screenSurface: %s",
-                SDL_GetError());
-    }
+    SDL_Surface *surface = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->getSurface();
 
     // next we want to copy out for copy back.
-    pick.w = m_screenSurface->w - ((x + num) * m_characterWidth);
-    pick.h = m_characterHeight;
-    pick.x = (x + num) * m_characterWidth;
-    pick.y = m_characterHeight * y;
+    pick.w = surface->w - ((x + num) * m_surface_manager->m_characterWidth);
+    pick.h = m_surface_manager->m_characterHeight;
+    pick.x = (x + num) * m_surface_manager->m_characterWidth;
+    pick.y = m_surface_manager->m_characterHeight * y;
 
     // destination
-    dest.w = m_screenSurface->w - ((x + num) * m_characterWidth);
-    dest.h = m_characterHeight;
-    dest.x = x * m_characterWidth;
-    dest.y = m_characterHeight * y;
+    dest.w = surface->w - ((x + num) * m_surface_manager->m_characterWidth);
+    dest.h = m_surface_manager->m_characterHeight;
+    dest.x = x * m_surface_manager->m_characterWidth;
+    dest.y = m_surface_manager->m_characterHeight * y;
 
     // Move surface to Surface
-    if(SDL_BlitSurface(m_screenSurface ,&pick, m_screenSurface, &dest) < 0)
+    if(SDL_BlitSurface(surface ,&pick, surface, &dest) < 0)
     {
         SDL_Log("renderDeleteCharScreen() SDL_BlitSurface bottomSurface: %s",
                 SDL_GetError());
@@ -655,8 +660,8 @@ void Renderer::renderDeleteCharScreen(int x, int y, int num)
 
     // Next we want to fill the hole from pull the text left with current
     // Colors background attributes as per the spec.
-    int start = 80 - num;
-    int end = 80;
+    int start = m_termWidth - num;
+    int end = m_termWidth;
 
     // Draw Char is 0 based.
     for(int i = start; i < end; i++)
@@ -666,161 +671,112 @@ void Renderer::renderDeleteCharScreen(int x, int y, int num)
     drawTextureScreen();
 }
 
-
 /**
- * Render The Bottom Row of the screen
- * So were only writing the to the bottom line of the screen only
- * And not redrawing the entire screen each time. Used After Scrolling
- * The Screen up.
+ * @brief Render The Bottom Row of the screen (After Scrolling)
  */
 void Renderer::renderBottomScreen()
 {
     SDL_Rect pick;
     SDL_Rect rect;
 
-    if(!m_bottomSurface)
-    {
-        SDL_Log("renderBottomScreen() bottomSurface CreateRGBSurface failed.");
-        return;
-    }
+    // Handles to the Surfaces
+    SDL_Surface *surface = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->getSurface();
 
-    pick.w = m_screenSurface->w;
-    pick.h = m_characterHeight;
+    SDL_Surface *bottomSurface = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_BOTTOM_ROW]
+                           ->getSurface();
+
+    pick.w = surface->w;
+    pick.h = m_surface_manager->m_characterHeight;
     pick.x = 0;
     if(m_scrollRegionActive)
-        pick.y = m_characterHeight * (m_bottomMargin-1);
+        pick.y = m_surface_manager->m_characterHeight * (m_bottomMargin-1);
     else
-        pick.y = m_characterHeight * (24);
+        pick.y = m_surface_manager->m_characterHeight * (m_termHeight-1);
 
-    rect.w = m_bottomSurface->w;
-    rect.h = m_bottomSurface->h;
+    rect.w = bottomSurface->w;
+    rect.h = bottomSurface->h;
     rect.x = 0;
     if(m_scrollRegionActive)
-        rect.y = m_characterHeight * (m_bottomMargin-1);
+        rect.y = m_surface_manager->m_characterHeight * (m_bottomMargin-1);
     else
-        rect.y = m_characterHeight * (24);
+        rect.y = m_surface_manager->m_characterHeight * (m_termHeight-1);
 
-    if(SDL_FillRect(m_bottomSurface, nullptr,
-                    SDL_MapRGBA(m_bottomSurface->format, 0, 0, 0, 0)) < 0)
-        //SDL_MapRGB(m_bottomSurface->format, 0, 0, 0)) < 0)
+    // Clear Surface
+    m_surface_manager->clearSurface(m_surface_manager->SURFACE_BOTTOM_ROW);
+
+    // Copy bottom row of the Surface
+    if(SDL_BlitSurface(surface, &pick, bottomSurface, nullptr) < 0)
     {
-        SDL_Log("renderBottomScreen() SDL_FillRect bottomSurface: %s",
-                SDL_GetError());
-        return;
+        SDL_Log("SDL_BlitSurface() surface -> bottomSurface: %s", SDL_GetError());
+        assert(false);
     }
 
-    if(!m_screenSurface)
-    {
-        SDL_Log("renderBottomScreen() m_screenSurface: %s",
-                SDL_GetError());
-        return;
-    }
-
-    if(SDL_BlitSurface(m_screenSurface ,&pick, m_bottomSurface, nullptr) < 0)
-    {
-        SDL_Log("renderBottomScreen() SDL_BlitSurface bottomSurface: %s",
-                SDL_GetError());
-        return;
-    }
-
-    if(!m_globalTexture)
-    {
-        createTexture(GLOBAL_TEXTURE, m_screenSurface);
-        if(!m_globalTexture)
-        {
-            SDL_Log("renderBottomScreen() SDL_CreateTexture globalTexture: %s",
-                    SDL_GetError());
-            assert(m_globalTexture);
-        }
-    }
-
-    if(SDL_UpdateTexture(m_globalTexture, &rect,
-                         m_bottomSurface->pixels,
-                         m_bottomSurface->pitch) < 0)
-    {
-        SDL_Log("renderBottomScreen() SDL_UpdateTexture globalTexture: %s",
-                SDL_GetError());
-    }
+    // Update Pixels in the Texture with the bottom row.
+    m_window_manager->updateTexture(
+        m_surface_manager
+        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->getTexture(),
+        &rect,
+        bottomSurface
+    );        
 }
 
 /**
- * Basically Plots each Char to Texture
- * Updates super fast now!! oh yea!!
+ * @brief Renders the MainScreen to the Texture.
  */
 void Renderer::renderScreen()
 {
-    SDL_Rect pick;
+    SDL_Rect rect;
 
-    pick.x = 0;
-    pick.y = 0;
-    pick.w = m_surfaceWidth;
-    pick.h = m_surfaceHeight;
+    SDL_Surface *surface = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->getSurface();
+    rect.x = 0;
+    rect.y = 0;
+    rect.w = surface->w;
+    rect.h = surface->h;
 
-    if(!m_screenSurface)
-    {
-        SDL_Log("renderBottomScreen() m_screenSurface: %s",
-                SDL_GetError());
-        return;
-    }
-
-    if(!m_globalTexture)
-    {
-        createTexture(GLOBAL_TEXTURE, m_screenSurface);
-        if(!m_globalTexture)
-        {
-            SDL_Log("renderScreen() SDL_CreateTexture globalTexture: %s",
-                    SDL_GetError());
-            assert(m_globalTexture);
-        }
-    }
-
-    if(SDL_UpdateTexture(m_globalTexture, &pick,
-                         m_screenSurface->pixels,
-                         m_screenSurface->pitch) < 0)
-    {
-        SDL_Log("renderScreen() SDL_UpdateTexture globalTexture: %s",
-                SDL_GetError());
-    }
+    // Update Pixels in the Texture with the bottom row.
+    m_window_manager->updateTexture(
+        m_surface_manager
+        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->getTexture(),
+        &rect,
+        surface
+    );   
 }
 
 /**
- * Basically Plots each Char to Texture
- * Updates super fast now!! oh yea!!
+ * @brief Renderer single character cell to texture.
+ * @param x
+ * @param y
  */
 void Renderer::renderCharScreen(int x, int y)
 {
     SDL_Rect rect;
 
-    rect.w = m_tmpSurface->w;
-    rect.h = m_tmpSurface->h;
-    rect.x = x * m_characterWidth;
-    rect.y = y * m_characterHeight;
+    SDL_Surface *surface = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_CHARACTER]
+                           ->getSurface();
 
-    if(!m_screenSurface)
-    {
-        SDL_Log("renderCharScreen() m_screenSurface: %s",
-                SDL_GetError());
-        return;
-    }
+    rect.w = surface->w;
+    rect.h = surface->h;
+    rect.x = x * m_surface_manager->m_characterWidth;
+    rect.y = y * m_surface_manager->m_characterHeight;
 
-    if(!m_globalTexture)
-    {
-        createTexture(GLOBAL_TEXTURE, m_screenSurface);
-        if(!m_globalTexture)
-        {
-            SDL_Log("renderCharScreen() SDL_CreateTexture globalTexture: %s",
-                    SDL_GetError());
-            assert(m_globalTexture);
-        }
-    }
-
-    if(SDL_UpdateTexture(m_globalTexture, &rect,
-                         m_screenSurface->pixels,
-                         m_screenSurface->pitch) < 0)
-    {
-        SDL_Log("renderCharScreen() SDL_UpdateTexture globalTexture: %s",
-                SDL_GetError());
-    }
+     // Update Pixels in the Texture with the character cell.
+    m_window_manager->updateTexture(
+        m_surface_manager
+        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->getTexture(),
+        &rect,
+        m_surface_manager
+       ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+       ->getSurface()
+    );           
 }
 
 /**
@@ -832,8 +788,8 @@ void Renderer::renderCursorOnScreen()
     SDL_Rect rect;
 
     // Check if the position has changed, if so, then skip!
-    if(m_cursorXPosition != TheSequenceParser::Instance()->x_position-1 ||
-            m_cursorYPosition != TheSequenceParser::Instance()->y_position-1)
+    if(m_surface_manager->m_cursorXPosition != TheSequenceParser::Instance()->x_position-1 ||
+        m_surface_manager->m_cursorYPosition != TheSequenceParser::Instance()->y_position-1)
     {
         return;
     }
@@ -946,8 +902,8 @@ void Renderer::drawTextureScreen()
         // We clip off bottom 80, so that we get proper 8x16
         // Display without Extra pixel borders around the screen,
         // Texture Filter results in Pixel Bleeding.
-        rect.w = m_surfaceWidth  - 40; // 680 - 640 = 40
-        rect.h = m_surfaceHeight - 80; // 480 - 400 = 80
+        rect.w = m_surfaceWidth; //  - 40; // 680 - 640 = 40
+        rect.h = m_surfaceHeight; // - 80; // 480 - 400 = 80
         rect.x = 0;
         rect.y = 0;
 
@@ -1022,6 +978,7 @@ void Renderer::replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 backgrou
         return;
     }
 
+    // Foreground/Backgroun of Original Bitmap Image for Replacement.
     static Uint32 fgColor = SDL_MapRGB(src->format, 255, 255, 255);  // White
     static Uint32 bgColor = SDL_MapRGB(src->format, 0,   0,   0);    // Black
 

@@ -510,3 +510,4 @@ void SurfaceManager::fillSurfaceColor(int surfaceType, SDL_Rect *rect, SDL_Color
         assert(false);
     }
 }
+

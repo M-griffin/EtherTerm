@@ -34,6 +34,10 @@
     <File Name="src/renderer.hpp"/>
     <File Name="src/surface.hpp"/>
     <File Name="src/texture.hpp"/>
+    <File Name="src/sequence_parser.cpp"/>
+    <File Name="src/sequence_parser.hpp"/>
+    <File Name="src/screen_buffer.cpp"/>
+    <File Name="src/screen_buffer.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

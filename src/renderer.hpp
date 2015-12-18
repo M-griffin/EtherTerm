@@ -28,6 +28,10 @@
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
+// Forward Decleration
+class Session;
+typedef boost::shared_ptr<Session> session_ptr;
+
 /**
  * @class Renderer
  * @author Michael Griffin
@@ -40,14 +44,16 @@ class Renderer
 public:
 
     Renderer(surface_manager_ptr surface,
-             window_manager_ptr window,
-             input_handler_ptr input);
+             window_manager_ptr  window,
+             input_handler_ptr   input,
+             session_ptr         session);
     ~Renderer();
 
     // Handle to Managers
     surface_manager_ptr m_surface_manager;
     window_manager_ptr  m_window_manager;
     input_handler_ptr   m_input_handler;
+    session_ptr         m_session;  // Handle to Instance.
 
     // Define ANSI Color Schemes
     SDL_Color BLACK;
@@ -72,6 +78,30 @@ public:
     SDL_Color m_currentFGColor;
     SDL_Color m_currentBGColor;
 
+    // Term Scale
+    int         m_termWidth;
+    int         m_termHeight;
+
+    // Scrolling Region
+    bool        m_scrollRegionActive;
+    int         m_topMargin;
+    int         m_bottomMargin;
+
+private:
+
+
+#ifdef _DEBBUG
+    TTF_Font*   trueTypeFont;      // UTF-8 Fonts.
+#endif
+
+    SDL_Rect    m_displayRect;
+    SDL_Rect    m_rectBackground;
+
+    int         m_cursorXPosition;
+    int         m_cursorYPosition;
+    bool        m_isUTF8Output;
+
+public:
     /**
      * @brief STartup Creation of Screen Surfaces in Memory
      */
@@ -121,15 +151,63 @@ public:
      */
     void scrollScreenUp();
 
-
+    /**
+     * @brief Clears the Surface Back Buffer, and Global Texture
+     * Clears the surface to the current background color
+     * This is for ESC[2J proper behavior.
+     */
     void clearScreenSurface();
-    void renderDeleteCharScreen(int x, int y, int num);
-    void renderClearLineAboveScreen(int y, int x);
-    void renderClearLineBelowScreen(int y, int x);
+
+    /**
+     * @brief Fill entire lines with space and BLACK foreground/Background
+     * Fast update to clear a row.
+     * @param y
+     * @param start
+     * @param end
+     */
     void renderClearLineScreen(int y, int start, int end);
+
+    /**
+     * @brief Erasing all of the screen below.
+     * @param y
+     * @param x
+     */
+    void renderClearLineAboveScreen(int y, int x);
+
+    /**
+     * @brief Erasing all of the screen below.
+     * @param y
+     * @param x
+     */
+    void renderClearLineBelowScreen(int y, int x);
+
+    /**
+     * @brief This will erase the current character or (s)
+     * Also moves all following text left by 1.
+     * @param x
+     * @param y
+     * @param num
+     */
+    void renderDeleteCharScreen(int x, int y, int num);
+
+    /**
+     * @brief Render The Bottom Row of the screen (After Scrolling)
+     */
     void renderBottomScreen();
+
+    /**
+     * @brief Renders the MainScreen to the Texture.
+     */
     void renderScreen();
+
+    /**
+     * @brief Renderer single character cell to texture.
+     * @param x
+     * @param y
+     */
     void renderCharScreen(int x, int y);
+
+
     void renderCursorOnScreen();
     void renderCursorOffScreen();
     void drawTextureScreen();
@@ -137,33 +215,10 @@ public:
     int  compareSDL_Colors(SDL_Color &src, SDL_Color &dest);
     void replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 background);
     void setupCursorChar();
-    void drawChar(int X, int Y, int asciicode);
-
-    //void drawString(int X, int Y, char text[]);
+    void drawChar(int X, int Y, int asciicode);//void drawString(int X, int Y, char text[]);
     //void drawCharSet(int X, int Y);
 
-    // Term Scale
-    int         m_termWidth;
-    int         m_termHeight;
-
-    // Scrolling Region
-    bool        m_scrollRegionActive;
-    int         m_topMargin;
-    int         m_bottomMargin;
-
-private:
-
-
-#ifdef _DEBBUG
-    TTF_Font*   trueTypeFont;      // UTF-8 Fonts.
-#endif
-
-    SDL_Rect    m_displayRect;
-    SDL_Rect    m_rectBackground;
-
-    int         m_cursorXPosition;
-    int         m_cursorYPosition;
-    bool        m_isUTF8Output;
+    
 
 };
 

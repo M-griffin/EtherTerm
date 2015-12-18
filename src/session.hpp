@@ -3,12 +3,18 @@
 
 #include "window_manager.hpp"
 #include "surface_manager.hpp"
+#include "sequence_parser.hpp"
 #include "renderer.hpp"
 #include "input_handler.hpp"
 #include "tcp_connection.hpp"
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
+
+#include <boost/bind.hpp>
+#include <boost/asio.hpp>
+#include <boost/asio/io_service.hpp>
+
 
 // For IO service!
 #include <thread>
@@ -38,10 +44,8 @@ public:
         : m_window_manager(new WindowManager())
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_input_handler(new InputHandler(m_surface_manager))
-        , m_renderer(new Renderer(m_surface_manager, m_window_manager, m_input_handler))
-        //,m_ansi_parser;
-        //,m_data_decorder;
-
+        , m_renderer(new Renderer(m_surface_manager, m_window_manager, m_input_handler, shared_from_this()))
+        , m_sequence_parser(new SequenceParser(m_renderer, connection))
         , m_connection(connection)
         , m_io_service(io_service)
         , m_session_list(sessions)
@@ -76,6 +80,48 @@ public:
     }
 
     /**
+     * @brief Callback from The Broadcaster to write data to the active sessions.
+     * @param msg
+     */
+    void deliver(const std::string &msg)
+    {
+        if(msg.size() == 0 || msg[0] == '\0')
+        {
+            return;
+        }
+
+        if(m_connection->is_open())
+        {
+            boost::asio::async_write(m_connection->socket(),
+                                     boost::asio::buffer(msg, msg.size()),
+                                     boost::bind(
+                                         &Session::handleWrite,
+                                         shared_from_this(),
+                                         boost::asio::placeholders::error
+                                     ));
+
+        }
+    }
+
+
+    /**
+     * @brief Callback after Writing Data, If error/hangup notifies
+     * everything this person has left.
+     * @param error
+     */
+    void handleWrite(const boost::system::error_code& error)
+    {
+        if(error)
+        {
+            std::cout << "async_write error: " << error.message() << std::endl;
+            std::cout << "Session Closed()" << std::endl;
+
+            m_connection->socket().shutdown(tcp::socket::shutdown_both);
+            m_connection->socket().close();
+        }
+    }
+
+    /**
      * @brief Cleanups Up Session by poping pointer off stack when done.
      */
     void close_session()
@@ -102,12 +148,10 @@ public:
     renderer_ptr             m_renderer;
 
     // Handles parsing data to create surfaces and screens
-//    ansi_parser_ptr        m_ansi_parser;
+    sequence_parser_ptr      m_sequence_parser;
 
     // Decodes incoming data and ESC sequences into arrays for the ansi parser
 //    data_decorder_ptr      m_data_decorder;
-
-
 
     // Socket_Manager handles sockets and incomming data from the server.
     connection_ptr           m_connection;

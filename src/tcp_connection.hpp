@@ -21,6 +21,11 @@ public:
     {
     }
 
+    bool is_open()
+    {
+        return m_socket.is_open();
+    }
+
     boost::asio::ip::tcp::socket& socket()
     {
         return m_socket;
