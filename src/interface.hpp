@@ -20,6 +20,8 @@ using boost::asio::ip::tcp;
  * @brief This Interfaces the Main System with Sessions and Async Client Connections.
  *        Must Call Shutdown() on close, this class is not RAII and is shutdown
  *        Only by the MenuSession being closed down or all connections (headless)
+ *        Sessions are still used from Main Thread, while the IO_SERVICE handles
+ *        Async IO in sepearte threads for Sockets.
  */
 class Interface
 {

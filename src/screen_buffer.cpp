@@ -11,8 +11,7 @@ ScreenBuffer::ScreenBuffer(int term_width, int term_height)
     , m_term_height(term_height)
     , m_term_width(term_width)
 {
-    // Set the default size of the vector screen buffer
-    // Then Fill each element with defaults
+    // Reserve Pixel Screen Space for each visable character.
     m_screenBuffer.reserve(m_term_height * m_term_width);
     m_screenBuffer.resize(m_term_height * m_term_width);
 }
@@ -26,9 +25,10 @@ ScreenBuffer::~ScreenBuffer()
 
 
 /**
- * handle screen buffer, Keeps track of all data
- * Plotted through the ANSI Parser so we can pull
- * Text and or redraw screens at anytime.
+ * @brief handle screen buffer, Keeps track of all screen data
+ * @param mySequence
+ * @param fg_color
+ * @param bg_color
  */
 void ScreenBuffer::setScreenBuffer(unsigned char mySequence,
                                    SDL_Color fg_color,
@@ -69,8 +69,8 @@ void ScreenBuffer::setScreenBuffer(unsigned char mySequence,
     m_sequenceBuffer.m_characterSequence.erase();
 }
 
-/*
- * Moves the Screen Buffer Up a line to match the internal SDL_Surface
+/**
+ * @brief Scrolls the Screen Buffer Up a line to match the internal SDL_Surface
  */
 void ScreenBuffer::scrollScreenBuffer()
 {
@@ -97,8 +97,10 @@ void ScreenBuffer::scrollScreenBuffer()
     m_screenBuffer.resize(m_term_height * m_term_width);
 }
 
-/*
- * Clear Range of Screen Buffer for Erase Sequences.
+/**
+ * @brief Clear Range of Screen Buffer for Erase Sequences.
+ * @param start
+ * @param end
  */
 void ScreenBuffer::clearScreenBufferRange(int start, int end)
 {
@@ -126,8 +128,9 @@ void ScreenBuffer::clearScreenBufferRange(int start, int end)
     // Debugging
     //getScreenBufferText();
 }
-/*
- * When the Screen/Surface is cleared, we also clear the buffer
+
+/**
+ * @brief Clears all data in the buffer.
  */
 void ScreenBuffer::clearScreenBuffer()
 {
@@ -136,10 +139,11 @@ void ScreenBuffer::clearScreenBuffer()
     m_screenBuffer.resize(m_term_height * m_term_width);
 }
 
-// Debug to console.
+/**
+ * @brief Testing, Prints screen butter to console.
+ */
 void ScreenBuffer::getScreenBufferText()
 {
-    //std::cout << "* getScreenBufferText" << std::endl; // Start Fresh line.
     for(auto &it : m_screenBuffer)
     {
         if(it.m_characterSequence != "")
@@ -149,10 +153,14 @@ void ScreenBuffer::getScreenBufferText()
     }
 }
 
-/*
- * Gets Coordinates from the screen already translated to
+/**
+ * @brief Gets Coordinates from the screen already translated to
  * Screen Buffer Positions, Now we pull the position and throw the
  * Text data into the Clipboard.
+ * @param startx
+ * @param starty
+ * @param numChar
+ * @param numRows
  */
 void ScreenBuffer::bufferToClipboard(int startx, int starty, int numChar, int numRows)
 {
@@ -161,7 +169,7 @@ void ScreenBuffer::bufferToClipboard(int startx, int starty, int numChar, int nu
     int endPosition   = startPosition + numChar;
 
     // Loop the Number of Rows to Grab
-    for(int ot = 0; ot < numRows; ot++)
+    for(int i = 0; i < numRows; i++)
     {
         // Grab each line per Row.
         for(int it = startPosition; it < endPosition; it++)
@@ -186,8 +194,8 @@ void ScreenBuffer::bufferToClipboard(int startx, int starty, int numChar, int nu
         textBuffer += "\r\n";
 
         // Reset start/end position to next Row.
-        startPosition += m_characters_per_line;
-        endPosition   += m_characters_per_line;
+        startPosition += m_term_width;
+        endPosition   += m_term_width;
     }
     // Copy Resulting text to the Clipboard.
     SDL_SetClipboardText(textBuffer.c_str());

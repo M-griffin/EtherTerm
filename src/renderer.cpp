@@ -685,8 +685,8 @@ void Renderer::renderBottomScreen()
                            ->getSurface();
 
     SDL_Surface *bottomSurface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_BOTTOM_ROW]
-                           ->getSurface();
+                                 ->m_surfaceList[m_surface_manager->SURFACE_BOTTOM_ROW]
+                                 ->getSurface();
 
     pick.w = surface->w;
     pick.h = m_surface_manager->m_characterHeight;
@@ -721,7 +721,7 @@ void Renderer::renderBottomScreen()
         ->getTexture(),
         &rect,
         bottomSurface
-    );        
+    );
 }
 
 /**
@@ -746,7 +746,7 @@ void Renderer::renderScreen()
         ->getTexture(),
         &rect,
         surface
-    );   
+    );
 }
 
 /**
@@ -767,197 +767,149 @@ void Renderer::renderCharScreen(int x, int y)
     rect.x = x * m_surface_manager->m_characterWidth;
     rect.y = y * m_surface_manager->m_characterHeight;
 
-     // Update Pixels in the Texture with the character cell.
+    // Update Pixels in the Texture with the character cell.
     m_window_manager->updateTexture(
         m_surface_manager
         ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
         ->getTexture(),
         &rect,
         m_surface_manager
-       ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
-       ->getSurface()
-    );           
+        ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+        ->getSurface()
+    );
 }
 
 /**
- * Basically Plots each Char to Texture
- * Updates super fast now!! oh yea!!
+ * @brief Setup the Cursor to Display at current position
  */
 void Renderer::renderCursorOnScreen()
 {
     SDL_Rect rect;
 
     // Check if the position has changed, if so, then skip!
-    if(m_surface_manager->m_cursorXPosition != TheSequenceParser::Instance()->x_position-1 ||
-        m_surface_manager->m_cursorYPosition != TheSequenceParser::Instance()->y_position-1)
+    if(m_cursorXPosition !=
+            m_session->m_sequence_parser->m_screen_buffer.m_x_position-1 ||
+            m_cursorYPosition !=
+            m_session->m_sequence_parser->m_screen_buffer.m_y_position-1)
     {
         return;
     }
 
-    if(!m_screenSurface || !m_cursorOnSurface)
-    {
-        SDL_Log("renderCursorOnScreen() surface error: %s",
-                SDL_GetError());
-        return;
-    }
+    // Handle to Cursor On Surface
+    SDL_Surface *surface = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_CURSOR_ON]
+                           ->getSurface();
 
-    // Size of Each Char 8x16 or 16x32
-    rect.w = m_cursorOnSurface->w;
-    rect.h = m_cursorOnSurface->h;
-    rect.x = m_cursorXPosition * m_characterWidth;
-    rect.y = m_cursorYPosition * m_characterHeight;
+    // Size of Each Character
+    rect.w = surface->w;
+    rect.h = surface->h;
+    rect.x = m_cursorXPosition * m_surface_manager->m_characterWidth;
+    rect.y = m_cursorYPosition * m_surface_manager->m_characterHeight;
 
-    if(!m_globalTexture)
-    {
-        createTexture(GLOBAL_TEXTURE, m_screenSurface);
-        if(!m_globalTexture)
-        {
-            SDL_Log("renderCursorOnScreen() SDL_CreateTexture globalTexture: %s",
-                    SDL_GetError());
-            assert(m_globalTexture);
-        }
-    }
-
-    if(SDL_UpdateTexture(m_globalTexture, &rect,
-                         m_cursorOnSurface->pixels,
-                         m_cursorOnSurface->pitch) < 0)
-    {
-        SDL_Log("renderCursorOffScreen() SDL_SetTextureBlendMode globalTexture: %s",
-                SDL_GetError());
-    }
+    // Update Pixels in the Texture with the character cell.
+    m_window_manager->updateTexture(
+        m_surface_manager
+        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->getTexture(),
+        &rect,
+        surface
+    );
 }
 
 /**
- * Basically Plots each Char to Texture
- * Updates super fast now!! oh yea!!
+ * @brief Setup the Cursor to hide at current position
  */
 void Renderer::renderCursorOffScreen()
 {
     SDL_Rect rect;
 
     // Check if the position has changed, if so, then skip!
-    if(m_cursorXPosition != TheSequenceParser::Instance()->x_position-1 ||
-            m_cursorYPosition != TheSequenceParser::Instance()->y_position-1)
+    if(m_cursorXPosition !=
+            m_session->m_sequence_parser->m_screen_buffer.m_x_position-1 ||
+            m_cursorYPosition !=
+            m_session->m_sequence_parser->m_screen_buffer.m_y_position-1)
     {
         return;
     }
 
-    if(!m_screenSurface || !m_cursorOnSurface)
-    {
-        SDL_Log("renderCursorOffScreen() surface error: %s",
-                SDL_GetError());
-        return;
-    }
+    // Handle to Cursor Off Surface
+    SDL_Surface *surface = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_CURSOR_OFF]
+                           ->getSurface();
 
-    // Size of Each Char 8x16 or 16x32
-    rect.w = m_cursorOffSurface->w;
-    rect.h = m_cursorOffSurface->h;
-    rect.x = m_cursorXPosition * m_characterWidth;
-    rect.y = m_cursorYPosition * m_characterHeight;
+    // Size of Each Character
+    rect.w = surface->w;
+    rect.h = surface->h;
+    rect.x = m_cursorXPosition * m_surface_manager->m_characterWidth;
+    rect.y = m_cursorYPosition * m_surface_manager->m_characterHeight;
 
-    if(!m_globalTexture)
-    {
-        createTexture(GLOBAL_TEXTURE, m_screenSurface);
-        if(!m_globalTexture)
-        {
-            SDL_Log("renderCursorOffScreen() SDL_CreateTexture globalTexture: %s",
-                    SDL_GetError());
-            assert(m_globalTexture);
-        }
-    }
-
-    if(SDL_UpdateTexture(m_globalTexture, &rect,
-                         m_cursorOffSurface->pixels,
-                         m_cursorOffSurface->pitch) < 0)
-    {
-        SDL_Log("renderCursorOffScreen() SDL_UpdateTexture globalTexture: %s",
-                SDL_GetError());
-    }
+    // Update Pixels in the Texture with the character cell.
+    m_window_manager->updateTexture(
+        m_surface_manager
+        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->getTexture(),
+        &rect,
+        surface
+    );
 }
 
 /**
- * Transfers the Buffer to a Texture and
- * Renders the Screen
+ * @brief Pushed the Current MAIN Texutre to the Renderer to Draw
  */
 void Renderer::drawTextureScreen()
 {
-    SDL_Rect rect;
+    /*
+    SDL_Rect pick, rect;
+
+    // Get The Actual size of the Render/Window.
     int screenWidth, screenHeight;
+    m_window_manager->renderOutputSize(screenWidth, screenHeight);
 
-    if(m_globalRenderer)
-    {
-        if(SDL_GetRendererOutputSize(m_globalRenderer,&screenWidth,&screenHeight) < 0)
-        {
-            SDL_Log("drawTextureScreen() SDL_GetRendererOutputSize globalRenderer: %s",
-                    SDL_GetError());
-        }
+    // Handle to Cursor Off Surface
+    SDL_Surface *surface = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->getSurface();
 
-        if(!m_globalTexture)
-        {
-            SDL_Log("drawTextureScreen() m_globalTexture error: %s",
-                    SDL_GetError());
-            return;
-        }
+    // Used when cliping larger screen then texture size.
+    pick.w = surface->w; //  - 40; // 680 - 640 = 40
+    pick.h = surface->h; // - 80; // 480 - 400 = 80
+    pick.x = 0;
+    pick.y = 0;
 
-        // We clip off bottom 80, so that we get proper 8x16
-        // Display without Extra pixel borders around the screen,
-        // Texture Filter results in Pixel Bleeding.
-        rect.w = m_surfaceWidth; //  - 40; // 680 - 640 = 40
-        rect.h = m_surfaceHeight; // - 80; // 480 - 400 = 80
-        rect.x = 0;
-        rect.y = 0;
+    // Destination
+    rect.w = screenWidth;
+    rect.h = screenHeight;
+    rect.x = 0;
+    rect.y = 0;*/
 
-        // Destination
-        m_displayRect.w = screenWidth;
-        m_displayRect.h = screenHeight;
-        m_displayRect.x = 0;
-        m_displayRect.y = 0;
+    // Copy Surface to Texture
+    m_window_manager->renderCopy(
+        m_surface_manager
+        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->getTexture(),
+        nullptr,
+        nullptr
+    );
 
-        if(SDL_RenderCopy(m_globalRenderer, m_globalTexture, &rect, &m_displayRect) < 0)
-        {
-            SDL_Log("drawTextureScreen() SDL_RenderCopy globalRenderer: %s",
-                    SDL_GetError());
-        }
-        SDL_RenderPresent(m_globalRenderer);
-    }
-    else
-    {
-        SDL_Log("drawTextureScreen() globalRenderer: %s",
-                SDL_GetError());
-    }
+    // Draw Out to Screen.
+    m_window_manager->renderPresent();
 }
 
 /**
- * Clears the Terminal Screen for Fresh Redraw.
- * Renders the Screen
+ * @brief Clears Renderer and Redraws Black Screen
  */
 void Renderer::clearScreen()
 {
-    if(m_globalRenderer)
-    {
-        //Clear screen
-        if(SDL_SetRenderDrawColor(m_globalRenderer, 0x00, 0x00, 0x00, 0xFF) < 0)
-        {
-            SDL_Log("clearScreen() SDL_SetRenderDrawColor globalRenderer: %s",
-                    SDL_GetError());
-        }
-        if(SDL_RenderClear(m_globalRenderer) < 0)
-        {
-            SDL_Log("clearScreen() SDL_RenderClear globalRenderer: %s",
-                    SDL_GetError());
-        }
-        SDL_RenderPresent(m_globalRenderer);
-    }
-    else
-    {
-        SDL_Log("clearScreen() globalRenderer: %s",
-                SDL_GetError());
-    }
+    m_window_manager->setRenderDrawColor(0x00, 0x00, 0x00, 0xFF);
+    m_window_manager->renderClear();
+    m_window_manager->renderPresent();
 }
 
 /**
- * Compares (2) SDL Colors to determine if they are the same
- * Without conversions.
+ * @brief Compares (2) SDL Colors to determine if they are the same
+ * @param src
+ * @param dest
+ * @return
  */
 int Renderer::compareSDL_Colors(SDL_Color &src, SDL_Color &dest)
 {
@@ -967,64 +919,64 @@ int Renderer::compareSDL_Colors(SDL_Color &src, SDL_Color &dest)
 }
 
 /**
- * Replace Foreground and Background colors per character cell by pixel.
+ * @brief Recolors FG/BG colors per character cell.
+ * @param foreground
+ * @param background
  */
-void Renderer::replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 background)
+void Renderer::replaceColor(Uint32 foreground, Uint32 background)
 {
-    if(!src)
-    {
-        SDL_Log("replaceColor() SDL_Surface error: %s",
-                SDL_GetError());
-        return;
-    }
+    SDL_Surface *surface = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_CHARACTER]
+                           ->getSurface();
 
     // Foreground/Backgroun of Original Bitmap Image for Replacement.
-    static Uint32 fgColor = SDL_MapRGB(src->format, 255, 255, 255);  // White
-    static Uint32 bgColor = SDL_MapRGB(src->format, 0,   0,   0);    // Black
+    static Uint32 fgColor = SDL_MapRGB(surface->format, 255, 255, 255);  // White
+    static Uint32 bgColor = SDL_MapRGB(surface->format, 0,   0,   0);    // Black
 
     // If color already default of bitmap, then skip changing.
     if(fgColor == foreground && bgColor == background)
-        return;
-
-    Uint8 *pixel = (Uint8 *)src->pixels;
-    if(SDL_MUSTLOCK(src))
     {
-        if(SDL_LockSurface(src) < 0)
-        {
-            SDL_Log("replaceColor() SDL_LockSurface src: %s",
-                    SDL_GetError());
-        }
+        return;
     }
 
-    int count = src->h * src->w;
+    // Get a handle to the pixels.
+    Uint8 *pixel = (Uint8 *)surface->pixels;
+    m_surface_manager->lockSurface(m_surface_manager->SURFACE_CHARACTER);
+
+    // Loop and replace foreground and Background colors.
+    int count = surface->h * surface->w;
     for(int i = 0; i < count; i++, pixel += 4)
     {
         // more background in most cases check first.
         if(*(Uint32 *) pixel == bgColor)
+        {
             *(Uint32 *) pixel = background;
-        else // if(*(Uint32 *) p == fgColor)
+        }
+        else
+        {
             *(Uint32 *) pixel = foreground;
+        }
     }
-    if(SDL_MUSTLOCK(src))
-        SDL_UnlockSurface(src);
+
+    // Unlock the Surface Pixels
+    m_surface_manager->unlockSurface(m_surface_manager->SURFACE_CHARACTER);
 }
 
 /**
- * Setup The Blinking Cursor
- * This grabs the current cell of the cursor position
- * Then builder on and off character surfaces.
+ * @brief Setup the Cursor font, character and create from underscore
+ * NOTE: this should be rewroked, can't trust all font sets!
+ * This is not the best way to handle this IMO.
  */
 void Renderer::setupCursorChar()
 {
-    if(!m_tmpSurface || !m_cachedSurface)
+    // If cursor is not active then don't waste processing.
+    if(!m_session->m_sequence_parser->isCursorActive())
     {
-        SDL_Log("setupCursorChar() m_tmpSurface error: %s",
-                SDL_GetError());
         return;
     }
 
-    m_cursorXPosition = TheSequenceParser::Instance()->x_position-1;
-    m_cursorYPosition = TheSequenceParser::Instance()->y_position-1;
+    m_cursorXPosition = m_session->m_sequence_parser->m_screen_buffer.m_x_position-1;
+    m_cursorYPosition = m_session->m_sequence_parser->m_screen_buffer.m_y_position-1;
 
     SDL_Rect pick, area;
 
@@ -1033,100 +985,97 @@ void Renderer::setupCursorChar()
 
     // Quad for Char Cell in Bitmap
     // 32 Cols by 8 Rows.
-    pick.x = (asciicode % 32) * m_characterWidth;
-    pick.y = round(asciicode / 32) * m_characterHeight;
-    pick.w = m_characterWidth;
-    pick.h = m_characterHeight;
+    pick.x = (asciicode % 32) * m_surface_manager->m_characterWidth;
+    pick.y = round(asciicode / 32) * m_surface_manager->m_characterHeight;
+    pick.w = m_surface_manager->m_characterWidth;
+    pick.h = m_surface_manager->m_characterHeight;
 
     // Quad for Char Cell to Map to Screen
-    area.x = m_cursorXPosition * m_characterWidth;
-    area.y = m_cursorYPosition * m_characterHeight;
-    area.w = m_characterWidth;
-    area.h = m_characterHeight;
+    area.x = m_cursorXPosition * m_surface_manager->m_characterWidth;
+    area.y = m_cursorYPosition * m_surface_manager->m_characterHeight;
+    area.w = m_surface_manager->m_characterWidth;
+    area.h = m_surface_manager->m_characterHeight;
+
+    // Handles to Surfaces, when using more than once per method.
+    SDL_Surface *surfaceFont = m_surface_manager
+                               ->m_surfaceList[m_surface_manager->SURFACE_FONT]
+                               ->getSurface();
+
+    SDL_Surface *surfaceMain = m_surface_manager
+                               ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                               ->getSurface();
+
+    SDL_Surface *surfaceCharacter = m_surface_manager
+                                    ->m_surfaceList[m_surface_manager->SURFACE_CHARACTER]
+                                    ->getSurface();
+
+    SDL_Surface *surfaceOn = m_surface_manager
+                             ->m_surfaceList[m_surface_manager->SURFACE_CURSOR_ON]
+                             ->getSurface();
+
+    SDL_Surface *surfaceOff = m_surface_manager
+                              ->m_surfaceList[m_surface_manager->SURFACE_CURSOR_OFF]
+                              ->getSurface();
 
     // Clear Surfaces
-    fillSurface(m_tmpSurface);
-    fillSurface(m_cursorOffSurface);
-    fillSurface(m_cursorOnSurface);
+    m_surface_manager->clearSurface(m_surface_manager->SURFACE_CHARACTER);
+    m_surface_manager->clearSurface(m_surface_manager->SURFACE_CURSOR_ON);
+    m_surface_manager->clearSurface(m_surface_manager->SURFACE_CURSOR_OFF);
 
     //First Grab Underscore from Font Surface
-    if(SDL_BlitSurface(m_cachedSurface, &pick, m_tmpSurface, nullptr) < 0)
+    if(SDL_BlitSurface(surfaceFont, &pick, surfaceCharacter, nullptr) < 0)
     {
-        SDL_Log("setupCursorChar() SDL_BlitSurface tmpSurface: %s",
-                SDL_GetError());
-    }
-
-    if(!m_screenSurface)
-    {
-        SDL_Log("setupCursorChar() m_screenSurface error: %s",
-                SDL_GetError());
-        return;
+        SDL_Log("setupCursorChar() SURFACE_CHARACTER: %s", SDL_GetError());
     }
 
     // Grab current Char Block where Cursor position is at on screen
-    if(SDL_BlitSurface(m_screenSurface, &area, m_cursorOnSurface, nullptr) < 0)
+    if(SDL_BlitSurface(surfaceMain, &area, surfaceOn, nullptr) < 0)
     {
-        SDL_Log("setupCursorChar() SDL_BlitSurface cursorOnSurface: %s",
-                SDL_GetError());
+        SDL_Log("setupCursorChar() SURFACE_CURSOR_ON: %s", SDL_GetError());
     }
 
     // Grab current Char Block where Passed Cursor position is.
-    if(SDL_BlitSurface(m_screenSurface, &area, m_cursorOffSurface, nullptr) < 0)
+    if(SDL_BlitSurface(surfaceMain, &area, surfaceOff, nullptr) < 0)
     {
-        SDL_Log("setupCursorChar() SDL_BlitSurface cursorOffSurface: %s",
-                SDL_GetError());
+        SDL_Log("setupCursorChar() SURFACE_CURSOR_OFF: %s", SDL_GetError());
     }
 
     // We'll Copy over the Underscore and overall it on the cursor on
-    int bpp = m_screenSurface->format->BytesPerPixel;
-    Uint8 *pixelTemp = (Uint8 *)m_tmpSurface->pixels;
-    Uint8 *pixelNew  = (Uint8 *)m_cursorOnSurface->pixels;
+    int bpp = surfaceMain->format->BytesPerPixel;
+    Uint8 *pixelTemp = (Uint8 *)surfaceCharacter->pixels;
+    Uint8 *pixelNew  = (Uint8 *)surfaceOn->pixels;
 
     // Transpose the underscore character to the same
     // Character cell as the current x/y position were at.
-
-    //std::cout << "show currentFont: " << currentFont << std::endl;
-
-    if(m_currentFont == "vga8x16.bmp")
+    if(m_surface_manager->m_currentFont == "vga8x16.bmp")
     {
         //std::cout << "current font VGA" << std::endl;
         // VGA font starts higher
-        pixelTemp += (13 * m_tmpSurface->w)      * bpp;
-        pixelNew  += (15 * m_cursorOnSurface->w) * bpp;
+        pixelTemp += (13 * surfaceCharacter->w) * bpp;
+        pixelNew  += (15 * surfaceOn->w) * bpp;
     }
     else
     {
         //std::cout << "current font NOT VGA" << std::endl;
         // Amiga fonts already at bottom of cell.
-        pixelTemp += (15 * m_tmpSurface->w)      * bpp;
-        pixelNew  += (15 * m_cursorOnSurface->w) * bpp;
+        pixelTemp += (15 * surfaceCharacter->w) * bpp;
+        pixelNew  += (15 * surfaceOn->w) * bpp;
     }
 
-    if(SDL_MUSTLOCK(m_cursorOnSurface))
-    {
-        if(SDL_LockSurface(m_cursorOnSurface) < 0)
-        {
-            SDL_Log("setupCursorChar() SDL_LockSurface(cursorOnSurface): %s", SDL_GetError());
-        }
-    }
+    // Copy (2) Rows of Pixels from underscore for the Cursor
+    m_surface_manager->lockSurface(m_surface_manager->SURFACE_CURSOR_ON);
+    memcpy(pixelNew, pixelTemp, (surfaceCharacter->w * 2) * bpp);
+    m_surface_manager->unlockSurface(m_surface_manager->SURFACE_CURSOR_ON);
 
-    // Copy (2) Rows of Pixels for the Cursor
-    // from TmpSurface to CursorOn Surface.
-    memcpy(pixelNew, pixelTemp, (m_tmpSurface->w * 2) * bpp);
-
-    if(SDL_MUSTLOCK(m_cursorOnSurface))
-        SDL_UnlockSurface(m_cursorOnSurface);
-
-    // Render the initial cursor only if it's exposed!
-    if(TheSequenceParser::Instance()->isCursorActive())
-    {
-        TheRenderer::Instance()->renderCursorOnScreen();
-        TheRenderer::Instance()->drawTextureScreen();
-    }
+    renderCursorOnScreen();
+    drawTextureScreen();
 }
 
 /**
- * Draws a Char Cell to x/y location on screen surface.
+ * @brief Draws/Recolors a Char Cell to x/y location on screen surface.
+ * @param X
+ * @param Y
+ * @param asciicode
  */
 void Renderer::drawChar(int X, int Y, int asciicode)
 {
@@ -1134,47 +1083,50 @@ void Renderer::drawChar(int X, int Y, int asciicode)
 
     // Quad for Char Cell in Bitmap
     // 32 Cols by 8 Rows.
-    pick.x = (asciicode % 32) * m_characterWidth;
-    pick.y = round(asciicode / 32) * m_characterHeight;
-    pick.w = m_characterWidth;
-    pick.h = m_characterHeight;
+    pick.x = (asciicode % 32) * m_surface_manager->m_characterWidth;
+    pick.y = round(asciicode / 32) * m_surface_manager->m_characterHeight;
+    pick.w = m_surface_manager->m_characterWidth;
+    pick.h = m_surface_manager->m_characterHeight;
 
     // Quad for Char Cell to Map to Screen
-    area.x = X * m_characterWidth;
-    area.y = Y * m_characterHeight;
-    area.w = m_characterWidth;
-    area.h = m_characterHeight;
+    area.x = X * m_surface_manager->m_characterWidth;
+    area.y = Y * m_surface_manager->m_characterHeight;
+    area.w = m_surface_manager->m_characterWidth;
+    area.h = m_surface_manager->m_characterHeight;
 
-    if(!m_tmpSurface)
-    {
-        SDL_Log("drawChar() m_tmpSurface error: %s",
-                SDL_GetError());
+    SDL_Surface *surface = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_CHARACTER]
+                           ->getSurface();
 
-        // Create it, shouldn't be free!
-        createSurface(TEMP_SURFACE);
-        return;
-    }
+    m_surface_manager->clearSurface(m_surface_manager->SURFACE_CHARACTER);
 
-    // Clear Temp Surface before blitting it.
-    if(SDL_FillRect(m_tmpSurface, nullptr, SDL_MapRGBA(m_tmpSurface->format, 0, 0, 0, 0)) < 0)
-    {
-        SDL_Log("drawChar() SDL_FillRect tmpSurface: %s", SDL_GetError());
-    }
-
-    if(SDL_BlitSurface(m_cachedSurface,&pick,m_tmpSurface,nullptr) < 0)
+    // Copy from font surface to character surface.
+    if(SDL_BlitSurface(
+                m_surface_manager
+                ->m_surfaceList[m_surface_manager->SURFACE_FONT]
+                ->getSurface()
+                ,&pick,
+                surface,
+                nullptr) < 0)
     {
         SDL_Log("drawChar() SDL_BlitSurface tmpSurface: %s", SDL_GetError());
     }
 
-    replaceColor(m_tmpSurface,
-                 SDL_MapRGB(m_tmpSurface->format, m_currentFGColor.r,
-                            m_currentFGColor.g, m_currentFGColor.b),
-                 SDL_MapRGB(m_tmpSurface->format, m_currentBGColor.r,
-                            m_currentBGColor.g, m_currentBGColor.b));
+    // Replace the Character Cell Color
+    replaceColor(
+        SDL_MapRGB(surface->format, m_currentFGColor.r,
+                   m_currentFGColor.g, m_currentFGColor.b),
+        SDL_MapRGB(surface->format, m_currentBGColor.r,
+                   m_currentBGColor.g, m_currentBGColor.b));
 
     // Write to Back Buffer for Scrolling the Screen.
-    if(SDL_BlitSurface(m_tmpSurface, nullptr,
-                       m_screenSurface, &area) < 0)
+    if(SDL_BlitSurface(
+                surface,
+                nullptr,
+                m_surface_manager
+                ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                ->getSurface(),
+                &area) < 0)
     {
         SDL_Log("drawChar() SDL_BlitSurface screenSurface: %s", SDL_GetError());
     }

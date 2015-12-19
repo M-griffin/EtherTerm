@@ -1,4 +1,15 @@
-    
+
+Change Log 3.0.11 - 2015-12-19
+    - Complete initial rework of Renderer class, along with
+      The ScreenBuffer and PixelScreen Structs.  
+    - NOTES: SetupCursorSurface() in renderer should be redone eventually
+      to not use the underscore from the current font set since it can be 
+      in different positions it's not ideal.  Should create a custom char
+      for this eventually.
+    - NOTES: Showing the blinking cursor is disabled at this time, get back
+      to this once we have everything going again.
+    - Next Items are the Data decoder, Input Data Queue, and Dialing Directory.
+
 Change Log 3.0.10 - 2015-12-17 / 18
     - More rework on the renderer class and the following.
     - Added in SequenceParser Class which uses the renderer.

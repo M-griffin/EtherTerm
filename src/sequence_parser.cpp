@@ -49,7 +49,7 @@ SequenceParser::~SequenceParser()
  * @brief Sending Socket Replies to the Client
  * @param msg
  */
-void deliver(std::string msg)
+void SequenceParser::deliver(std::string msg)
 {
     if(msg.size() == 0)
         return;

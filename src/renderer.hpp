@@ -207,18 +207,58 @@ public:
      */
     void renderCharScreen(int x, int y);
 
-
+    /**
+     * @brief Setup the Cursor to Display at current position
+     */
     void renderCursorOnScreen();
-    void renderCursorOffScreen();
-    void drawTextureScreen();
-    void clearScreen();
-    int  compareSDL_Colors(SDL_Color &src, SDL_Color &dest);
-    void replaceColor(SDL_Surface *src, Uint32 foreground, Uint32 background);
-    void setupCursorChar();
-    void drawChar(int X, int Y, int asciicode);//void drawString(int X, int Y, char text[]);
-    //void drawCharSet(int X, int Y);
 
-    
+    /**
+     * @brief Setup the Cursor to hide at current position
+     */
+    void renderCursorOffScreen();
+
+    /**
+     * @brief Pushed the Current MAIN Texutre to the Renderer to Draw
+     */
+    void drawTextureScreen();
+
+    /**
+     * @brief Clears Renderer and Redraws Black Screen
+     */
+    void clearScreen();
+
+    /**
+     * @brief Compares (2) SDL Colors to determine if they are the same
+     * @param src
+     * @param dest
+     * @return
+     */
+    int  compareSDL_Colors(SDL_Color &src, SDL_Color &dest);
+
+    /**
+     * @brief Recolors FG/BG colors per character cell.
+     * @param foreground
+     * @param background
+     */
+    void replaceColor(Uint32 foreground, Uint32 background);
+
+    /**
+     * @brief Setup the Cursor font, character and create from underscore
+     * NOTE: this should be rewroked, can't trust all font sets!
+     * This is not the best way to handle this IMO.
+     */
+    void setupCursorChar();
+
+    /**
+     * @brief Draws/Recolors a Char Cell to x/y location on screen surface.
+     * @param X
+     * @param Y
+     * @param asciicode
+     */
+    void drawChar(int X, int Y, int asciicode);//void drawString(int X, int Y, char text[]);
+
+    // Testing only, draws bitmap graphic.
+    //void drawCharSet(int X, int Y);
 
 };
 

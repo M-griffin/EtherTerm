@@ -25,14 +25,14 @@ class ScreenPixel
 {
 public:
 
-    // Default for Object Creation
+    // Default for Object Creation Reused!
     ScreenPixel()
         : m_characterSequence()
         , m_foreground( {255, 255, 255, 0})
         , m_background( {0, 0, 0, 0})
     { }
 
-    // Passed for Inserts
+    // Not used at this time!
     ScreenPixel(std::string sequence, SDL_Color fg, SDL_Color bg)
         : m_characterSequence(sequence)
         , m_foreground(fg)
@@ -49,7 +49,6 @@ public:
     SDL_Color m_background;
 };
 
-typedef boost::shared_ptr<ScreenPixel> pixel_ptr;
 
 /**
  * @class ScreenBuffer
@@ -75,15 +74,47 @@ public:
     ScreenPixel m_sequenceBuffer;
     std::vector<ScreenPixel> m_screenBuffer;
 
-    // Function for populating the Screen Buffer
+    /**
+     * @brief handle screen buffer, Keeps track of all screen data
+     * @param mySequence
+     * @param fg_color
+     * @param bg_color
+     */
     void setScreenBuffer(unsigned char mySequence,
                          SDL_Color fg_color,
                          SDL_Color bg_color);
 
+    /**
+     * @brief Scrolls the Screen Buffer Up a line to match the internal SDL_Surface
+     */
     void scrollScreenBuffer();
+
+    /**
+     * @brief Clear Range of Screen Buffer for Erase Sequences.
+     * @param start
+     * @param end
+     */
     void clearScreenBufferRange(int start, int end);
+
+    /**
+     * @brief Clears all data in the buffer.
+     */
     void clearScreenBuffer();
+
+    /**
+     * @brief Testing, Prints screen butter to console.
+     */
     void getScreenBufferText();
+
+    /**
+     * @brief Gets Coordinates from the screen already translated to
+     * Screen Buffer Positions, Now we pull the position and throw the
+     * Text data into the Clipboard.
+     * @param startx
+     * @param starty
+     * @param numChar
+     * @param numRows
+     */
     void bufferToClipboard(int startx, int starty, int numChar, int numRows);
 
 };

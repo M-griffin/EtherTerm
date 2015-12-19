@@ -51,6 +51,8 @@ public:
         , m_session_list(sessions)
     {
 
+        // NOTES Reallocate by using reset! When rending Term Height/Width Change, need to recrete.
+        // m_sequence_parser.reset(new SequenceParser(m_renderer, connection));
     }
 
     ~Session();
@@ -116,8 +118,11 @@ public:
             std::cout << "async_write error: " << error.message() << std::endl;
             std::cout << "Session Closed()" << std::endl;
 
-            m_connection->socket().shutdown(tcp::socket::shutdown_both);
-            m_connection->socket().close();
+            if (m_connection->is_open())
+            {
+                m_connection->socket().shutdown(tcp::socket::shutdown_both);
+                m_connection->socket().close();
+            }
         }
     }
 

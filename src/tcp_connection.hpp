@@ -20,6 +20,14 @@ public:
         : m_socket(io_service)
     {
     }
+    ~tcp_connection()
+    {
+        if (m_socket.is_open())
+        {
+            m_socket.shutdown(tcp::socket::shutdown_both);
+            m_socket.close();
+        }
+    }
 
     bool is_open()
     {
