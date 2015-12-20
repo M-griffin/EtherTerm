@@ -4,9 +4,12 @@
 #include "window_manager.hpp"
 #include "surface_manager.hpp"
 #include "sequence_parser.hpp"
+#include "sequence_decoder.hpp"
 #include "renderer.hpp"
 #include "input_handler.hpp"
 #include "tcp_connection.hpp"
+#include "safe_queue.hpp"
+#include "message_queue.hpp"
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -45,6 +48,7 @@ public:
         , m_input_handler(new InputHandler(m_surface_manager))
         , m_renderer(new Renderer(m_surface_manager, m_window_manager, m_input_handler, shared_from_this()))
         , m_sequence_parser(new SequenceParser(m_renderer, connection))
+        , m_sequence_decoder(new SequenceDecoder(shared_from_this()))
         , m_connection(connection)
         , m_io_service(io_service)
         , m_session_list(sessions)
@@ -155,13 +159,16 @@ public:
     sequence_parser_ptr      m_sequence_parser;
 
     // Decodes incoming data and ESC sequences into arrays for the ansi parser
-//    data_decorder_ptr      m_data_decorder;
+    sequence_decoder_ptr     m_sequence_decoder;
 
     // Socket_Manager handles sockets and incomming data from the server.
     connection_ptr           m_connection;
 
     // Place Holder if we need it lateron
     boost::asio::io_service& m_io_service;
+
+    // Decoded Data Queue for Sequence Parser.
+    SafeQueue<MessageQueue>  m_data_queue;
 
     // Handle to session pointers so we can pop our own session off the stack
     std::set<session_ptr>&   m_session_list;

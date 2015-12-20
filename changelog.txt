@@ -1,6 +1,13 @@
 
+Change Log 3.0.13 - 2015-12-20
+    - Added MessageQueue for storing text/esc sequences.
+    - Added SequenceDecoder for Parameterizing incoming data and ESC Sequences
+    - Added SafeQueue for storing array of processed sequences and text data.    
+    - Worked initial SafeQueue into Session instance.
+    - Reworked and normalized variables and classes for newly added files.
+
 Change Log 3.0.12 - 2015-12-20
-	 - Code cleanup and variable normalization.
+     - Code cleanup and variable normalization.
 
 Change Log 3.0.11 - 2015-12-19
     - Complete initial rework of Renderer class, along with

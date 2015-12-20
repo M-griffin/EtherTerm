@@ -38,6 +38,10 @@
     <File Name="src/sequence_parser.hpp"/>
     <File Name="src/screen_buffer.cpp"/>
     <File Name="src/screen_buffer.hpp"/>
+    <File Name="src/sequence_decoder.cpp"/>
+    <File Name="src/sequence_decoder.hpp"/>
+    <File Name="src/safe_queue.hpp"/>
+    <File Name="src/message_queue.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
