@@ -15,7 +15,6 @@
 #include <boost/asio.hpp>
 #include <boost/asio/io_service.hpp>
 
-
 // For IO service!
 #include <thread>
 #include <deque>

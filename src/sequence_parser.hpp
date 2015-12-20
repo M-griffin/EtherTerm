@@ -44,7 +44,6 @@ public:
     ScreenBuffer   m_screen_buffer;
 
     const  char ESC   = '\x1b';
-
     #define MAX_PARAMS  10
 
         // Control Sequence Terminators
@@ -59,7 +58,6 @@ public:
 
     #define ERASE_DISPLAY         'J'   // 2J
     #define ERASE_TO_EOL          'K'
-
     #define DELETE_CHARACTER      'P'   // Erase Character(2)
 
     #define REPEAT_CHARACTER      'b'   // Repeat preceding character
@@ -81,9 +79,6 @@ public:
     ESC [ 25 h     Show text cursor.
     ESC [ 25 l     Hide text cursor.
     */
-
-    // Handles Character Repeats.
-    unsigned char preceedingSequence;
 
     // Text attributes
     enum
@@ -123,49 +118,78 @@ public:
      */
     void deliver(std::string msg);
 
-    // Reset Static Variables values for the class
+    /**
+     * @brief Reset AnsiParser Specific Class Attributes
+     */
     void reset();
 
-    // Parses Straight Text input with no control sequences
+    /**
+     * @brief Handles parsing Text and formatting to the screen buffer
+     * @param buffer
+     */
     void textInput(const std::string &buffer);
 
-    // Parses Control sequences passed in vector. (sequenceParser)
+    /**
+     * @brief Handle Screen Position and Display Erase
+     */
     void sequenceCursorAndDisplay();
+
+    /**
+     * @brief Handle Switching Modes and Colors
+     */
     void sequenceGraphicsModeDisplay();
+
+    /**
+     * @brief Handle Mode Resets and Responses to Server
+     */
     void sequenceResetAndResponses();
 
-    // Handles parameterized ESC Sequences.
+    /**
+     * @brief Handles parsing Control Sequences and formatting the screen buffer
+     * @param sequenceParameters
+     */
     void sequenceInput(std::vector<int> &sequenceParameters);
 
+    /**
+     * @brief Checks if the Cursor is Shown
+     * @return
+     */
     bool isCursorActive()
     {
-        return isCursorShown;
+        return m_is_cursor_shown;
     }
+
+    /**
+     * @brief Sets the Cursor Active or Inactive.
+     * @param active
+     */
     void setCursorActive(bool active)
     {
-        isCursorShown = active;
+        m_is_cursor_shown = active;
     }
 
 private:
 
-    std::vector<int> parameters;
-    std::string current_color;
-    std::string textBuffer;
+    // Handles Character Repeats.
+    unsigned char    m_preceeding_sequence;
+    std::vector<int> m_parameters;
+    std::string      m_current_color;
+    std::string      m_text_buffer;
 
-    int max_x_position;
-    int saved_cursor_x;
-    int saved_cursor_y;
-    int saved_attribute;
-    int saved_prev_attr;
-    int color_attribute;
-    int prev_color_attribute;
+    int m_max_x_position;
+    int m_saved_cursor_x;
+    int m_saved_cursor_y;
+    int m_saved_attribute;
+    int m_saved_prev_attr;
+    int m_color_attribute;
+    int m_prev_color_attribute;
 
-    bool line_wrapped;
-    bool cleared_the_screen;
-    bool isCursorShown;
+    bool m_is_line_wrapped;
+    bool m_is_cleared_the_screen;
+    bool m_is_cursor_shown;
 
-    SDL_Color savedForegroundColor;
-    SDL_Color savedBackgroundColor;
+    SDL_Color m_saved_fg_color;
+    SDL_Color m_saved_bg_color;
 
 };
 

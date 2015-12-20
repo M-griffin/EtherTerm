@@ -48,16 +48,16 @@ Renderer::Renderer(surface_manager_ptr surface,
     , LIGHT_MAGENTA( { 255,  87, 255,   0 })
     , YELLOW( { 255, 255,  87,   0 })
     , WHITE( { 255, 255, 255,   0 })
-    , m_currentFGColor(GREY)
-    , m_currentBGColor(BLACK)
-    , m_termWidth(80)
-    , m_termHeight(25)
-    , m_scrollRegionActive(false)
-    , m_topMargin(0)
-    , m_bottomMargin(0)
-    , m_cursorXPosition(0)
-    , m_cursorYPosition(0)
-    , m_isUTF8Output(false)
+    , m_current_fg_color(GREY)
+    , m_current_bg_color(BLACK)
+    , m_term_width(80)
+    , m_term_height(25)
+    , m_is_scroll_region_active(false)
+    , m_top_margin(0)
+    , m_bottom_margin(0)
+    , m_cursor_x_position(0)
+    , m_cursor_y_position(0)
+    , m_is_utf8_output(false)
 {
     // Startup Surface and Texture Creation
     initSurfaceTextures();
@@ -127,7 +127,7 @@ void Renderer::initSurfaceTextures()
 void Renderer::calcBoxSize(SDL_Rect &rect,
                            int sourceX, int sourceY,
                            int x, int y,
-                           double charWidth, double charHeight)
+                           double char_width, double char_height)
 {
     // This is the source position that we Xy     = Source
     //                                      []
@@ -144,23 +144,23 @@ void Renderer::calcBoxSize(SDL_Rect &rect,
     if(sourceX < x)
     {
         // TOP Stationary -> Right ->> OK!
-        rect.x = floor((double)sourceX / charWidth) * charWidth;
+        rect.x = floor((double)sourceX / char_width) * char_width;
     }
     else
     {
         // Top -> Left ->> OK!
-        rect.x = floor((double)x / charWidth) * charWidth;
+        rect.x = floor((double)x / char_width) * char_width;
     }
 
     if(sourceY < y)
     {
         // Top Stationary ->> OK!
-        rect.y = floor((double)sourceY / charHeight) * charHeight;
+        rect.y = floor((double)sourceY / char_height) * char_height;
     }
     else
     {
         // Top -> Up ->> OK!
-        rect.y = floor((double)y / charHeight) * charHeight;
+        rect.y = floor((double)y / char_height) * char_height;
     }
 
     // Width and height are calcuated by the different from motion to source
@@ -172,31 +172,31 @@ void Renderer::calcBoxSize(SDL_Rect &rect,
     if(sourceX < x)
     {
         // Bottom Width RIGHT ->> OK!
-        rect.w = charWidth + (floor((double)x / charWidth) * charWidth) -  rect.x ;
+        rect.w = char_width + (floor((double)x / char_width) * char_width) -  rect.x ;
     }
     else
     {
         // Bottom Stationary ->> OK!
-        rect.w = charWidth + (floor((double)sourceX / charWidth) * charWidth) - rect.x; // back
+        rect.w = char_width + (floor((double)sourceX / char_width) * char_width) - rect.x; // back
     }
     if(sourceY < y)
     {
         // Bottom -> Down ->> OK!
-        rect.h = charHeight + (floor((double)y / charHeight) * charHeight) - rect.y;
+        rect.h = char_height + (floor((double)y / char_height) * char_height) - rect.y;
     }
     else
     {
         // Bottom -> Stationary ->> OK!
-        rect.h = charHeight + (floor((double)sourceY / charHeight) * charHeight) - rect.y; // back
+        rect.h = char_height + (floor((double)sourceY / char_height) * char_height) - rect.y; // back
     }
 
     // If were inbetween lines, Height = 0, then add char Height to the bottom
     // So we always have a row!
     if(rect.h == 0)
-        rect.h += round(charHeight);
+        rect.h += round(char_height);
 
     if(rect.w == 0)
-        rect.w += round(charWidth);
+        rect.w += round(char_width);
 }
 
 /**
@@ -206,19 +206,19 @@ void Renderer::calcBoxSize(SDL_Rect &rect,
  */
 void Renderer::pullSelectionBuffer(int x, int y)
 {
-    int screenWidth, screenHeight;
-    m_window_manager->renderOutputSize(screenWidth, screenHeight);
+    int screen_width, screen_height;
+    m_window_manager->renderOutputSize(screen_width, screen_height);
 
     // We need to Translate the Screen Width vs Rows and Width to
     // get actual the grid size of the Characters to snap everything correctly.
-    double charWidth, charHeight;
+    double char_width, char_height;
     double value;
 
-    value = (double)screenHeight / (double)m_termHeight;
-    charHeight = value; //round(abs(value));
+    value = (double)screen_height / (double)m_term_height;
+    char_height = value; //round(abs(value));
 
-    value = (double)screenWidth / (double)m_termWidth;
-    charWidth = value; //round(abs(value));
+    value = (double)screen_width / (double)m_term_width;
+    char_width = value; //round(abs(value));
 
     // First we need to convert the current Screen size to 640x400
     // So we can calcuate the actual pixel size of each resized character cell.
@@ -232,19 +232,19 @@ void Renderer::pullSelectionBuffer(int x, int y)
     int sourceY = m_input_handler->getMouseSourceYPosition();
 
     // Calcuate the Box Dimensions
-    calcBoxSize(rect, sourceX, sourceY, x, y, charWidth, charHeight);
+    calcBoxSize(rect, sourceX, sourceY, x, y, char_width, char_height);
 
     // Now that we have the excat coordinates of the selected text.
     // We need to translate this to the screenbuffer positions
     // So that we can grab the text that was selected on the screen.
 
     // Get Starting Position
-    int startColumn = rect.x / charWidth;
-    int startRow    = rect.y / charHeight;
+    int startColumn = rect.x / char_width;
+    int startRow    = rect.y / char_height;
     // Now figure out how many character per row
-    int length      = rect.w / charWidth;
+    int length      = rect.w / char_width;
     // Now figure out how many rows of character to pull
-    int numberRows  = rect.h / charHeight;
+    int numberRows  = rect.h / char_height;
 
     // Use coords to pull screen text directly from screen buffer.
     /*
@@ -274,7 +274,7 @@ void Renderer::renderSelectionScreen(int x, int y)
 {
     // Redraw screen so we don't increase lighting intensitity
     // As the selection keeps redrawing!  Cool effect though!!
-    SDL_Rect rectorig;
+    SDL_Rect rect_source, rect_dest;
 
     // Get Handles to Surface and Textures
     SDL_Surface *surface = m_surface_manager
@@ -286,29 +286,29 @@ void Renderer::renderSelectionScreen(int x, int y)
                            ->getTexture();
 
     // Get The Actual size of the Render/Window.
-    int screenWidth, screenHeight;
-    m_window_manager->renderOutputSize(screenWidth, screenHeight);
+    int screen_width, screen_height;
+    m_window_manager->renderOutputSize(screen_width, screen_height);
 
     // We clip off botom 80, so that we get proper 8x16
     // Display without Extra pixel borders around the screen,
     // Texture Filter results in Pixel Bleeding.
-    rectorig.w = surface->w; // - 40; // 680 - 640 = 40
-    rectorig.h = surface->h; // - 80; // 480 - 400 = 80
-    rectorig.x = 0;
-    rectorig.y = 0;
+    rect_source.w = surface->w; // - 40; // 680 - 640 = 40
+    rect_source.h = surface->h; // - 80; // 480 - 400 = 80
+    rect_source.x = 0;
+    rect_source.y = 0;
 
     // Destination
-    m_displayRect.w = screenWidth;
-    m_displayRect.h = screenHeight;
-    m_displayRect.x = 0;
-    m_displayRect.y = 0;
+    rect_dest.w = screen_width;
+    rect_dest.h = screen_height;
+    rect_dest.x = 0;
+    rect_dest.y = 0;
 
     // Redraw the screen between selection changes so we have nothing left
     // from previous coordinates.
     m_window_manager->renderCopy(
         texture,
-        &rectorig,
-        &m_displayRect
+        &rect_source,
+        &rect_dest
     );
 
     // Next create a texture to overlay for highlighting
@@ -339,12 +339,12 @@ void Renderer::renderSelectionScreen(int x, int y)
 
     // We need to Translate the Screen Width vs Rows and Width to
     // get actual the grid size of the Characters to snap everything correctly.
-    double charWidth, charHeight, value;
+    double char_width, char_height, value;
 
-    value = (double)screenHeight / double(m_termHeight);
-    charHeight = value;
-    value = (double)screenWidth / double(m_termWidth);
-    charWidth = value;
+    value = (double)screen_height / double(m_term_height);
+    char_height = value;
+    value = (double)screen_width / double(m_term_width);
+    char_width = value;
 
     // First we need to convert the current Screen size to 640x400
     // So we can calcuate the actual pixel size of each resized character cell.
@@ -353,7 +353,7 @@ void Renderer::renderSelectionScreen(int x, int y)
     int sourceY = m_input_handler->getMouseSourceYPosition();
 
     // Calculate the Boxsize for drawing, fill rect!
-    calcBoxSize(rect, sourceX, sourceY, x, y, charWidth, charHeight);
+    calcBoxSize(rect, sourceX, sourceY, x, y, char_width, char_height);
 
     // Draw First Highlight Overlay
     m_window_manager->renderCopy(
@@ -384,34 +384,34 @@ void Renderer::renderSelectionScreen(int x, int y)
 /**
  * @Brief Overrides the Scrolling region of the screen
  */
-void Renderer::setScrollRegion(int top, int bot, int terminalHeight)
+void Renderer::setScrollRegion(int top, int bot, int term_height)
 {
     // If Region is larger then the Terminal,
     // Ignore it!
-    if(top == 1 && bot >= terminalHeight)
+    if(top == 1 && bot >= term_height)
     {
-        m_scrollRegionActive = false;
+        m_is_scroll_region_active = false;
         return;
     }
     // 0,0 is reset.
     if(top == 0 && bot == 0)
     {
-        m_scrollRegionActive = false;
+        m_is_scroll_region_active = false;
         return;
     }
     else
     {
         // Make sure Bottom Region
         // Is the same as our terminal length.
-        if(bot > terminalHeight)
+        if(bot > term_height)
         {
-            bot = terminalHeight;
+            bot = term_height;
         }
-        m_scrollRegionActive = true;
+        m_is_scroll_region_active = true;
     }
     // Set Scrolling Margins
-    m_topMargin = top;
-    m_bottomMargin = bot;
+    m_top_margin = top;
+    m_bottom_margin = bot;
 }
 
 /**
@@ -423,7 +423,7 @@ void Renderer::scrollRegionUp()
 
     // Clear Out last line after Scrolling up.
     area.x = 0;
-    area.y = m_surface_manager->m_characterHeight * (m_bottomMargin-1);
+    area.y = m_surface_manager->m_characterHeight * (m_bottom_margin-1);
     area.w = m_surface_manager->m_surfaceWidth;
     area.h = m_surface_manager->m_characterHeight;
 
@@ -437,10 +437,10 @@ void Renderer::scrollRegionUp()
     Uint8 *pixelTopPos = (Uint8 *)surface->pixels;
 
     // Move position to start
-    pixelTopPos += surface->w * (m_surface_manager->m_characterHeight * (m_topMargin -1)) * bpp;
+    pixelTopPos += surface->w * (m_surface_manager->m_characterHeight * (m_top_margin -1)) * bpp;
 
     // Start from One line below the Top Margin.
-    pixelNewPos += surface->w * (m_surface_manager->m_characterHeight * m_topMargin) * bpp;
+    pixelNewPos += surface->w * (m_surface_manager->m_characterHeight * m_top_margin) * bpp;
 
     // Lock the Surface to Modify Pixels
     m_surface_manager->lockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
@@ -449,7 +449,7 @@ void Renderer::scrollRegionUp()
     memmove(
         pixelTopPos,
         pixelNewPos,
-        (surface->w * (m_surface_manager->m_characterHeight * (m_bottomMargin - m_topMargin))) * bpp);
+        (surface->w * (m_surface_manager->m_characterHeight * (m_bottom_margin - m_top_margin))) * bpp);
 
     // Unlock when modification is done.
     m_surface_manager->unlockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
@@ -474,7 +474,7 @@ void Renderer::scrollRegionUp()
 void Renderer::scrollScreenUp()
 {
     // Check for Active Scrolling Region
-    if(m_scrollRegionActive)
+    if(m_is_scroll_region_active)
     {
         scrollRegionUp();
         return;
@@ -528,7 +528,7 @@ void Renderer::clearScreenSurface()
     m_surface_manager->fillSurfaceColor(
         m_surface_manager->SURFACE_MAIN_SCREEN,
         nullptr,
-        &m_currentBGColor
+        &m_current_bg_color
     );
 
     // Update the Texture Pixels
@@ -554,16 +554,16 @@ void Renderer::clearScreenSurface()
 void Renderer::renderClearLineScreen(int y, int start, int end)
 {
     // Save Background Color so we can switch back to it.
-    SDL_Color originalGB = m_currentBGColor;
-    m_currentBGColor = BLACK;
+    SDL_Color originalGB = m_current_bg_color;
+    m_current_bg_color = BLACK;
 
     // Clear out entire line.
     for(int i = start; i < end; i++)
     {
-        drawChar(i, y, 32); // 32 Space Character
+        drawCharacterCell(i, y, 32); // 32 Space Character
         renderCharScreen(i, y);
     }
-    m_currentBGColor = originalGB;
+    m_current_bg_color = originalGB;
 }
 
 /**
@@ -574,8 +574,8 @@ void Renderer::renderClearLineScreen(int y, int start, int end)
 void Renderer::renderClearLineAboveScreen(int y, int x)
 {
     // Save Background Color so we can switch back to it.
-    SDL_Color originalGB = m_currentBGColor;
-    m_currentBGColor = BLACK;
+    SDL_Color originalGB = m_current_bg_color;
+    m_current_bg_color = BLACK;
 
     // Clear out entire lines Up The Screen the screen.
     // Fix with term variables lateron.
@@ -585,13 +585,13 @@ void Renderer::renderClearLineAboveScreen(int y, int x)
         for(int i = startPosition; (i+1) > 0; i--)
         {
             // x;y ' '
-            drawChar(i, j, 32); // 32 space character
+            drawCharacterCell(i, j, 32); // 32 space character
             renderCharScreen(i, j);
         }
         // Reset to starting position for following lines.
-        startPosition = m_termWidth-1;
+        startPosition = m_term_width-1;
     }
-    m_currentBGColor = originalGB;
+    m_current_bg_color = originalGB;
 }
 
 /**
@@ -602,24 +602,24 @@ void Renderer::renderClearLineAboveScreen(int y, int x)
 void Renderer::renderClearLineBelowScreen(int y, int x)
 {
     // Save Background Color so we can switch back to it.
-    SDL_Color originalGB = m_currentBGColor;
-    m_currentBGColor = BLACK;
+    SDL_Color originalGB = m_current_bg_color;
+    m_current_bg_color = BLACK;
 
     int startPosition = x;
 
     // Clear out entire lines down the screen.
     // Fix with term variables lateron.
-    for(int j = y; j < m_termHeight; j++)
+    for(int j = y; j < m_term_height; j++)
     {
-        for(int i = startPosition; i < m_termWidth; i++)
+        for(int i = startPosition; i < m_term_width; i++)
         {
             // x;y ' '
-            drawChar(i, j, 32); // 32 space character
+            drawCharacterCell(i, j, 32); // 32 space character
             renderCharScreen(i, j);
         }
         startPosition = 0;
     }
-    m_currentBGColor = originalGB;
+    m_current_bg_color = originalGB;
 }
 
 /**
@@ -660,12 +660,12 @@ void Renderer::renderDeleteCharScreen(int x, int y, int num)
 
     // Next we want to fill the hole from pull the text left with current
     // Colors background attributes as per the spec.
-    int start = m_termWidth - num;
-    int end = m_termWidth;
+    int start = m_term_width - num;
+    int end = m_term_width;
 
     // Draw Char is 0 based.
     for(int i = start; i < end; i++)
-        drawChar(i,y,32);  // 32 space character
+        drawCharacterCell(i,y,32);  // 32 space character
 
     renderScreen();
     drawTextureScreen();
@@ -691,18 +691,18 @@ void Renderer::renderBottomScreen()
     pick.w = surface->w;
     pick.h = m_surface_manager->m_characterHeight;
     pick.x = 0;
-    if(m_scrollRegionActive)
-        pick.y = m_surface_manager->m_characterHeight * (m_bottomMargin-1);
+    if(m_is_scroll_region_active)
+        pick.y = m_surface_manager->m_characterHeight * (m_bottom_margin-1);
     else
-        pick.y = m_surface_manager->m_characterHeight * (m_termHeight-1);
+        pick.y = m_surface_manager->m_characterHeight * (m_term_height-1);
 
     rect.w = bottomSurface->w;
     rect.h = bottomSurface->h;
     rect.x = 0;
-    if(m_scrollRegionActive)
-        rect.y = m_surface_manager->m_characterHeight * (m_bottomMargin-1);
+    if(m_is_scroll_region_active)
+        rect.y = m_surface_manager->m_characterHeight * (m_bottom_margin-1);
     else
-        rect.y = m_surface_manager->m_characterHeight * (m_termHeight-1);
+        rect.y = m_surface_manager->m_characterHeight * (m_term_height-1);
 
     // Clear Surface
     m_surface_manager->clearSurface(m_surface_manager->SURFACE_BOTTOM_ROW);
@@ -787,9 +787,9 @@ void Renderer::renderCursorOnScreen()
     SDL_Rect rect;
 
     // Check if the position has changed, if so, then skip!
-    if(m_cursorXPosition !=
+    if(m_cursor_x_position !=
             m_session->m_sequence_parser->m_screen_buffer.m_x_position-1 ||
-            m_cursorYPosition !=
+            m_cursor_y_position !=
             m_session->m_sequence_parser->m_screen_buffer.m_y_position-1)
     {
         return;
@@ -803,8 +803,8 @@ void Renderer::renderCursorOnScreen()
     // Size of Each Character
     rect.w = surface->w;
     rect.h = surface->h;
-    rect.x = m_cursorXPosition * m_surface_manager->m_characterWidth;
-    rect.y = m_cursorYPosition * m_surface_manager->m_characterHeight;
+    rect.x = m_cursor_x_position * m_surface_manager->m_characterWidth;
+    rect.y = m_cursor_y_position * m_surface_manager->m_characterHeight;
 
     // Update Pixels in the Texture with the character cell.
     m_window_manager->updateTexture(
@@ -824,9 +824,9 @@ void Renderer::renderCursorOffScreen()
     SDL_Rect rect;
 
     // Check if the position has changed, if so, then skip!
-    if(m_cursorXPosition !=
+    if(m_cursor_x_position !=
             m_session->m_sequence_parser->m_screen_buffer.m_x_position-1 ||
-            m_cursorYPosition !=
+            m_cursor_y_position !=
             m_session->m_sequence_parser->m_screen_buffer.m_y_position-1)
     {
         return;
@@ -840,8 +840,8 @@ void Renderer::renderCursorOffScreen()
     // Size of Each Character
     rect.w = surface->w;
     rect.h = surface->h;
-    rect.x = m_cursorXPosition * m_surface_manager->m_characterWidth;
-    rect.y = m_cursorYPosition * m_surface_manager->m_characterHeight;
+    rect.x = m_cursor_x_position * m_surface_manager->m_characterWidth;
+    rect.y = m_cursor_y_position * m_surface_manager->m_characterHeight;
 
     // Update Pixels in the Texture with the character cell.
     m_window_manager->updateTexture(
@@ -862,8 +862,8 @@ void Renderer::drawTextureScreen()
     SDL_Rect pick, rect;
 
     // Get The Actual size of the Render/Window.
-    int screenWidth, screenHeight;
-    m_window_manager->renderOutputSize(screenWidth, screenHeight);
+    int screen_width, screen_height;
+    m_window_manager->renderOutputSize(screen_width, screen_height);
 
     // Handle to Cursor Off Surface
     SDL_Surface *surface = m_surface_manager
@@ -877,8 +877,8 @@ void Renderer::drawTextureScreen()
     pick.y = 0;
 
     // Destination
-    rect.w = screenWidth;
-    rect.h = screenHeight;
+    rect.w = screen_width;
+    rect.h = screen_height;
     rect.x = 0;
     rect.y = 0;*/
 
@@ -967,7 +967,7 @@ void Renderer::replaceColor(Uint32 foreground, Uint32 background)
  * NOTE: this should be rewroked, can't trust all font sets!
  * This is not the best way to handle this IMO.
  */
-void Renderer::setupCursorChar()
+void Renderer::setupCursorCharacter()
 {
     // If cursor is not active then don't waste processing.
     if(!m_session->m_sequence_parser->isCursorActive())
@@ -975,8 +975,8 @@ void Renderer::setupCursorChar()
         return;
     }
 
-    m_cursorXPosition = m_session->m_sequence_parser->m_screen_buffer.m_x_position-1;
-    m_cursorYPosition = m_session->m_sequence_parser->m_screen_buffer.m_y_position-1;
+    m_cursor_x_position = m_session->m_sequence_parser->m_screen_buffer.m_x_position-1;
+    m_cursor_y_position = m_session->m_sequence_parser->m_screen_buffer.m_y_position-1;
 
     SDL_Rect pick, area;
 
@@ -991,8 +991,8 @@ void Renderer::setupCursorChar()
     pick.h = m_surface_manager->m_characterHeight;
 
     // Quad for Char Cell to Map to Screen
-    area.x = m_cursorXPosition * m_surface_manager->m_characterWidth;
-    area.y = m_cursorYPosition * m_surface_manager->m_characterHeight;
+    area.x = m_cursor_x_position * m_surface_manager->m_characterWidth;
+    area.y = m_cursor_y_position * m_surface_manager->m_characterHeight;
     area.w = m_surface_manager->m_characterWidth;
     area.h = m_surface_manager->m_characterHeight;
 
@@ -1075,16 +1075,16 @@ void Renderer::setupCursorChar()
  * @brief Draws/Recolors a Char Cell to x/y location on screen surface.
  * @param X
  * @param Y
- * @param asciicode
+ * @param ascii_code
  */
-void Renderer::drawChar(int X, int Y, int asciicode)
+void Renderer::drawCharacterCell(int X, int Y, int ascii_code)
 {
     SDL_Rect pick, area;
 
     // Quad for Char Cell in Bitmap
     // 32 Cols by 8 Rows.
-    pick.x = (asciicode % 32) * m_surface_manager->m_characterWidth;
-    pick.y = round(asciicode / 32) * m_surface_manager->m_characterHeight;
+    pick.x = (ascii_code % 32) * m_surface_manager->m_characterWidth;
+    pick.y = round(ascii_code / 32) * m_surface_manager->m_characterHeight;
     pick.w = m_surface_manager->m_characterWidth;
     pick.h = m_surface_manager->m_characterHeight;
 
@@ -1114,10 +1114,10 @@ void Renderer::drawChar(int X, int Y, int asciicode)
 
     // Replace the Character Cell Color
     replaceColor(
-        SDL_MapRGB(surface->format, m_currentFGColor.r,
-                   m_currentFGColor.g, m_currentFGColor.b),
-        SDL_MapRGB(surface->format, m_currentBGColor.r,
-                   m_currentBGColor.g, m_currentBGColor.b));
+        SDL_MapRGB(surface->format, m_current_fg_color.r,
+                   m_current_fg_color.g, m_current_fg_color.b),
+        SDL_MapRGB(surface->format, m_current_bg_color.r,
+                   m_current_bg_color.g, m_current_bg_color.b));
 
     // Write to Back Buffer for Scrolling the Screen.
     if(SDL_BlitSurface(

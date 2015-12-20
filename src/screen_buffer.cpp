@@ -7,19 +7,18 @@ ScreenBuffer::ScreenBuffer(int term_width, int term_height)
     : m_position(0)
     , m_x_position(1)
     , m_y_position(1)
-    , m_characters_per_line(80)
     , m_term_height(term_height)
     , m_term_width(term_width)
 {
     // Reserve Pixel Screen Space for each visable character.
-    m_screenBuffer.reserve(m_term_height * m_term_width);
-    m_screenBuffer.resize(m_term_height * m_term_width);
+    m_screen_buffer.reserve(m_term_height * m_term_width);
+    m_screen_buffer.resize(m_term_height * m_term_width);
 }
 
 ScreenBuffer::~ScreenBuffer()
 {
     // Clear
-    std::vector<ScreenPixel>().swap(m_screenBuffer);
+    std::vector<ScreenPixel>().swap(m_screen_buffer);
     std::cout << "ScreenBuffer Released" << std::endl;
 }
 
@@ -30,7 +29,7 @@ ScreenBuffer::~ScreenBuffer()
  * @param fg_color
  * @param bg_color
  */
-void ScreenBuffer::setScreenBuffer(unsigned char mySequence,
+void ScreenBuffer::setScreenBuffer(unsigned char my_sequence,
                                    SDL_Color fg_color,
                                    SDL_Color bg_color)
 {
@@ -40,21 +39,21 @@ void ScreenBuffer::setScreenBuffer(unsigned char mySequence,
     //    max_x_position = x_position;
 
     std::string sequence;
-    sequence = (signed)mySequence;
-    m_sequenceBuffer.m_characterSequence = sequence;
+    sequence = (signed)my_sequence;
+    m_sequence_buffer.m_character_sequence = sequence;
     sequence.erase();
 
-    m_sequenceBuffer.m_foreground = fg_color;
-    m_sequenceBuffer.m_background = bg_color;
+    m_sequence_buffer.m_foreground = fg_color;
+    m_sequence_buffer.m_background = bg_color;
 
     // Setup current position in the screen buffer. 1 based for 0 based.
-    m_position = ((m_y_position-1) * m_characters_per_line) + (m_x_position-1);
+    m_position = ((m_y_position-1) * m_term_width) + (m_x_position-1);
 
     // Add Sequence to Screen Buffer
     try
     {
-        if((unsigned)m_position < m_screenBuffer.size())
-            m_screenBuffer.at(m_position) = m_sequenceBuffer;
+        if((unsigned)m_position < m_screen_buffer.size())
+            m_screen_buffer.at(m_position) = m_sequence_buffer;
         else
         {
             std::cout << "Xposition: " << m_x_position-1 << std::endl;
@@ -66,7 +65,7 @@ void ScreenBuffer::setScreenBuffer(unsigned char mySequence,
         std::cout << "Server sent data that exceeds screen dimensions." << std::endl;
     }
     // Clear for next sequences.
-    m_sequenceBuffer.m_characterSequence.erase();
+    m_sequence_buffer.m_character_sequence.erase();
 }
 
 /**
@@ -85,8 +84,8 @@ void ScreenBuffer::scrollScreenBuffer()
     // And follow the SDL Surface!  later on add history for scroll back.
     try
     {
-        m_screenBuffer.erase(
-            m_screenBuffer.begin(), m_screenBuffer.begin() + m_characters_per_line
+        m_screen_buffer.erase(
+            m_screen_buffer.begin(), m_screen_buffer.begin() + m_term_width
         );
     }
     catch(std::exception &e)
@@ -94,7 +93,7 @@ void ScreenBuffer::scrollScreenBuffer()
         std::cout << "Exception scrollScreenBuffer: " << e.what() << std::endl;
     }
     // Readd The last Line back to the buffer.
-    m_screenBuffer.resize(m_term_height * m_term_width);
+    m_screen_buffer.resize(m_term_height * m_term_width);
 }
 
 /**
@@ -104,7 +103,7 @@ void ScreenBuffer::scrollScreenBuffer()
  */
 void ScreenBuffer::clearScreenBufferRange(int start, int end)
 {
-    int startPosition = ((m_y_position-1) * m_characters_per_line) + (start);
+    int startPosition = ((m_y_position-1) * m_term_width) + (start);
     int endPosition = startPosition + (end - start);
 
     //std::cout << "start " << start << " end " << end
@@ -117,7 +116,7 @@ void ScreenBuffer::clearScreenBufferRange(int start, int end)
     {
         try
         {
-            m_screenBuffer[i].m_characterSequence.erase();
+            m_screen_buffer[i].m_character_sequence.erase();
         }
         catch(std::exception &e)
         {
@@ -135,8 +134,8 @@ void ScreenBuffer::clearScreenBufferRange(int start, int end)
 void ScreenBuffer::clearScreenBuffer()
 {
     // Allocate the Size
-    m_screenBuffer.clear();
-    m_screenBuffer.resize(m_term_height * m_term_width);
+    m_screen_buffer.clear();
+    m_screen_buffer.resize(m_term_height * m_term_width);
 }
 
 /**
@@ -144,10 +143,10 @@ void ScreenBuffer::clearScreenBuffer()
  */
 void ScreenBuffer::getScreenBufferText()
 {
-    for(auto &it : m_screenBuffer)
+    for(auto &it : m_screen_buffer)
     {
-        if(it.m_characterSequence != "")
-            std::cout << it.m_characterSequence << std::flush;
+        if(it.m_character_sequence != "")
+            std::cout << it.m_character_sequence << std::flush;
         else
             std::cout << " " << std::flush;
     }
@@ -157,28 +156,32 @@ void ScreenBuffer::getScreenBufferText()
  * @brief Gets Coordinates from the screen already translated to
  * Screen Buffer Positions, Now we pull the position and throw the
  * Text data into the Clipboard.
- * @param startx
- * @param starty
- * @param numChar
- * @param numRows
+ * @param start_x_position
+ * @param start_y_position
+ * @param num_chars
+ * @param num_rows
  */
-void ScreenBuffer::bufferToClipboard(int startx, int starty, int numChar, int numRows)
+void ScreenBuffer::bufferToClipboard(
+    int start_x_position,
+    int start_y_position,
+    int num_chars,
+    int num_rows)
 {
     std::string textBuffer = "";
-    int startPosition = (starty * m_characters_per_line) + startx;
-    int endPosition   = startPosition + numChar;
+    int startPosition = (start_y_position * m_term_width) + start_x_position;
+    int endPosition   = startPosition + num_chars;
 
     // Loop the Number of Rows to Grab
-    for(int i = 0; i < numRows; i++)
+    for(int i = 0; i < num_rows; i++)
     {
         // Grab each line per Row.
         for(int it = startPosition; it < endPosition; it++)
         {
             try
             {
-                if(m_screenBuffer[it].m_characterSequence != "")
+                if(m_screen_buffer[it].m_character_sequence != "")
                 {
-                    textBuffer += m_screenBuffer[it].m_characterSequence;
+                    textBuffer += m_screen_buffer[it].m_character_sequence;
                 }
                 else
                 {

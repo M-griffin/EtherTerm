@@ -75,31 +75,28 @@ public:
     SDL_Color WHITE;
 
     // Active Colors
-    SDL_Color m_currentFGColor;
-    SDL_Color m_currentBGColor;
+    SDL_Color   m_current_fg_color;
+    SDL_Color   m_current_bg_color;
 
     // Term Scale
-    int         m_termWidth;
-    int         m_termHeight;
+    int         m_term_width;
+    int         m_term_height;
 
     // Scrolling Region
-    bool        m_scrollRegionActive;
-    int         m_topMargin;
-    int         m_bottomMargin;
+    bool        m_is_scroll_region_active;
+    int         m_top_margin;
+    int         m_bottom_margin;
 
 private:
 
-
 #ifdef _DEBBUG
-    TTF_Font*   trueTypeFont;      // UTF-8 Fonts.
+    // WIP
+    TTF_Font*   m_trueTypeFont; // UTF-8 Fonts.
 #endif
 
-    SDL_Rect    m_displayRect;
-    SDL_Rect    m_rectBackground;
-
-    int         m_cursorXPosition;
-    int         m_cursorYPosition;
-    bool        m_isUTF8Output;
+    int         m_cursor_x_position;
+    int         m_cursor_y_position;
+    bool        m_is_utf8_output;
 
 public:
     /**
@@ -138,7 +135,7 @@ public:
     /**
      * @Brief Overrides the Scrolling region of the screen
      */
-    void setScrollRegion(int top, int bot, int terminalHeight);
+    void setScrollRegion(int top, int bot, int term_height);
 
     /**
      * @brief Scroll a specific set region of the screen only
@@ -247,7 +244,7 @@ public:
      * NOTE: this should be rewroked, can't trust all font sets!
      * This is not the best way to handle this IMO.
      */
-    void setupCursorChar();
+    void setupCursorCharacter();
 
     /**
      * @brief Draws/Recolors a Char Cell to x/y location on screen surface.
@@ -255,9 +252,10 @@ public:
      * @param Y
      * @param asciicode
      */
-    void drawChar(int X, int Y, int asciicode);//void drawString(int X, int Y, char text[]);
+    void drawCharacterCell(int X, int Y, int ascii_code);
 
     // Testing only, draws bitmap graphic.
+    //void drawString(int X, int Y, char text[]);
     //void drawCharSet(int X, int Y);
 
 };
