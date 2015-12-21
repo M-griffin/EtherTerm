@@ -47,22 +47,14 @@ private:
         SEQ_ERROR      = 4  // Bad Sequence, Kill it!
     };
 
-    int m_sequenceState;
-    unsigned
-    char m_sequence;
-    int  m_parameter;
-    bool m_foundSequence;
-    bool m_foundParameters;
-    bool m_isInvalidSequence;
-    bool m_isSequenceCompleted;
-    int  m_sequenceLevel;
-
-    void processSequenceLevel0();
-    void processSequenceLevel1();
-    void processSequenceLevel2();
-
-    void handleFontChangeSequences();
-    void validateSequence();
+    int unsigned m_sequence_state;
+    char         m_sequence;
+    int          m_parameter;
+    bool         m_is_sequence;
+    bool         m_is_parameter;
+    bool         m_is_invalid_sequence;
+    bool         m_is_sequence_completed;
+    int          m_sequence_level;
 
     // Holds the intern data while we build the sequence,
     // This is needed if inputString doesn't have a complete sequence
@@ -78,6 +70,45 @@ private:
     // for writing to the screen.
     std::string            m_valid_output_data;
     std::string::size_type m_escape_position;
+
+    /**
+     * @brief Level 0 Parsing check for Start of CSI or Alternate ESC Sequences
+     */
+    void processSequenceLevel0();
+
+    /**
+     * @brief Level 1 Parsing Comes After ESC[ = CSI.
+     * Numbers and Separators are found in the middle of sequences as Parameters
+     * Switch Statement catch the end of a Valid Sequence.
+     *
+     * Any non-supported sequences can have certain characters after the CSI
+     * and These are parsed so that they are skipped and marked Invalid.
+     */
+    void processSequenceLevel1();
+
+    /**
+     * @brief Level 2 Parsing Catches (2) Different Sequence Styles and Comes After ESC[ = CSI.
+     * Specifically for ? preceding sequencing, and ' ' Space D ending Sequence
+     * For syncterm font switching.
+     *
+     * Numbers and Separators are found in the middle of sequences as Parameters
+     * Switch Statement catch the end of a Valid Sequence.
+     *
+     * Any non-supported sequences can have certain characters after the CSI
+     * and These are parsed so that they are skipped and marked Invalid.
+     */
+    void processSequenceLevel2();
+
+    /**
+     * @brief Handle SyncTerm Font Change Sequences
+     */
+    void handleFontChangeSequences();
+
+    /**
+     * @brief Decode and Validate Escapce Sequences.
+     */
+    void validateSequence();
+    
 };
 
 typedef boost::shared_ptr<SequenceDecoder> sequence_decoder_ptr;

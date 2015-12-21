@@ -9,14 +9,14 @@
 // Initialize Class Variables
 SequenceDecoder::SequenceDecoder(session_ptr session)
     : m_session(session)
-    , m_sequenceState(SEQ_NORMAL)
+    , m_sequence_state(SEQ_NORMAL)
     , m_sequence(0)
     , m_parameter(0)
-    , m_foundSequence(false)
-    , m_foundParameters(false)
-    , m_isInvalidSequence(false)
-    , m_isSequenceCompleted(false)
-    , m_sequenceLevel(0)
+    , m_is_sequence(false)
+    , m_is_parameter(false)
+    , m_is_invalid_sequence(false)
+    , m_is_sequence_completed(false)
+    , m_sequence_level(0)
 { }
 
 SequenceDecoder::~SequenceDecoder()
@@ -26,10 +26,8 @@ SequenceDecoder::~SequenceDecoder()
     m_message_queue.clear();                      // Clear Message Structure
 }
 
-/*
- * Level 0 Parsing check for Start of CSI or Alternate ESC Sequences
- * Supported in Xterm that a server might send.
- * Switch Statement catches the Start of a Valid Sequence.
+/**
+ * @brief Level 0 Parsing check for Start of CSI or Alternate ESC Sequences
  */
 void SequenceDecoder::processSequenceLevel0()
 {
@@ -130,12 +128,12 @@ void SequenceDecoder::processSequenceLevel0()
         case '~':  // ESC ~ Invoke the G1 Character Set as GR (LS1R).
         case '\0':   // Catch any NULL characters after ESC
         case '\x1b': // catch any double ESC's from bad servers
-            m_isInvalidSequence = true;
+            m_is_invalid_sequence = true;
             break;
 
         default:
             // Nothing Matched, Shouldn't get here.
-            m_isInvalidSequence = true;
+            m_is_invalid_sequence = true;
 #ifdef _DEBUG
             std::cout << "CSI parser exception: received ESC: "
                       << m_sequence <<  std::endl;
@@ -144,8 +142,8 @@ void SequenceDecoder::processSequenceLevel0()
     }
 }
 
-/*
- * Level 1 Parsing Comes After ESC[ = CSI.
+/**
+ * @brief Level 1 Parsing Comes After ESC[ = CSI.
  * Numbers and Separators are found in the middle of sequences as Parameters
  * Switch Statement catch the end of a Valid Sequence.
  *
@@ -489,7 +487,7 @@ void SequenceDecoder::processSequenceLevel1()
             //P n = 0 ← STP flags.
         case '!':  // Soft terminal reset (DECSTR).
             // Valid Sequences Ended.
-            m_isSequenceCompleted = true;
+            m_is_sequence_completed = true;
             break;
 
             // Unsupported Text and Keyboard Modifiers.
@@ -498,18 +496,18 @@ void SequenceDecoder::processSequenceLevel1()
         case '$':
         case '"':
         case '*':
-            m_isInvalidSequence = true;
+            m_is_invalid_sequence = true;
             break;
 
         case '?': // -- Switch to next sequenceLevel
             // Ie.. handle ESC[?7h, ESC[?7l, and other ? DEC Sequences.
             // These Sequences DEC Level Sequences and need extra Parsing.
         case ' ': // Need to Precheck SyncTerm Font switching ' D' Space D.
-            ++m_sequenceLevel;
+            ++m_sequence_level;
             break;
         default:
             // Nothing Matched, Shouldn't get here.
-            m_isInvalidSequence = true;
+            m_is_invalid_sequence = true;
 #ifdef _DEBUG
             std::cout << "CSI parser exception: received ESC: "
                       << m_sequence <<  std::endl;
@@ -518,8 +516,8 @@ void SequenceDecoder::processSequenceLevel1()
     }
 }
 
-/*
- * Level 2 Parsing Catches (2) Different Sequence Styles and Comes After ESC[ = CSI.
+/**
+ * @brief Level 2 Parsing Catches (2) Different Sequence Styles and Comes After ESC[ = CSI.
  * Specifically for ? preceding sequencing, and ' ' Space D ending Sequence
  * For syncterm font switching.
  *
@@ -541,7 +539,7 @@ void SequenceDecoder::processSequenceLevel2()
 #ifdef _DEBUG
         std::cout << "Invalid space found in sequence!" << std::endl;
 #endif
-        m_isInvalidSequence = true;
+        m_is_invalid_sequence = true;
         return;
     }
 
@@ -745,7 +743,7 @@ void SequenceDecoder::processSequenceLevel2()
         case 's':  // Save DEC Private Mode Values. P s values are the same as for DECSET.
         case '!':  // Soft terminal reset (DECSTR).
             // Valid Sequences Ended.
-            m_isSequenceCompleted = true;
+            m_is_sequence_completed = true;
             break;
 
             // Unsupported Text and Keyboard Modifiers.
@@ -755,12 +753,12 @@ void SequenceDecoder::processSequenceLevel2()
         case '"':
         case '*':
         case ' ':
-            m_isInvalidSequence = true;
+            m_is_invalid_sequence = true;
             break;
 
         default:
             // Nothing Matched, Shouldn't get here.
-            m_isInvalidSequence = true;
+            m_is_invalid_sequence = true;
 #ifdef _DEBUG
             std::cout << "CSI parser exception: received ESC: "
                       << m_sequence << std::endl;
@@ -769,9 +767,8 @@ void SequenceDecoder::processSequenceLevel2()
     }
 }
 
-/*
- * Handle SyncTerm Font Change Sequences
- * Needs to be moved to SequenceParser!
+/**
+ * @brief Handle SyncTerm Font Change Sequences
  */
 void SequenceDecoder::handleFontChangeSequences()
 {
@@ -846,10 +843,9 @@ void SequenceDecoder::handleFontChangeSequences()
      */
 
 }
-/*
- * Validate Complete ESC Control Sequences
- * Break up the parameters into a Vector
- * For decoding of Screen Display.
+
+/**
+ * @brief Decode and Validate Escapce Sequences.
  */
 void SequenceDecoder::validateSequence()
 {
@@ -1021,7 +1017,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
             {
                 std::cout << "Exception replacing double ESC characters: "
                           << e.what() << std::endl;
-                m_sequenceState = SEQ_ERROR; // Reset The State
+                m_sequence_state = SEQ_ERROR; // Reset The State
             }
         }
     }
@@ -1030,7 +1026,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
     for(std::string::size_type i = 0; i < input_string.size(); i++)
     {
 #ifdef _DEBUG
-        std::cout << "sequenceState: " << m_sequenceState << std::endl;
+        std::cout << "sequenceState: " << m_sequence_state << std::endl;
 #endif
         // Get next Input Sequence
         m_sequence = input_string[i];
@@ -1047,11 +1043,11 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
         // is FIFO with regards to how incoming data is handled.
         if(m_sequence == '\x1b')
         {
-            m_sequenceState = SEQ_START;
+            m_sequence_state = SEQ_START;
         }
 
         // Pre-Handle the Parser State
-        switch(m_sequenceState)
+        switch(m_sequence_state)
         {
                 // Normal Text Data, Append to Buffer
             case SEQ_NORMAL:
@@ -1069,7 +1065,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                 m_message_queue.clear();
 
                 m_valid_output_data.erase();
-                m_sequenceState = SEQ_PROCESSING;
+                m_sequence_state = SEQ_PROCESSING;
                 m_sequence_builder += m_sequence;
                 break;
 
@@ -1083,15 +1079,15 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                 // Validating the Sequence Bombed, Clear the vector and continue.
                 std::vector<int>().swap(m_sequence_params); // Clear for next run.
                 m_sequence_builder.erase();         // Clear Any Prebuilt.
-                m_sequenceState = SEQ_NORMAL;
+                m_sequence_state = SEQ_NORMAL;
                 continue;
         }
 
-        if(m_sequence == '\x1b' && !m_isSequenceCompleted)
+        if(m_sequence == '\x1b' && !m_is_sequence_completed)
         {
             // Error Checking, If were in the middle of an incomplete sequence
             // Then we shouldn't get an ESC before we complete the sequence!
-            if(m_foundSequence)
+            if(m_is_sequence)
             {
 #ifdef _DEBUG
                 std::cout << "Invalid Sequence, ESC in current sequence"
@@ -1120,30 +1116,30 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
             std::cout << "ESC starting new sequence parsing" << std::endl;
 #endif
             m_escape_position = i;
-            m_foundSequence = true;
+            m_is_sequence = true;
             continue;
         }
 
         // Each Level is the next character after the ESC
         // Check the first few levels to make sure we have a valid CSI
-        if(m_foundSequence && !m_isInvalidSequence)
+        if(m_is_sequence && !m_is_invalid_sequence)
         {
-            switch(m_sequenceLevel)
+            switch(m_sequence_level)
             {
                 case 0: // Process first char after ESC '['
 #ifdef _DEBUG
-                    std::cout << "sequenceLevel: " << m_sequenceLevel << " : "
+                    std::cout << "sequenceLevel: " << m_sequence_level << " : "
                               << m_sequence << std::endl;
 #endif
                     processSequenceLevel0();
                     // Move to next Level if valid.
-                    if(!m_isInvalidSequence)
-                        ++m_sequenceLevel;
+                    if(!m_is_invalid_sequence)
+                        ++m_sequence_level;
                     break;
 
                 case 1: // Process second char after ESC [ 'c'
 #ifdef _DEBUG
-                    std::cout << "sequenceLevel: " << m_sequenceLevel << " : "
+                    std::cout << "sequenceLevel: " << m_sequence_level << " : "
                               << m_sequence << std::endl;
 #endif
                     processSequenceLevel1();
@@ -1151,7 +1147,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
 
                 case 2: // Process 2nd char after ESC [ '?' DEC Sequences
 #ifdef _DEBUG
-                    std::cout << "sequenceLevel: " << m_sequenceLevel << " : "
+                    std::cout << "sequenceLevel: " << m_sequence_level << " : "
                               << m_sequence << std::endl;
 #endif
                     processSequenceLevel2();
@@ -1160,7 +1156,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
         }
 
         // Handle Completed Control Sequences
-        if(m_isSequenceCompleted)
+        if(m_is_sequence_completed)
         {
 #ifdef _DEBUG
             std::cout << "SequenceCompleted!" << std::endl;
@@ -1174,25 +1170,25 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                 // Break up the sequence into separate parameters for
                 // The Screen Parser.
                 validateSequence();
-                m_sequenceState = SEQ_DONE;
+                m_sequence_state = SEQ_DONE;
             }
             catch(std::exception &e)
             {
                 std::cout << "Exception substring on escapeSequence: "
                           << e.what() << std::endl;
-                m_sequenceState = SEQ_ERROR;
+                m_sequence_state = SEQ_ERROR;
             }
 
             // If the sequence is completed, The Parse the parameters and
             // Setup for ANSI Parser and Drawing to Screen.
-            m_isSequenceCompleted = false;
-            m_foundSequence     = false;
-            m_isInvalidSequence   = false;
-            m_sequenceLevel     = 0;
+            m_is_sequence_completed = false;
+            m_is_sequence     = false;
+            m_is_invalid_sequence   = false;
+            m_sequence_level     = 0;
         }
         // Invalid Sequences, Replace ESC with ^ characters for display
         // Then move on.
-        if(m_isInvalidSequence)
+        if(m_is_invalid_sequence)
         {
 #ifdef _DEBUG
             std::cout << " *** SequenceInvalid!" << std::endl;
@@ -1212,9 +1208,9 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                 sequenceState = SEQ_ERROR; // Reset The State
             }*/
 
-            m_foundSequence   = false;
-            m_isInvalidSequence = false;
-            m_sequenceLevel   = 0;
+            m_is_sequence   = false;
+            m_is_invalid_sequence = false;
+            m_sequence_level   = 0;
 
             // First grab the entire sequence parsed so far, from ESC position
             // Place it into validOutputData to display on the screen,
@@ -1232,11 +1228,11 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                           << e.what() << std::endl;
             }
             // Reset the State
-            m_sequenceState = SEQ_ERROR;
+            m_sequence_state = SEQ_ERROR;
         }
 
         // Post-Handle the Parser State
-        switch(m_sequenceState)
+        switch(m_sequence_state)
         {
             case SEQ_NORMAL:
                 // If we are reset to this state, reset the level
@@ -1258,14 +1254,14 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                 m_message_queue.clear();
 
                 std::vector<int>().swap(m_sequence_params); // Clear for next run.
-                m_sequenceState = SEQ_NORMAL; // Reset The State
+                m_sequence_state = SEQ_NORMAL; // Reset The State
                 m_sequence_builder.erase();
                 break;
 
             case SEQ_ERROR:
                 // Validating the Sequence Bombed, Clear the vector and continue.
                 std::vector<int>().swap(m_sequence_params); // Clear for next run.
-                m_sequenceState = SEQ_NORMAL; // Reset The State
+                m_sequence_state = SEQ_NORMAL; // Reset The State
                 m_sequence_builder.erase();
                 break;
         }
@@ -1279,7 +1275,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
               << std::endl << std::endl;
 #endif
     // Catch any echo'ed input that passed through with no sequences
-    if(m_sequenceState == SEQ_NORMAL && m_valid_output_data.size() > 0)
+    if(m_sequence_state == SEQ_NORMAL && m_valid_output_data.size() > 0)
     {
         //TheAnsiParser::Instance()->textInput(validOutputData);
         /*

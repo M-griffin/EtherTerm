@@ -1,4 +1,9 @@
 
+Change Log 3.0.14 - 2015-12-20
+	- Added MenuIO, MenuConfig and MenuFunction
+	- Did some initial rework on classes and methods.  Still need to finish up 
+	  some more work on tying it all together. Still a bit of refactoring needed.
+
 Change Log 3.0.13 - 2015-12-20
     - Added MessageQueue for storing text/esc sequences.
     - Added SequenceDecoder for Parameterizing incoming data and ESC Sequences

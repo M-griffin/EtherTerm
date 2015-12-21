@@ -63,7 +63,8 @@ AS       := C:/MinGW-5.1.0/mingw32/bin/as.exe
 ##
 CodeLiteDir:=C:\Program Files (x86)\CodeLite
 UNIT_TEST_PP_SRC_DIR:=C:\UnitTest++-1.3
-Objects0=$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_window_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_input_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_renderer.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_screen_buffer.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_sequence_decoder.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_window_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_input_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_renderer.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_screen_buffer.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_sequence_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_config.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_menu_function.cpp$(ObjectSuffix) 
 
 
 
@@ -157,6 +158,30 @@ $(IntermediateDirectory)/src_sequence_decoder.cpp$(DependSuffix): src/sequence_d
 
 $(IntermediateDirectory)/src_sequence_decoder.cpp$(PreprocessSuffix): src/sequence_decoder.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_sequence_decoder.cpp$(PreprocessSuffix) "src/sequence_decoder.cpp"
+
+$(IntermediateDirectory)/src_menu_io.cpp$(ObjectSuffix): src/menu_io.cpp $(IntermediateDirectory)/src_menu_io.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/menu_io.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_menu_io.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_menu_io.cpp$(DependSuffix): src/menu_io.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_menu_io.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_menu_io.cpp$(DependSuffix) -MM "src/menu_io.cpp"
+
+$(IntermediateDirectory)/src_menu_io.cpp$(PreprocessSuffix): src/menu_io.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_menu_io.cpp$(PreprocessSuffix) "src/menu_io.cpp"
+
+$(IntermediateDirectory)/src_menu_config.cpp$(ObjectSuffix): src/menu_config.cpp $(IntermediateDirectory)/src_menu_config.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/menu_config.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_menu_config.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_menu_config.cpp$(DependSuffix): src/menu_config.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_menu_config.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_menu_config.cpp$(DependSuffix) -MM "src/menu_config.cpp"
+
+$(IntermediateDirectory)/src_menu_config.cpp$(PreprocessSuffix): src/menu_config.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_menu_config.cpp$(PreprocessSuffix) "src/menu_config.cpp"
+
+$(IntermediateDirectory)/src_menu_function.cpp$(ObjectSuffix): src/menu_function.cpp $(IntermediateDirectory)/src_menu_function.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/menu_function.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_menu_function.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_menu_function.cpp$(DependSuffix): src/menu_function.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_menu_function.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_menu_function.cpp$(DependSuffix) -MM "src/menu_function.cpp"
+
+$(IntermediateDirectory)/src_menu_function.cpp$(PreprocessSuffix): src/menu_function.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_menu_function.cpp$(PreprocessSuffix) "src/menu_function.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

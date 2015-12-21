@@ -42,6 +42,12 @@
     <File Name="src/sequence_decoder.hpp"/>
     <File Name="src/safe_queue.hpp"/>
     <File Name="src/message_queue.hpp"/>
+    <File Name="src/menu_io.hpp"/>
+    <File Name="src/menu_io.cpp"/>
+    <File Name="src/menu_config.cpp"/>
+    <File Name="src/menu_config.hpp"/>
+    <File Name="src/menu_function.cpp"/>
+    <File Name="src/menu_function.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
