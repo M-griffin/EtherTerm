@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=12/20/2015
+Date                   :=12/21/2015
 CodeLitePath           :="C:\Program Files (x86)\CodeLite"
 LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
@@ -64,7 +64,7 @@ AS       := C:/MinGW-5.1.0/mingw32/bin/as.exe
 CodeLiteDir:=C:\Program Files (x86)\CodeLite
 UNIT_TEST_PP_SRC_DIR:=C:\UnitTest++-1.3
 Objects0=$(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_window_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_input_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_renderer.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_screen_buffer.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_sequence_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_config.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_menu_function.cpp$(ObjectSuffix) 
+	$(IntermediateDirectory)/src_menu_function.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_link_list.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_manager.cpp$(ObjectSuffix) 
 
 
 
@@ -182,6 +182,22 @@ $(IntermediateDirectory)/src_menu_function.cpp$(DependSuffix): src/menu_function
 
 $(IntermediateDirectory)/src_menu_function.cpp$(PreprocessSuffix): src/menu_function.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_menu_function.cpp$(PreprocessSuffix) "src/menu_function.cpp"
+
+$(IntermediateDirectory)/src_link_list.cpp$(ObjectSuffix): src/link_list.cpp $(IntermediateDirectory)/src_link_list.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/link_list.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_link_list.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_link_list.cpp$(DependSuffix): src/link_list.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_link_list.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_link_list.cpp$(DependSuffix) -MM "src/link_list.cpp"
+
+$(IntermediateDirectory)/src_link_list.cpp$(PreprocessSuffix): src/link_list.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_link_list.cpp$(PreprocessSuffix) "src/link_list.cpp"
+
+$(IntermediateDirectory)/src_menu_manager.cpp$(ObjectSuffix): src/menu_manager.cpp $(IntermediateDirectory)/src_menu_manager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/menu_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_menu_manager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_menu_manager.cpp$(DependSuffix): src/menu_manager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_menu_manager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_menu_manager.cpp$(DependSuffix) -MM "src/menu_manager.cpp"
+
+$(IntermediateDirectory)/src_menu_manager.cpp$(PreprocessSuffix): src/menu_manager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_menu_manager.cpp$(PreprocessSuffix) "src/menu_manager.cpp"
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

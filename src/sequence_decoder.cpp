@@ -1287,3 +1287,11 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
         m_valid_output_data.erase();
     }
 }
+
+/**
+ * @brief Rset the Sequence Parser to refresh the scrren
+ */
+void SequenceDecoder::resetParser()
+{
+    m_session->m_sequence_parser->reset();
+}

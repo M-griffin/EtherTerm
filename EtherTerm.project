@@ -48,6 +48,10 @@
     <File Name="src/menu_config.hpp"/>
     <File Name="src/menu_function.cpp"/>
     <File Name="src/menu_function.hpp"/>
+    <File Name="src/link_list.cpp"/>
+    <File Name="src/link_list.hpp"/>
+    <File Name="src/menu_manager.cpp"/>
+    <File Name="src/menu_manager.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

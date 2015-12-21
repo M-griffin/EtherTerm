@@ -108,7 +108,13 @@ private:
      * @brief Decode and Validate Escapce Sequences.
      */
     void validateSequence();
-    
+
+public:
+    /**
+     * @brief Rset the Sequence Parser to refresh the scrren
+     */
+    void resetParser();
+
 };
 
 typedef boost::shared_ptr<SequenceDecoder> sequence_decoder_ptr;
