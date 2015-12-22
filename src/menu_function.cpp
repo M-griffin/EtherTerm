@@ -2,16 +2,13 @@
 #include "sequence_decoder.hpp"
 #include "menu_io.hpp"
 
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <cstring>   // gcc 4.3
-#include <unistd.h>  // gcc 4.7
-
-#include <string>   // string and wstring
+#include <cstring>
+#include <unistd.h>
+#include <string>
 #include <fstream>
-
 
 MenuFunction::MenuFunction(sequence_decoder_ptr decoder, std::string program_path)
     : m_program_path(program_path)
