@@ -1,16 +1,6 @@
 
-Change Log 3.0.16 - 2015-12-22
-    - Initial rework of MenuManager and the menu system completed.
-    - Added back the SystemConnection structure
-    - Next is to incorporate into the interface to spawn the menu
-      sesssion, then rework connection spawns from the MenuManager
-      with pointer to the Interface.
-    - Added back TinyXML to get things up and working again. 
-      The plan is to replace this with boost later on once the major
-      rework is completed.
-
 Change Log 3.0.15 - 2015-12-21
-    - Added MenuFunction and MenuManager.
+	- Added MenuFunction and MenuManager.
     - WIP Reworking MenuManager.
       Need to rework the system connection structure that is used to hold
       system information.  Also looking into replacing tinyxml with boost

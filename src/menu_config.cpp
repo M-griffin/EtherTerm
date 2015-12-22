@@ -8,16 +8,6 @@
 #include <cstdio>
 #include <cstring>
 
-
-MenuConfig::MenuConfig(std::string program_path)
-    : m_program_path(program_path)
-{ }
-
-MenuConfig::~MenuConfig()
-{
-    std::cout << "~MenuConfig" << std::endl;
-}
-
 /*
  * Path Helper Function
  */
@@ -38,11 +28,11 @@ std::string MenuConfig::SetupThePath()
 bool MenuConfig::ddirectory_exists()
 {
     std::cout << "ddirectory_exists()" << std::endl;
-    m_top_margin = 0;
-    m_bottom_margin = 0;
+    TOP_MARGIN = 0;
+    BOTTOM_MARGIN = 0;
 
     std::string path = SetupThePath();
-    path += m_ini_name;
+    path += INI_NAME;
     FILE *stream;
     stream = fopen(path.c_str(),"rb+");
     if(!stream)
@@ -60,7 +50,7 @@ bool MenuConfig::ddirectory_exists()
 void MenuConfig::ddirectory_create()
 {
     std::string path = SetupThePath();
-    path += m_ini_name;
+    path += INI_NAME;
     std::ofstream outStream2;
     outStream2.open(path.c_str(), std::ofstream::out | std::ofstream::trunc);
     if(!outStream2.is_open())
@@ -108,74 +98,74 @@ void MenuConfig::ddirectory_check(std::string &cfgdata)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
         id1 = atoi(result.c_str());
-        m_top_margin = id1;
+        TOP_MARGIN = id1;
     }
     else if(cfgdata.find("set BOT ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
         id1 = atoi(result.c_str());
-        m_bottom_margin = id1;
+        BOTTOM_MARGIN = id1;
     }
     else if(cfgdata.find("set THEME_NAME ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
-        m_theme_name = std::move(result);
+        THEME_NAME = std::move(result);
     }
     else if(cfgdata.find("set FONT_SET ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
-        m_font_set = std::move(result);
-        std::cout << " $$$ FONT_SET " << m_font_set << std::endl;
+        FONT_SET = std::move(result);
+        std::cout << " $$$ FONT_SET " << FONT_SET << std::endl;
     }
     else if(cfgdata.find("set ANSI_FILE ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
-        m_ansi_filename = std::move(result);
+        ANSI_FILE = std::move(result);
     }
     else if(cfgdata.find("set MENU_PROMPT ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
-        m_menu_prompt_text = std::move(result);
+        MENU_PROMPT_TEXT = std::move(result);
     }
     else if(cfgdata.find("set PAGENUM ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
-        m_page_number = std::move(result);
+        PAGE_NUMBER = std::move(result);
     }
     else if(cfgdata.find("set PAGETOTAL ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
-        m_page_total = std::move(result);
+        PAGE_TOTAL = std::move(result);
     }
     else if(cfgdata.find("set MOREMSG_ON ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
-        m_more_active = std::move(result);
+        MORE_MESSAGE_ON = std::move(result);
     }
     else if(cfgdata.find("set MOREMSG_WORD_ON ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
-        m_more_active_text = std::move(result);
+        MORE_MESSAGE_TEXT_ON = std::move(result);
     }
     else if(cfgdata.find("set MOREMSG_OFF ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
-        m_more_inactive = std::move(result);
+        MORE_MESSAGE_OFF = std::move(result);
     }
     else if(cfgdata.find("set MOREMSG_WORD_OFF ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
-        m_more_inactive_text = std::move(result);
+        MORE_MESSAGE_TEXT_OFF = std::move(result);
     }
     else if(cfgdata.find("set TEXT_COLOR ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
-        m_text_color_normal = std::move(result);
+        TEXT_COLOR = std::move(result);
     }
     else if(cfgdata.find("set MAX_AREAS ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
-        m_max_systems = std::move(result);
+        MAX_SYSTEMS = std::move(result);
     }
     cfgdata.erase();
 }
@@ -197,8 +187,8 @@ bool MenuConfig::ddirectory_parse(int index)
     std::string path = SetupThePath();
 
     // Set for Theme, check index number for themes,.
-    sprintf(name, "%s%s", path.c_str(), m_ini_name.c_str());
-    sprintf(name2,"%s%s%i.ini", path.c_str(), m_ini_name.c_str(), index);
+    sprintf(name, "%s%s", path.c_str(), INI_NAME.c_str());
+    sprintf(name2,"%s%s%i.ini", path.c_str(), INI_NAME.c_str(), index);
     if(index != 0) strcpy(name, name2);
     // Check if Theme Exists, if not return FALSE.
 

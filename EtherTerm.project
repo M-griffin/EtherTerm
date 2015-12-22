@@ -52,12 +52,6 @@
     <File Name="src/link_list.hpp"/>
     <File Name="src/menu_manager.cpp"/>
     <File Name="src/menu_manager.hpp"/>
-    <File Name="src/tinystr.cpp"/>
-    <File Name="src/tinystr.hpp"/>
-    <File Name="src/tinyxml.cpp"/>
-    <File Name="src/tinyxml.hpp"/>
-    <File Name="src/tinyxmlerror.cpp"/>
-    <File Name="src/tinyxmlparser.cpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
