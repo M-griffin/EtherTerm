@@ -1,9 +1,3 @@
-// EtherTerm SVN: $Id$
-// Source: $HeadURL$
-// $LastChangedDate$
-// $LastChangedRevision$
-// $LastChangedBy$
-
 #include "link_list.hpp"
 #include "menu_function.hpp"
 
@@ -12,40 +6,39 @@
 #include <cstdlib>
 #include <string>
 
-/**
- * MenuFunction Link List Class
- */
-LinkList::LinkList() :
-    m_current_row(1),
-    m_top_margin(0),
-    m_bottom_margin(0),
-    m_total_lines(1),
-    m_currnet_line_number(1),
-    m_current_page(1),
-    m_total_pages(0),
-    m_rows_per_page(0),
-    m_current_selection(0)
+
+LinkList::LinkList()
+    : m_current_row(1)
+    , m_top_margin(0)
+    , m_bottom_margin(0)
+    , m_total_lines(1)
+    , m_currnet_line_number(1)
+    , m_current_page(1)
+    , m_total_pages(0)
+    , m_rows_per_page(0)
+    , m_current_selection(0)
 { }
 
 LinkList::~LinkList()
 {
-    // Clear
     std::vector<list_bar>().swap(m_listing);
 }
 
 /**
- * Copy message from link lists to <vector> buffer
+ * @brief Copy text from link lists to <vector> buffer
+ * @param listbar
  */
-void LinkList::getVectorList(std::vector<list_bar> listbar)
+ void LinkList::getVectorList(std::vector<list_bar> listbar)
 {
     // Swap passed with Global
     m_listing.swap(listbar);
 }
 
 /**
- * New Faster Full Screen Interface for Light-bars and Lists
- * This one functions does all start and  page up/down
- * And Handles jumping to different pages.
+ * @brief Draws the List inside the box dimensions
+ * @param page
+ * @param list
+ * @return
  */
 std::string LinkList::drawVectorList(unsigned long page, unsigned long list)
 {

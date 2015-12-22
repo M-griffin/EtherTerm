@@ -47,12 +47,15 @@ bool SDLStartUp()
 {
 	bool success = true;
 
-	// Initialize SDL w/ Video, Skip Sound and Controlers for now.
+	// Initialize SDL w/ Video, Skip Sound and Controllers for now.
 	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
 	{
 		std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
 		success = false;
 	}
+
+    // Turn off, might make a toggle for this later on.
+    SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
 	return success;
 }
 
@@ -67,10 +70,10 @@ int main(int argc, char* argv[])
     int c = 0;
 
     /*
-     * Interfaces to be added lateron
+     * Interfaces to be added later on
      * h = headless
      * t = telnet
-     * s = seure ssl/ssh
+     * s = secure ssl/ssh
      * f = ftp
      * i = irc
      */
@@ -167,7 +170,7 @@ int main(int argc, char* argv[])
     else
     {
         // Startup the Window System and load initial menu
-        // Window with SDL initilization with window event processing.
+        // Window with Initialization with window event processing.
         if (!SDLStartUp())
         {
              return -1;
@@ -253,7 +256,7 @@ int main(int argc, char* argv[])
                     // Main Loop, Handle update per State Machine
                     TheStateMachine::Instance()->update();
 
-                    // Proces Any incoming Data from the State
+                    // Process Any incoming Data from the State
                     // Process and send to Screen for Updates.
                     TheSequenceManager::Instance()->update();
                 }

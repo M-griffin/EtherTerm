@@ -5,12 +5,12 @@
 #include "link_list.hpp"
 #include "menu_config.hpp"
 
-#include <boost/asio/io_service.hpp>
+#include <boost/smart_ptr/shared_ptr.hpp>
 
 #include <string>
 #include <vector>
 
-// Forward Declerations.
+// Forward Declarations.
 class SequenceDecoder;
 typedef boost::shared_ptr<SequenceDecoder> sequence_decoder_ptr;
 
@@ -42,7 +42,7 @@ typedef struct SystemConnection
  * @author Michael Griffin
  * @date 12/22/2015
  * @file menu_manager.hpp
- * @brief Handle the Menu System / Dialing Directy interface.
+ * @brief Handle the Menu System / Dialing Directory interface.
  */
 class MenuManager
 {
@@ -86,7 +86,7 @@ public:
     void  createDialDirectory();
     void  writeDialDirectory();
 
-    // Setup for Inital Screen
+    // Setup for Initial Screen
     void  setupDialDirectory();
 
     // Redraws Pages and Changes.
@@ -99,5 +99,8 @@ public:
     int  handleMenuActions(const std::string &inputSequence);
 
 };
+
+class MenuManager;
+typedef boost::shared_ptr<MenuManager> menu_manager_ptr;
 
 #endif // MENUSYSTEM_HPP

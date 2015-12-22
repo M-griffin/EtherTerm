@@ -137,7 +137,7 @@ private:
         CTRLZ
     };
 
-    // First Break Up into Seperate Functions,
+    // First Break Up into Separate Functions,
     // Later Map Enum and and setup commands for the following.
     void handleWindowEvents(SDL_Event &event);
     bool handleTextInputEvent(SDL_Event &event);

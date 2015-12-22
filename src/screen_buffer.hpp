@@ -16,7 +16,7 @@
 
 /**
  * @class ScreenPixel
- * @author Micahel Griffin
+ * @author Michael Griffin
  * @date 12/18/2015
  * @file screen_buffer.hpp
  * @brief Holds Character/Sequence and Attributes of each position.

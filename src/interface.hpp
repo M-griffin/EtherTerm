@@ -21,7 +21,7 @@ using boost::asio::ip::tcp;
  *        Must Call Shutdown() on close, this class is not RAII and is shutdown
  *        Only by the MenuSession being closed down or all connections (headless)
  *        Sessions are still used from Main Thread, while the IO_SERVICE handles
- *        Async IO in sepearte threads for Sockets.
+ *        Async IO in separate threads for Sockets.
  */
 class Interface
 {
@@ -42,9 +42,10 @@ public:
         : m_work(m_io_service)
         , m_program_path(program_path)
     {
-        // Startup worker thread of ASIO. We want socket communications in a seperate thread.
+        // Startup worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on startup.
         m_thread = create_thread();
+        startup();
     }
 
     ~Interface()
@@ -52,7 +53,7 @@ public:
     }
 
     /**
-     * @brief Shutdown the socket and commication thread.
+     * @brief Shutdown the socket and communication thread.
      */
     void shutdown()
     {
@@ -65,34 +66,23 @@ public:
      */
     void startup()
     {
-        // Startup is called once, we need to setup the menu session
-        // Here to handle Graphics and i/o processing
-
-        // Then determine the best way to swap connection sessions.
-
-        /***** WE NEED A WAY TO DETERMINE SESSION TYPE AND LINK THE SESSIONS!*/
-
-
+        // First Session will always be the Dialing Directory
+        spawnLocalSession();
     }
 
-
     /**
-     * @brief Spawns Local Sessions Menu System etc..
-     *        Return the Session Pointer to link it to the class using it.
+     * @brief Spawns Local Session For Dialing Directory Interface
      */
     void spawnLocalSession()
     {
         //Mock up connection which will not be used.
         connection_ptr new_connection(new tcp_connection(m_io_service));
-
-        // Spawn the session
         session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
 
-        // Start Async Read/Writes for Session Socket Data.
-        // Required only for Sessions that make connections, Local sessions do not use this.
-        new_session->wait_for_data();
+        // Start the Dialing Directory on the local instance
+        new_session->start_menu_instance();
 
-        //  Or just poass in msession_list to the session!  so it can pop itself off.
+        //  Or just pass in msession_list to the session!  so it can pop itself off.
         m_session_list.insert(new_session);
     }
 
@@ -103,7 +93,7 @@ public:
     void spawnConnectionSession()
     {
 
-        // Connection Mock up, add passing for this lateron!
+        // Connection Mock up, add passing for this later on!
         std::string hostname;
         std::string port;
 
@@ -131,9 +121,9 @@ public:
 
                 // Start Async Read/Writes for Session Socket Data.
                 // Required only for Sessions that make connections, Local sessions do not use this.
-                new_session->wait_for_data();
+                new_session->wait_for_data();                
 
-                //  Or just poass in msession_list to the session!  so it can pop itself off.
+                //  Or just pass in msession_list to the session!  so it can pop itself off.
                 m_session_list.insert(new_session);
             }
             else
@@ -160,7 +150,7 @@ public:
                 if((*it)->m_window_manager->getWindowId() == event.window.windowID)
                 {
 
-                    // Now pass the events for LocalInput/Mouse and Windows to the Session.
+                    // Now pass the events for Local Input/Mouse and Windows to the Session.
 
                 }
             }

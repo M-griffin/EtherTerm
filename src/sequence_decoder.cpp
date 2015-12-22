@@ -1289,7 +1289,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
 }
 
 /**
- * @brief Rset the Sequence Parser to refresh the scrren
+ * @brief Reset the Sequence Parser to refresh the screen
  */
 void SequenceDecoder::resetParser()
 {

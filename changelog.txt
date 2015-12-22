@@ -1,9 +1,15 @@
 
+Change Log 3.0.17 - 2015-12-22
+    - Code Cleanup and Working the MenuManager into the Local Session
+      Which will be spawned from the Interface.  Have to rework code
+      From the Previous MainMenuState since were not using a state 
+      system any longer.
+
 Change Log 3.0.16 - 2015-12-22
     - Initial rework of MenuManager and the menu system completed.
     - Added back the SystemConnection structure
     - Next is to incorporate into the interface to spawn the menu
-      sesssion, then rework connection spawns from the MenuManager
+      session, then rework connection spawns from the MenuManager
       with pointer to the Interface.
     - Added back TinyXML to get things up and working again. 
       The plan is to replace this with boost later on once the major
@@ -23,7 +29,7 @@ Change Log 3.0.14 - 2015-12-20
 
 Change Log 3.0.13 - 2015-12-20
     - Added MessageQueue for storing text/esc sequences.
-    - Added SequenceDecoder for Parameterizing incoming data and ESC Sequences
+    - Added SequenceDecoder for Parameterize incoming data and ESC Sequences
     - Added SafeQueue for storing array of processed sequences and text data.    
     - Worked initial SafeQueue into Session instance.
     - Reworked and normalized variables and classes for newly added files.
@@ -54,7 +60,7 @@ Change Log 3.0.10 - 2015-12-17 / 18
     - Passing the Session Instance to the Renderer now so it can
       Access the Session->SequenceParser->Screen Buffer without 
       Direct Circle Dependencies.    
-    - Passing the Conenction Instatnce to the SequenceParser
+    - Passing the Connection Instance to the SequenceParser
       So Client can now reply with Cursor X/Y Positions
 
 Change Log 3.0.9 - 2015-12-15
@@ -76,7 +82,7 @@ Change Log 3.0.7 - 2015-12-14
       Lots of new functions to and cleanup to keep the flow easier to follow.
 
 Change Log 3.0.6 - 2015-12-13
-    - Added Textures Class to SurfaceManager for handling Textures dynamicaly also.
+    - Added Textures Class to SurfaceManager for handling Textures dynamically also.
     - Added new TEXTURE_HILIGHT for future use in highlighting Menu Bars
     - WIP Renderer rewrite.
     

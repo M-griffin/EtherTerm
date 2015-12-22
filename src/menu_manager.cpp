@@ -3,7 +3,7 @@
 #include "renderer.hpp"
 #include "sequence_decoder.hpp"
 
-// Temp, replace with boost lateron.
+// Temp, replace with boost later on.
 #include "tinyxml.hpp"
 
 #include <algorithm>
@@ -79,7 +79,7 @@ void MenuManager::parseHeader(std::string FileName)
     // Set the font type for the menu being displayed.
     m_renderer->m_surface_manager->setCurrentFont(m_menu_config.m_font_set);
 
-    std::cout << "currnet after set: "
+    std::cout << "current after set: "
               << m_renderer->m_surface_manager->getCurrentFont()
               << std::endl;
 
@@ -100,7 +100,7 @@ void MenuManager::parseHeader(std::string FileName)
 }
 
 /**
- * @brief Readin and Parse, Setup Margins for Directory listing
+ * @brief Read in and Parse, Setup Margins for Directory listing
  */
 void MenuManager::readDirectoryListing()
 {
@@ -112,7 +112,6 @@ void MenuManager::readDirectoryListing()
 
 /**
  * Dial-directory - Change ANSI Template Theme
- *
  * Not Used At this Time.
  *
 bool MenuManager::changeTheme(int index)
@@ -122,8 +121,8 @@ bool MenuManager::changeTheme(int index)
         // Theme Doesn't Exist.
         return false;
     }
-    m_link_list.m_topMargin = TOP_MARGIN;
-    m_link_list.m_bottomMargin = BOTTOM_MARGIN;
+    m_link_list.m_topMargin = m_menu_config.m_top_margin;
+    m_link_list.m_bottomMargin = m_menu_config.m_bottom_margin;
     return true;
 }
 */
@@ -633,15 +632,15 @@ void MenuManager::updateDialDirectory()
     sprintf(outBuffer,"%s%.3d",(char *)m_menu_config.m_max_systems.c_str(), m_link_list.m_total_lines);
     outputBuffer += outBuffer;
 
-    // Parse Sequence to ANSI Ouput and Send to Queue.
+    // Parse Sequence to ANSI output and Send to Queue.
     m_menu_function.m_menu_io.sequenceToAnsi(outputBuffer);
 
-    // Inital Menu Command ReadIn and Setup.
+    // Initial Menu Command Read In and Setup.
     m_menu_function.menuStart(m_menu_config.m_menu_prompt_text);
 }
 
 /**
- * @brief Pass-Throigh handles key update and returns changes.
+ * @brief Pass-Through updates and returns changes.
  * @param inputSequence
  * @return
  */
@@ -650,7 +649,7 @@ int MenuManager::handleMenuUpdates(const std::string &inputSequence)
     char returnParameters[10] = {0};
     m_menu_function.menuProcess(returnParameters, inputSequence, m_lightbar_position);
 
-    // If we got a passthrough command back, then execute it!
+    // If we got a pass through command back, then execute it!
     if(strlen(returnParameters) > 0)
     {
         std::string sequence = returnParameters;
@@ -696,7 +695,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 // hit ENTER
             case 'E': // Selected Current System to Dial
                 // Pass the selected system to the TERM Instance so we can
-                // Pull it inside the TelnetState.
+                // Pull it inside the Telnet State.
 //                TheRenderer::Instance()->setSystemConnection(m_systemConnection[m_lightbar_position]);
                 return m_lightbar_position;
 
@@ -772,7 +771,6 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 return EOF;
 
             case '?': // Directory Help
-                // Not Implimented Yet!
                 //ansiPrintf(sANSI_HELP);
                 //getkey(true);
                 parseHeader(m_menu_config.m_ansi_filename);

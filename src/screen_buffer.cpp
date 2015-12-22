@@ -10,7 +10,7 @@ ScreenBuffer::ScreenBuffer(int term_width, int term_height)
     , m_term_height(term_height)
     , m_term_width(term_width)
 {
-    // Reserve Pixel Screen Space for each visable character.
+    // Reserve Pixel Screen Space for each visible character.
     m_screen_buffer.reserve(m_term_height * m_term_width);
     m_screen_buffer.resize(m_term_height * m_term_width);
 }

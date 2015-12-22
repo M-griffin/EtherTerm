@@ -36,7 +36,7 @@ void MenuIO::rightSpacing(std::string &str, int space)   // Pad Right
     if(space == 0) return;
 
     int s = str.size();
-    // if Line > Sapce, Erase to Make it match!
+    // if Line > Space, Erase to Make it match!
     if(s >= space)
     {
         str.erase(space, s - space);
@@ -56,7 +56,7 @@ void MenuIO::leftSpacing(std::string &str, int space)   // Pad Left
     if(space == 0) return;
 
     int s = str.size();
-    // if Line > Sapce, Erase to Make it match!
+    // if Line > Space, Erase to Make it match!
     if(s > space)
     {
         // Truncate to the last space digits.
@@ -94,7 +94,7 @@ void MenuIO::inputField(std::string &text, int &len)
         return;
     }
 
-    // Overide Input Length for Ansi
+    // Override Input Length for ANSI
     position = text.find("|IN", 0);
     if(position != std::string::npos)
     {
@@ -121,7 +121,7 @@ void MenuIO::inputField(std::string &text, int &len)
         }
     }
 
-    // Overide Foreground/Background Input Field Colors
+    // Override Foreground/Background Input Field Colors
     position = text.find("|FB",0);
     if(position != std::string::npos)
     {
@@ -185,7 +185,7 @@ int MenuIO::getKey()
     std::string inputSequence;
     while(!TheInputHandler::Instance()->isGlobalShutdown())
     {
-        // Cath updates when in the menu system.
+        // Catch updates when in the menu system.
         TheSequenceManager::Instance()->update();
 
         if(TheInputHandler::Instance()->update())

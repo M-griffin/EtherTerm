@@ -70,7 +70,7 @@ Renderer::~Renderer()
 
 /**
  * @brief Startup Creation of Screen Surfaces in Memory
- * NOTE: Scaled Surface only screated when needed!
+ * NOTE: Scaled Surface only created when needed!
  */
 void Renderer::initSurfaceTextures()
 {
@@ -92,7 +92,7 @@ void Renderer::initSurfaceTextures()
         assert(false);
     }
 
-    // Indivdiual Character Cell Surface
+    // Individual Character Cell Surface
     m_surface_manager->createSurface(m_surface_manager->SURFACE_CHARACTER);
     if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_CHARACTER))
     {
@@ -101,7 +101,7 @@ void Renderer::initSurfaceTextures()
         assert(false);
     }
 
-    // Indivdiual Character Cell Cursor On
+    // Individual Character Cell Cursor On
     m_surface_manager->createSurface(m_surface_manager->SURFACE_CURSOR_ON);
     if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_CURSOR_ON))
     {
@@ -110,7 +110,7 @@ void Renderer::initSurfaceTextures()
         assert(false);
     }
 
-    // Indivdiual Character Cell Cursor Off
+    // Individual Character Cell Cursor Off
     m_surface_manager->createSurface(m_surface_manager->SURFACE_CURSOR_OFF);
     if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_CURSOR_OFF))
     {
@@ -121,7 +121,7 @@ void Renderer::initSurfaceTextures()
 }
 
 /**
- * @brief Calcuate the Box Dimensions for Copy/Paste Selection.
+ * @brief Calculate the Box Dimensions for Copy/Paste Selection.
  * @param rect
  */
 void Renderer::calcBoxSize(SDL_Rect &rect,
@@ -163,7 +163,7 @@ void Renderer::calcBoxSize(SDL_Rect &rect,
         rect.y = floor((double)y / char_height) * char_height;
     }
 
-    // Width and height are calcuated by the different from motion to source
+    // Width and height are calculated by the different from motion to source
     // Well need to round these values to the width and height of a character!
     // Also need to swap source for the lowest value so we can select both
     // above and behind the starting points.
@@ -190,7 +190,7 @@ void Renderer::calcBoxSize(SDL_Rect &rect,
         rect.h = char_height + (floor((double)sourceY / char_height) * char_height) - rect.y; // back
     }
 
-    // If were inbetween lines, Height = 0, then add char Height to the bottom
+    // If were in between lines, Height = 0, then add char Height to the bottom
     // So we always have a row!
     if(rect.h == 0)
         rect.h += round(char_height);
@@ -221,20 +221,20 @@ void Renderer::pullSelectionBuffer(int x, int y)
     char_width = value; //round(abs(value));
 
     // First we need to convert the current Screen size to 640x400
-    // So we can calcuate the actual pixel size of each resized character cell.
+    // So we can calculate the actual pixel size of each resized character cell.
     SDL_Rect rect;
 
-    // We clip off botom 80, so that we get proper 8x16
+    // We clip off bottom 80, so that we get proper 8x16
     // Display without Extra pixel borders around the screen,
     // Texture Filter results in Pixel Bleeding.
 
     int sourceX = m_input_handler->getMouseSourceXPosition();
     int sourceY = m_input_handler->getMouseSourceYPosition();
 
-    // Calcuate the Box Dimensions
+    // Calculate the Box Dimensions
     calcBoxSize(rect, sourceX, sourceY, x, y, char_width, char_height);
 
-    // Now that we have the excat coordinates of the selected text.
+    // Now that we have the exact coordinates of the selected text.
     // We need to translate this to the screenbuffer positions
     // So that we can grab the text that was selected on the screen.
 
@@ -272,7 +272,7 @@ void Renderer::clearSelectionTexture()
  */
 void Renderer::renderSelectionScreen(int x, int y)
 {
-    // Redraw screen so we don't increase lighting intensitity
+    // Redraw screen so we don't increase lighting intensity
     // As the selection keeps redrawing!  Cool effect though!!
     SDL_Rect rect_source, rect_dest;
 
@@ -289,9 +289,9 @@ void Renderer::renderSelectionScreen(int x, int y)
     int screen_width, screen_height;
     m_window_manager->renderOutputSize(screen_width, screen_height);
 
-    // We clip off botom 80, so that we get proper 8x16
+    // We clip off bottom 80, so that we get proper 8x16
     // Display without Extra pixel borders around the screen,
-    // Texture Filter results in Pixel Bleeding.
+    // Texture Filter results in Pixel Bleeding. (NOT USED RIGHT NOW!)
     rect_source.w = surface->w; // - 40; // 680 - 640 = 40
     rect_source.h = surface->h; // - 80; // 480 - 400 = 80
     rect_source.x = 0;
@@ -347,7 +347,7 @@ void Renderer::renderSelectionScreen(int x, int y)
     char_width = value;
 
     // First we need to convert the current Screen size to 640x400
-    // So we can calcuate the actual pixel size of each resized character cell.
+    // So we can calculate the actual pixel size of each resized character cell.
     SDL_Rect rect;
     int sourceX = m_input_handler->getMouseSourceXPosition();
     int sourceY = m_input_handler->getMouseSourceYPosition();
@@ -578,7 +578,7 @@ void Renderer::renderClearLineAboveScreen(int y, int x)
     m_current_bg_color = BLACK;
 
     // Clear out entire lines Up The Screen the screen.
-    // Fix with term variables lateron.
+    // Fix with term variables later on.
     int startPosition = x;
     for(int j = y; (j+1) > 0; j--)
     {
@@ -608,7 +608,7 @@ void Renderer::renderClearLineBelowScreen(int y, int x)
     int startPosition = x;
 
     // Clear out entire lines down the screen.
-    // Fix with term variables lateron.
+    // Fix with term variables later on.
     for(int j = y; j < m_term_height; j++)
     {
         for(int i = startPosition; i < m_term_width; i++)
@@ -854,7 +854,7 @@ void Renderer::renderCursorOffScreen()
 }
 
 /**
- * @brief Pushed the Current MAIN Texutre to the Renderer to Draw
+ * @brief Pushed the Current MAIN Texture to the Renderer to Draw
  */
 void Renderer::drawTextureScreen()
 {
@@ -929,7 +929,7 @@ void Renderer::replaceColor(Uint32 foreground, Uint32 background)
                            ->m_surfaceList[m_surface_manager->SURFACE_CHARACTER]
                            ->getSurface();
 
-    // Foreground/Backgroun of Original Bitmap Image for Replacement.
+    // Foreground/Background of Original Bitmap Image for Replacement.
     static Uint32 fgColor = SDL_MapRGB(surface->format, 255, 255, 255);  // White
     static Uint32 bgColor = SDL_MapRGB(surface->format, 0,   0,   0);    // Black
 
@@ -964,7 +964,7 @@ void Renderer::replaceColor(Uint32 foreground, Uint32 background)
 
 /**
  * @brief Setup the Cursor font, character and create from underscore
- * NOTE: this should be rewroked, can't trust all font sets!
+ * NOTE: this should be reworked, can't trust all font sets!
  * This is not the best way to handle this IMO.
  */
 void Renderer::setupCursorCharacter()

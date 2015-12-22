@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-// Forward Decleration
+// Forward Deceleration
 class Session;
 typedef boost::shared_ptr<Session> session_ptr;
 
@@ -28,12 +28,12 @@ public:
     ~SequenceDecoder();
 
     // {Main Execution Method}
-    // Valide and Decode ESC Sequences
+    // Validate and Decode ESC Sequences
     void decodeEscSequenceData(std::string &input_string);
 
 private:
 
-    // Holds Indivdual Sequences
+    // Holds Individual Sequences
     session_ptr  m_session;
     MessageQueue m_message_queue;
 
@@ -111,7 +111,7 @@ private:
 
 public:
     /**
-     * @brief Rset the Sequence Parser to refresh the scrren
+     * @brief Reset the Sequence Parser to refresh the screen
      */
     void resetParser();
 

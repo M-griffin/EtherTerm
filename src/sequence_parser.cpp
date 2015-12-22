@@ -230,7 +230,7 @@ void SequenceParser::textInput(const std::string &buffer)
                 ++m_screen_buffer.m_y_position;
             }
 
-            // Reset to Begining of next Line.
+            // Reset to Beginning of next Line.
             m_screen_buffer.m_x_position = 1;
             ++m_screen_buffer.m_y_position;
 

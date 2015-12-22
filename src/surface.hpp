@@ -48,7 +48,7 @@ public:
     }
 
     /**
-     * @brief Convert The Surface to match Texutre Pixel Format
+     * @brief Convert The Surface to match Texture Pixel Format
      * @return
      */
     bool convert()

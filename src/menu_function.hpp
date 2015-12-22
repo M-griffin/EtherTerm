@@ -25,7 +25,7 @@ typedef struct MenuRecord
 
 /**
  * @class CommandRecord
- * @author Micahel Griffin
+ * @author Michael Griffin
  * @date 12/20/2015
  * @file menu_function.hpp
  * @brief Struct for Menu Command Records

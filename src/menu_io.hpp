@@ -10,7 +10,7 @@
  * @date 12/20/2015
  * @file menu_io.hpp
  * @brief Menu IO handling
- * NOTES: Need to Rewrite GetLine() for passthrough
+ * NOTES: Need to Rewrite GetLine() for pass through
  */
 class MenuIO
 {

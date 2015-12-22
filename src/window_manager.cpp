@@ -21,7 +21,7 @@ WindowManager::WindowManager()
     , m_width(0)
     , m_height(0)
     , m_hint_vSync("0")          // "0" or "1" Disabled or Enabled
-    , m_hint_textureFilter("1")  // "0" or "1", "2" for none or linear, bilinear
+    , m_hint_textureFilter("1")  // "0" or "1", "2" for none or linear, bi-linear
     , m_hint_acceleration("1")   // "0" or "1" Disabled or Enabled
 {
 }
@@ -45,7 +45,7 @@ WindowManager::~WindowManager()
 }
 
 /**
- * @brief Overide default Window Height
+ * @brief Override default Window Height
  * @param value
  */
 void WindowManager::setWindowHeight(int value)
@@ -54,7 +54,7 @@ void WindowManager::setWindowHeight(int value)
 }
 
 /**
- * @brief Overide default Window Width
+ * @brief Override default Window Width
  * @param value
  */
 void WindowManager::setWindowWidth(int value)
@@ -63,7 +63,7 @@ void WindowManager::setWindowWidth(int value)
 }
 
 /**
- * @brief Toggle Verticle Sync with GPU
+ * @brief Toggle Vertical Sync with GPU
  * @param value
  */
 void WindowManager::setHintVsync(bool value)
@@ -88,7 +88,7 @@ void WindowManager::setTextureFilter(int value)
         case 1: // Linear
             m_hint_vSync = "1";
             break;
-        case 2: // BiLinear
+        case 2: // Bi-linear
             m_hint_vSync = "2";
             break;
         default:

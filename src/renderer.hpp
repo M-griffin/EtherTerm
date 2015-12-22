@@ -28,7 +28,7 @@
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
-// Forward Decleration
+// Forward Deceleration
 class Session;
 typedef boost::shared_ptr<Session> session_ptr;
 
@@ -100,12 +100,12 @@ private:
 
 public:
     /**
-     * @brief STartup Creation of Screen Surfaces in Memory
+     * @brief Startup Creation of Screen Surfaces in Memory
      */
     void initSurfaceTextures();
 
     /**
-     * @brief Calcuate the Box Dimensions for Copy/Paste Selection.
+     * @brief Calculate the Box Dimensions for Copy/Paste Selection.
      * @param rect
      */
     void calcBoxSize(SDL_Rect &rect,
@@ -215,7 +215,7 @@ public:
     void renderCursorOffScreen();
 
     /**
-     * @brief Pushed the Current MAIN Texutre to the Renderer to Draw
+     * @brief Pushed the Current MAIN Texture to the Renderer to Draw
      */
     void drawTextureScreen();
 
@@ -241,7 +241,7 @@ public:
 
     /**
      * @brief Setup the Cursor font, character and create from underscore
-     * NOTE: this should be rewroked, can't trust all font sets!
+     * NOTE: this should be reworked, can't trust all font sets!
      * This is not the best way to handle this IMO.
      */
     void setupCursorCharacter();

@@ -43,19 +43,19 @@ public:
     }
 
     /**
-     * @brief Overide default Window Height
+     * @brief Override default Window Height
      * @param value
      */
     void setWindowHeight(int value);
 
     /**
-     * @brief Overide default Window Width
+     * @brief Override default Window Width
      * @param value
      */
     void setWindowWidth(int value);
 
     /**
-     * @brief Toggle Verticle Sync with GPU
+     * @brief Toggle Vertical Sync with GPU
      * @param value
      */
     void setHintVsync(bool value);

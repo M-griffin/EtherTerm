@@ -106,7 +106,7 @@ int MenuFunction::menuParseData(std::string cfgdata)
         return false;
     }
 
-    id1 = cfgdata.find("menu_prompt ", 0);
+    id1 = cfgdata.find("MenuPrompt ", 0);
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);

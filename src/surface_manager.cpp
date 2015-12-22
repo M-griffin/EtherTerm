@@ -18,7 +18,7 @@ SurfaceManager::SurfaceManager(window_manager_ptr window_manager, std::string pr
     , m_programPath(program_path)
     , m_currentFont("vga8x16.bmp")
     , m_previousFont("")
-    // Initalize Color Masks.
+    // Initialize Color Masks.
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     , m_redMask(0xff000000)
     , m_greenMask(0x00ff0000)
@@ -126,7 +126,7 @@ bool SurfaceManager::textureExists(int value)
 
 
 /**
- * @brief Set the Current Fontname
+ * @brief Set the Current Font name
  * @return
  */
 void SurfaceManager::setCurrentFont(std::string font)
@@ -136,7 +136,7 @@ void SurfaceManager::setCurrentFont(std::string font)
 }
 
 /**
- * @brief Grab the Current Fontname
+ * @brief Grab the Current Font name
  * @return
  */
 std::string SurfaceManager::getCurrentFont()
@@ -200,7 +200,7 @@ bool SurfaceManager::loadBitmapImage(std::string fontName)
 
     return true;
     /*
-     * WIP, Reimpliment this!
+     * WIP, Implement this!
      */
     /*
        // Redraw Cursor with new font!
@@ -345,7 +345,7 @@ void SurfaceManager::createSurface(int surfaceType)
     // Run Through Surface Alias and create surface.
     switch(surfaceType)
     {
-            // Handle Indivdiual Character Surfaces
+            // Handle Individual Character Surfaces
         case SURFACE_CHARACTER:
         case SURFACE_CURSOR_ON:
         case SURFACE_CURSOR_OFF:
@@ -356,7 +356,7 @@ void SurfaceManager::createSurface(int surfaceType)
                     delSurface(surfaceType);
                 }
 
-                // Create Surface with Smartpointer.
+                // Create Surface with Smart pointer.
                 surface_ptr surface(
                     new Surfaces(
                         SDL_CreateRGBSurface(
@@ -380,7 +380,7 @@ void SurfaceManager::createSurface(int surfaceType)
                     delSurface(surfaceType);
                 }
 
-                // Create Surface with Smartpointer.
+                // Create Surface with Smart pointer
                 surface_ptr surface(
                     new Surfaces(
                         SDL_CreateRGBSurface(
@@ -412,7 +412,7 @@ void SurfaceManager::createSurface(int surfaceType)
                     &screenHeight
                 );
 
-                // Create Surface with Smartpointer.
+                // Create Surface with Smart pointer
                 surface_ptr surface(
                     new Surfaces(
                         SDL_CreateRGBSurface(
@@ -443,7 +443,7 @@ void SurfaceManager::createSurface(int surfaceType)
                     assert(false);
                 }
 
-                // Create Surface with Smartpointer, uses with of Main Screen, Must exist first!
+                // Create Surface with Smart pointer, uses with of Main Screen, Must exist first!
                 surface_ptr surface(
                     new Surfaces(
                         SDL_CreateRGBSurface(
