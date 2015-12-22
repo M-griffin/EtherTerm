@@ -31,12 +31,13 @@ SequenceParser::SequenceParser(renderer_ptr renderer, connection_ptr connection)
     , m_is_cursor_shown(true)
 {
     // Set Default Region to Off!
+    std::cout << "SequenceParser Created" << std::endl;
     m_renderer->setScrollRegion(0, 0, renderer->m_term_height);
 }
 
 SequenceParser::~SequenceParser()
 {
-    std::cout << "SequenceParser Released" << std::endl;
+    std::cout << "~SequenceParser" << std::endl;
     std::vector<ScreenPixel>().swap(m_screen_buffer.m_screen_buffer); // Clear
 }
 

@@ -15,13 +15,14 @@ InputHandler::InputHandler(surface_manager_ptr surface_manager)
     , m_mouseReleaseYPosition(0)
     , m_fullScreenWindowSize(0)
 {
+    std::cout << "InputHandler Created" << std::endl;
     SDL_StartTextInput();
 }
 
 InputHandler::~InputHandler()
 {
     SDL_StopTextInput();
-    std::cout << "InputHandler Released" << std::endl;
+    std::cout << "~InputHandler" << std::endl;
 }
 
 

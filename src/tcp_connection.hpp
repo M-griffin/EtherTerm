@@ -19,9 +19,11 @@ public:
     tcp_connection(boost::asio::io_service& io_service)
         : m_socket(io_service)
     {
+        std::cout << "tcp_connection Created" << std::endl;
     }
     ~tcp_connection()
     {
+        std::cout << "~tcp_connection" << std::endl;
         if (m_socket.is_open())
         {
             m_socket.shutdown(tcp::socket::shutdown_both);

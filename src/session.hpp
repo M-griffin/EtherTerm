@@ -53,20 +53,35 @@ public:
         , m_window_manager(new WindowManager())
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_input_handler(new InputHandler(m_surface_manager))
-        , m_renderer(new Renderer(m_surface_manager, m_window_manager, m_input_handler, shared_from_this()))
-        , m_sequence_parser(new SequenceParser(m_renderer, connection))
-        , m_sequence_decoder(new SequenceDecoder(shared_from_this()))
         , m_connection(connection)
         , m_io_service(io_service)
         , m_session_list(sessions)
     {
-
+        std::cout << "Session created!" << std::endl;
         // NOTES Reallocate by using reset! When rending Term Height/Width Change, need to recreate.
         // m_sequence_parser.reset(new SequenceParser(m_renderer, connection));
     }
 
     ~Session()
-    { }
+    {
+        std::cout << "~Session" << std::endl;
+    }
+
+    /**
+     * @brief Starts up the Rendering and Sequence Decoder which needs a handle back to the session.
+     */
+    void startup()
+    {
+         // Can't Pass Shared_From_This in itializer list, must wait till object is constructed.
+        std::cout << "m_renderer Startup" << std::endl;
+        m_renderer.reset(new Renderer(m_surface_manager, m_window_manager, m_input_handler, shared_from_this()));
+
+        std::cout << "m_sequence_parser Startup" << std::endl;
+        m_sequence_parser.reset(new SequenceParser(m_renderer, m_connection));
+
+        std::cout << "m_sequence_decoder Startup" << std::endl;
+        m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));
+    }
 
     /**
      * @brief Active Connections etc are send to new sessions on creation.
@@ -82,6 +97,9 @@ public:
     {
         // Create and Pass back the new Session Instance.
         session_ptr new_session(new Session(io_service, connection, sessions, program_path));
+
+        // Call Startup outside of constrctor for shared_from_this() handle.
+        new_session->startup();
         return new_session;
     }
 
@@ -200,7 +218,7 @@ public:
     SafeQueue<MessageQueue>  m_data_queue;
 
     // Handle to session pointers so we can pop our own session off the stack
-    std::set<session_ptr>&   m_session_list;
+    std::set<session_ptr>    m_session_list;
 
     // Dialing Directory for Local Session.
     menu_manager_ptr         m_menu_manager;

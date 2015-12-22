@@ -17,7 +17,9 @@ SequenceDecoder::SequenceDecoder(session_ptr session)
     , m_is_invalid_sequence(false)
     , m_is_sequence_completed(false)
     , m_sequence_level(0)
-{ }
+{
+    std::cout << "SequenceDecoder Created" << std::endl;
+}
 
 SequenceDecoder::~SequenceDecoder()
 {

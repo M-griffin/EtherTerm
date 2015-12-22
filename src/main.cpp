@@ -196,7 +196,6 @@ int main(int argc, char* argv[])
                 // Send the event along for each session
                 interface_spawn.process_event(event);
 
-
                 switch(event.type)
                 {
                     case SDL_QUIT:

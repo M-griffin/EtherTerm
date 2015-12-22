@@ -59,6 +59,7 @@ Renderer::Renderer(surface_manager_ptr surface,
     , m_cursor_y_position(0)
     , m_is_utf8_output(false)
 {
+    std::cout << "Renderer Created" << std::endl;
     // Startup Surface and Texture Creation
     initSurfaceTextures();
 }

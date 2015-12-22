@@ -1,4 +1,9 @@
 
+Change Log 3.0.18 - 2015-12-22
+	- Initial Startup sequence of session is working now. 
+	  Added startup() called externally to properly start the render
+	  with shared_from_this() object.  Now to work on renderer startup.
+
 Change Log 3.0.17 - 2015-12-22
     - Code Cleanup and Working the MenuManager into the Local Session
       Which will be spawned from the Interface.  Have to rework code

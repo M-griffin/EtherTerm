@@ -24,12 +24,13 @@ WindowManager::WindowManager()
     , m_hint_textureFilter("1")  // "0" or "1", "2" for none or linear, bi-linear
     , m_hint_acceleration("1")   // "0" or "1" Disabled or Enabled
 {
+    std::cout << "WindowManager created!" << std::endl;
 }
 
 WindowManager::~WindowManager()
 {
     // Cleanup Deallocate Renderer and Window.
-    std::cout << "Closing Window - Title " << m_window_id << std::endl;
+    std::cout << "~WindowManager: " << m_window_id << std::endl;
 
     if(m_renderer)
     {

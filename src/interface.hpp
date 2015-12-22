@@ -45,7 +45,7 @@ public:
         // Startup worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on startup.
         m_thread = create_thread();
-        startup();
+        spawnLocalSession();
     }
 
     ~Interface()
@@ -67,7 +67,6 @@ public:
     void startup()
     {
         // First Session will always be the Dialing Directory
-        spawnLocalSession();
     }
 
     /**
@@ -80,10 +79,10 @@ public:
         session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
 
         // Start the Dialing Directory on the local instance
-        new_session->start_menu_instance();
+        // new_session->start_menu_instance();
 
         //  Or just pass in msession_list to the session!  so it can pop itself off.
-        m_session_list.insert(new_session);
+        //m_session_list.insert(new_session);
     }
 
     /**
@@ -149,9 +148,8 @@ public:
                 // send through the event to the specific session for processing.
                 if((*it)->m_window_manager->getWindowId() == event.window.windowID)
                 {
-
-                    // Now pass the events for Local Input/Mouse and Windows to the Session.
-
+                    // Pass the Events to the specific Session for Specific Window and Input Events.
+                    (*it)->m_input_handler->update(event);
                 }
             }
         }

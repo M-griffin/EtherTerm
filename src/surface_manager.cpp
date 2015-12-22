@@ -38,6 +38,7 @@ SurfaceManager::SurfaceManager(window_manager_ptr window_manager, std::string pr
     , m_characterWidth(8)
     , m_characterHeight(16)
 {
+    std::cout << "SurfaceManager created!" << std::endl;
 }
 
 SurfaceManager::~SurfaceManager()
