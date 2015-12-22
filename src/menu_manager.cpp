@@ -16,8 +16,8 @@
 MenuManager::MenuManager(
     std::string          program_path,
     renderer_ptr         renderer,
-    sequence_decoder_ptr decoder)
-
+    sequence_decoder_ptr decoder
+)
     : m_program_path(program_path)
     , m_menu_config(program_path)
     , m_sequence_decoder(decoder)
@@ -33,26 +33,23 @@ MenuManager::MenuManager(
 MenuManager::~MenuManager()
 {
     std::vector<list_bar>()
-    .swap(m_result);
+        .swap(m_result);
 
-    //std::vector<TheRenderer::SystemConnection>()
-    // .swap(m_systemConnection);
+    std::vector<SystemConnection>()
+        .swap(m_systemConnection);
 }
 
-
 /**
- * Reads in ANSI file into Buffer Only
+ * @brief Reads in ANSI file into Buffer Only for Parsing.
+ * @param FileName
+ * @param buff
  */
 void MenuManager::readinAnsi(std::string FileName, std::string &buff)
 {
-    std::cout << "readinAnsi()" << std::endl;
-
     std::string path = m_program_path;
     path += FileName;
     path += ".ans";
     FILE *fp;
-
-    std::cout << "Load ANSI: " << path << std::endl;
 
     int sequence = 0;
     if((fp = fopen(path.c_str(), "r+")) ==  nullptr)
@@ -71,20 +68,20 @@ void MenuManager::readinAnsi(std::string FileName, std::string &buff)
 }
 
 /**
- * Dial-directory - Parse ANSI Template
+ * @brief Parse Ansi Template (Dialing Directory)
+ * @param FileName
  */
 void MenuManager::parseHeader(std::string FileName)
 {
     std::cout << "parseHeader()" << std::endl;
-    std::cout << "sFONT_SET: " << m_menu_config.FONT_SET << std::endl;
+    std::cout << "sFONT_SET: " << m_menu_config.m_font_set << std::endl;
 
     // Set the font type for the menu being displayed.
-    m_renderer->m_surface_manager->setCurrentFont(m_menu_config.FONT_SET);
+    m_renderer->m_surface_manager->setCurrentFont(m_menu_config.m_font_set);
 
     std::cout << "currnet after set: "
               << m_renderer->m_surface_manager->getCurrentFont()
               << std::endl;
-
 
     // Test if font changed, if so, then re-load it.
     if(m_renderer->m_surface_manager->didFontChange())
@@ -98,20 +95,19 @@ void MenuManager::parseHeader(std::string FileName)
             return;
         }
     }
-
     m_sequence_decoder->resetParser();
     m_menu_function.m_menu_io.displayAnsiFile(FileName);
 }
 
 /**
- * Dial-directory - Setup Reading INI File and init Theme
+ * @brief Readin and Parse, Setup Margins for Directory listing
  */
 void MenuManager::readDirectoryListing()
 {
-    m_menu_config.INI_NAME = "dialdirectory.ini";
+    m_menu_config.m_ini_name = "dialdirectory.ini";
     m_menu_config.ddirectory_parse();
-    m_directory_top_margin = m_menu_config.TOP_MARGIN;
-    m_directory_bottom_margin = m_menu_config.BOTTOM_MARGIN;
+    m_directory_top_margin = m_menu_config.m_top_margin;
+    m_directory_bottom_margin = m_menu_config.m_bottom_margin;
 }
 
 /**
@@ -126,17 +122,15 @@ bool MenuManager::changeTheme(int index)
         // Theme Doesn't Exist.
         return false;
     }
-    m_linkList.m_topMargin = TOP_MARGIN;
-    m_linkList.m_bottomMargin = BOTTOM_MARGIN;
+    m_link_list.m_topMargin = TOP_MARGIN;
+    m_link_list.m_bottomMargin = BOTTOM_MARGIN;
     return true;
 }
 */
 
 /**
- * Build Phone-book with List of Systems
- * This function creates 4 versions of each line,
- * one for default, default selected, new, then new selected.
- * This doesn't mark which are new or to be used.
+ * @brief Build the List of Systems to Display Lightbars.
+ * @return
  */
 std::vector<list_bar> MenuManager::buildDialList()
 {
@@ -197,11 +191,8 @@ std::vector<list_bar> MenuManager::buildDialList()
 
     unsigned long maxSystems    = 0;
     unsigned long currentSystem = 0;
-///    maxSystems = m_systemConnection.size();
-/**
-  REWORK CONNECTIONS
-*/
-//    std::cout << "systemConnection.size(): " << m_systemConnection.size() << std::endl;
+    maxSystems = m_systemConnection.size();
+    std::cout << "systemConnection.size(): " << m_systemConnection.size() << std::endl;
 
     int counter = 0;
     while(currentSystem < maxSystems)
@@ -273,7 +264,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                             if(isLeftPadding)
                             {
                                 std::string stringReplace = temp2;
-                                m_menu_function.leftSpacing(stringReplace, padding);
+                                m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
                                 std::replace(
                                     stringReplace.begin(), stringReplace.end(), ' ', '.');
                                 isLeftPadding = false;
@@ -282,7 +273,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                             else if(isRightPadding)
                             {
                                 std::string stringReplace = temp2;
-                                m_menu_function.rightSpacing(stringReplace, padding);
+                                m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
                                 std::replace(
                                     stringReplace.begin(), stringReplace.end(), ' ', '.');
                                 isRightPadding = false;
@@ -295,12 +286,12 @@ std::vector<list_bar> MenuManager::buildDialList()
                                 m_systemConnection[currentSystem].name;
                             if(isLeftPadding)
                             {
-                                MenuFunction::leftSpacing(stringReplace, padding);
+                                m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
                                 isLeftPadding = false;
                             }
                             else if(isRightPadding)
                             {
-                                MenuFunction::rightSpacing(stringReplace, padding);
+                                m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
                                 isRightPadding = false;
                             }
                             stringBuilder += stringReplace;
@@ -321,12 +312,12 @@ std::vector<list_bar> MenuManager::buildDialList()
 
                             if(isLeftPadding)
                             {
-                                MenuFunction::leftSpacing(stringReplace, padding);
+                                m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
                                 isLeftPadding = false;
                             }
                             else if(isRightPadding)
                             {
-                                MenuFunction::rightSpacing(stringReplace, padding);
+                                m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
                                 isRightPadding = false;
                             }
                             stringBuilder += stringReplace;
@@ -338,12 +329,12 @@ std::vector<list_bar> MenuManager::buildDialList()
                             std::string stringReplace = temp2;
                             if(isLeftPadding)
                             {
-                                MenuFunction::leftSpacing(stringReplace, padding);
+                                m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
                                 isLeftPadding = false;
                             }
                             else if(isRightPadding)
                             {
-                                MenuFunction::rightSpacing(stringReplace, padding);
+                                m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
                                 isRightPadding = false;
                             }
                             stringBuilder += stringReplace;
@@ -354,12 +345,12 @@ std::vector<list_bar> MenuManager::buildDialList()
                                 m_systemConnection[currentSystem].protocol;
                             if(isLeftPadding)
                             {
-                                MenuFunction::leftSpacing(stringReplace, padding);
+                                m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
                                 isLeftPadding = false;
                             }
                             else if(isRightPadding)
                             {
-                                MenuFunction::rightSpacing(stringReplace, padding);
+                                m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
                                 isRightPadding = false;
                             }
                             stringBuilder += stringReplace;
@@ -370,12 +361,12 @@ std::vector<list_bar> MenuManager::buildDialList()
                                 m_systemConnection[currentSystem].keyMap;
                             if(isLeftPadding)
                             {
-                                MenuFunction::leftSpacing(stringReplace, padding);
+                                m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
                                 isLeftPadding = false;
                             }
                             else if(isRightPadding)
                             {
-                                MenuFunction::rightSpacing(stringReplace, padding);
+                                m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
                                 isRightPadding = false;
                             }
                             stringBuilder += stringReplace;
@@ -422,13 +413,14 @@ std::vector<list_bar> MenuManager::buildDialList()
     return result;
 }
 
-/*
- * Read All Systems in Dialing Directory
+/**
+ * @brief Read in the XML Data File.
+ * @return
  */
 bool MenuManager::readDialDirectory()
 {
-    TheRenderer::SystemConnection sysconn;
-    std::string path = SetupThePath();
+    SystemConnection sysconn;
+    std::string path = m_program_path;
     path += "dialdirectory.xml";
     TiXmlDocument doc(path.c_str());
     if(!doc.LoadFile())
@@ -444,7 +436,7 @@ bool MenuManager::readDialDirectory()
     if(m_systemConnection.size() > 0)
     {
         m_systemConnection.clear();
-        std::vector<TheRenderer::SystemConnection>().swap(m_systemConnection);
+        std::vector<SystemConnection>().swap(m_systemConnection);
     }
     // block: EtherTerm
     {
@@ -488,13 +480,13 @@ bool MenuManager::readDialDirectory()
     return true;
 }
 
-/*
- * Create a new initial dialing directory.
+/**
+ * @brief Create a new XML File.
  */
 void MenuManager::createDialDirectory()
 {
     // Create Default Phone Book.
-    std::string path = SetupThePath();
+    std::string path = m_program_path;
     path += "dialdirectory.xml";
 
     TiXmlDocument doc;
@@ -534,13 +526,13 @@ void MenuManager::createDialDirectory()
     doc.SaveFile(path.c_str());
 }
 
-/*
- * Write All connections to the dialing directory
+/**
+ * @brief Write all Connections to XML
  */
 void MenuManager::writeDialDirectory()
 {
     // Create Default Phone Book.
-    std::string path = SetupThePath();
+    std::string path = m_program_path;
     path += "dialdirectory.xml";
 
     TiXmlDocument doc;
@@ -572,6 +564,9 @@ void MenuManager::writeDialDirectory()
     doc.SaveFile(path.c_str());
 }
 
+/**
+ * @brief Readin and Parse the Dialing Directory.
+ */
 void MenuManager::setupDialDirectory()
 {
     readDirectoryListing();
@@ -597,12 +592,13 @@ void MenuManager::setupDialDirectory()
     m_link_list.getVectorList(m_result);
 
     // Loop Light bar Interface.
-    parseHeader(ANSI_FILE);
+    parseHeader(m_menu_config.m_ansi_filename);
     m_box_size = m_link_list.m_bottom_margin - m_link_list.m_top_margin;
     m_current_page = m_lightbar_position / m_box_size;
 }
+
 /**
- * Title Scan - Start Interface
+ * @brief Main Interface for Dialing Directory
  */
 void MenuManager::updateDialDirectory()
 {
@@ -628,25 +624,26 @@ void MenuManager::updateDialDirectory()
     outputBuffer = "|16"; // Clear Color Bleeding, reset background to black.
 
     // Show Current/Total Pages in Dialing Directory
-    sprintf(outBuffer,"%s%.3d",(char *)PAGE_NUMBER.c_str(), m_link_list.m_current_page+1);
+    sprintf(outBuffer,"%s%.3d",(char *)m_menu_config.m_page_number.c_str(), m_link_list.m_current_page+1);
     outputBuffer += outBuffer;
-    sprintf(outBuffer,"%s%.3d",(char *)PAGE_TOTAL.c_str(), m_link_list.m_total_pages);
+    sprintf(outBuffer,"%s%.3d",(char *)m_menu_config.m_page_total.c_str(), m_link_list.m_total_pages);
     outputBuffer += outBuffer;
 
     // # of Systems in Dialing Directory
-    sprintf(outBuffer,"%s%.3d",(char *)MAX_SYSTEMS.c_str(), m_link_list.m_total_lines);
+    sprintf(outBuffer,"%s%.3d",(char *)m_menu_config.m_max_systems.c_str(), m_link_list.m_total_lines);
     outputBuffer += outBuffer;
 
     // Parse Sequence to ANSI Ouput and Send to Queue.
-    MenuFunction::sequenceToAnsi(outputBuffer);
+    m_menu_function.m_menu_io.sequenceToAnsi(outputBuffer);
 
     // Inital Menu Command ReadIn and Setup.
-    m_menu_function.menuStart(MENU_PROMPT_TEXT);
+    m_menu_function.menuStart(m_menu_config.m_menu_prompt_text);
 }
 
-/*
- * If input is received, the pass it to the Menu System
- * for a Return Action or Interface Update!
+/**
+ * @brief Pass-Throigh handles key update and returns changes.
+ * @param inputSequence
+ * @return
  */
 int MenuManager::handleMenuUpdates(const std::string &inputSequence)
 {
@@ -662,9 +659,10 @@ int MenuManager::handleMenuUpdates(const std::string &inputSequence)
     return 0;
 }
 
-/*
- * Handles Comamnd Keys returned from the menu
- * For what command to execute.
+/**
+ * @brief Handle Menu Actions from Input
+ * @param inputSequence
+ * @return
  */
 int MenuManager::handleMenuActions(const std::string &inputSequence)
 {
@@ -699,7 +697,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
             case 'E': // Selected Current System to Dial
                 // Pass the selected system to the TERM Instance so we can
                 // Pull it inside the TelnetState.
-                TheRenderer::Instance()->setSystemConnection(m_systemConnection[m_lightbar_position]);
+//                TheRenderer::Instance()->setSystemConnection(m_systemConnection[m_lightbar_position]);
                 return m_lightbar_position;
 
             case '+': // Next Message - Move Down
@@ -711,22 +709,22 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 //Calculate if we go down, ++Current Area, are we on next page or not.
                 // Because 0 Based, need to add +1
                 // Test if we moved to next page.
-                if((signed)LIGHTBAR_POSITION+1 < (m_box_size*(m_current_page+1))+1)
+                if((signed)m_lightbar_position+1 < (m_box_size*(m_current_page+1))+1)
                 {
                     // Low-light Current, then Highlight Next.
                     sprintf(stringBuffer, "\x1b[%i;%iH|16%s",
                             m_link_list.m_current_selection, 1,
-                            (char *)m_linkList.m_listing[m_lightbar_position-1].active_lightbar.c_str());
+                            (char *)m_link_list.m_listing[m_lightbar_position-1].active_lightbar.c_str());
 
                     outputBuffer += stringBuffer;
                     m_link_list.m_current_selection += 1;
 
                     sprintf(stringBuffer, "\x1b[%i;%iH|16%s",
                             m_link_list.m_current_selection, 1,
-                            (char *)m_linkList.m_listing[m_lightbar_position].inactive_lightbar.c_str());
+                            (char *)m_link_list.m_listing[m_lightbar_position].inactive_lightbar.c_str());
 
                     outputBuffer += stringBuffer;
-                    MenuFunction::sequenceToAnsi(outputBuffer);
+                    m_menu_function.m_menu_io.sequenceToAnsi(outputBuffer);
                     outputBuffer.erase();
                 }
                 else
@@ -747,19 +745,19 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 //Calculate if we go down, --Current Area, are we on next page or not.
                 // Because 0 Based, need to add +1
                 // Test if we moved to next page.
-                if((signed)LIGHTBAR_POSITION+1 > (m_box_size*(m_current_page)))
+                if((signed)m_lightbar_position+1 > (m_box_size*(m_current_page)))
                 {
                     // Still on Same Page
                     // Low-light Current, then Highlight Next.
                     sprintf(stringBuffer, "\x1b[%i;%iH|16%s", m_link_list.m_current_selection, 1,
-                            (char *)m_linkList.m_listing[m_lightbar_position+1].active_lightbar.c_str());
+                            (char *)m_link_list.m_listing[m_lightbar_position+1].active_lightbar.c_str());
                     outputBuffer = stringBuffer;
                     m_link_list.m_current_selection -= 1;
 
                     sprintf(stringBuffer, "\x1b[%i;%iH|16%s", m_link_list.m_current_selection, 1,
-                            (char *)m_linkList.m_listing[m_lightbar_position].inactive_lightbar.c_str());
+                            (char *)m_link_list.m_listing[m_lightbar_position].inactive_lightbar.c_str());
                     outputBuffer += stringBuffer;
-                    MenuFunction::sequenceToAnsi(outputBuffer);
+                    m_menu_function.m_menu_io.sequenceToAnsi(outputBuffer);
                     outputBuffer.erase();
                 }
                 else
@@ -777,7 +775,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 // Not Implimented Yet!
                 //ansiPrintf(sANSI_HELP);
                 //getkey(true);
-                parseHeader(ANSI_FILE);
+                parseHeader(m_menu_config.m_ansi_filename);
                 m_link_list.drawVectorList(m_current_page,m_lightbar_position);
                 break;
 
@@ -785,12 +783,10 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 parseHeader((char *)"about.ans");
 
                 // Get input (Blocking!) This should be rewritten later on.
-                MenuFunction::getKey();
-                parseHeader((char *)"about2.ans");
+                //parseHeader((char *)"about2.ans");
 
                 // Get input (Blocking!) This should be rewritten later on.
-                MenuFunction::getKey();
-                parseHeader((char *)"et2.ans"); // Re-display Display ANSI
+                //parseHeader((char *)"et2.ans"); // Re-display Display ANSI
                 m_link_list.drawVectorList(m_current_page,m_lightbar_position);
                 break;
 
