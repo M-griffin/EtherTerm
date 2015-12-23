@@ -29,11 +29,12 @@ public:
         : m_surface(surface)
         , m_is_converted(false)
     {
+        std::cout << "A Surface was Created!" << std::endl;
     }
 
     ~Surfaces()
     {
-        std::cout << "surfaces: Surface Removed!" << std::endl;
+        std::cout << "~A Surface was Removed!" << std::endl;
         SDL_FreeSurface(m_surface);
         m_surface = nullptr;
     }

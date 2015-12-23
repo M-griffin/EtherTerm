@@ -2,6 +2,7 @@
 #include "sequence_decoder.hpp"
 #include "menu_io.hpp"
 
+#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -30,12 +31,15 @@ MenuFunction::MenuFunction(sequence_decoder_ptr decoder, std::string program_pat
     , m_menu_record()
     , m_isLoadNewMenu(true)
 {
+    std::cout << "MenuFunction Created!" << std::endl;
     strcpy(m_menu_path, "");
     strcpy(m_output_buffer, "");
+
 }
 
 MenuFunction::~MenuFunction()
 {
+    std::cout << "~MenuFunction" << std::endl;
     std::vector<CommandRecord>().swap(m_command_record);
     std::vector<int>().swap(m_command_index);
     std::vector<int>().swap(m_command_index_lightbar);

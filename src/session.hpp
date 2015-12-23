@@ -14,6 +14,7 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/smart_ptr/weak_ptr.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -28,6 +29,7 @@ using boost::asio::ip::tcp;
 
 class Session;
 typedef boost::shared_ptr<Session> session_ptr;
+typedef boost::weak_ptr<Session> session_weak_ptr;
 
 
 /**
@@ -43,7 +45,7 @@ class Session
 public:
 
     Session(
-        boost::asio::io_service& io_service,
+        //boost::asio::io_service& io_service,
         connection_ptr           connection,
         std::set<session_ptr>&   sessions,
         std::string              program_path
@@ -54,10 +56,10 @@ public:
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_input_handler(new InputHandler(m_surface_manager))
         , m_connection(connection)
-        , m_io_service(io_service)
+        //, m_io_service(io_service)
         , m_session_list(sessions)
     {
-        std::cout << "Session created!" << std::endl;
+        std::cout << "Session Created!" << std::endl;
         // NOTES Reallocate by using reset! When rending Term Height/Width Change, need to recreate.
         // m_sequence_parser.reset(new SequenceParser(m_renderer, connection));
     }
@@ -72,14 +74,9 @@ public:
      */
     void startup()
     {
-         // Can't Pass Shared_From_This in itializer list, must wait till object is constructed.
-        std::cout << "m_renderer Startup" << std::endl;
+        // Can't Pass Shared_From_This in itializer list, must wait till object is constructed.
         m_renderer.reset(new Renderer(m_surface_manager, m_window_manager, m_input_handler, shared_from_this()));
-
-        std::cout << "m_sequence_parser Startup" << std::endl;
         m_sequence_parser.reset(new SequenceParser(m_renderer, m_connection));
-
-        std::cout << "m_sequence_decoder Startup" << std::endl;
         m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));
     }
 
@@ -89,14 +86,15 @@ public:
      * @param connection
      * @return
      */
-    static session_ptr create(boost::asio::io_service& io_service,
+    static session_ptr create(//boost::asio::io_service& io_service,
                               connection_ptr           connection,
                               std::set<session_ptr>&   sessions,
                               std::string              program_path)
 
     {
         // Create and Pass back the new Session Instance.
-        session_ptr new_session(new Session(io_service, connection, sessions, program_path));
+        //session_ptr new_session(new Session(io_service, connection, sessions, program_path));
+        session_ptr new_session(new Session(connection, sessions, program_path));
 
         // Call Startup outside of constrctor for shared_from_this() handle.
         new_session->startup();
@@ -212,7 +210,7 @@ public:
     connection_ptr           m_connection;
    
     // Place Holder if we need it later on
-    boost::asio::io_service& m_io_service;
+//    boost::asio::io_service& m_io_service;
 
     // Decoded Data Queue for Sequence Parser.
     SafeQueue<MessageQueue>  m_data_queue;

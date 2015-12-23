@@ -28,10 +28,13 @@ MenuManager::MenuManager(
     , m_directory_bottom_margin(1)
     , m_current_page(0)
     , m_box_size(0)
-{ }
+{
+    std::cout << "MenuManager Created!" << std::endl;
+}
 
 MenuManager::~MenuManager()
 {
+    std::cout << "~MenuManager" << std::endl;
     std::vector<list_bar>()
         .swap(m_result);
 

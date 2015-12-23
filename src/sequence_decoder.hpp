@@ -5,6 +5,7 @@
 #include "message_queue.hpp"
 
 #include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/smart_ptr/weak_ptr.hpp>
 
 #include <string>
 #include <vector>
@@ -12,6 +13,7 @@
 // Forward Deceleration
 class Session;
 typedef boost::shared_ptr<Session> session_ptr;
+typedef boost::weak_ptr<Session> session_weak_ptr;
 
 /**
  * @class SequenceDecoder
@@ -33,9 +35,11 @@ public:
 
 private:
 
+    // Handle to Session for Sending Responses to Client.
+    session_weak_ptr  m_weak_session;
+
     // Holds Individual Sequences
-    session_ptr  m_session;
-    MessageQueue m_message_queue;
+    MessageQueue      m_message_queue;
 
     // Sequence Parser State
     enum

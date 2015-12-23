@@ -31,7 +31,7 @@ Renderer::Renderer(surface_manager_ptr surface,
     : m_surface_manager(surface)
     , m_window_manager(window)
     , m_input_handler(input)
-    , m_session(session)
+    , m_weak_session(session)
     , BLACK( {   0,   0,   0,   0 })
     , BLUE( {   0,   0, 171,   0 })
     , GREEN( {   0, 171,   0,   0 })
@@ -116,6 +116,19 @@ void Renderer::initSurfaceTextures()
     if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_CURSOR_OFF))
     {
         SDL_Log("initSurfaceTextures() surfaceExists SURFACE_CURSOR_OFF: %s",
+                SDL_GetError());
+        assert(false);
+    }
+
+    // Create the Main Screen Texture, Matches the Window size.
+    // Individual Character Cell Cursor Off
+    m_surface_manager->createTexture(
+        m_surface_manager->TEXTURE_MAIN_SCREEN,
+        m_surface_manager->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]->getSurface()
+    );
+    if(!m_surface_manager->textureExists(m_surface_manager->TEXTURE_MAIN_SCREEN))
+    {
+        SDL_Log("initSurfaceTextures() textureExists TEXTURE_MAIN_SCREEN: %s",
                 SDL_GetError());
         assert(false);
     }
@@ -787,11 +800,20 @@ void Renderer::renderCursorOnScreen()
 {
     SDL_Rect rect;
 
-    // Check if the position has changed, if so, then skip!
-    if(m_cursor_x_position !=
-            m_session->m_sequence_parser->m_screen_buffer.m_x_position-1 ||
-            m_cursor_y_position !=
-            m_session->m_sequence_parser->m_screen_buffer.m_y_position-1)
+    // Grab handle from weak pointer.
+    session_ptr session = m_weak_session.lock();
+    if(session)
+    {
+        // Check if the position has changed, if so, then skip!
+        if(m_cursor_x_position !=
+                session->m_sequence_parser->m_screen_buffer.m_x_position-1 ||
+                m_cursor_y_position !=
+                session->m_sequence_parser->m_screen_buffer.m_y_position-1)
+        {
+            return;
+        }
+    }
+    else
     {
         return;
     }
@@ -824,11 +846,20 @@ void Renderer::renderCursorOffScreen()
 {
     SDL_Rect rect;
 
-    // Check if the position has changed, if so, then skip!
-    if(m_cursor_x_position !=
-            m_session->m_sequence_parser->m_screen_buffer.m_x_position-1 ||
-            m_cursor_y_position !=
-            m_session->m_sequence_parser->m_screen_buffer.m_y_position-1)
+    // Grab handle from weak pointer.
+    session_ptr session = m_weak_session.lock();
+    if(session)
+    {
+        // Check if the position has changed, if so, then skip!
+        if(m_cursor_x_position !=
+                session->m_sequence_parser->m_screen_buffer.m_x_position-1 ||
+                m_cursor_y_position !=
+                session->m_sequence_parser->m_screen_buffer.m_y_position-1)
+        {
+            return;
+        }
+    }
+    else
     {
         return;
     }
@@ -970,14 +1001,23 @@ void Renderer::replaceColor(Uint32 foreground, Uint32 background)
  */
 void Renderer::setupCursorCharacter()
 {
-    // If cursor is not active then don't waste processing.
-    if(!m_session->m_sequence_parser->isCursorActive())
+    // Grab handle from weak pointer.
+    session_ptr session = m_weak_session.lock();
+    if(session)
+    {
+        // If cursor is not active then don't waste processing.
+        if(!session->m_sequence_parser->isCursorActive())
+        {
+            return;
+        }
+
+        m_cursor_x_position = session->m_sequence_parser->m_screen_buffer.m_x_position-1;
+        m_cursor_y_position = session->m_sequence_parser->m_screen_buffer.m_y_position-1;
+    }
+    else
     {
         return;
     }
-
-    m_cursor_x_position = m_session->m_sequence_parser->m_screen_buffer.m_x_position-1;
-    m_cursor_y_position = m_session->m_sequence_parser->m_screen_buffer.m_y_position-1;
 
     SDL_Rect pick, area;
 

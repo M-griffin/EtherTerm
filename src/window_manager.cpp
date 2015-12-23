@@ -18,13 +18,24 @@ WindowManager::WindowManager()
     : m_window(nullptr)
     , m_renderer(nullptr)
     , m_window_id(0)
-    , m_width(0)
-    , m_height(0)
+    , m_width(640)
+    , m_height(400)
     , m_hint_vSync("0")          // "0" or "1" Disabled or Enabled
     , m_hint_textureFilter("1")  // "0" or "1", "2" for none or linear, bi-linear
     , m_hint_acceleration("1")   // "0" or "1" Disabled or Enabled
 {
-    std::cout << "WindowManager created!" << std::endl;
+    std::cout << "WindowManager Created!" << std::endl;
+
+    // Startup create the Window NOT Fullscreen.
+    if(createWindow(false))
+    {
+        std::cout << "Creating Window and Renderer!" << std::endl;
+        // Set new Render Hints.
+        createHints();
+
+        // Create the Renderer
+        createRenderer();
+    }
 }
 
 WindowManager::~WindowManager()
@@ -191,12 +202,13 @@ void WindowManager::createRenderer()
                 SDL_GetError());
     }
 
-
     if(SDL_RenderClear(m_renderer) < 0)
     {
         SDL_Log("createRenderer() SDL_RenderClear globalRenderer: %s",
                 SDL_GetError());
     }
+
+    SDL_RenderPresent(m_renderer);
 }
 
 /**
@@ -204,13 +216,6 @@ void WindowManager::createRenderer()
  */
 bool WindowManager::createWindow(bool fullScreen)
 {
-
-    // Set new Texture Hints.
-    createHints();
-
-    // Create the Renderer
-    createRenderer();
-
     // If Window Already Exists, destory so we can recreate it.
     if(m_window)
     {
@@ -222,7 +227,7 @@ bool WindowManager::createWindow(bool fullScreen)
     // create window in in full screen or windowed mode.
     if(fullScreen)
     {
-        m_window = SDL_CreateWindow("EtherTerm 3.0 Demo - Fullscreen",
+        m_window = SDL_CreateWindow("EtherTerm 3.0 Demo - Full Screen",
                                     SDL_WINDOWPOS_CENTERED,
                                     SDL_WINDOWPOS_CENTERED,
                                     m_width,
@@ -252,34 +257,9 @@ bool WindowManager::createWindow(bool fullScreen)
         }
     }
 
-    // Make Sure the window was created
-    if(!m_window)
-    {
-        //Create renderer for window
-        m_renderer = SDL_CreateRenderer(m_window,
-                                        -1,
-                                        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-        if(!m_renderer)
-        {
-            std::cout << "Renderer could not be created! SDL Error: " << SDL_GetError() << std::endl;
-            SDL_DestroyWindow(m_window);
-            m_window = nullptr;
-            assert(m_renderer);
-        }
-        else
-        {
-            //Initialize renderer color RGBA
-            SDL_SetRenderDrawColor(m_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
-            //Grab window identifier
-            m_window_id = SDL_GetWindowID(m_window);
-        }
-    }
-    else
-    {
-        std::cout << "Window could not be created! SDL Error: " << SDL_GetError() << std::endl;
-        assert(m_window);
-    }
+    // Set the Window ID
+    m_window_id = SDL_GetWindowID(m_window);
 
     // Display and move focus to the new window.
     SDL_ShowWindow(m_window);

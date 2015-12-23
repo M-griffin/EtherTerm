@@ -9,6 +9,7 @@
 #include "menu_io.hpp"
 #include "sequence_decoder.hpp"
 
+#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -19,10 +20,12 @@ MenuIO::MenuIO(sequence_decoder_ptr decoder, std::string program_path)
     , m_program_path(program_path)
 
 {
+    std::cout << "MenuIO Created!" << std::endl;
 }
 
 MenuIO::~MenuIO()
 {
+    std::cout << "~MenuIO" << std::endl;
 }
 
 

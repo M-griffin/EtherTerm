@@ -27,10 +27,12 @@
 #include <vector>
 
 #include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/smart_ptr/weak_ptr.hpp>
 
 // Forward Deceleration
 class Session;
 typedef boost::shared_ptr<Session> session_ptr;
+typedef boost::weak_ptr<Session> session_weak_ptr;
 
 /**
  * @class Renderer
@@ -53,7 +55,9 @@ public:
     surface_manager_ptr m_surface_manager;
     window_manager_ptr  m_window_manager;
     input_handler_ptr   m_input_handler;
-    session_ptr         m_session;  // Handle to Instance.
+
+    // Handle to Instance, make weak!
+    session_weak_ptr    m_weak_session;
 
     // Define ANSI Color Schemes
     SDL_Color BLACK;

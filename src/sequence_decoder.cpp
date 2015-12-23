@@ -8,7 +8,7 @@
 
 // Initialize Class Variables
 SequenceDecoder::SequenceDecoder(session_ptr session)
-    : m_session(session)
+    : m_weak_session(session)
     , m_sequence_state(SEQ_NORMAL)
     , m_sequence(0)
     , m_parameter(0)
@@ -1062,13 +1062,24 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
             case SEQ_START:
                 //TheAnsiParser::Instance()->textInput(validOutputData);
                 // Build a Message Queue with PassThrough Text Data.
-                m_message_queue.m_text = m_valid_output_data;
-                m_session->m_data_queue.enqueue(m_message_queue);
-                m_message_queue.clear();
+                {
+                    m_message_queue.m_text = m_valid_output_data;
 
-                m_valid_output_data.erase();
-                m_sequence_state = SEQ_PROCESSING;
-                m_sequence_builder += m_sequence;
+                    // Grab handle from weak pointer.
+                    session_ptr session = m_weak_session.lock();
+                    if(session)
+                    {
+                        session->m_data_queue.enqueue(m_message_queue);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                    m_message_queue.clear();
+                    m_valid_output_data.erase();
+                    m_sequence_state = SEQ_PROCESSING;
+                    m_sequence_builder += m_sequence;
+                }
                 break;
 
             case SEQ_PROCESSING:
@@ -1251,13 +1262,24 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                  * Build Message Queue Broken Down Sequences
                  */
                 //TheAnsiParser::Instance()->sequenceInput(params);
-                m_message_queue.m_queueParams.swap(m_sequence_params);
-                m_session->m_data_queue.enqueue(m_message_queue);
-                m_message_queue.clear();
+                {
+                    m_message_queue.m_queueParams.swap(m_sequence_params);
 
-                std::vector<int>().swap(m_sequence_params); // Clear for next run.
-                m_sequence_state = SEQ_NORMAL; // Reset The State
-                m_sequence_builder.erase();
+                    // Handle to Session Instatnce
+                    session_ptr session = m_weak_session.lock();
+                    if(session)
+                    {
+                        session->m_data_queue.enqueue(m_message_queue);
+                    }
+                    else
+                    {
+                        return;
+                    }
+                    m_message_queue.clear();
+                    std::vector<int>().swap(m_sequence_params); // Clear for next run.
+                    m_sequence_state = SEQ_NORMAL; // Reset The State
+                    m_sequence_builder.erase();
+                }
                 break;
 
             case SEQ_ERROR:
@@ -1284,7 +1306,18 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
          * Build Queue with Passthrough Message Test
          */
         m_message_queue.m_text = m_valid_output_data;
-        m_session->m_data_queue.enqueue(m_message_queue);
+
+        // Handle to Session Instatnce
+        session_ptr session = m_weak_session.lock();
+        if(session)
+        {
+            session->m_data_queue.enqueue(m_message_queue);
+        }
+        else
+        {
+            return;
+        }
+
         m_message_queue.clear();
         m_valid_output_data.erase();
     }
@@ -1295,5 +1328,10 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
  */
 void SequenceDecoder::resetParser()
 {
-    m_session->m_sequence_parser->reset();
+    // Handle to Session Instatnce
+    session_ptr session = m_weak_session.lock();
+    if(session)
+    {
+        session->m_sequence_parser->reset();
+    }
 }

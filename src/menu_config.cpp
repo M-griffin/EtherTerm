@@ -11,7 +11,9 @@
 
 MenuConfig::MenuConfig(std::string program_path)
     : m_program_path(program_path)
-{ }
+{
+    std::cout << "MenuConfig Created!" << std::endl;
+}
 
 MenuConfig::~MenuConfig()
 {

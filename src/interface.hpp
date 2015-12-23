@@ -7,6 +7,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/io_service.hpp>
 
+#include <iostream>
 #include <thread>
 #include <set>
 
@@ -42,6 +43,7 @@ public:
         : m_work(m_io_service)
         , m_program_path(program_path)
     {
+        std::cout << "Interface Created" << std::endl;
         // Startup worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on startup.
         m_thread = create_thread();
@@ -50,6 +52,9 @@ public:
 
     ~Interface()
     {
+        std::cout << "~Interface" << std::endl;
+        m_io_service.stop();
+        m_thread.join();
     }
 
     /**
@@ -57,6 +62,8 @@ public:
      */
     void shutdown()
     {
+
+        // Not work here, have to shutdown sessions first!!
         m_io_service.stop();
         m_thread.join();
     }
@@ -75,8 +82,10 @@ public:
     void spawnLocalSession()
     {
         //Mock up connection which will not be used.
-        connection_ptr new_connection(new tcp_connection(m_io_service));
-        session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
+        // connection_ptr new_connection(new tcp_connection(m_io_service));
+        //connection_ptr new_connection;
+        //session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
+        session_ptr new_session = Session::create(nullptr, m_session_list, m_program_path);
 
         // Start the Dialing Directory on the local instance
         // new_session->start_menu_instance();
@@ -116,7 +125,8 @@ public:
                 std::cout << "Connected" << std::endl;
 
                 // Were good, spawn the session
-                session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
+                //session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
+                session_ptr new_session = Session::create(new_connection, m_session_list, m_program_path);
 
                 // Start Async Read/Writes for Session Socket Data.
                 // Required only for Sessions that make connections, Local sessions do not use this.

@@ -11,7 +11,6 @@
 #include <SDL2/SDL.h>
 #endif
 
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 
 /**
@@ -22,7 +21,6 @@
  * @brief Manages Individual Window Interfaces with Renderers
  */
 class WindowManager
-    : public boost::enable_shared_from_this<WindowManager>
 {
 public:
     WindowManager();

@@ -1,8 +1,15 @@
 
+Change Log 3.0.19 - 2015-12-23
+    - Reworked the startup and shutdown sequences.
+    - Added weak_prt for shared_from_this() so the main session
+      instance being passed would not lock and stay alive.
+    - WIP SessionList container in the Interface, research the best 
+      container for the job to easily main and release sessions.
+
 Change Log 3.0.18 - 2015-12-22
-	- Initial Startup sequence of session is working now. 
-	  Added startup() called externally to properly start the render
-	  with shared_from_this() object.  Now to work on renderer startup.
+    - Initial Startup sequence of session is working now. 
+      Added startup() called externally to properly start the render
+      with shared_from_this() object.  Now to work on renderer startup.
 
 Change Log 3.0.17 - 2015-12-22
     - Code Cleanup and Working the MenuManager into the Local Session

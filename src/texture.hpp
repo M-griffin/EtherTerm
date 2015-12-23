@@ -28,11 +28,12 @@ public:
     Textures(SDL_Texture *texture)
         : m_texture(texture)
     {
+        std::cout << "A Texture was Created!" << std::endl;
     }
 
     ~Textures()
     {
-        std::cout << "textures: Texture Removed!" << std::endl;
+        std::cout << "~A Texture was removed!" << std::endl;
         SDL_DestroyTexture(m_texture);
         m_texture = nullptr;
     }
