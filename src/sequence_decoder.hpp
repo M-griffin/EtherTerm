@@ -29,6 +29,13 @@ public:
     SequenceDecoder(session_ptr session);
     ~SequenceDecoder();
 
+
+    /**
+     * @brief Queue the Pasred Data back to the Session for Display
+     * @return
+     */
+    bool sessionQueue();
+
     // {Main Execution Method}
     // Validate and Decode ESC Sequences
     void decodeEscSequenceData(std::string &input_string);

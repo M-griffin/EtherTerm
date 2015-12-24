@@ -989,6 +989,25 @@ void SequenceDecoder::validateSequence()
 #endif
 }
 
+/**
+ * @brief Queue the Pasred Data back to the Session for Display
+ * @return
+ */
+bool SequenceDecoder::sessionQueue()
+{
+    // Handle to Session Instance
+    session_ptr session = m_weak_session.lock();
+    if(session)
+    {
+        session->m_data_queue.enqueue(m_message_queue);
+        m_message_queue.clear();
+    }
+    else
+    {
+        return false;
+    }
+    return true;
+}
 /*
  * Takes String input and parses for ESC Control Sequences
  * State machine stays actives waiting for complete control sequences
@@ -1065,17 +1084,10 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                 {
                     m_message_queue.m_text = m_valid_output_data;
 
-                    // Grab handle from weak pointer.
-                    session_ptr session = m_weak_session.lock();
-                    if(session)
-                    {
-                        session->m_data_queue.enqueue(m_message_queue);
-                    }
-                    else
-                    {
+                    // Queue the Data back to the Session
+                    if (!sessionQueue())
                         return;
-                    }
-                    m_message_queue.clear();
+
                     m_valid_output_data.erase();
                     m_sequence_state = SEQ_PROCESSING;
                     m_sequence_builder += m_sequence;
@@ -1265,17 +1277,10 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                 {
                     m_message_queue.m_queueParams.swap(m_sequence_params);
 
-                    // Handle to Session Instatnce
-                    session_ptr session = m_weak_session.lock();
-                    if(session)
-                    {
-                        session->m_data_queue.enqueue(m_message_queue);
-                    }
-                    else
-                    {
+                    // Queue the Data back to the Session
+                    if (!sessionQueue())
                         return;
-                    }
-                    m_message_queue.clear();
+
                     std::vector<int>().swap(m_sequence_params); // Clear for next run.
                     m_sequence_state = SEQ_NORMAL; // Reset The State
                     m_sequence_builder.erase();
@@ -1307,18 +1312,10 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
          */
         m_message_queue.m_text = m_valid_output_data;
 
-        // Handle to Session Instatnce
-        session_ptr session = m_weak_session.lock();
-        if(session)
-        {
-            session->m_data_queue.enqueue(m_message_queue);
-        }
-        else
-        {
+        // Queue the Data back to the Session
+        if (!sessionQueue())
             return;
-        }
 
-        m_message_queue.clear();
         m_valid_output_data.erase();
     }
 }

@@ -2,6 +2,7 @@
 #define INTERFACE_HPP
 
 #include "session.hpp"
+#include "broad_caster.hpp"
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -42,12 +43,12 @@ public:
     Interface(std::string program_path)
         : m_work(m_io_service)
         , m_program_path(program_path)
+        , m_session_list(new BroadCaster())
     {
         std::cout << "Interface Created" << std::endl;
         // Startup worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on startup.
         m_thread = create_thread();
-        spawnLocalSession();
     }
 
     ~Interface()
@@ -62,18 +63,64 @@ public:
      */
     void shutdown()
     {
-
         // Not work here, have to shutdown sessions first!!
         m_io_service.stop();
         m_thread.join();
     }
 
     /**
-     * @brief Starts up the Sessions
+     * @brief Starts up Main Loop and Sessions.
      */
     void startup()
     {
-        // First Session will always be the Dialing Directory
+        // Startup the initial Menu/Dialing Directory Sessions
+        spawnLocalSession();
+
+        bool is_global_shutdown = false;
+        SDL_Event event;
+
+        // Send the event along for each session
+        if (m_session_list->numberOfSessions() == 0)
+        {
+            std::cout << "Startup Unsuccessful, Shutting Down!" << std::endl;
+            is_global_shutdown = true;
+        }
+        else
+        {
+            std::cout << "Startup Successful!" << std::endl;
+        }
+
+        // Main Loop SDL Event Polling must always be done in main thread.
+        // Along with All Rendering. This is how SDL works. Events are therefore
+        // Read, then passed through to each session to handle per instance.
+        while (!is_global_shutdown)
+        {
+            while(SDL_PollEvent(&event) != 0 && !is_global_shutdown)
+            {
+                // Send the event along for each session
+                if (m_session_list->numberOfSessions() == 0)
+                {
+                    std::cout << "Shutting Down!" << std::endl;
+                    is_global_shutdown = true;
+                    break;
+                }
+
+
+                // Process Event.
+                process_event(event);
+
+                // Check for Quit, should really only activate on main window closeing!
+                // Update this later on.
+                switch(event.type)
+                {
+                    case SDL_QUIT:
+                        is_global_shutdown = true;
+                        break;
+                }
+            }
+            SDL_Delay(10);
+        }
+
     }
 
     /**
@@ -87,11 +134,15 @@ public:
         //session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
         session_ptr new_session = Session::create(nullptr, m_session_list, m_program_path);
 
-        // Start the Dialing Directory on the local instance
-        // new_session->start_menu_instance();
+        // Join the Broadcaster to keep instance properly active!
+        m_session_list->join(new_session);
 
-        //  Or just pass in msession_list to the session!  so it can pop itself off.
-        //m_session_list.insert(new_session);
+        // Call Startup outside of constrctor for shared_from_this() handle.
+        new_session->startup();
+
+        // Start the Dialing Directory on the local instance
+        //new_session->start_menu_instance();
+
     }
 
     /**
@@ -128,12 +179,12 @@ public:
                 //session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
                 session_ptr new_session = Session::create(new_connection, m_session_list, m_program_path);
 
+                m_session_list->join(new_session);
                 // Start Async Read/Writes for Session Socket Data.
                 // Required only for Sessions that make connections, Local sessions do not use this.
                 new_session->wait_for_data();                
 
                 //  Or just pass in msession_list to the session!  so it can pop itself off.
-                m_session_list.insert(new_session);
             }
             else
             {
@@ -149,8 +200,9 @@ public:
      */
     void process_event(SDL_Event &event)
     {
-        if(m_session_list.size() > 0)
+        if(m_session_list->numberOfSessions() > 0)
         {
+            /*
             std::set<session_ptr>::iterator it;
             for(it = m_session_list.begin(); it != m_session_list.end(); ++it)
             {
@@ -161,12 +213,9 @@ public:
                     // Pass the Events to the specific Session for Specific Window and Input Events.
                     (*it)->m_input_handler->update(event);
                 }
-            }
+            }*/
         }
     }
-
-    // Spawned Session List
-    std::set<session_ptr>          m_session_list;
 
     // MenuSystem here,  pass the m_session_List, and io_service
     // To the menu system so it can spawn new connections that link back here.
@@ -175,6 +224,10 @@ public:
     boost::asio::io_service        m_io_service;
     boost::asio::io_service::work  m_work;
     std::string                    m_program_path;
+
+    // Spawned Session List
+    broad_caster_ptr               m_session_list;
+
     std::thread                    m_thread;
 
 };

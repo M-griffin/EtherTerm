@@ -1,11 +1,12 @@
 #include "input_handler.hpp"
+#include "surface_manager.hpp"
 
 #include <iostream>
 #include <string>
 
 
 InputHandler::InputHandler(surface_manager_ptr surface_manager)
-    : m_surface_manager(surface_manager)
+    : m_weak_surface_manager(surface_manager)
     , m_globalShutdown(false)
     , m_isWindowMode(false)
     , m_isMouseSelected(false)
@@ -1063,7 +1064,7 @@ bool InputHandler::update(SDL_Event &event)
     // Notes.. Need to check for Window ID!
 
     //while(SDL_PollEvent(&event) != 0 && !isGlobalShutdown())
-    {
+    //{
         switch(event.type)
         {
             case SDL_QUIT:
@@ -1096,7 +1097,7 @@ bool InputHandler::update(SDL_Event &event)
             default:
                 break;
         }
-    }
+    //}
 
     // If Input was received return true.
     // Otherwise events are handled here.

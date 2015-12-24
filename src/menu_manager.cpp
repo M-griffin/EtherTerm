@@ -90,8 +90,7 @@ void MenuManager::parseHeader(std::string FileName)
     if(m_renderer->m_surface_manager->didFontChange())
     {
         // loadBitmapImage
-        if(!m_renderer->m_surface_manager->loadBitmapImage(
-                    m_renderer->m_surface_manager->getCurrentFont()))
+        if(!m_renderer->m_surface_manager->loadBitmapImage())
         {
             SDL_Delay(1500);
             assert(false);

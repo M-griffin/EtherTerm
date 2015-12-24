@@ -207,8 +207,6 @@ void WindowManager::createRenderer()
         SDL_Log("createRenderer() SDL_RenderClear globalRenderer: %s",
                 SDL_GetError());
     }
-
-    SDL_RenderPresent(m_renderer);
 }
 
 /**

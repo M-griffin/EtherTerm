@@ -9,13 +9,16 @@
 #include <SDL2/SDL.h>
 #endif
 
-#include "surface_manager.hpp"
-
 #include <iostream>
 #include <string>
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/smart_ptr/weak_ptr.hpp>
+
+class SurfaceManager;
+typedef boost::shared_ptr<SurfaceManager> surface_manager_ptr;
+typedef boost::weak_ptr<SurfaceManager> surface_manager_weak_ptr;
 
 
 /**
@@ -82,7 +85,7 @@ private:
     }
 
     // Handles Access to Surfaces and Windows.
-    surface_manager_ptr     m_surface_manager;
+    surface_manager_weak_ptr  m_weak_surface_manager;
 
     bool m_globalShutdown;
     bool m_isWindowMode;
@@ -156,6 +159,7 @@ private:
 };
 
 typedef boost::shared_ptr<InputHandler> input_handler_ptr;
+typedef boost::weak_ptr<InputHandler> input_handler_weak_ptr;
 
 
 #endif

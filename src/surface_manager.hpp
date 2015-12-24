@@ -3,7 +3,6 @@
 
 #include "surface.hpp"
 #include "texture.hpp"
-#include "window_manager.hpp"
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
@@ -20,7 +19,11 @@
 #include <assert.h>
 
 #include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/smart_ptr/weak_ptr.hpp>
 
+class WindowManager;
+typedef boost::shared_ptr<WindowManager> window_manager_ptr;
+typedef boost::weak_ptr<WindowManager> window_manager_weak_ptr;
 
 /**
  * @class SurfaceManager
@@ -36,7 +39,7 @@ public:
     ~SurfaceManager();
 
     // Handle to Current Window
-    window_manager_ptr     m_window_manager;
+    window_manager_weak_ptr  m_weak_window_manager;
 
    
     std::string    m_programPath;
@@ -138,10 +141,9 @@ public:
 
     /**
      * @brief Loads Bitmap Fonts from Files
-     * @param fontName
      * @return
      */
-    bool loadBitmapImage(std::string fontName);
+    bool loadBitmapImage();
 
     /**
      * @brief Creates / Recreate Textures

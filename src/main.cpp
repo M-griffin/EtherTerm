@@ -55,7 +55,7 @@ bool SDLStartUp()
 	}
 
     // Turn off, might make a toggle for this later on.
-    SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+    SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "1");
 	return success;
 }
 
@@ -176,54 +176,8 @@ int main(int argc, char* argv[])
              return -1;
         }        
 
-        bool is_global_shutdown = false;
-        SDL_Event event;
-
-        // we need to get the window_id from the main window (menu)
-        // if this window closes, then we are done!
+        // Lead into Interface spawn for session startup and management.
         interface_spawn.startup();
-
-        // Send the event along for each session
-        if (interface_spawn.m_session_list.size() == 0)
-        {
-            std::cout << "Startup Unsuccessful, Shutting Down!" << std::endl;
-            is_global_shutdown = true;
-        }
-        else
-        {
-            std::cout << "Startup Successful!" << std::endl;
-        }
-
-        // Main Loop SDL Event Polling must always be done in main thread.
-        // Along with All Rendering. This is how SDL works. Events are therefore
-        // Read, then passed through to each session to handle per instance.
-        while (!is_global_shutdown)
-        {
-            while(SDL_PollEvent(&event) != 0 && !is_global_shutdown)
-            {
-                // Send the event along for each session
-                if (interface_spawn.m_session_list.size() == 0)
-                {
-                    std::cout << "Shutting Down!" << std::endl;
-                    is_global_shutdown = true;
-                    break;
-                }
-                interface_spawn.process_event(event);
-
-                switch(event.type)
-                {
-                    case SDL_QUIT:
-                        is_global_shutdown = true;
-                        break;
-                }
-            }
-
-            SDL_Delay(10);
-
-            //interface_spawn.shutdown();
-        }
-
-        // Setup the First Window for the Startup Splash Screen and Window.
 
         // SDL is done.
         std::cout << "EtherTerm Shutdown completed." << std::endl;

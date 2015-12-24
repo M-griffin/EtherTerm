@@ -259,8 +259,8 @@ public:
     void drawCharacterCell(int X, int Y, int ascii_code);
 
     // Testing only, draws bitmap graphic.
-    //void drawString(int X, int Y, char text[]);
-    //void drawCharSet(int X, int Y);
+    void drawString(int X, int Y, char text[]);
+    void drawCharSet(int X, int Y);
 
 };
 

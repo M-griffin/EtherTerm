@@ -1,4 +1,20 @@
 
+Change Log 3.0.20 - 2015-12-24
+	- Good Progress, Finally have the Classes loading in sync and
+	  clean destruction in sync.
+	- Also have added broadcaster to hold all active sessions.
+	- Move main loop from Main() to Interface->Startup()
+	  This keeps sessions and windows alive, falling back to main
+	  seems to have been clearing pointers.  
+	- Able to render the full VGA character setup in a basic window.
+WIP
+	- Still loads of work to do, test the SequenceDecoder.
+	- Add processing and passing events to each session.
+	- Getting session data and passing it back through to the decoder
+	  so it reaches he SequenceParser and renders on the screen.
+	- Render scaling on the fly to different and pre-set sizes without blur
+	  when using texture filtering.
+
 Change Log 3.0.19 - 2015-12-23
     - Reworked the startup and shutdown sequences.
     - Added weak_prt for shared_from_this() so the main session

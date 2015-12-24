@@ -1,4 +1,5 @@
 #include "surface_manager.hpp"
+#include "window_manager.hpp"
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
@@ -14,7 +15,7 @@
 #include <assert.h>
 
 SurfaceManager::SurfaceManager(window_manager_ptr window_manager, std::string program_path)
-    : m_window_manager(window_manager)
+    : m_weak_window_manager(window_manager)
     , m_programPath(program_path)
     , m_currentFont("vga8x16.bmp")
     , m_previousFont("")
@@ -159,17 +160,18 @@ bool SurfaceManager::didFontChange()
  * @param fontName
  * @return
  */
-bool SurfaceManager::loadBitmapImage(std::string fontName)
+bool SurfaceManager::loadBitmapImage()
 {
     std::string path = m_programPath;
-    std::cout << "loading Fontname -> : " << fontName << std::endl;
 
 #ifdef _WIN32
     path.append("assets\\");
 #else
     path.append("assets/");
 #endif
-    path.append(fontName);
+    path.append(m_currentFont);
+
+    std::cout << "loading Font -> : " << path << std::endl;
 
     // Loading Bitmap first time, or reloading,  If already Exists remove it.
     if(surfaceExists(SURFACE_FONT))
@@ -227,6 +229,13 @@ bool SurfaceManager::loadBitmapImage(std::string fontName)
  */
 void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
 {
+    // Handle to Window Manager
+    window_manager_ptr window = m_weak_window_manager.lock();
+    if (!window)
+    {
+        return;
+    }
+
     switch(textureType)
     {
         case TEXTURE_MAIN_SCREEN:
@@ -241,7 +250,7 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                 texture_ptr texture(
                     new Textures(
                         SDL_CreateTexture(
-                            m_window_manager->getRenderer(),
+                            window->getRenderer(),
                             SDL_PIXELFORMAT_ARGB8888,
                             SDL_TEXTUREACCESS_STREAMING,
                             surface->w, surface->h
@@ -274,7 +283,7 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                 texture_ptr texture(
                     new Textures(
                         SDL_CreateTexture(
-                            m_window_manager->getRenderer(),
+                            window->getRenderer(),
                             SDL_PIXELFORMAT_ARGB8888,
                             SDL_TEXTUREACCESS_TARGET,
                             surface->w, surface->h
@@ -405,10 +414,17 @@ void SurfaceManager::createSurface(int surfaceType)
                     delSurface(surfaceType);
                 }
 
+                 // Handle to Window Manager
+                window_manager_ptr window = m_weak_window_manager.lock();
+                if (!window)
+                {
+                    return;
+                }
+
                 // Get the Actual size of the Renderer to match the surface for scaling.
                 int screenWidth, screenHeight;
                 SDL_GetRendererOutputSize(
-                    m_window_manager->getRenderer(),
+                    window->getRenderer(),
                     &screenWidth,
                     &screenHeight
                 );

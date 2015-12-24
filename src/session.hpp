@@ -11,10 +11,12 @@
 #include "safe_queue.hpp"
 #include "message_queue.hpp"
 #include "menu_manager.hpp"
+#include "broad_caster.hpp"
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
+#include <boost/make_shared.hpp>
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -47,17 +49,17 @@ public:
     Session(
         //boost::asio::io_service& io_service,
         connection_ptr           connection,
-        std::set<session_ptr>&   sessions,
-        std::string              program_path
+        std::string              program_path,
+        broad_caster_ptr         session_list
     )
         : m_is_dial_directory(false)
         , m_program_path(program_path)
+        , m_weak_session_list(session_list)
         , m_window_manager(new WindowManager())
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_input_handler(new InputHandler(m_surface_manager))
         , m_connection(connection)
-        //, m_io_service(io_service)
-        , m_session_list(sessions)
+        ////, m_io_service(io_service)
     {
         std::cout << "Session Created!" << std::endl;
         // NOTES Reallocate by using reset! When rending Term Height/Width Change, need to recreate.
@@ -78,6 +80,16 @@ public:
         m_renderer.reset(new Renderer(m_surface_manager, m_window_manager, m_input_handler, shared_from_this()));
         m_sequence_parser.reset(new SequenceParser(m_renderer, m_connection));
         m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));
+
+
+        // Test
+        //m_sequence_decoder->decodeEscSequenceData("Testing");
+
+        // Test initial Graphics with writting out the Character set.
+        m_surface_manager->loadBitmapImage();
+        m_renderer->drawCharSet(0, 0);
+        m_renderer->renderScreen();
+        m_renderer->drawTextureScreen();
     }
 
     /**
@@ -88,16 +100,13 @@ public:
      */
     static session_ptr create(//boost::asio::io_service& io_service,
                               connection_ptr           connection,
-                              std::set<session_ptr>&   sessions,
+                              broad_caster_ptr         session_list,
                               std::string              program_path)
 
     {
         // Create and Pass back the new Session Instance.
         //session_ptr new_session(new Session(io_service, connection, sessions, program_path));
-        session_ptr new_session(new Session(connection, sessions, program_path));
-
-        // Call Startup outside of constrctor for shared_from_this() handle.
-        new_session->startup();
+        session_ptr new_session(new Session(connection, program_path, session_list));
         return new_session;
     }
 
@@ -178,7 +187,7 @@ public:
     void close_session()
     {
         // Remove our session from the list close the session.
-        m_session_list.erase(shared_from_this());
+       // m_session_list.erase(shared_from_this());
     }
 
 
@@ -187,6 +196,9 @@ public:
 
     // Program Path for File locations.
     std::string              m_program_path;
+
+    // Handle to List of Sessions to Keep Active.
+    broad_caster_wptr        m_weak_session_list;
 
     // Window Managers Creates and Handles Input/Mouse Events Rendering per active instance.
     window_manager_ptr       m_window_manager;
@@ -214,9 +226,6 @@ public:
 
     // Decoded Data Queue for Sequence Parser.
     SafeQueue<MessageQueue>  m_data_queue;
-
-    // Handle to session pointers so we can pop our own session off the stack
-    std::set<session_ptr>    m_session_list;
 
     // Dialing Directory for Local Session.
     menu_manager_ptr         m_menu_manager;

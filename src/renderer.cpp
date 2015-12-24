@@ -914,7 +914,7 @@ void Renderer::drawTextureScreen()
     rect.x = 0;
     rect.y = 0;*/
 
-    // Copy Surface to Texture
+    // Copy Texture to Renderer
     m_window_manager->renderCopy(
         m_surface_manager
         ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
@@ -1145,8 +1145,8 @@ void Renderer::drawCharacterCell(int X, int Y, int ascii_code)
     if(SDL_BlitSurface(
                 m_surface_manager
                 ->m_surfaceList[m_surface_manager->SURFACE_FONT]
-                ->getSurface()
-                ,&pick,
+                ->getSurface(),
+                &pick,
                 surface,
                 nullptr) < 0)
     {
@@ -1180,7 +1180,8 @@ void Renderer::drawCharacterCell(int X, int Y, int ascii_code)
  * But this will most likely be done in the ANSI Parser.
  *
  * Not Used at this time
-void Terminal::drawString(int X, int Y, char text[])
+ */
+void Renderer::drawString(int X, int Y, char text[])
 {
     SDL_Rect area;
 
@@ -1189,19 +1190,28 @@ void Terminal::drawString(int X, int Y, char text[])
     area.x = X;
     area.y = Y;
 
+    int surface_width = m_surface_manager
+                ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                ->getSurface()->w;
+
     for(i = 0; i < (signed)strlen(text); i++)
     {
         asciiCode = std::char_traits<unsigned char>().to_int_type(text[i]);
-        drawChar(area.x / m_characterWidth, area.y / m_characterHeight, asciiCode);
-        area.x += m_characterWidth;
-        if(area.x >= m_surfaceWidth-5)
+        drawCharacterCell(
+            area.x / m_surface_manager->m_characterWidth,
+            area.y / m_surface_manager->m_characterHeight,
+            asciiCode
+        );
+
+        area.x += m_surface_manager->m_characterWidth;
+        if(area.x >= surface_width-5)
         {
             area.x = 0;
-            area.y += m_characterHeight;
+            area.y += m_surface_manager->m_characterHeight;
         }
     }
 }
-*/
+
 
 /**
  * Draws Character Set of each Character Cells to x/y location on screen surface.
@@ -1209,14 +1219,19 @@ void Terminal::drawString(int X, int Y, char text[])
  * Mainly for testing all characters loaded from Bitmap Image.
  *
  * Not used at this time
- *
-void Terminal::drawCharSet(int X, int Y)
+ */
+void Renderer::drawCharSet(int X, int Y)
 {
     SDL_Rect area;
     int i = 0;
     int asciiCode = 0;
-    area.x = X * m_characterWidth;
-    area.y = Y * m_characterHeight;
+    area.x = X * m_surface_manager->m_characterWidth;
+    area.y = Y * m_surface_manager->m_characterHeight;
+
+    int surface_width = m_surface_manager
+                ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                ->getSurface()->w;
+
 
     // Loop through Each Char in Bitmap.
     for(i = 1; i < 255; i++)
@@ -1226,14 +1241,17 @@ void Terminal::drawCharSet(int X, int Y)
         {
             break;
         }
-        drawChar(area.x / m_characterWidth, area.y / m_characterHeight, asciiCode);
-        area.x += m_characterWidth;
+        drawCharacterCell(
+            area.x / m_surface_manager->m_characterWidth,
+            area.y / m_surface_manager->m_characterHeight,
+            asciiCode
+        );
+        area.x += m_surface_manager->m_characterWidth;
         // Wrap
-        if(area.x >= m_surfaceWidth-5)
+        if(area.x >= surface_width-5)
         {
             area.x = 0;
-            area.y += m_characterHeight;
+            area.y += m_surface_manager->m_characterHeight;
         }
     }
 }
-*/
