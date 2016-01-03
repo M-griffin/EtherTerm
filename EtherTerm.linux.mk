@@ -15,8 +15,8 @@ CurrentFileFullPath    :=
 User                   :=Michael Griffin
 Date                   :=19/06/2015
 CodeLitePath           :="/home/merc/.codelite"
-LinkerName             :=/usr/bin/g++
-SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
+LinkerName             =${CXX}
+SharedObjectLinkerName =${CXX} -shared -fPIC
 ObjectSuffix           :=.o
 DependSuffix           :=.o.d
 PreprocessSuffix       :=.i
@@ -28,14 +28,14 @@ LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
 OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
-Preprocessors          :=
+Preprocessors          = ${CPPFLAGS}
 ObjectSwitch           :=-o
 ArchiveOutputSwitch    :=
 PreprocessOnlySwitch   :=-E
 ObjectsFileList        :="EtherTerm.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
-LinkOptions            :=
+LinkOptions            = ${LDFLAGS}
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch).
 IncludePCH             :=
 RcIncludePath          :=
@@ -47,14 +47,14 @@ LibPath                := $(LibraryPathSwitch).
 ## Common variables
 ## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
 ##
-AR       := /usr/bin/ar rcu
-CXX      := /usr/bin/g++
-CC       := /usr/bin/gcc
-CXXFLAGS :=  -Wfatal-errors -O2 -pedantic -W -std=c++11 -Wall  $(Preprocessors)
-CFLAGS   :=  -Wfatal-errors -O2 -pedantic -W -std=c++11 -Wall  $(Preprocessors)
+AR       ?= /usr/bin/ar rcu
+CXX      ?= /usr/bin/g++
+CC       ?= /usr/bin/gcc
+CXXFLAGS +=  -Wfatal-errors -O2 -pedantic -W -std=c++11 -Wall  $(Preprocessors)
+CFLAGS   +=  -Wfatal-errors -O2 -pedantic -W -std=c++11 -Wall  $(Preprocessors)
 
 ASFLAGS  :=
-AS       := /usr/bin/as
+AS       ?= /usr/bin/as
 
 
 ##
