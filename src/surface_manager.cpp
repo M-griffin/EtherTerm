@@ -31,9 +31,9 @@ SurfaceManager::SurfaceManager(window_manager_ptr window_manager, std::string pr
     , m_blueMask(0x00ff0000)
     , m_alphaMask(0xff000000)
 #endif
-    , m_surfaceWidth(640)
+    , m_surfaceWidth(640)   // Main Surface vs Window/Texture Size
     , m_surfaceHeight(400)
-    , m_windowWidth(640)
+    , m_windowWidth(640)    // Default Windoow, not passed to window yet!?!
     , m_windowHeight(400)
     , m_surfaceBits(32)
     , m_characterWidth(8)
@@ -246,6 +246,24 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                     delTexture(textureType);
                 }
 
+                 // Handle to Window Manager
+                window_manager_ptr window = m_weak_window_manager.lock();
+                if (!window)
+                {
+                    return;
+                }
+
+                // Get the Actual size of the Renderer to match the surface for scaling.
+
+                // m_is_scalling_surface!!  Add Toggle for Scaling here,
+                // Otherwise should use same size as main surface!
+                int screenWidth, screenHeight;
+                SDL_GetRendererOutputSize(
+                    window->getRenderer(),
+                    &screenWidth,
+                    &screenHeight
+                );
+
                 // Create Texture: SDL_TEXTUREACCESS_STREAMING
                 texture_ptr texture(
                     new Textures(
@@ -253,7 +271,7 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                             window->getRenderer(),
                             SDL_PIXELFORMAT_ARGB8888,
                             SDL_TEXTUREACCESS_STREAMING,
-                            surface->w, surface->h
+                            screenWidth, screenHeight
                         )
                     )
                 );

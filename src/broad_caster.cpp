@@ -4,6 +4,12 @@
 #include <algorithm>
 #include <boost/bind.hpp>
 
+
+BroadCaster::BroadCaster()
+{
+    std::cout << "BroadCaster Created" << std::endl;
+}
+
 BroadCaster::~BroadCaster()
 {
     std::cout << "~BroadCaster" << std::endl;
@@ -15,10 +21,9 @@ BroadCaster::~BroadCaster()
  */
 void BroadCaster::join(session_ptr session)
 {
-    std::cout << "joined BroadCaster" << std::endl;
+    std::cout << "joined session BroadCaster" << std::endl;
     m_sessions.insert(session);
 }
-
 
 /**
  * @brief Notifies that a user has left the room
@@ -26,7 +31,7 @@ void BroadCaster::join(session_ptr session)
  */
 void BroadCaster::leave(session_ptr session)
 {
-    std::cout << "left BroadCaster" << std::endl;
+    std::cout << "left session BroadCaster" << std::endl;
 
     // Clear Session
     m_sessions.erase(session);
@@ -53,29 +58,27 @@ void BroadCaster::deliver(std::string msg)
  */
 int BroadCaster::numberOfSessions()
 {
-    int count = 0;
-    for(auto it = begin(m_sessions); it != end(m_sessions); ++it)
-    {
-        ++count;
-    }
-    return count;
+    return m_sessions.size();
 }
 
 /**
- * @brief Broacaster Anchors the Sessions, we loop to shutdown all connections.
+ * @brief Update, Hits Session Updates for processing Data Queue.
+ * @return
+ */
+void BroadCaster::update()
+{
+    for(auto it = m_sessions.begin(); it != m_sessions.end(); ++it)
+    {
+        (*it)->update();
+    }
+}
+
+/**
+ * @brief Broacaster Anchors the Sessions, shutdown all session.
  * @return
  */
 void BroadCaster::shutdown()
 {
-    for(auto it = begin(m_sessions); it != end(m_sessions); ++it)
-    {
-        /*
-        if ((*it)->m_connection)
-        {
-            (*it)->m_connection->m_normal_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-            (*it)->m_connection->m_normal_socket.close();
-        }
-        m_sessions.erase(it);
-        */
-    }
+    // Swap to pop all enteries off the stack.
+    std::set<session_ptr>().swap(m_sessions);
 }

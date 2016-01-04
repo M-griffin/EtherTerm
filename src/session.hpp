@@ -22,6 +22,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/io_service.hpp>
 
+
 // For IO service!
 #include <thread>
 #include <deque>
@@ -81,16 +82,63 @@ public:
         m_sequence_parser.reset(new SequenceParser(m_renderer, m_connection));
         m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));
 
+        // Don't Startup menu_managers for other sessions, this is one off!
+        //m_menu_manager.reset(new MenuManager(m_program_path, m_renderer, m_sequence_decoder));
+
+        // Load the Font set and set the default colors for testing!
+        /*
+        m_surface_manager->setCurrentFont("topazPlus-8x16.bmp");
+        m_surface_manager->loadBitmapImage();
+
+        m_renderer->m_current_fg_color = m_renderer->WHITE;
+        m_renderer->m_current_bg_color = m_renderer->BLACK;
+
+        std::cout << "display ET2.ans" << std::endl;
+        m_menu_manager->m_menu_function.m_menu_io.displayAnsiFile("et2.ans");
+
+        std::cout << "message queue" << std::endl;
+        MessageQueue msgQueue;
+        while(!m_data_queue.is_empty())
+        {
+            std::cout << "message dequeue" << std::endl;
+            msgQueue = std::move(m_data_queue.dequeue());
+            if(msgQueue.m_text.empty())
+            {
+                // Make Sure Vector is not Empty!
+                if(msgQueue.m_queueParams.size() > 0)
+                {
+                    std::cout << "m_sequence_ Input" << std::endl;
+                    m_sequence_parser->sequenceInput(msgQueue.m_queueParams);
+                }
+            }
+            else
+            {
+                std::cout << "m_sequence_ textInput" << std::endl;
+                m_sequence_parser->textInput(msgQueue.m_text);
+            }
+            msgQueue.clear();
+        }
+
+        m_renderer->renderScreen();
+        m_renderer->drawTextureScreen();
+
+        std::cout << "Done!" << std::endl;
+        */
 
         // Test
         //m_sequence_decoder->decodeEscSequenceData("Testing");
 
         // Test initial Graphics with writting out the Character set.
+        /*
         m_surface_manager->loadBitmapImage();
+
+        m_renderer->m_current_fg_color = m_renderer->WHITE;
+        m_renderer->m_current_bg_color = m_renderer->BLACK;
+
         m_renderer->drawCharSet(0, 0);
         m_renderer->renderScreen();
-        m_renderer->drawTextureScreen();
-    }
+        m_renderer->drawTextureScreen();*/
+    }    
 
     /**
      * @brief Active Connections etc are send to new sessions on creation.
@@ -99,9 +147,9 @@ public:
      * @return
      */
     static session_ptr create(//boost::asio::io_service& io_service,
-                              connection_ptr           connection,
-                              broad_caster_ptr         session_list,
-                              std::string              program_path)
+        connection_ptr           connection,
+        broad_caster_ptr         session_list,
+        std::string              program_path)
 
     {
         // Create and Pass back the new Session Instance.
@@ -117,7 +165,7 @@ public:
     {
 
         // Add code to for call back on data received from Server!
-
+        // Handle Socket Data
 
     }
 
@@ -157,7 +205,7 @@ public:
             std::cout << "async_write error: " << error.message() << std::endl;
             std::cout << "Session Closed()" << std::endl;
 
-            if (m_connection->is_open())
+            if(m_connection->is_open())
             {
                 m_connection->socket().shutdown(tcp::socket::shutdown_both);
                 m_connection->socket().close();
@@ -171,6 +219,7 @@ public:
     void start_menu_instance()
     {
         // Allocate a new Dialing Directory Instance on existing placeholder.
+        std::cout << "Starting Menu Instatnce:" << std::endl;
         m_menu_manager.reset(
             new MenuManager(
                 m_program_path,
@@ -182,12 +231,48 @@ public:
     }
 
     /**
+     * @brief Process Waiting Data Buffer and pass to rendering
+     * @return
+     */
+    void update()
+    {
+        //std::cout << "Session Update()" << std::endl;
+
+        MessageQueue msgQueue;
+        while(!m_data_queue.is_empty())
+        {
+            std::cout << "Message dequeue in progress" << std::endl;
+            msgQueue = std::move(m_data_queue.dequeue());
+            if(msgQueue.m_text.empty())
+            {
+                // Make Sure Vector is not Empty!
+                if(msgQueue.m_queueParams.size() > 0)
+                {
+                    //std::cout << "m_sequence_ Input" << std::endl;
+                    m_sequence_parser->sequenceInput(msgQueue.m_queueParams);
+                }
+            }
+            else
+            {
+                //std::cout << "m_sequence_ textInput" << std::endl;
+                m_sequence_parser->textInput(msgQueue.m_text);
+            }
+            msgQueue.clear();
+        }
+
+        // Shouldn't be needed, but lets double check this!
+        m_renderer->renderScreen();
+        m_renderer->drawTextureScreen();
+    }
+
+    /**
      * @brief Cleanups Up Session by popping pointer off stack when done.
      */
-    void close_session()
+    void close_this_session()
     {
         // Remove our session from the list close the session.
-       // m_session_list.erase(shared_from_this());
+        broad_caster_ptr session = m_weak_session_list.lock();
+        session->leave(shared_from_this());
     }
 
 
@@ -220,7 +305,7 @@ public:
 
     // Socket_Manager handles sockets and incoming data from the server.
     connection_ptr           m_connection;
-   
+
     // Place Holder if we need it later on
 //    boost::asio::io_service& m_io_service;
 
