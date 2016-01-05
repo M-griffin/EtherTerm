@@ -1,4 +1,14 @@
 
+Change Log 3.0.21 - 2016-01-05
+	 - Fixed Shutdown with Broadcaster
+	 - Tested Initial Rendering with 640x400, still need to work on switching
+	   modes and scaling for the best quality/performance.
+	 - Working on re-intergrating the menu system.
+	 - Input passing to the menu system is now working.
+	 - Dialing Directory is now displaying with input for light bar movements.
+	   Right now only arrow keys are working. Need to look at default Key Mappings
+	   to make sure PAGEUP/DN etc are all captured correctly on the local side.
+	
 Change Log 3.0.20 - 2015-12-24
 	- Good Progress, Finally have the Classes loading in sync and
 	  clean destruction in sync.

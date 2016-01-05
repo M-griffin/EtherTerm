@@ -50,6 +50,11 @@ MenuManager::~MenuManager()
 void MenuManager::readinAnsi(std::string FileName, std::string &buff)
 {
     std::string path = m_program_path;
+#ifdef _WIN32
+    path.append("assets\\");
+#else
+    path.append("assets/");
+#endif
     path += FileName;
     path += ".ans";
     FILE *fp;
@@ -162,10 +167,15 @@ std::vector<list_bar> MenuManager::buildDialList()
     // We cache array with all four choices so we can
     // easily switch between them in the listing.
     std::string path = m_program_path;
+#ifdef _WIN32
+    path.append("assets\\");
+#else
+    path.append("assets/");
+#endif
     path += "ddirectorymid1.ans";
     if((inStream = fopen(path.c_str(), "r+")) ==  nullptr)
     {
-        std::cout << "unable to read " <<  "ddirectorymid1.ans" << std::endl;
+        std::cout << "unable to read " <<  path << std::endl;
         return result;
     }
     while(sequence != EOF)
@@ -177,10 +187,15 @@ std::vector<list_bar> MenuManager::buildDialList()
     sequence = '\0';
 
     path = m_program_path;
+#ifdef _WIN32
+    path.append("assets\\");
+#else
+    path.append("assets/");
+#endif
     path += "ddirectorymid2.ans";
     if((inStream = fopen(path.c_str(), "r+")) ==  nullptr)
     {
-        std::cout << "unable to read " <<  "ddirectorymid2.ans" << std::endl;
+        std::cout << "unable to read " <<  path << std::endl;
         return result;
     }
     while(sequence != EOF)
@@ -422,6 +437,11 @@ bool MenuManager::readDialDirectory()
 {
     SystemConnection sysconn;
     std::string path = m_program_path;
+#ifdef _WIN32
+    path.append("assets\\");
+#else
+    path.append("assets/");
+#endif
     path += "dialdirectory.xml";
     TiXmlDocument doc(path.c_str());
     if(!doc.LoadFile())
@@ -488,6 +508,11 @@ void MenuManager::createDialDirectory()
 {
     // Create Default Phone Book.
     std::string path = m_program_path;
+#ifdef _WIN32
+    path.append("assets\\");
+#else
+    path.append("assets/");
+#endif
     path += "dialdirectory.xml";
 
     TiXmlDocument doc;
@@ -534,6 +559,11 @@ void MenuManager::writeDialDirectory()
 {
     // Create Default Phone Book.
     std::string path = m_program_path;
+#ifdef _WIN32
+    path.append("assets\\");
+#else
+    path.append("assets/");
+#endif
     path += "dialdirectory.xml";
 
     TiXmlDocument doc;
@@ -609,7 +639,10 @@ void MenuManager::updateDialDirectory()
     //  Make sure we have areas.
     if(m_result.size() > 0)
     {
-        m_link_list.drawVectorList(m_current_page, m_lightbar_position);
+        outputBuffer = m_link_list.drawVectorList(m_current_page, m_lightbar_position);
+        std::cout << "drawVectorList" << std::endl;
+        std::cout << outputBuffer << std::endl;
+
     }
     else
     {
@@ -621,8 +654,8 @@ void MenuManager::updateDialDirectory()
 
     m_link_list.m_total_lines = m_result.size();
 
-    outputBuffer.erase();
-    outputBuffer = "|16"; // Clear Color Bleeding, reset background to black.
+    //outputBuffer.erase();
+    outputBuffer += "|16"; // Clear Color Bleeding, reset background to black.
 
     // Show Current/Total Pages in Dialing Directory
     sprintf(outBuffer,"%s%.3d",(char *)m_menu_config.m_page_number.c_str(), m_link_list.m_current_page+1);

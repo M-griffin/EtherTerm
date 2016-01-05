@@ -100,6 +100,7 @@ private:
 
     int         m_cursor_x_position;
     int         m_cursor_y_position;
+    bool        m_is_scalling_surface;
     bool        m_is_utf8_output;
 
 public:

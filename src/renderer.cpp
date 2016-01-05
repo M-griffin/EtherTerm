@@ -57,6 +57,7 @@ Renderer::Renderer(surface_manager_ptr surface,
     , m_bottom_margin(0)
     , m_cursor_x_position(0)
     , m_cursor_y_position(0)
+    , m_is_scalling_surface(false)
     , m_is_utf8_output(false)
 {
     std::cout << "Renderer Created" << std::endl;
@@ -743,24 +744,74 @@ void Renderer::renderBottomScreen()
  */
 void Renderer::renderScreen()
 {
-    SDL_Rect rect;
-
     SDL_Surface *surface = m_surface_manager
                            ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
                            ->getSurface();
-    rect.x = 0;
-    rect.y = 0;
-    rect.w = surface->w;
-    rect.h = surface->h;
 
-    // Update Pixels in the Texture with the bottom row.
-    m_window_manager->updateTexture(
-        m_surface_manager
-        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
-        ->getTexture(),
-        &rect,
-        surface
-    );
+    // Get The Actual size of the Render/Window.
+    int screen_width, screen_height;
+    m_window_manager->renderOutputSize(screen_width, screen_height);
+
+    // Testing
+    //SDL_RenderSetLogicalSize(m_window_manager->getRenderer(), screen_width, screen_height);
+
+    SDL_Rect rect_dest;
+    rect_dest.x = 0;
+    rect_dest.y = 0;
+    rect_dest.w = screen_width;
+    rect_dest.h = screen_height;
+
+    SDL_Rect rect_src;
+    rect_src.x = 0;
+    rect_src.y = 0;
+    rect_src.w = surface->w;
+    rect_src.h = surface->h;
+    
+    // Test Overide.
+    m_is_scalling_surface = false;
+    if (m_is_scalling_surface)
+    {
+        // Create Scaled
+        m_surface_manager->createSurface(m_surface_manager->SURFACE_MAIN_SCALED);
+
+        // Handle to Scaled.
+        SDL_Surface *scaled = m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCALED]
+                           ->getSurface();
+
+        std::cout << "surface w" << surface->w << std::endl;
+        std::cout << "surface h" << surface->h << std::endl;
+
+        std::cout << "Scaled w" << scaled->w << std::endl;
+        std::cout << "Scaled h" << scaled->h << std::endl;
+
+        // Blit Main to Scaled
+        SDL_BlitScaled(surface, nullptr, scaled, &rect_dest);
+
+        //scaled = rotozoomSurfaceXY(surface, 0.0, 2, 2, 1);
+
+        std::cout << "Scaled done" << scaled->h << std::endl;
+
+        // Update Pixels in the Texture with the bottom row.
+        m_window_manager->updateTexture(
+            m_surface_manager
+            ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+            ->getTexture(),
+            &rect_dest,
+            scaled
+        );
+    }
+    else
+    {
+        // Update Pixels in the Texture with the bottom row.
+        m_window_manager->updateTexture(
+            m_surface_manager
+            ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+            ->getTexture(),
+            &rect_src,
+            surface
+        );
+    }
 }
 
 /**
@@ -914,13 +965,22 @@ void Renderer::drawTextureScreen()
     rect.x = 0;
     rect.y = 0;*/
 
+    SDL_Rect dest;
+    int screen_width, screen_height;
+    m_window_manager->renderOutputSize(screen_width, screen_height);
+
+    dest.w = screen_width;
+    dest.h = screen_height;
+    dest.x = 0;
+    dest.y = 0;
+
     // Copy Texture to Renderer
     m_window_manager->renderCopy(
         m_surface_manager
         ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
         ->getTexture(),
         nullptr,
-        nullptr
+        &dest
     );
 
     // Draw Out to Screen.
