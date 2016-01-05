@@ -22,47 +22,21 @@ typedef boost::shared_ptr<Session> session_ptr;
 class BroadCaster
 {
 public:
-    BroadCaster();
+    BroadCaster()
+    {
+        std::cout << "Global BroadCaster Created." << std::endl;
+    }
     ~BroadCaster();
 
-    /**
-     * @brief Notifies that a user has joined the room
-     * @param participant
-     */
     void join(session_ptr session);
-
-    /**
-     * @brief Notifies that a user has left the room
-     * @param participant
-     */
     void leave(session_ptr session);
-
-    /**
-     * @brief Sends message to all users in the current room.
-     * @param participant
-     */
     void deliver(std::string msg);
 
-    /**
-     * @brief Retrieve Number of users connected
-     * Also helpful for determinging next node number.
-     * @return
-     */
-    int numberOfSessions();
-
-    /**
-     * @brief Update, Hits Session Updates for processing Data Queue.
-     * @return
-     */
-    void update();
-
-    /**
-     * @brief Broacaster Anchors the Sessions, shutdown all session.
-     * @return
-     */
+    int  numberOfSessions();
     void shutdown();
 
-    // Handle to Sessions
+private:
+
     std::set<session_ptr> m_sessions;
 };
 

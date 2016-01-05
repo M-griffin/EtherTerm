@@ -670,6 +670,7 @@ void MenuIO::sequenceToAnsi(const std::string &sequence)
  */
 void MenuIO::displayAnsiFile(const std::string &file_name)
 {
+    //std::cout << "ansiPrintf" << std::endl;
     std::string path = m_program_path;
 #ifdef _WIN32
     path += "assets\\";

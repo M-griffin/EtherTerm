@@ -44,7 +44,6 @@ public:
         : m_work(m_io_service)
         , m_program_path(program_path)
         , m_session_list(new BroadCaster())
-        , m_is_global_shutdown(false)
     {
         std::cout << "Interface Created" << std::endl;
         // Startup worker thread of ASIO. We want socket communications in a separate thread.
@@ -54,9 +53,9 @@ public:
 
     ~Interface()
     {
-        //std::cout << "~Interface" << std::endl;
-        //m_io_service.stop();
-        //m_thread.join();
+        std::cout << "~Interface" << std::endl;
+        m_io_service.stop();
+        m_thread.join();
     }
 
     /**
@@ -76,13 +75,15 @@ public:
     {
         // Startup the initial Menu/Dialing Directory Sessions
         spawnLocalSession();
+
+        bool is_global_shutdown = false;
         SDL_Event event;
 
         // Send the event along for each session
         if (m_session_list->numberOfSessions() == 0)
         {
             std::cout << "Startup Unsuccessful, Shutting Down!" << std::endl;
-            m_is_global_shutdown = true;
+            is_global_shutdown = true;
         }
         else
         {
@@ -92,19 +93,19 @@ public:
         // Main Loop SDL Event Polling must always be done in main thread.
         // Along with All Rendering. This is how SDL works. Events are therefore
         // Read, then passed through to each session to handle per instance.
-        while (!m_is_global_shutdown)
+        while (!is_global_shutdown)
         {
-
-            // Send the event along for each session
-            if (m_session_list->numberOfSessions() == 0)
+            while(SDL_PollEvent(&event) != 0 && !is_global_shutdown)
             {
-                std::cout << "Shutting Down!" << std::endl;
-                m_is_global_shutdown = true;
-                return;
-            }
+                // Send the event along for each session
+                if (m_session_list->numberOfSessions() == 0)
+                {
+                    std::cout << "Shutting Down!" << std::endl;
+                    is_global_shutdown = true;
+                    break;
+                }
 
-            while(SDL_PollEvent(&event) != 0 && !m_is_global_shutdown)
-            {
+
                 // Process Event.
                 process_event(event);
 
@@ -113,22 +114,10 @@ public:
                 switch(event.type)
                 {
                     case SDL_QUIT:
-                        m_is_global_shutdown = true;
-
-                        // Shutdown Sessions
-                        std::cout << "Shutdown Sessions! " << std::endl;
-                        m_session_list->shutdown();
-
-                        std::cout << "Shutdown Interface! " << std::endl;
-                        shutdown();
-
-                        std::cout << "Shutdown Completed, exit interface." << std::endl;
-                        return;
+                        is_global_shutdown = true;
+                        break;
                 }
             }
-
-            // Process Data Queue for Each Active Session.
-            m_session_list->update();
             SDL_Delay(10);
         }
 
@@ -152,7 +141,7 @@ public:
         new_session->startup();
 
         // Start the Dialing Directory on the local instance
-        new_session->start_menu_instance();
+        //new_session->start_menu_instance();
 
     }
 
@@ -211,10 +200,11 @@ public:
      */
     void process_event(SDL_Event &event)
     {
-        if(m_session_list->numberOfSessions() > 0 && !m_is_global_shutdown)
+        if(m_session_list->numberOfSessions() > 0)
         {
-            std::set<session_ptr>::iterator itEnd = end(m_session_list->m_sessions);
-            for(auto it = begin(m_session_list->m_sessions); it != itEnd; ++it)
+            /*
+            std::set<session_ptr>::iterator it;
+            for(it = m_session_list.begin(); it != m_session_list.end(); ++it)
             {
                 // If the window id matches the current event, then
                 // send through the event to the specific session for processing.
@@ -223,7 +213,7 @@ public:
                     // Pass the Events to the specific Session for Specific Window and Input Events.
                     (*it)->m_input_handler->update(event);
                 }
-            }
+            }*/
         }
     }
 
@@ -239,7 +229,6 @@ public:
     broad_caster_ptr               m_session_list;
 
     std::thread                    m_thread;
-    bool                           m_is_global_shutdown;
 
 };
 
