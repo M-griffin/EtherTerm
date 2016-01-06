@@ -18,7 +18,6 @@ public:
     ~MenuConfig();
 
     std::string m_program_path;
-
     std::string m_ini_path;
     std::string m_ini_name;
     int  m_top_margin;
@@ -41,7 +40,7 @@ public:
 
     // Message Read .ini File
     std::string SetupThePath();
-    bool ddirectory_exists();
+    bool ddirectory_exists(std::string filename);
     void ddirectory_create();
     std::string ddirectory_chkpar(const std::string &data);
     void ddirectory_check(std::string &cfgdata);

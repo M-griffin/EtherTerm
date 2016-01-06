@@ -1,19 +1,32 @@
 
+Change Log 3.0.23 - 2016-01-06
+    - Added Themes to the Dialing Directory, The ANSI/ASCII screen along with
+      Light bars for both the systems list and light bar commands have always 
+      been open and customizable.  Now by created a new DialDirectory.ini
+      and appending 1..2..3.. like DialDirectory1.ini you can setup each ini to point
+      to different theme templates to personalize your interface use to some 
+      pre-make ones that will be created.  Themes can be quick switched using 
+      then brackets '[' and ']' keys for switching between next and previous themes.
+    - Todo, update the Redraw light bar commands once themes are switched.
+    - Checked that Themes are working with different font sets, now to test menu
+      templates for different light bar colors and positions alone with the system
+      listing light bars, colors, and box sizes.      
+
 Change Log 3.0.22 - 2016-01-05
-	- Created new Fontset.xml file to hold all system fonts with names, height,
-	  width, filename and ESC sequence for automatic font switching.  
-	  The availability to set the sequence in the XML is an added bonus to set
-	  a preference.  For example.  If ESC[0;40 D is received for Amiga Topaz,
-	  however you preference is to see Topaz Plus, you can set this ESC sequence
-	  under the preferred font so it will be used instead.  All fonts are now
-	  configurable.
-	- Also updated the Dialing Directory to pull front names from the new xml set.
+    - Created new Fontset.xml file to hold all system fonts with names, height,
+      width, filename and ESC sequence for automatic font switching.  
+      The availability to set the sequence in the XML is an added bonus to set
+      a preference.  For example.  If ESC[0;40 D is received for Amiga Topaz,
+      however you preference is to see Topaz Plus, you can set this ESC sequence
+      under the preferred font so it will be used instead.  All fonts are now
+      configurable.
+    - Also updated the Dialing Directory to pull front names from the new xml set.
 
 Change Log 3.0.21 - 2016-01-05
     - Fixed Shutdown with Broadcaster
     - Tested Initial Rendering with 640x400, still need to work on switching
       modes and scaling for the best quality/performance.
-    - Working on re-intergrating the menu system.
+    - Working on reintegrating the menu system.
     - Input passing to the menu system is now working.
     - Dialing Directory is now displaying with input for light bar movements.
       Right now only arrow keys are working. Need to look at default Key Mappings

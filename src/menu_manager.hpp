@@ -69,6 +69,7 @@ public:
     int                  m_directory_bottom_margin;
     int                  m_current_page;
     int                  m_box_size;
+    int                  m_current_theme_index;
 
     // Class Types for use
     LinkList                      m_link_list;
@@ -79,7 +80,7 @@ public:
     std::vector<list_bar> buildDialList();
     void  readinAnsi(std::string FileName, std::string &buff);
     void  parseHeader(std::string FileName);
-    //bool  changeTheme(int idx);
+    bool  changeTheme(int idx);
     void  readDirectoryListing();
 
     bool  readDialDirectory();

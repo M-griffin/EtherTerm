@@ -28,6 +28,7 @@ MenuManager::MenuManager(
     , m_directory_bottom_margin(1)
     , m_current_page(0)
     , m_box_size(0)
+    , m_current_theme_index(0) // NOTE Reload this from saved preference!
 {
     std::cout << "MenuManager Created!" << std::endl;
 }
@@ -111,7 +112,21 @@ void MenuManager::parseHeader(std::string FileName)
  */
 void MenuManager::readDirectoryListing()
 {
-    m_menu_config.m_ini_name = "dialdirectory.ini";
+    /**
+     * NOTE this should be set up by the last used theme!
+     * Right now it uses default on startup!
+     */
+    if (m_current_theme_index == 0)
+    {
+        m_menu_config.m_ini_name = "dialdirectory.ini";
+    }
+    else
+    {
+        m_menu_config.m_ini_name = "dialdirectory";
+        m_menu_config.m_ini_name.append(std::to_string(m_current_theme_index));
+        m_menu_config.m_ini_name.append(".ini");
+    }
+
     m_menu_config.ddirectory_parse();
     m_directory_top_margin = m_menu_config.m_top_margin;
     m_directory_bottom_margin = m_menu_config.m_bottom_margin;
@@ -119,20 +134,22 @@ void MenuManager::readDirectoryListing()
 
 /**
  * Dial-directory - Change ANSI Template Theme
- * Not Used At this Time.
- *
+ */
 bool MenuManager::changeTheme(int index)
 {
-    if(!ddirectory_parse(index))
+    if(!m_menu_config.ddirectory_parse(index))
     {
         // Theme Doesn't Exist.
         return false;
     }
-    m_link_list.m_topMargin = m_menu_config.m_top_margin;
-    m_link_list.m_bottomMargin = m_menu_config.m_bottom_margin;
+    // Set the new index, then reset the margins for the list.
+    m_current_theme_index = index;
+    m_link_list.m_top_margin = m_menu_config.m_top_margin;
+    m_link_list.m_bottom_margin = m_menu_config.m_bottom_margin;
+
     return true;
 }
-*/
+
 
 /**
  * @brief Build the List of Systems to Display Lightbars.
@@ -816,6 +833,56 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 m_link_list.drawVectorList(m_current_page,m_lightbar_position);
                 break;
 
+            case ']': // Next Theme
+            {
+                int idx = m_current_theme_index;
+                ++idx;
+                bool is_theme_changed = changeTheme(idx);
+                if (is_theme_changed)
+                {
+                    std::string output = "|CS|CR|15You've switched to the ";
+                    output.append(m_menu_config.m_theme_name);
+                    output.append(" theme.");
+                    m_menu_function.m_menu_io.sequenceToAnsi(output);
+                    // _mnuf._premenu.clear();  Check if needed!@
+                }
+                else
+                {
+                    m_menu_function.m_menu_io.sequenceToAnsi(
+                        "|CS|CR|04You've hit the highest theme available."
+                    );
+                    // _mnuf._premenu.clear();  Check if needed!@
+                }
+                // Now redraw the dialing directory
+                parseHeader(m_menu_config.m_ansi_filename);
+                m_link_list.drawVectorList(m_current_page,m_lightbar_position);
+                break;
+            }
+            case '[': // Previous Theme
+            {
+                int idx = m_current_theme_index;
+                --idx;
+                bool is_theme_changed = changeTheme(idx);
+                if (is_theme_changed)
+                {
+                    std::string output = "|CS|CR|15You've switched to the ";
+                    output.append(m_menu_config.m_theme_name);
+                    output.append(" theme.");
+                    m_menu_function.m_menu_io.sequenceToAnsi(output);
+                    // _mnuf._premenu.clear();  Check if needed!@
+                }
+                else
+                {
+                    m_menu_function.m_menu_io.sequenceToAnsi(
+                        "|CS|CR|04You've hit the lowest theme available."
+                    );
+                    // _mnuf._premenu.clear();  Check if needed!@
+                }
+                // Now redraw the dialing directory
+                parseHeader(m_menu_config.m_ansi_filename);
+                m_link_list.drawVectorList(m_current_page,m_lightbar_position);
+                break;
+            }
             default :
                 break;
         }

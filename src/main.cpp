@@ -45,18 +45,18 @@
  */
 bool SDLStartUp()
 {
-	bool success = true;
+    bool success = true;
 
-	// Initialize SDL w/ Video, Skip Sound and Controllers for now.
-	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-	{
-		std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
-		success = false;
-	}
+    // Initialize SDL w/ Video, Skip Sound and Controllers for now.
+    if(SDL_Init(SDL_INIT_VIDEO) < 0)
+    {
+        std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
+        success = false;
+    }
 
     // Turn off, might make a toggle for this later on.
-    SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "1");
-	return success;
+    SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+    return success;
 }
 
 /*
@@ -65,10 +65,7 @@ bool SDLStartUp()
 int main(int argc, char* argv[])
 {
     bool is_headless = false;
-    SDL_SetMainReady();
-
-    int c = 0;
-
+    SDL_SetMainReady();   
     /*
      * Interfaces to be added later on
      * h = headless
@@ -77,12 +74,16 @@ int main(int argc, char* argv[])
      * f = ftp
      * i = irc
      */
-    while ((c = getopt (argc, argv, "h")) != -1)
+    int c = 0;
+    while((c = getopt(argc, argv, "h")) != -1)
     {
-        switch(c) {
+        switch(c)
+        {
             case 'h':
                 // Headless Operation
                 is_headless = true;
+                break;
+
             default:
                 break;
         }
@@ -158,7 +159,7 @@ int main(int argc, char* argv[])
 
     // Don't loaded menu system waiting for user input, just handle
     // Scripts and connections or parsing functions for testing.
-    if (is_headless)
+    if(is_headless)
     {
         // Execute scripts / connections via command line
         // Don't startup SDL since were not using the video
@@ -171,10 +172,10 @@ int main(int argc, char* argv[])
     {
         // Startup the Window System and load initial menu
         // Window with Initialization with window event processing.
-        if (!SDLStartUp())
+        if(!SDLStartUp())
         {
-             return -1;
-        }        
+            return -1;
+        }
 
         // Lead into Interface spawn for session startup and management.
         interface_spawn.startup();
@@ -184,80 +185,13 @@ int main(int argc, char* argv[])
         SDL_Quit();
     }
 
-/*
- * SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
-
-//    TheRenderer::Instance()->setProgramPath(realPath);
-
-    // Initialize Renderer and Window with default sizes.
-    // We define 680 instead of 640 because we clip the extract off
-    // in Screen->Texture.  We do this because when Texture filtering is used
-    // Pixels on the last line tend to bleed from blending. This clips off the
-    // Bleeding Leaving a nice screen.
-
-    if(TheRenderer::Instance()->init("EtherTerm v3.0 alpha preview", 680, 480, 1280, 800, 8, 16))
-    {
-        // Setup the Surfaces
-        if(TheRenderer::Instance()->initSurfaceTextures())
-        {
-            std::cout << "Surface & Textures Initialized. " << std::endl;
-            // Load Font Texture to Surface
-            if( TheRenderer::Instance()->loadBitmapImage(TheRenderer::Instance()->getCurrentFont()) )
-            {
-                std::cout << "Term init success!\n";
-                TheRenderer::Instance()->clearScreen();
-
-                // Display intro ANSI Screen
-                TheRenderer::Instance()->clearScreenSurface();
-                TheSequenceParser::Instance()->reset();
-
-                // Setup main menu state
-                // Load into Main Menu System (Dialing Directory)
-               //std::shared_ptr<MainMenuState> ms(new MainMenuState());
-               //TheTerminal::Instance()->getStateMachine()->changeState(ms);
-               TheStateMachine::Instance()->changeState(new MainMenuState());
-
-                while(TheRenderer::Instance()->running())
-                {
-                    // If the font changed, then load the new image.
-                    if(TheRenderer::Instance()->didFontChange())
-                        TheRenderer::Instance()->loadBitmapImage(
-                            TheRenderer::Instance()->getCurrentFont());
-
-                    // Main Loop, Handle update per State Machine
-                    TheStateMachine::Instance()->update();
-
-                    // Process Any incoming Data from the State
-                    // Process and send to Screen for Updates.
-                    TheSequenceManager::Instance()->update();
-                }
-            }
-            else
-            {
-                std::cout << "Error Loading Font." << SDL_GetError() << "\n";
-                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                                         "Closed Session", "Error Loading Font.", nullptr);
-                return -1;
-            }
-        }
-        else
-        {
-            std::cout << "Term init failure: allocating surfaces." << SDL_GetError() << "\n";
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                                     "Closed Session", "Term init failure: allocating surfaces.", nullptr);
-            return -1;
-        }
-    }
-    else
-    {
-        std::cout << "Term init failure: SDL Init()." << SDL_GetError() << "\n";
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                                 "Closed Session", "Term init failure: SDL Init().", nullptr);
-        return -1;
-    } */
-
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                             "Closed Session", "User has closed the program.", nullptr);
+    // Closing Message Box.
+    SDL_ShowSimpleMessageBox(
+        SDL_MESSAGEBOX_INFORMATION,
+        "Closed Session",
+        "User has closed the program.",
+        nullptr
+    );
 
     return 0;
 }

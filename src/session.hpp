@@ -82,7 +82,7 @@ public:
         m_sequence_parser.reset(new SequenceParser(m_renderer, m_connection));
         m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));
 
-        // On creation, load the Font Sets
+        // On creation, load a list of Font Sets
         bool is_loaded = m_surface_manager->readFontSets();
         if (!is_loaded)
         {

@@ -25,12 +25,11 @@ class WindowManager;
 typedef boost::shared_ptr<WindowManager> window_manager_ptr;
 typedef boost::weak_ptr<WindowManager> window_manager_weak_ptr;
 
-
 /**
- * @class SystemConnection
+ * @class FontSet
  * @author Michael Griffin
- * @date 12/22/2015
- * @file menu_manager.hpp
+ * @date 1/5/2016
+ * @file surface_manager.hpp
  * @brief Connection data pulled from XML
  */
 typedef struct FontSet
