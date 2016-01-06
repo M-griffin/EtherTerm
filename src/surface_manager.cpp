@@ -9,6 +9,9 @@
 #include <SDL2/SDL.h>
 #endif
 
+// Temp, replace with boost later on.
+#include "tinyxml.hpp"
+
 #include <iostream>
 #include <cmath>
 #include <cstdio>
@@ -39,17 +42,20 @@ SurfaceManager::SurfaceManager(window_manager_ptr window_manager, std::string pr
     , m_characterWidth(8)
     , m_characterHeight(16)
 {
-    std::cout << "SurfaceManager Created!" << std::endl;
+    std::cout << "SurfaceManager Created!" << std::endl;    
 }
 
 SurfaceManager::~SurfaceManager()
 {
+    std::cout << "~SurfaceManager" << std::endl;
+    // Clear All Fonts.
+    std::vector<FontSet>().swap(m_fontSet);
 
     // Clear All Surfaces
     std::unordered_map<int, surface_ptr>().swap(m_surfaceList);
+
     // Clear All Textures
     std::unordered_map<int, texture_ptr>().swap(m_textureList);
-    std::cout << "~SurfaceManager" << std::endl;
 }
 
 /**
@@ -155,12 +161,154 @@ bool SurfaceManager::didFontChange()
     return (m_currentFont != m_previousFont);
 }
 
+
 /**
- * @brief Loads Bitmap Fonts from Files
+ * @brief Read in the XML Data File.
+ * @return
+ */
+bool SurfaceManager::readFontSets()
+{
+    FontSet font_set;
+    std::string path = m_programPath;
+#ifdef _WIN32
+    path.append("assets\\");
+#else
+    path.append("assets/");
+#endif
+    path += "fontsets.xml";
+    TiXmlDocument doc(path.c_str());
+    if(!doc.LoadFile())
+    {
+        std::cout << "readFontSets() Error Reading: " << path << std::endl;
+        return false;
+    }
+    TiXmlHandle hDoc(&doc);
+    TiXmlElement* pElem;
+    TiXmlHandle hRoot(0);
+
+    // If vector already populated then clear to refresh it.
+    if(m_fontSet.size() > 0)
+    {
+        m_fontSet.clear();
+        std::vector<FontSet>().swap(m_fontSet);
+    }
+    // block: EtherTerm
+    {
+        std::cout << "readFontConfiguration - FirstChildElement" << std::endl;
+        pElem=hDoc.FirstChildElement().Element();
+        // should always have a valid root but handle gracefully if it does
+        if(!pElem)
+        {
+            std::cout << "readFontConfiguration - EtherTerm Element not found!" << std::endl;
+            return false;
+        }
+        std::cout << "Root Value: " << pElem->Value() << std::endl;
+        // save this for later
+        hRoot=TiXmlHandle(pElem);
+    }
+    // block: Fontset
+    {
+        //std::cout << "readDialDirectory - Phonebook" << std::endl;
+        pElem=hRoot.FirstChild("Fontset").Element();
+        std::cout << "Fontset Version: " << pElem->Attribute("version") << std::endl;
+    }
+    // block: Font
+    {
+        //std::cout << "readDialDirectory - BBS" << std::endl;
+        pElem=hRoot.FirstChild("Fontset").FirstChild().Element();
+        for(; pElem; pElem=pElem->NextSiblingElement())
+        {
+            font_set.name = pElem->Attribute("name");
+            font_set.type = pElem->Attribute("type");
+            pElem->QueryIntAttribute("width", &font_set.width);
+            pElem->QueryIntAttribute("height", &font_set.height);
+            font_set.filename = pElem->Attribute("filename");
+            font_set.sequence = pElem->Attribute("sequence");
+
+            // Add to Vector so we can parse
+            m_fontSet.push_back(font_set);
+        }
+    }
+    std::cout << "readFontConfiguration - Done" << std::endl;
+    return true;
+}
+
+/**
+ * @brief Searches and grab the fontset by filename
+ * @param value
+ * @return
+ */
+FontSet SurfaceManager::getFontFromSet(std::string value)
+{
+    FontSet font_set;
+    for (FontSet f : m_fontSet)
+    {
+        if (f.filename == value)
+        {
+            font_set = f;
+        }
+    }
+    return font_set;
+}
+
+/**
+ * @brief Loads Fonts
  * @param fontName
  * @return
  */
-bool SurfaceManager::loadBitmapImage()
+bool SurfaceManager::loadFont()
+{
+    bool is_loaded = false;
+
+    if (m_fontSet.size() == 0)
+    {
+        is_loaded = readFontSets();
+        if (is_loaded)
+        {
+            std::cout << "Error, Fontsets not loaded!" << std::endl;
+            return false;
+        }
+        // reset.
+        is_loaded = false;
+    }
+
+    FontSet font(getFontFromSet(m_currentFont));
+    if (font.filename != m_currentFont)
+    {
+        std::cout << "Error, unable to load front from set!" << std::endl;
+        assert(false);
+    }
+
+    // If type = bmp or bitmap.
+    if (font.type == "bmp")
+    {
+        is_loaded = loadBitmapFontImage();
+    }
+    // True Type (WIP) for Unicode fonts.
+    else if (font.type == "ttf")
+    {  }
+
+    // If font loaded, then read and set the properties.
+    if (is_loaded)
+    {
+        /**
+         * Important note, if these change, but there static right now
+         * Then we need to recrete the surfaces with new calculations for
+         * 80x25 by calculating width and height in pixels 8x16 = 640x400.
+         */
+        // Set the character dimenions
+        m_characterWidth = font.width;
+        m_characterHeight = font.height;
+    }
+    return is_loaded;
+}
+
+/**
+ * @brief Loads Bitmap Fonts Images from Files
+ * @param fontName
+ * @return
+ */
+bool SurfaceManager::loadBitmapFontImage()
 {
     std::string path = m_programPath;
 

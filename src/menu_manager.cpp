@@ -95,7 +95,7 @@ void MenuManager::parseHeader(std::string FileName)
     if(m_renderer->m_surface_manager->didFontChange())
     {
         // loadBitmapImage
-        if(!m_renderer->m_surface_manager->loadBitmapImage())
+        if(!m_renderer->m_surface_manager->loadFont())
         {
             SDL_Delay(1500);
             assert(false);
@@ -314,18 +314,14 @@ std::vector<list_bar> MenuManager::buildDialList()
                         }
                         else if(strcmp(mciCode,"FO") == 0)
                         {
-                            // FIXME Temp - Translate File-name to Description
-                            // Will add to the xml once it's ready.
-                            std::string stringReplace;
-                            if(m_systemConnection[currentSystem].font == "vga8x16.bmp")
-                            {
-                                stringReplace = "IBM-PC CP437 VGA  8x16";
-                            }
-                            else if(m_systemConnection[currentSystem].font == "topazPlus-8x16.bmp")
-                            {
-                                stringReplace = "AMIGA Topaz+ 1200 8x16";
-                            }
-
+                            // Load the Font from the selected system
+                            FontSet font(
+                                m_renderer->m_surface_manager->getFontFromSet(
+                                    m_systemConnection[currentSystem].font
+                                )
+                            );
+                            // Replace with the Font name from XML.
+                            std::string stringReplace = font.name;
                             if(isLeftPadding)
                             {
                                 m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
@@ -636,13 +632,10 @@ void MenuManager::updateDialDirectory()
     std::string outputBuffer;
     char outBuffer[1024] = {0};
 
-    //  Make sure we have areas.
+    //  Make sure we have areas, then pull the list into the string buffer.
     if(m_result.size() > 0)
     {
         outputBuffer = m_link_list.drawVectorList(m_current_page, m_lightbar_position);
-        std::cout << "drawVectorList" << std::endl;
-        std::cout << outputBuffer << std::endl;
-
     }
     else
     {

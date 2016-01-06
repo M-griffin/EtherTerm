@@ -82,6 +82,18 @@ public:
         m_sequence_parser.reset(new SequenceParser(m_renderer, m_connection));
         m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));
 
+        // On creation, load the Font Sets
+        bool is_loaded = m_surface_manager->readFontSets();
+        if (!is_loaded)
+        {
+            std::cout << "Error: m_surface_manager->readFontSets()" << std::endl;
+            assert(false);
+        }
+        else
+        {
+            std::cout << "Fontset Created!" << std::endl;
+        }
+
         // Don't Startup menu_managers for other sessions, this is one off!
         //m_menu_manager.reset(new MenuManager(m_program_path, m_renderer, m_sequence_decoder));
 

@@ -25,6 +25,25 @@ class WindowManager;
 typedef boost::shared_ptr<WindowManager> window_manager_ptr;
 typedef boost::weak_ptr<WindowManager> window_manager_weak_ptr;
 
+
+/**
+ * @class SystemConnection
+ * @author Michael Griffin
+ * @date 12/22/2015
+ * @file menu_manager.hpp
+ * @brief Connection data pulled from XML
+ */
+typedef struct FontSet
+{
+    std::string name;
+    std::string type;
+    int         width;
+    int         height;
+    std::string filename;
+    std::string sequence;
+
+} FontSet;
+
 /**
  * @class SurfaceManager
  * @author Michael Griffin
@@ -40,11 +59,13 @@ public:
 
     // Handle to Current Window
     window_manager_weak_ptr  m_weak_window_manager;
-
    
     std::string    m_programPath;
     std::string    m_currentFont;
     std::string    m_previousFont;
+
+    // Holds list of all fonts in their parameters.
+    std::vector<FontSet> m_fontSet;
 
     // Surface List for easier Management.
     std::unordered_map<int, surface_ptr> m_surfaceList;
@@ -140,10 +161,29 @@ public:
     bool didFontChange();
 
     /**
+     * @brief Read in the XML Data File.
+     * @return
+     */
+    bool readFontSets();
+
+    /**
+     * @brief Searches and grab the fontset by filename
+     * @param value
+     * @return
+     */
+    FontSet getFontFromSet(std::string value);
+
+    /**
+     * @brief Loads Fonts
+     * @return
+     */
+    bool loadFont();
+
+    /**
      * @brief Loads Bitmap Fonts from Files
      * @return
      */
-    bool loadBitmapImage();
+    bool loadBitmapFontImage();
 
     /**
      * @brief Creates / Recreate Textures
