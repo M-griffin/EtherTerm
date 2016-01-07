@@ -78,7 +78,7 @@ public:
      * @brief Reads in ANSI text file and pushes to Display
      * @param file_name
      */
-    void displayAnsiFile(const std::string &file_name);
+    void displayMenuAnsi(const std::string &file_name);
 
 };
 

@@ -77,6 +77,21 @@ public:
     std::vector<SystemConnection> m_systemConnection;
 
     // Methods
+    /**
+     * @brief Helper to append folder to path
+     */
+    std::string getAssetPath();
+
+    /**
+     * @brief Helper to append directory path
+     */
+    std::string getDirectoryPath();
+
+    /**
+     * @brief Helper to append ansi path
+     */
+    std::string getAnsiPath();
+
     std::vector<list_bar> buildDialList();
     void  readinAnsi(std::string FileName, std::string &buff);
     void  parseHeader(std::string FileName);

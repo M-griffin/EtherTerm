@@ -259,6 +259,10 @@ bool WindowManager::createWindow(bool fullScreen)
     // Set the Window ID
     m_window_id = SDL_GetWindowID(m_window);
 
+    std::string title = "EtherTerm 3.x Demo w/ Multiple Windows - Window ID: ";
+    title.append(std::to_string(m_window_id));
+    SDL_SetWindowTitle(m_window, title.c_str());
+
     // Display and move focus to the new window.
     SDL_ShowWindow(m_window);
     SDL_RaiseWindow(m_window);

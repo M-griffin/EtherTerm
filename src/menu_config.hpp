@@ -20,6 +20,8 @@ public:
     std::string m_program_path;
     std::string m_ini_path;
     std::string m_ini_name;
+    std::string m_mid_ansi_1;
+    std::string m_mid_ansi_2;
     int  m_top_margin;
     int  m_bottom_margin;
     std::string m_page_number;
@@ -39,7 +41,8 @@ public:
     std::string m_menu_prompt_text;
 
     // Message Read .ini File
-    std::string SetupThePath();
+    std::string getProgramPath();
+    std::string getDirectoryPath();
     bool ddirectory_exists(std::string filename);
     void ddirectory_create();
     std::string ddirectory_chkpar(const std::string &data);

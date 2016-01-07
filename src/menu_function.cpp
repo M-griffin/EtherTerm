@@ -48,7 +48,7 @@ MenuFunction::~MenuFunction()
 /*
  * Setup Menu Path
  */
-std::string MenuFunction::setupMenuPath()
+std::string MenuFunction::getProgramPath()
 {
     std::string path = m_program_path;
 #ifdef _WIN32
@@ -58,6 +58,22 @@ std::string MenuFunction::setupMenuPath()
 #endif
     return path;
 }
+
+/**
+ * @brief Helper to append directory path
+ */
+std::string MenuFunction::getDirectoryPath()
+{
+    // Create Default Phone Book.
+    std::string path = getProgramPath();
+#ifdef _WIN32
+    path.append("directory\\");
+#else
+    path.append("directory/");
+#endif
+    return path;
+}
+
 /*
  * Parse Helper for Menu's / Commands
  */
@@ -136,7 +152,7 @@ int MenuFunction::menuParseData(std::string cfgdata)
  */
 int MenuFunction::menuReadData(std::string MenuName)
 {
-    std::string path = setupMenuPath();
+    std::string path = getDirectoryPath();
     path.append(MenuName);
     path.append(".menu");
 
@@ -274,7 +290,7 @@ void MenuFunction::commandsParse(std::string cfgdata,
 int MenuFunction::commandsExist(std::string MenuName, int idx)
 {
     //std::cout << "MenuFunction::cmdexist" << std::endl;
-    std::string path = setupMenuPath();
+    std::string path = getDirectoryPath();
     path.append(MenuName);
     path.append(".menu");
     int ret = false;
@@ -321,7 +337,7 @@ int MenuFunction::commandsCount(std::string MenuName)
  */
 int MenuFunction::commandsReadData(std::string MenuName, int idx)
 {
-    std::string path = setupMenuPath();
+    std::string path = getDirectoryPath();
     path.append(MenuName);
     path.append(".menu");
 
@@ -406,7 +422,7 @@ void MenuFunction::menuStart(std::string currentMenu)
     // Setup the current Menu Passed.
     m_curent_menu = currentMenu;
 
-    std::string path = setupMenuPath();
+    std::string path = getDirectoryPath();
     path.append(m_curent_menu);
     path.append(".menu");
 
@@ -448,7 +464,7 @@ void MenuFunction::menuStart(std::string currentMenu)
     // Will speed up display and make ghosting not appear as much
     if(m_menu_record.directive != "")
     {
-        m_menu_io.displayAnsiFile(m_menu_record.directive);
+        m_menu_io.displayMenuAnsi(m_menu_record.directive);
     }
 
     // First time load, Map Command Keys to HOTKEYS

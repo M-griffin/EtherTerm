@@ -23,7 +23,7 @@ MenuConfig::~MenuConfig()
 /*
  * Path Helper Function
  */
-std::string MenuConfig::SetupThePath()
+std::string MenuConfig::getProgramPath()
 {
     std::string path = m_program_path;
 #ifdef _WIN32
@@ -33,6 +33,23 @@ std::string MenuConfig::SetupThePath()
 #endif
     return path;
 }
+
+
+/**
+ * @brief Helper to append directory path
+ */
+std::string MenuConfig::getDirectoryPath()
+{
+    // Create Default Phone Book.
+    std::string path = getProgramPath();
+#ifdef _WIN32
+    path.append("directory\\");
+#else
+    path.append("directory/");
+#endif
+    return path;
+}
+
 
 /**
  * Start of Dial-directory INI Class
@@ -54,7 +71,7 @@ bool MenuConfig::ddirectory_exists(std::string filename)
  */
 void MenuConfig::ddirectory_create()
 {
-    std::string path = SetupThePath();
+    std::string path = getDirectoryPath();
     path += m_ini_name;
     std::ofstream outStream2;
     outStream2.open(path.c_str(), std::ofstream::out | std::ofstream::trunc);
@@ -99,6 +116,16 @@ void MenuConfig::ddirectory_check(std::string &cfgdata)
     std::string result;
 
     if(cfgdata[0] == '#') { }
+    else if(cfgdata.find("set MID_ANSI_1 ", 0) != std::string::npos)
+    {
+        result = std::move(ddirectory_chkpar(cfgdata));
+        m_mid_ansi_1 = std::move(result);
+    }
+    else if(cfgdata.find("set MID_ANSI_2 ", 0) != std::string::npos)
+    {
+        result = std::move(ddirectory_chkpar(cfgdata));
+        m_mid_ansi_2 = std::move(result);
+    }
     else if(cfgdata.find("set TOP ", 0) != std::string::npos)
     {
         result = std::move(ddirectory_chkpar(cfgdata));
@@ -180,14 +207,14 @@ void MenuConfig::ddirectory_check(std::string &cfgdata)
  */
 bool MenuConfig::ddirectory_parse(int index)
 {    
-    std::string path = SetupThePath();
+    std::string path = getDirectoryPath();
     if (index == 0)
     {
-        path.append("dialdirectory.ini");
+        path.append("directory.ini");
     }
     else
     {
-        path.append("dialdirectory");
+        path.append("directory");
         path.append(std::to_string(index));
         path.append(".ini");
     }
@@ -198,7 +225,8 @@ bool MenuConfig::ddirectory_parse(int index)
         return false;
     }
 
-    std::cout << "Reading Theme: " << path << std::endl;
+    std::cout << "Reading Theme: " << m_theme_name << std::endl;
+    std::cout << "Reading file: " << path << std::endl;
     FILE *stream;
     stream = fopen(path.c_str(),"rb+");
     if(!stream)

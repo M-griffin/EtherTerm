@@ -104,6 +104,16 @@ public:
     int m_characterHeight;
 
     /**
+     * @brief Helper for Program Path
+     */
+    std::string getProgramPath();
+
+    /**
+     * @brief Helper to append font path
+     */
+    std::string getFontPath();
+
+    /**
      * @brief Add Surface to Container
      * @param value
      * @param surface

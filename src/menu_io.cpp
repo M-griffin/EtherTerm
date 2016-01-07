@@ -668,22 +668,23 @@ void MenuIO::sequenceToAnsi(const std::string &sequence)
  * @brief Reads in ANSI text file and pushes to Display
  * @param file_name
  */
-void MenuIO::displayAnsiFile(const std::string &file_name)
+void MenuIO::displayMenuAnsi(const std::string &file_name)
 {
     std::string path = m_program_path;
 #ifdef _WIN32
-    path += "assets\\";
+    path.append("assets\\directory\\");
 #else
-    path += "assets/";
+    path.append("assets/directory/");
 #endif
-    path += file_name;
+    path.append(file_name);
 
     std::string buff;
     FILE *fp;
     int sequence = 0;
     if((fp = fopen(path.c_str(), "r+")) ==  nullptr)
     {
-        std::cout << "displayAnsiFile(): ANSI found: " << file_name << std::endl;
+        std::cout << "MenuIO displayAnsiFile(): not found: "
+                  << std::endl << path << std::endl;
         return;
     }
     do

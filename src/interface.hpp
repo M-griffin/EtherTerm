@@ -66,6 +66,10 @@ public:
     {
         // Startup the initial Menu/Dialing Directory Sessions
         spawnLocalSession();
+
+        // Test 2nd Local Session
+        spawnLocalSession();
+
         SDL_Event event;
 
         // Send the event along for each session

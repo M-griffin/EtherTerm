@@ -1,4 +1,11 @@
 
+Change Log 3.0.24 - 2016-01-07
+	- Themes are reorganized and cleaner
+	- Created new folder in assets for to organize directory themes
+	- Created new folder for fonts
+	- Added Mid ANSI's for light bars to ini files
+	- Renamed files for better theme organization.
+
 Change Log 3.0.23 - 2016-01-06
     - Added Themes to the Dialing Directory, The ANSI/ASCII screen along with
       Light bars for both the systems list and light bar commands have always 
@@ -96,7 +103,7 @@ Change Log 3.0.13 - 2015-12-20
     - Reworked and normalized variables and classes for newly added files.
 
 Change Log 3.0.12 - 2015-12-20
-     - Code cleanup and variable normalization.
+    - Code cleanup and variable normalization.
 
 Change Log 3.0.11 - 2015-12-19
     - Complete initial rework of Renderer class, along with

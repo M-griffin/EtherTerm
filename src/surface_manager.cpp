@@ -59,6 +59,36 @@ SurfaceManager::~SurfaceManager()
 }
 
 /**
+ * @brief Helper to append program path
+ */
+std::string SurfaceManager::getProgramPath()
+{
+    std::string path = m_programPath;
+#ifdef _WIN32
+    path.append("assets\\");
+#else
+    path.append("assets/");
+#endif
+    return path;
+}
+
+/**
+ * @brief Helper to append font path
+ */
+std::string SurfaceManager::getFontPath()
+{
+    // Create Default Phone Book.
+    std::string path = getProgramPath();
+#ifdef _WIN32
+    path.append("font\\");
+#else
+    path.append("font/");
+#endif
+    return path;
+}
+
+
+/**
  * @brief Add Surface to Container
  * @param value
  * @param surface
@@ -132,7 +162,6 @@ bool SurfaceManager::textureExists(int value)
     return false;
 }
 
-
 /**
  * @brief Set the Current Font name
  * @return
@@ -169,13 +198,9 @@ bool SurfaceManager::didFontChange()
 bool SurfaceManager::readFontSets()
 {
     FontSet font_set;
-    std::string path = m_programPath;
-#ifdef _WIN32
-    path.append("assets\\");
-#else
-    path.append("assets/");
-#endif
-    path += "fontsets.xml";
+    std::string path = getProgramPath();
+    path.append("fontsets.xml");
+
     TiXmlDocument doc(path.c_str());
     if(!doc.LoadFile())
     {
@@ -310,13 +335,7 @@ bool SurfaceManager::loadFont()
  */
 bool SurfaceManager::loadBitmapFontImage()
 {
-    std::string path = m_programPath;
-
-#ifdef _WIN32
-    path.append("assets\\");
-#else
-    path.append("assets/");
-#endif
+    std::string path = getFontPath();
     path.append(m_currentFont);
 
     std::cout << "loading Font -> : " << path << std::endl;

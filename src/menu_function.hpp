@@ -98,7 +98,9 @@ public:
     // Below here are Menu Processing Functions
     bool m_isLoadNewMenu;
 
-    std::string setupMenuPath();
+    std::string getProgramPath();
+    std::string getDirectoryPath();
+
     void dataParseHelper(std::string &temp);
 
     // Command Data Functions

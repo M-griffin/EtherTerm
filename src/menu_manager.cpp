@@ -44,23 +44,63 @@ MenuManager::~MenuManager()
 }
 
 /**
- * @brief Reads in ANSI file into Buffer Only for Parsing.
- * @param FileName
- * @param buff
+ * @brief Helper to append folder to path
  */
-void MenuManager::readinAnsi(std::string FileName, std::string &buff)
+std::string MenuManager::getAssetPath()
 {
+    // Create Default Phone Book.
     std::string path = m_program_path;
 #ifdef _WIN32
     path.append("assets\\");
 #else
     path.append("assets/");
 #endif
-    path += FileName;
-    path += ".ans";
-    FILE *fp;
+    return path;
+}
+
+/**
+ * @brief Helper to append directory path
+ */
+std::string MenuManager::getDirectoryPath()
+{
+    // Create Default Phone Book.
+    std::string path = getAssetPath();
+#ifdef _WIN32
+    path.append("directory\\");
+#else
+    path.append("directory/");
+#endif
+    return path;
+}
+
+/**
+ * @brief Helper to append ansi path
+ */
+std::string MenuManager::getAnsiPath()
+{
+    // Create Default Phone Book.
+    std::string path = getAssetPath();
+#ifdef _WIN32
+    path.append("ansi\\");
+#else
+    path.append("ansi/");
+#endif
+    return path;
+}
+
+/**
+ * @brief Reads in ANSI file into Buffer Only for Parsing.
+ * @param FileName
+ * @param buff
+ */
+void MenuManager::readinAnsi(std::string FileName, std::string &buff)
+{
+    std::string path = getAnsiPath();
+    path.append(FileName);
+    path.append(".ans");
 
     int sequence = 0;
+    FILE *fp;
     if((fp = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         std::cout << "ANSI not found: " << path << std::endl;
@@ -88,10 +128,6 @@ void MenuManager::parseHeader(std::string FileName)
     // Set the font type for the menu being displayed.
     m_renderer->m_surface_manager->setCurrentFont(m_menu_config.m_font_set);
 
-    std::cout << "current after set: "
-              << m_renderer->m_surface_manager->getCurrentFont()
-              << std::endl;
-
     // Test if font changed, if so, then re-load it.
     if(m_renderer->m_surface_manager->didFontChange())
     {
@@ -104,7 +140,7 @@ void MenuManager::parseHeader(std::string FileName)
         }
     }
     m_sequence_decoder->resetParser();
-    m_menu_function.m_menu_io.displayAnsiFile(FileName);
+    m_menu_function.m_menu_io.displayMenuAnsi(FileName);
 }
 
 /**
@@ -118,11 +154,11 @@ void MenuManager::readDirectoryListing()
      */
     if (m_current_theme_index == 0)
     {
-        m_menu_config.m_ini_name = "dialdirectory.ini";
+        m_menu_config.m_ini_name = "directory.ini";
     }
     else
     {
-        m_menu_config.m_ini_name = "dialdirectory";
+        m_menu_config.m_ini_name = "directory";
         m_menu_config.m_ini_name.append(std::to_string(m_current_theme_index));
         m_menu_config.m_ini_name.append(".ini");
     }
@@ -146,10 +182,8 @@ bool MenuManager::changeTheme(int index)
     m_current_theme_index = index;
     m_link_list.m_top_margin = m_menu_config.m_top_margin;
     m_link_list.m_bottom_margin = m_menu_config.m_bottom_margin;
-
     return true;
 }
-
 
 /**
  * @brief Build the List of Systems to Display Lightbars.
@@ -183,16 +217,12 @@ std::vector<list_bar> MenuManager::buildDialList()
     //
     // We cache array with all four choices so we can
     // easily switch between them in the listing.
-    std::string path = m_program_path;
-#ifdef _WIN32
-    path.append("assets\\");
-#else
-    path.append("assets/");
-#endif
-    path += "ddirectorymid1.ans";
+    std::string path = getDirectoryPath();
+    path.append(m_menu_config.m_mid_ansi_1);
+
     if((inStream = fopen(path.c_str(), "r+")) ==  nullptr)
     {
-        std::cout << "unable to read " <<  path << std::endl;
+        std::cout << "Error Mid ANSI 1: " <<  path << std::endl;
         return result;
     }
     while(sequence != EOF)
@@ -203,16 +233,12 @@ std::vector<list_bar> MenuManager::buildDialList()
     fclose(inStream);
     sequence = '\0';
 
-    path = m_program_path;
-#ifdef _WIN32
-    path.append("assets\\");
-#else
-    path.append("assets/");
-#endif
-    path += "ddirectorymid2.ans";
+    // Process the Second Mid Ansi File
+    path = getDirectoryPath();
+    path.append(m_menu_config.m_mid_ansi_2);   
     if((inStream = fopen(path.c_str(), "r+")) ==  nullptr)
     {
-        std::cout << "unable to read " <<  path << std::endl;
+        std::cout << "Error Mid ANSI 2: " <<  path << std::endl;
         return result;
     }
     while(sequence != EOF)
@@ -449,17 +475,12 @@ std::vector<list_bar> MenuManager::buildDialList()
 bool MenuManager::readDialDirectory()
 {
     SystemConnection sysconn;
-    std::string path = m_program_path;
-#ifdef _WIN32
-    path.append("assets\\");
-#else
-    path.append("assets/");
-#endif
-    path += "dialdirectory.xml";
+    std::string path = getAssetPath();
+    path.append("dialdirectory.xml");
     TiXmlDocument doc(path.c_str());
     if(!doc.LoadFile())
     {
-        std::cout << "Error Reading dialdirectory.xml" << std::endl;
+        std::cout << "Error Reading XML" << path << std::endl;
         return false;
     }
     TiXmlHandle hDoc(&doc);
@@ -520,13 +541,8 @@ bool MenuManager::readDialDirectory()
 void MenuManager::createDialDirectory()
 {
     // Create Default Phone Book.
-    std::string path = m_program_path;
-#ifdef _WIN32
-    path.append("assets\\");
-#else
-    path.append("assets/");
-#endif
-    path += "dialdirectory.xml";
+    std::string path = getAssetPath();
+    path.append("dialdirectory.xml");
 
     TiXmlDocument doc;
     TiXmlDeclaration * decl = new TiXmlDeclaration("1.0", "", "");
@@ -571,13 +587,8 @@ void MenuManager::createDialDirectory()
 void MenuManager::writeDialDirectory()
 {
     // Create Default Phone Book.
-    std::string path = m_program_path;
-#ifdef _WIN32
-    path.append("assets\\");
-#else
-    path.append("assets/");
-#endif
-    path += "dialdirectory.xml";
+    std::string path = getAssetPath();
+    path.append("dialdirectory.xml");
 
     TiXmlDocument doc;
     TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
@@ -844,18 +855,17 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                     output.append(m_menu_config.m_theme_name);
                     output.append(" theme.");
                     m_menu_function.m_menu_io.sequenceToAnsi(output);
-                    // _mnuf._premenu.clear();  Check if needed!@
                 }
                 else
                 {
                     m_menu_function.m_menu_io.sequenceToAnsi(
                         "|CS|CR|04You've hit the highest theme available."
                     );
-                    // _mnuf._premenu.clear();  Check if needed!@
                 }
+                m_menu_function.m_previous_menu.erase();
                 // Now redraw the dialing directory
                 parseHeader(m_menu_config.m_ansi_filename);
-                m_link_list.drawVectorList(m_current_page,m_lightbar_position);
+                m_link_list.drawVectorList(m_current_page, m_lightbar_position);
                 break;
             }
             case '[': // Previous Theme
@@ -869,18 +879,18 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                     output.append(m_menu_config.m_theme_name);
                     output.append(" theme.");
                     m_menu_function.m_menu_io.sequenceToAnsi(output);
-                    // _mnuf._premenu.clear();  Check if needed!@
                 }
                 else
                 {
                     m_menu_function.m_menu_io.sequenceToAnsi(
                         "|CS|CR|04You've hit the lowest theme available."
                     );
-                    // _mnuf._premenu.clear();  Check if needed!@
+
                 }
                 // Now redraw the dialing directory
+                m_menu_function.m_previous_menu.erase();
                 parseHeader(m_menu_config.m_ansi_filename);
-                m_link_list.drawVectorList(m_current_page,m_lightbar_position);
+                m_link_list.drawVectorList(m_current_page, m_lightbar_position);
                 break;
             }
             default :
