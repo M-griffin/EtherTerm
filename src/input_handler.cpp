@@ -1,12 +1,14 @@
 #include "input_handler.hpp"
 #include "surface_manager.hpp"
+#include "session.hpp"
 
 #include <iostream>
 #include <string>
 
 
-InputHandler::InputHandler(surface_manager_ptr surface_manager)
+InputHandler::InputHandler(surface_manager_ptr surface_manager, session_ptr session)
     : m_weak_surface_manager(surface_manager)
+    , m_weak_session(session)
     , m_globalShutdown(false)
     , m_isWindowMode(false)
     , m_isMouseSelected(false)
@@ -89,10 +91,13 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_CLOSE:
+        {
             m_globalShutdown = true;
-            SDL_Log("Window %d closed by user!", event.window.windowID);
-            break;
-
+            SDL_Log("Window %d closed received by user!", event.window.windowID);
+            session_ptr session = m_weak_session.lock();
+            session->close_this_session();
+            return;
+        }
         case SDL_WINDOWEVENT_ENTER:
             //SDL_Log("Mouse entered window %d",
             //event.window.windowID);
@@ -1067,8 +1072,8 @@ bool InputHandler::update(SDL_Event &event)
     //{
         switch(event.type)
         {
-            case SDL_QUIT:
-                return false;
+            //case SDL_QUIT:
+            //    return false;
 
             case SDL_WINDOWEVENT:
                 handleWindowEvents(event);
@@ -1098,6 +1103,10 @@ bool InputHandler::update(SDL_Event &event)
                 break;
         }
     //}
+
+    // If shutdown then Ignore any input!
+    if (m_globalShutdown)
+        return false;
 
     // If Input was received return true.
     // Otherwise events are handled here.

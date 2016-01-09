@@ -3,7 +3,6 @@
 
 #include "surface_manager.hpp"
 #include "window_manager.hpp"
-#include "input_handler.hpp"
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
@@ -33,6 +32,11 @@
 class Session;
 typedef boost::shared_ptr<Session> session_ptr;
 typedef boost::weak_ptr<Session> session_weak_ptr;
+
+
+class InputHandler;
+typedef boost::shared_ptr<InputHandler> input_handler_ptr;
+
 
 /**
  * @class Renderer

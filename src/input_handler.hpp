@@ -21,6 +21,10 @@ typedef boost::shared_ptr<SurfaceManager> surface_manager_ptr;
 typedef boost::weak_ptr<SurfaceManager> surface_manager_weak_ptr;
 
 
+class Session;
+typedef boost::shared_ptr<Session> session_ptr;
+typedef boost::weak_ptr<Session> session_weak_ptr;
+
 /**
  * @class InputHandler
  * @author Michael Griffin
@@ -32,7 +36,7 @@ class InputHandler
 {
 public:
 
-    InputHandler(surface_manager_ptr surface_manager);
+    InputHandler(surface_manager_ptr surface_manager, session_ptr session);
     ~InputHandler();
 
     // keyboard events, True if Data Available.
@@ -86,6 +90,7 @@ private:
 
     // Handles Access to Surfaces and Windows.
     surface_manager_weak_ptr  m_weak_surface_manager;
+    session_weak_ptr          m_weak_session;
 
     bool m_globalShutdown;
     bool m_isWindowMode;

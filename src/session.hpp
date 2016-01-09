@@ -58,7 +58,6 @@ public:
         , m_weak_session_list(session_list)
         , m_window_manager(new WindowManager())
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
-        , m_input_handler(new InputHandler(m_surface_manager))
         , m_connection(connection)
         ////, m_io_service(io_service)
     {
@@ -78,6 +77,7 @@ public:
     void startup()
     {
         // Can't Pass Shared_From_This in itializer list, must wait till object is constructed.
+        m_input_handler.reset(new InputHandler(m_surface_manager, shared_from_this()));
         m_renderer.reset(new Renderer(m_surface_manager, m_window_manager, m_input_handler, shared_from_this()));
         m_sequence_parser.reset(new SequenceParser(m_renderer, m_connection));
         m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));

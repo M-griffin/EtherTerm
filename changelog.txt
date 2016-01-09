@@ -1,10 +1,18 @@
 
+Change Log 3.0.25 - 2016-01-09
+    - Added Windows Close Event Handling to shutdown Windows on clicking X
+    - Still need to add switch to check for Main Session, So Closing dialing 
+      directory shuts down all windows, while just closing connection and secondary
+      sessions just kills each session.  The base is already setup.
+    - Update default ANSI theme screen names to match themes
+      Still WIP on second test Theme Fire_Theme. Might just to test switching.
+
 Change Log 3.0.24 - 2016-01-07
-	- Themes are reorganized and cleaner
-	- Created new folder in assets for to organize directory themes
-	- Created new folder for fonts
-	- Added Mid ANSI's for light bars to ini files
-	- Renamed files for better theme organization.
+    - Themes are reorganized and cleaner
+    - Created new folder in assets for to organize directory themes
+    - Created new folder for fonts
+    - Added Mid ANSI's for light bars to ini files
+    - Renamed files for better theme organization.
 
 Change Log 3.0.23 - 2016-01-06
     - Added Themes to the Dialing Directory, The ANSI/ASCII screen along with

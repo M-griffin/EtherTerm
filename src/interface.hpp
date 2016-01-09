@@ -67,7 +67,7 @@ public:
         // Startup the initial Menu/Dialing Directory Sessions
         spawnLocalSession();
 
-        // Test 2nd Local Session
+        // Test 2nd Local Session to test multiple windows.
         spawnLocalSession();
 
         SDL_Event event;
@@ -77,6 +77,7 @@ public:
         {
             std::cout << "Startup Unsuccessful, Shutting Down!" << std::endl;
             m_is_global_shutdown = true;
+            return;
         }
         else
         {
@@ -97,25 +98,18 @@ public:
                 return;
             }
 
+            // Process SDL Events for Window and Key Input
             while(SDL_PollEvent(&event) != 0 && !m_is_global_shutdown)
             {
-                // Process Event.
                 process_event(event);
-
-                // Check for Quit, should really only activate on main window closeing!
-                // Update this later on.
-                switch(event.type)
-                {
-                    case SDL_QUIT:
-                        m_is_global_shutdown = true;
-
-                        // Shutdown Sessions
-                        std::cout << "Shutdown Sessions! " << std::endl;
-                        m_session_list->shutdown();
-
-                        std::cout << "Shutdown Completed, exit interface." << std::endl;
-                        return;
-                }
+            }
+            
+            // All sessions Closed, then exit.
+            if (m_session_list->numberOfSessions() == 0)
+            {
+                std::cout << "Shutting Down!" << std::endl;
+                m_is_global_shutdown = true;
+                break;
             }
 
             // Process Data Queue for Each Active Session.
@@ -201,24 +195,45 @@ public:
      */
     void process_event(SDL_Event &event)
     {
-        if(m_session_list->numberOfSessions() > 0 && !m_is_global_shutdown)
+        int num_sesisons = m_session_list->numberOfSessions();
+        if(num_sesisons > 0 && !m_is_global_shutdown)
         {
             std::set<session_ptr>::iterator itEnd = end(m_session_list->m_sessions);
             for(auto it = begin(m_session_list->m_sessions); it != itEnd; ++it)
             {
-                // If the window id matches the current event, then
-                // send through the event to the specific session for processing.
-                if((*it)->m_window_manager->getWindowId() == event.window.windowID)
+                // If number of sessions changed, (Window was Closed) restart loop.
+                if (m_session_list->numberOfSessions() == num_sesisons)
                 {
-                    // Pass the Events to the specific Session for Specific Window and Input Events.
-                    (*it)->m_input_handler->update(event);
+                    // If the window id matches the current event, then
+                    // send through the event to the specific session for processing.
+                    if((*it)->m_window_manager->getWindowId() == event.window.windowID)
+                    {
+                        // Pass the Events to the specific Session for Specific Window and Input Events.
+                        (*it)->m_input_handler->update(event);
+                    }
+                }
+                else
+                {
+                    // Restart the Loop so we don't miss any events on Window Closes.
+                    if (m_session_list->numberOfSessions() > 0)
+                    {
+                        it = begin(m_session_list->m_sessions);
+                        if((*it)->m_window_manager->getWindowId() == event.window.windowID)
+                        {
+                            // Pass the Events to the specific Session for Specific Window and Input Events.
+                            (*it)->m_input_handler->update(event);
+                        }
+                    }
+                    else
+                    {
+                        // No more sessions exist, exit
+                        std::cout << "No more sesisons exist, Complete Shutdown!" << std::endl;
+                        return;
+                    }
                 }
             }
         }
     }
-
-    // MenuSystem here,  pass the m_session_List, and io_service
-    // To the menu system so it can spawn new connections that link back here.
 
     // Client ASIO Service Specific
     boost::asio::io_service        m_io_service;
