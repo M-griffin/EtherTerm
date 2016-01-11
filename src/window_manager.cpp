@@ -21,7 +21,7 @@ WindowManager::WindowManager()
     , m_width(640)
     , m_height(400)
     , m_hint_vSync("0")          // "0" or "1" Disabled or Enabled
-    , m_hint_textureFilter("1")  // "0" or "1", "2" for none or linear, bi-linear
+    , m_hint_textureFilter("0")  // "0" or "1", "2" for none or linear, bi-linear
     , m_hint_acceleration("1")   // "0" or "1" Disabled or Enabled
 {
     std::cout << "WindowManager Created!" << std::endl;

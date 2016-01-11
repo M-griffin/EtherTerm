@@ -50,12 +50,19 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_EXPOSED:
-            //SDL_Log("Window %d exposed", event.window.windowID);
-            //TheTerminal::Instance()->clearScreen();
-            //SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
-//            TheRenderer::Instance()->drawTextureScreen();
+            /*
+            {
+                SDL_Log("Window %d exposed", event.window.windowID);
+                session_ptr session = m_weak_session.lock();
+                if(session)
+                {
+                    session->m_renderer->renderScreen();
+                    session->m_renderer->drawTextureScreen();
+                }
+                break;
+            }
+            */
             break;
-
         case SDL_WINDOWEVENT_MOVED:
             /*
                 SDL_Log("Window %d moved to %d,%d",
@@ -65,11 +72,19 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_RESIZED:
-            /*
+            {
                 SDL_Log("Window %d resized to %dx%d",
-                        event.window.windowID, event.window.data1,
-                        event.window.data2);*/
- //           TheRenderer::Instance()->drawTextureScreen();
+                        event.window.windowID,
+                        event.window.data1,
+                        event.window.data2);
+
+                session_ptr session = m_weak_session.lock();
+                if(session)
+                {
+                    session->m_renderer->renderScreen();
+                    session->m_renderer->drawTextureScreen();
+                }
+            }
             break;
 
         case SDL_WINDOWEVENT_MINIMIZED:
@@ -77,27 +92,42 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_MAXIMIZED:
-            //SDL_Log("Window %d maximized", event.window.windowID);
-            //TheTerminal::Instance()->clearScreen();
-            //SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
- //           TheRenderer::Instance()->drawTextureScreen();
+            {
+                SDL_Log("Window %d maximized", event.window.windowID);
+
+                session_ptr session = m_weak_session.lock();
+                if(session)
+                {
+                    session->m_renderer->renderScreen();
+                    session->m_renderer->drawTextureScreen();
+                }
+            }
             break;
 
         case SDL_WINDOWEVENT_RESTORED:
-            //SDL_Log("Window %d restored", event.window.windowID);
-            //TheTerminal::Instance()->clearScreen();
-            //SDL_RenderPresent(TheTerminal::Instance()->getRenderer());
- //           TheRenderer::Instance()->drawTextureScreen();
+            {
+                SDL_Log("Window %d restored", event.window.windowID);
+
+                session_ptr session = m_weak_session.lock();
+                if(session)
+                {
+                    session->m_renderer->renderScreen();
+                    session->m_renderer->drawTextureScreen();
+                }
+            }
             break;
 
         case SDL_WINDOWEVENT_CLOSE:
-        {
-            m_globalShutdown = true;
-            SDL_Log("Window %d closed received by user!", event.window.windowID);
-            session_ptr session = m_weak_session.lock();
-            session->close_this_session();
-            return;
-        }
+            {
+                SDL_Log("Window %d closed received by user!", event.window.windowID);
+                m_globalShutdown = true;
+                session_ptr session = m_weak_session.lock();
+                if(session)
+                {
+                    session->close_this_session();
+                }
+                return;
+            }
         case SDL_WINDOWEVENT_ENTER:
             //SDL_Log("Mouse entered window %d",
             //event.window.windowID);
@@ -131,7 +161,7 @@ bool InputHandler::handleTextInputEvent(SDL_Event &event)
     // Check for NumKey and Number Input,  IF Numlock if off
     // Then ignore numbers
     //if (!(event.key.keysym.mod & KMOD_NUM))
-    if (strlen(event.text.text) > 0)
+    if(strlen(event.text.text) > 0)
         setInputSequence(event.text.text);
     else
         return false;
@@ -150,19 +180,27 @@ void InputHandler::handleMouseButtonUpEvent(SDL_Event &event)
         m_mouseReleaseXPosition = event.button.x;
         m_mouseReleaseYPosition = event.button.y;
 
-        // Clear the screen of the selection box.
-//        TheRenderer::Instance()->drawTextureScreen();
-        // Copy Selected Text to Clipboard. Make sure click
-        // in window with no movement is not considered a selection
-        if(m_mouseReleaseXPosition != m_mouseSourceXPosition &&
-                m_mouseReleaseYPosition != m_mouseSourceYPosition)
+        session_ptr session = m_weak_session.lock();
+        if(session)
         {
-//            TheRenderer::Instance()->pullSelectionBuffer(
-//                m_mouseReleaseXPosition, m_mouseReleaseYPosition);
+            // Clear and redraw the screen (remove selection box).
+            session->m_renderer->drawTextureScreen();
+
+            // Copy Selected Text to Clipboard. Make sure click
+            // in window with no movement is not considered a selection
+            if(m_mouseReleaseXPosition != m_mouseSourceXPosition &&
+                    m_mouseReleaseYPosition != m_mouseSourceYPosition)
+            {
+                session->m_renderer->pullSelectionBuffer(
+                    m_mouseReleaseXPosition,
+                    m_mouseReleaseYPosition
+                );
+            }
+
+            // Needed for Windows Full Screen Mode Switches, otherwise it doesn't
+            // Repopulate properly.  Clear so texture is refreshed each selection
+            session->m_renderer->clearSelectionTexture();
         }
-        // Needed for Windows Full Screen Mode Switches, otherwise it doesn't
-        // Repopulate properly.  Clear so texture is refreshed each selection
-//        TheRenderer::Instance()->clearSelectionTexture();
     }
 }
 
@@ -179,10 +217,16 @@ void InputHandler::handleMouseMotionEvent(SDL_Event &event)
             << event.motion.x << "," << event.motion.y
             << std::endl;
         */
-        // Process the Mouse Position from the Origin
-        // To Highlight the selected screen segment.
-//        TheRenderer::Instance()->renderSelectionScreen(
-//            event.motion.x, event.motion.y);
+        session_ptr session = m_weak_session.lock();
+        if(session)
+        {
+            // Process the Mouse Position from the Origin
+            // To Highlight the selected screen segment.
+            session->m_renderer->renderSelectionScreen(
+                event.motion.x,
+                event.motion.y
+            );
+        }
     }
 }
 
@@ -195,16 +239,11 @@ bool InputHandler::handleMouseButtonDownEvent(SDL_Event &event)
         //Get the mouse offsets
         m_mouseSourceXPosition = event.button.x;
         m_mouseSourceYPosition = event.button.y;
-
-        //std::cout << "Mouse pressed at: " << mouseSourceXPosition << ","
-        //    << mouseSourceYPosition << std::endl;
-
-        // Fix for clicking on title bar, 0 pixels will not register
-        // for text selection
-        if(m_mouseSourceXPosition > 0 && m_mouseSourceYPosition > 0)
-            m_isMouseSelected = true;
+        m_isMouseSelected = true;
 
         //SDL_Log("SDL_MOUSEBUTTONDOWN %d shown", event.button.button);
+        //std::cout << "Mouse pressed at: " << mouseSourceXPosition << ","
+        //    << mouseSourceYPosition << std::endl;
         return false;
     }
 
@@ -339,14 +378,14 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
                 // OSX Doesn't do full-screen properly!
                 // Reset Texture Filtering when in windowed mode.
                 // Set Window Mode
-/*
-                if(SDL_SetWindowFullscreen(TheRenderer::Instance()->getWindow(), 0) < 0)
-                {
-                    SDL_Log(
-                        "Error setting window to Windowed Mode: %s", SDL_GetError());
-                    return false;
-                }
-*/
+                /*
+                                if(SDL_SetWindowFullscreen(TheRenderer::Instance()->getWindow(), 0) < 0)
+                                {
+                                    SDL_Log(
+                                        "Error setting window to Windowed Mode: %s", SDL_GetError());
+                                    return false;
+                                }
+                */
                 //Toggle Between Window Sizes.
                 switch(m_fullScreenWindowSize)
                 {
@@ -996,15 +1035,15 @@ bool InputHandler::handleSCOKeyMapFunctionKeys(SDL_Event &event)
 
 bool InputHandler::handleKeyDownEvents(SDL_Event &event)
 {
-/*
-    TheRenderer::SystemConnection sysConection;
-    sysConection = TheRenderer::Instance()->getSystemConnection();
+    /*
+        TheRenderer::SystemConnection sysConection;
+        sysConection = TheRenderer::Instance()->getSystemConnection();
 
-    // Set default Key-mapping when there is no connection
-    // ie.. Dialing Directory for Menu System.
-    if(sysConection.keyMap == "")
-        sysConection.keyMap = "ANSI";
-*/
+        // Set default Key-mapping when there is no connection
+        // ie.. Dialing Directory for Menu System.
+        if(sysConection.keyMap == "")
+            sysConection.keyMap = "ANSI";
+    */
 
 
     // Handle Shift + CTRL + _
@@ -1031,29 +1070,29 @@ bool InputHandler::handleKeyDownEvents(SDL_Event &event)
     {
         if(handleKeyPadAndFunctionKeys(event))
             return true;
-/*
-        // Term specific key mappings
-        if(sysConection.keyMap == "ANSI")
-        {
-            if(handleANSIKeyMapFunctionKeys(event))
-                return true;
-        }
-        else if(sysConection.keyMap == "VT100")
-        {
-            if(handleVT100KeyMapFunctionKeys(event))
-                return true;
-        }
-        else if(sysConection.keyMap == "LINUX")
-        {
-            if(handleLINUXKeyMapFunctionKeys(event))
-                return true;
-        }
-        else if(sysConection.keyMap == "SCO")
-        {
-            if(handleSCOKeyMapFunctionKeys(event))
-                return true;
-        }
-*/
+        /*
+                // Term specific key mappings
+                if(sysConection.keyMap == "ANSI")
+                {
+                    if(handleANSIKeyMapFunctionKeys(event))
+                        return true;
+                }
+                else if(sysConection.keyMap == "VT100")
+                {
+                    if(handleVT100KeyMapFunctionKeys(event))
+                        return true;
+                }
+                else if(sysConection.keyMap == "LINUX")
+                {
+                    if(handleLINUXKeyMapFunctionKeys(event))
+                        return true;
+                }
+                else if(sysConection.keyMap == "SCO")
+                {
+                    if(handleSCOKeyMapFunctionKeys(event))
+                        return true;
+                }
+        */
     }
     return false;
 }
@@ -1065,52 +1104,46 @@ bool InputHandler::handleKeyDownEvents(SDL_Event &event)
  */
 bool InputHandler::update(SDL_Event &event)
 {
+    switch(event.type)
+    {
+        //case SDL_QUIT:
+        //    return false;
 
-    // Notes.. Need to check for Window ID!
+        case SDL_WINDOWEVENT:
+            handleWindowEvents(event);
+            break;
 
-    //while(SDL_PollEvent(&event) != 0 && !isGlobalShutdown())
-    //{
-        switch(event.type)
-        {
-            //case SDL_QUIT:
-            //    return false;
+        case SDL_TEXTINPUT:
+            handleTextInputEvent(event);
+            break;
 
-            case SDL_WINDOWEVENT:
-                handleWindowEvents(event);
-                break;
+        case SDL_MOUSEBUTTONDOWN:
+            handleMouseButtonDownEvent(event);
+            break;
 
-            case SDL_TEXTINPUT:
-                handleTextInputEvent(event);
-                break;
+        case SDL_MOUSEBUTTONUP:
+            handleMouseButtonUpEvent(event);
+            break;
 
-            case SDL_MOUSEBUTTONDOWN:
-                handleMouseButtonDownEvent(event);
-                break;
+        case SDL_MOUSEMOTION:
+            handleMouseMotionEvent(event);
+            break;
 
-            case SDL_MOUSEBUTTONUP:
-                handleMouseButtonUpEvent(event);
-                break;
+        case SDL_KEYDOWN:
+            handleKeyDownEvents(event);
+            break;
 
-            case SDL_MOUSEMOTION:
-                handleMouseMotionEvent(event);
-                break;
-
-            case SDL_KEYDOWN:
-                handleKeyDownEvents(event);
-                break;
-
-            default:
-                break;
-        }
-    //}
+        default:
+            break;
+    }
 
     // If shutdown then Ignore any input!
-    if (m_globalShutdown)
+    if(m_globalShutdown)
         return false;
 
     // If Input was received return true.
     // Otherwise events are handled here.
-    if (!m_inputSequence.empty())
+    if(!m_inputSequence.empty())
         return true;
 
     return false;

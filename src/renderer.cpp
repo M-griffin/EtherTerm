@@ -33,32 +33,32 @@ Renderer::Renderer(surface_manager_ptr surface,
     , m_input_handler(input)
     , m_weak_session(session)
     , BLACK( {   0,   0,   0,   0 })
-    , BLUE( {   0,   0, 171,   0 })
-    , GREEN( {   0, 171,   0,   0 })
-    , CYAN( {   0, 171, 171,   0 })
-    , RED( { 171,   0,   0,   0 })
-    , MAGENTA( { 171,   0, 171,   0 })
-    , BROWN( { 171,  87,   0,   0 })
-    , GREY( { 171, 171, 171,   0 })
-    , DARK_GREY( {  87,  87,  87,   0 })
-    , LIGHT_BLUE( {  87,  87, 255,   0 })
-    , LIGHT_GREEN( {  87, 255,  87,   0 })
-    , LIGHT_CYAN( {  87, 255, 255,   0 })
-    , LIGHT_RED( { 255,  87,  87,   0 })
-    , LIGHT_MAGENTA( { 255,  87, 255,   0 })
-    , YELLOW( { 255, 255,  87,   0 })
-    , WHITE( { 255, 255, 255,   0 })
-    , m_current_fg_color(GREY)
-    , m_current_bg_color(BLACK)
-    , m_term_width(80)
-    , m_term_height(25)
-    , m_is_scroll_region_active(false)
-    , m_top_margin(0)
-    , m_bottom_margin(0)
-    , m_cursor_x_position(0)
-    , m_cursor_y_position(0)
-    , m_is_scalling_surface(false)
-    , m_is_utf8_output(false)
+, BLUE( {   0,   0, 171,   0 })
+, GREEN( {   0, 171,   0,   0 })
+, CYAN( {   0, 171, 171,   0 })
+, RED( { 171,   0,   0,   0 })
+, MAGENTA( { 171,   0, 171,   0 })
+, BROWN( { 171,  87,   0,   0 })
+, GREY( { 171, 171, 171,   0 })
+, DARK_GREY( {  87,  87,  87,   0 })
+, LIGHT_BLUE( {  87,  87, 255,   0 })
+, LIGHT_GREEN( {  87, 255,  87,   0 })
+, LIGHT_CYAN( {  87, 255, 255,   0 })
+, LIGHT_RED( { 255,  87,  87,   0 })
+, LIGHT_MAGENTA( { 255,  87, 255,   0 })
+, YELLOW( { 255, 255,  87,   0 })
+, WHITE( { 255, 255, 255,   0 })
+, m_current_fg_color(GREY)
+, m_current_bg_color(BLACK)
+, m_term_width(80)
+, m_term_height(25)
+, m_is_scroll_region_active(false)
+, m_top_margin(0)
+, m_bottom_margin(0)
+, m_cursor_x_position(0)
+, m_cursor_y_position(0)
+, m_is_scalling_surface(false)
+, m_is_utf8_output(false)
 {
     std::cout << "Renderer Created" << std::endl;
     // Startup Surface and Texture Creation
@@ -296,9 +296,7 @@ void Renderer::renderSelectionScreen(int x, int y)
                            ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
                            ->getSurface();
 
-    SDL_Texture *texture = m_surface_manager
-                           ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
-                           ->getTexture();
+    SDL_Texture *texture;
 
     // Get The Actual size of the Render/Window.
     int screen_width, screen_height;
@@ -321,7 +319,9 @@ void Renderer::renderSelectionScreen(int x, int y)
     // Redraw the screen between selection changes so we have nothing left
     // from previous coordinates.
     m_window_manager->renderCopy(
-        texture,
+        m_surface_manager
+        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->getTexture(),
         &rect_source,
         &rect_dest
     );
@@ -336,8 +336,12 @@ void Renderer::renderSelectionScreen(int x, int y)
         );
 
         // On need to set this the first time!!
-        // Set Render Target to the Texture.
-        m_window_manager->setRenderTarget(texture);
+        // Set Render Target to the Selection Texture.
+        m_window_manager->setRenderTarget(
+            m_surface_manager
+            ->m_textureList[m_surface_manager->TEXTURE_SELECTION]
+            ->getTexture()
+        );
 
         // Clear The Renderer
         m_window_manager->renderClear();
@@ -351,6 +355,10 @@ void Renderer::renderSelectionScreen(int x, int y)
         //Reset back to Global Render, then push update over current texture
         m_window_manager->setRenderTarget(nullptr);
     }
+
+     texture = m_surface_manager
+               ->m_textureList[m_surface_manager->TEXTURE_SELECTION]
+               ->getTexture();
 
     // We need to Translate the Screen Width vs Rows and Width to
     // get actual the grid size of the Characters to snap everything correctly.
@@ -766,18 +774,18 @@ void Renderer::renderScreen()
     rect_src.y = 0;
     rect_src.w = surface->w;
     rect_src.h = surface->h;
-    
+
     // Test Overide.
     m_is_scalling_surface = false;
-    if (m_is_scalling_surface)
+    if(m_is_scalling_surface)
     {
         // Create Scaled
         m_surface_manager->createSurface(m_surface_manager->SURFACE_MAIN_SCALED);
 
         // Handle to Scaled.
         SDL_Surface *scaled = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCALED]
-                           ->getSurface();
+                              ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCALED]
+                              ->getSurface();
 
         std::cout << "surface w" << surface->w << std::endl;
         std::cout << "surface h" << surface->h << std::endl;
@@ -1251,8 +1259,8 @@ void Renderer::drawString(int X, int Y, char text[])
     area.y = Y;
 
     int surface_width = m_surface_manager
-                ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
-                ->getSurface()->w;
+                        ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                        ->getSurface()->w;
 
     for(i = 0; i < (signed)strlen(text); i++)
     {
@@ -1289,8 +1297,8 @@ void Renderer::drawCharSet(int X, int Y)
     area.y = Y * m_surface_manager->m_characterHeight;
 
     int surface_width = m_surface_manager
-                ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
-                ->getSurface()->w;
+                        ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                        ->getSurface()->w;
 
 
     // Loop through Each Char in Bitmap.

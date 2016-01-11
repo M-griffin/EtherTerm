@@ -317,7 +317,10 @@ public:
     {
         // Remove our session from the list close the session.
         broad_caster_ptr session = m_weak_session_list.lock();
-        session->leave(shared_from_this());
+        if (session)
+        {
+            session->leave(shared_from_this());
+        }
     }
 
 
