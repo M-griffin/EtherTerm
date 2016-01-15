@@ -37,6 +37,9 @@ typedef struct SystemConnection
 
 } SystemConnection;
 
+typedef boost::shared_ptr<SystemConnection> system_connection_ptr;
+
+
 /**
  * @class MenuManager
  * @author Michael Griffin

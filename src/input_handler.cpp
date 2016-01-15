@@ -17,9 +17,21 @@ InputHandler::InputHandler(surface_manager_ptr surface_manager, session_ptr sess
     , m_mouseReleaseXPosition(0)
     , m_mouseReleaseYPosition(0)
     , m_fullScreenWindowSize(0)
+    , m_keyMap("ANSI")
 {
     std::cout << "InputHandler Created" << std::endl;
     SDL_StartTextInput();
+
+    // Setup default keymapping, grab from session
+    session_ptr weak_session = m_weak_session.lock();
+    if (weak_session)
+    {
+        if (weak_session->m_system_connection)
+        {
+            // System Connection is populated from DialDirectory.XML File for each system
+            m_keyMap = weak_session->m_system_connection->keyMap;
+        }
+    }
 }
 
 InputHandler::~InputHandler()
@@ -36,9 +48,9 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
     {
         case SDL_WINDOWEVENT_SIZE_CHANGED:
             /*
-                SDL_Log("Window %d size changed to %dx%d",
-                        event.window.windowID, event.window.data1,
-                        event.window.data2);*/
+            SDL_Log("Window %d size changed to %dx%d",
+                    event.window.windowID, event.window.data1,
+                    event.window.data2);*/
             break;
 
         case SDL_WINDOWEVENT_SHOWN:
@@ -50,25 +62,24 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_EXPOSED:
-            /*
+        /*
+        {
+            SDL_Log("Window %d exposed", event.window.windowID);
+            session_ptr session = m_weak_session.lock();
+            if(session)
             {
-                SDL_Log("Window %d exposed", event.window.windowID);
-                session_ptr session = m_weak_session.lock();
-                if(session)
-                {
-                    session->m_renderer->renderScreen();
-                    session->m_renderer->drawTextureScreen();
-                }
-                break;
+                session->m_renderer->renderScreen();
+                session->m_renderer->drawTextureScreen();
             }
-            */
+            break;
+        }
+        */
             break;
         case SDL_WINDOWEVENT_MOVED:
             /*
-                SDL_Log("Window %d moved to %d,%d",
-                    event.window.windowID, event.window.data1,
-                    event.window.data2);*/
-
+            SDL_Log("Window %d moved to %d,%d",
+                event.window.windowID, event.window.data1,
+                event.window.data2);*/
             break;
 
         case SDL_WINDOWEVENT_RESIZED:
@@ -155,7 +166,11 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
     }// End of Switch
 }
 
-// SDL_TEXTINPUT
+/**
+ * @brief Handles SDL_TEXTINPUT Events.
+ * @param event
+ * @return
+ */
 bool InputHandler::handleTextInputEvent(SDL_Event &event)
 {
     // Check for NumKey and Number Input,  IF Numlock if off
@@ -169,7 +184,10 @@ bool InputHandler::handleTextInputEvent(SDL_Event &event)
     return true;
 }
 
-// SDL_MOUSEBUTTONUP:
+/**
+ * @brief Handles SDL_MOUSEBUTTONUP Events
+ * @param event
+ */
 void InputHandler::handleMouseButtonUpEvent(SDL_Event &event)
 {
     //If the left mouse button was released
@@ -204,7 +222,10 @@ void InputHandler::handleMouseButtonUpEvent(SDL_Event &event)
     }
 }
 
-// SDL_MOUSEMOTION
+/**
+ * @brief Handles SDL_MOUSEMOTION Events
+ * @param event
+ */
 void InputHandler::handleMouseMotionEvent(SDL_Event &event)
 {
     if(event.button.button == SDL_BUTTON_LEFT
@@ -230,6 +251,11 @@ void InputHandler::handleMouseMotionEvent(SDL_Event &event)
     }
 }
 
+/**
+ * @brief Handles SDL_BUTTON Events
+ * @param event
+ * @return
+ */
 bool InputHandler::handleMouseButtonDownEvent(SDL_Event &event)
 {
     std::string inputText;     // Copy/Paste Input
@@ -294,7 +320,11 @@ bool InputHandler::handleMouseButtonDownEvent(SDL_Event &event)
     return false;
 }
 
-// Shift + CTRL + Underscore.
+/**
+ * @brief Handles Shift + CTRL + _ Event
+ * @param event
+ * @return
+ */
 bool InputHandler::handleShiftControlKeys(SDL_Event &event)
 {
     // Special for some editors
@@ -314,7 +344,11 @@ bool InputHandler::handleShiftControlKeys(SDL_Event &event)
     return false;
 }
 
-// CTRL + KEY
+/**
+ * @brief Handles CTRL Key Sequences
+ * @param event
+ * @return
+ */
 bool InputHandler::handleControlKeys(SDL_Event &event)
 {
     // CTRL Keys have lowercase letters -
@@ -334,7 +368,11 @@ bool InputHandler::handleControlKeys(SDL_Event &event)
     return false;
 }
 
-// ALT + KEY
+/**
+ * @brief Handles ALT Key Sequences & Window Resizing.
+ * @param event
+ * @return
+ */
 bool InputHandler::handleAlternateKeys(SDL_Event &event)
 {
     switch(event.key.keysym.sym)
@@ -441,7 +479,11 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
     return false;
 }
 
-
+/**
+ * @brief Handles Special Case Shit And Default Keypad Sequences
+ * @param event
+ * @return
+ */
 bool InputHandler::handleKeyPadAndFunctionKeys(SDL_Event &event)
 {
     switch(event.key.keysym.sym)
@@ -533,6 +575,11 @@ bool InputHandler::handleKeyPadAndFunctionKeys(SDL_Event &event)
     return false;
 }
 
+/**
+ * @brief Handle ANSI Keypad Sequences (DOS)
+ * @param event
+ * @return
+ */
 bool InputHandler::handleANSIKeyMapFunctionKeys(SDL_Event &event)
 {
     // screen2|old VT 100/ANSI X3.64 virtual terminal:
@@ -659,6 +706,11 @@ bool InputHandler::handleANSIKeyMapFunctionKeys(SDL_Event &event)
     return false;
 }
 
+/**
+ * @brief Handles VT100 (Terminals Sequences)
+ * @param event
+ * @return
+ */
 bool InputHandler::handleVT100KeyMapFunctionKeys(SDL_Event &event)
 {
     // VT-100 Putty
@@ -784,6 +836,11 @@ bool InputHandler::handleVT100KeyMapFunctionKeys(SDL_Event &event)
     return false;
 }
 
+/**
+ * @brief Handles LINUX/XTERM (Terminals Sequences)
+ * @param event
+ * @return
+ */
 bool InputHandler::handleLINUXKeyMapFunctionKeys(SDL_Event &event)
 {
     // Linux Terminal Putty
@@ -909,6 +966,11 @@ bool InputHandler::handleLINUXKeyMapFunctionKeys(SDL_Event &event)
     return false;
 }
 
+/**
+ * @brief Handles SCO (Terminals Sequences)
+ * @param event
+ * @return
+ */
 bool InputHandler::handleSCOKeyMapFunctionKeys(SDL_Event &event)
 {
     // SCO Putty
@@ -1033,19 +1095,14 @@ bool InputHandler::handleSCOKeyMapFunctionKeys(SDL_Event &event)
     return false;
 }
 
+/**
+ * @brief Handles Function Key Sequences
+ * @param event
+ * @return
+ */
 bool InputHandler::handleKeyDownEvents(SDL_Event &event)
 {
-    /*
-        TheRenderer::SystemConnection sysConection;
-        sysConection = TheRenderer::Instance()->getSystemConnection();
-
-        // Set default Key-mapping when there is no connection
-        // ie.. Dialing Directory for Menu System.
-        if(sysConection.keyMap == "")
-            sysConection.keyMap = "ANSI";
-    */
-
-
+    
     // Handle Shift + CTRL + _
     if(event.key.keysym.mod & KMOD_SHIFT &&
             event.key.keysym.mod & KMOD_CTRL)
@@ -1068,31 +1125,30 @@ bool InputHandler::handleKeyDownEvents(SDL_Event &event)
     // Then Translate to ESC Sequences for Telnet.
     else
     {
-        if(handleKeyPadAndFunctionKeys(event))
-            return true;
-        /*
-                // Term specific key mappings
-                if(sysConection.keyMap == "ANSI")
-                {
-                    if(handleANSIKeyMapFunctionKeys(event))
-                        return true;
-                }
-                else if(sysConection.keyMap == "VT100")
-                {
-                    if(handleVT100KeyMapFunctionKeys(event))
-                        return true;
-                }
-                else if(sysConection.keyMap == "LINUX")
-                {
-                    if(handleLINUXKeyMapFunctionKeys(event))
-                        return true;
-                }
-                else if(sysConection.keyMap == "SCO")
-                {
-                    if(handleSCOKeyMapFunctionKeys(event))
-                        return true;
-                }
-        */
+        if(!handleKeyPadAndFunctionKeys(event))
+        {
+            // Term specific key mappings
+            if(m_keyMap == "ANSI")
+            {
+                if(handleANSIKeyMapFunctionKeys(event))
+                    return true;
+            }
+            else if(m_keyMap == "VT100")
+            {
+                if(handleVT100KeyMapFunctionKeys(event))
+                    return true;
+            }
+            else if(m_keyMap == "LINUX")
+            {
+                if(handleLINUXKeyMapFunctionKeys(event))
+                    return true;
+            }
+            else if(m_keyMap == "SCO")
+            {
+                if(handleSCOKeyMapFunctionKeys(event))
+                    return true;
+            }
+        }
     }
     return false;
 }

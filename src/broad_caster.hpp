@@ -1,6 +1,8 @@
 #ifndef BROAD_CASTER_HPP
 #define BROAD_CASTER_HPP
 
+#include "safe_queue.hpp"
+
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
 
@@ -8,9 +10,12 @@
 #include <string>
 #include <set>
 
+// Forward Declarations
 class Session;
 typedef boost::shared_ptr<Session> session_ptr;
 
+class SystemConnection;
+typedef boost::shared_ptr<SystemConnection> system_connection_ptr;
 
 /**
  * @class BroadCaster
@@ -61,6 +66,15 @@ public:
      * @return
      */
     void shutdown();
+
+    /**
+     * @brief Check if there are any new connections to Spawn
+     * @return
+     */
+    bool hasNewConnections();
+
+    // Queue of new connections to spawn.
+    SafeQueue<system_connection_ptr> m_new_connections;
 
     // Handle to Sessions
     std::set<session_ptr> m_sessions;

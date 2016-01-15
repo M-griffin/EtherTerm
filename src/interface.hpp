@@ -114,6 +114,18 @@ public:
 
             // Process Data Queue for Each Active Session.
             m_session_list->update();
+
+            // Check for Spawned Connection here. System connection container will be populated
+            // With connection info and data to be passed and spawned.
+            if (m_session_list)
+            {
+                while (!m_session_list->m_new_connections.is_empty())
+                {
+                    system_connection_ptr new_system;
+                    new_system = std::move(m_session_list->m_new_connections.dequeue());
+                    spawnConnectionSession(new_system);
+                }
+            }
             SDL_Delay(10);
         }
 
@@ -128,7 +140,7 @@ public:
         // connection_ptr new_connection(new tcp_connection(m_io_service));
         //connection_ptr new_connection;
         //session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
-        session_ptr new_session = Session::create(nullptr, m_session_list, m_program_path);
+        session_ptr new_session = Session::create(nullptr, m_session_list, m_program_path, nullptr);
 
         // Join the Broadcaster to keep instance properly active!
         m_session_list->join(new_session);
@@ -144,7 +156,7 @@ public:
      * @brief Spawn Connection Sessions
      *        Connection Sessions handle their own IO
      */
-    void spawnConnectionSession()
+    void spawnConnectionSession(system_connection_ptr system_connection)
     {
 
         // Connection Mock up, add passing for this later on!
@@ -163,7 +175,7 @@ public:
         // Start Async Connection
         boost::asio::async_connect(new_connection->socket(),
                                    endpoint_iterator,
-                                   [this, new_connection]
+                                   [this, new_connection, system_connection]
                                    (boost::system::error_code ec, tcp::resolver::iterator)
         {
             if(!ec)
@@ -172,7 +184,7 @@ public:
 
                 // Were good, spawn the session
                 //session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
-                session_ptr new_session = Session::create(new_connection, m_session_list, m_program_path);
+                session_ptr new_session = Session::create(new_connection, m_session_list, m_program_path, system_connection);
 
                 m_session_list->join(new_session);
                 // Start Async Read/Writes for Session Socket Data.

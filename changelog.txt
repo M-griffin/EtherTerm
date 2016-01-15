@@ -1,4 +1,16 @@
 
+Change Log 3.0.27 - 2016-01-15
+    - Worked in KeyMaps passed from Sessions to InputHandler
+      By default ANSI mapping is selected for dial directory
+    - Added SystemConnection passing from Interface class to spawn
+      new sessions with connection info and keyMapping which 
+      is then passed to the InputHandler
+    - Added Broadcaster new SafeQueue to hold connection spawn, this
+      can be populated from within the session then read by Interface Class
+      using the SafeQueue.
+    - WIP Added HOME/END to dial directory
+    - WIP Finishing Connection System to call out from dial directory.
+    
 Change Log 3.0.26 - 2016-01-11
     - Added Back Window Resize Events
     - Added Back Mouse Selection for Text Copy/Paste

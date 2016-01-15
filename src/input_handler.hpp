@@ -101,6 +101,7 @@ private:
     int m_mouseReleaseYPosition;
     int m_fullScreenWindowSize;
 
+    std::string m_keyMap;
     std::string m_inputSequence; // Keyboard Input
 
     // Control Keys.

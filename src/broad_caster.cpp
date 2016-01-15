@@ -13,6 +13,9 @@ BroadCaster::BroadCaster()
 BroadCaster::~BroadCaster()
 {
     std::cout << "~BroadCaster" << std::endl;
+
+    // Clear Any new Waiting connections on shutdown.
+    m_new_connections.clear();
 }
 
 /**

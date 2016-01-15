@@ -51,7 +51,8 @@ public:
         //boost::asio::io_service& io_service,
         connection_ptr           connection,
         std::string              program_path,
-        broad_caster_ptr         session_list
+        broad_caster_ptr         session_list,
+        system_connection_ptr    system_connection
     )
         : m_is_dial_directory(false)
         , m_program_path(program_path)
@@ -59,7 +60,7 @@ public:
         , m_window_manager(new WindowManager())
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_connection(connection)
-        ////, m_io_service(io_service)
+        , m_system_connection(system_connection)
     {
         std::cout << "Session Created!" << std::endl;
         // NOTES Reallocate by using reset! When rending Term Height/Width Change, need to recreate.
@@ -161,12 +162,12 @@ public:
     static session_ptr create(//boost::asio::io_service& io_service,
         connection_ptr           connection,
         broad_caster_ptr         session_list,
-        std::string              program_path)
+        std::string              program_path,
+        system_connection_ptr    system_connection)
 
     {
         // Create and Pass back the new Session Instance.
-        //session_ptr new_session(new Session(io_service, connection, sessions, program_path));
-        session_ptr new_session(new Session(connection, program_path, session_list));
+        session_ptr new_session(new Session(connection, program_path, session_list, system_connection));
         return new_session;
     }
 
@@ -354,14 +355,14 @@ public:
     // Socket_Manager handles sockets and incoming data from the server.
     connection_ptr           m_connection;
 
-    // Place Holder if we need it later on
-//    boost::asio::io_service& m_io_service;
-
     // Decoded Data Queue for Sequence Parser.
     SafeQueue<MessageQueue>  m_data_queue;
 
     // Dialing Directory for Local Session.
     menu_manager_ptr         m_menu_manager;
+
+    // Holds System Connection Information (struct resides/passed from MenuManager)
+    system_connection_ptr    m_system_connection;
 
 };
 
