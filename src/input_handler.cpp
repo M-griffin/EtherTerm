@@ -135,7 +135,7 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
                 session_ptr session = m_weak_session.lock();
                 if(session)
                 {
-                    session->close_this_session();
+                    session->closeThisSession();
                 }
                 return;
             }

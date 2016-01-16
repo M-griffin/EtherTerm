@@ -11,7 +11,7 @@
 #include "safe_queue.hpp"
 #include "message_queue.hpp"
 #include "menu_manager.hpp"
-#include "broad_caster.hpp"
+#include "session_manager.hpp"
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -48,15 +48,14 @@ class Session
 public:
 
     Session(
-        //boost::asio::io_service& io_service,
         connection_ptr           connection,
         std::string              program_path,
-        broad_caster_ptr         session_list,
+        session_manager_ptr      session_manager,
         system_connection_ptr    system_connection
     )
         : m_is_dial_directory(false)
         , m_program_path(program_path)
-        , m_weak_session_list(session_list)
+        , m_weak_session_manager(session_manager)
         , m_window_manager(new WindowManager())
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_connection(connection)
@@ -74,6 +73,7 @@ public:
 
     /**
      * @brief Starts up the Rendering and Sequence Decoder which needs a handle back to the session.
+     * We create on Startup becasue the session much be created before it can be passed.
      */
     void startup()
     {
@@ -83,7 +83,7 @@ public:
         m_sequence_parser.reset(new SequenceParser(m_renderer, m_connection));
         m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));
 
-        // On creation, load a list of Font Sets
+        // On creation, load a list of Font Sets XML
         bool is_loaded = m_surface_manager->readFontSets();
         if (!is_loaded)
         {
@@ -95,6 +95,7 @@ public:
             std::cout << "Fontset Created!" << std::endl;
         }
 
+        // Interface Testing USE ONLY
         // Don't Startup menu_managers for other sessions, this is one off!
         //m_menu_manager.reset(new MenuManager(m_program_path, m_renderer, m_sequence_decoder));
 
@@ -151,7 +152,7 @@ public:
         m_renderer->drawCharSet(0, 0);
         m_renderer->renderScreen();
         m_renderer->drawTextureScreen();*/
-    }    
+    }
 
     /**
      * @brief Active Connections etc are send to new sessions on creation.
@@ -161,20 +162,20 @@ public:
      */
     static session_ptr create(//boost::asio::io_service& io_service,
         connection_ptr           connection,
-        broad_caster_ptr         session_list,
+        session_manager_ptr      session_manager,
         std::string              program_path,
         system_connection_ptr    system_connection)
 
     {
         // Create and Pass back the new Session Instance.
-        session_ptr new_session(new Session(connection, program_path, session_list, system_connection));
+        session_ptr new_session(new Session(connection, program_path, session_manager, system_connection));
         return new_session;
     }
 
     /**
      * @brief Setup the initial Async Socket Data Calls for Managing the connection.
      */
-    void wait_for_data()
+    void waitForSocketData()
     {
 
         // Add code to for call back on data received from Server!
@@ -183,7 +184,7 @@ public:
     }
 
     /**
-     * @brief Callback from The Broadcaster to write data to the active sessions.
+     * @brief Callback from The SessionManager to write data to the active sessions.
      * @param msg
      */
     void deliver(const std::string &msg)
@@ -208,7 +209,7 @@ public:
     }
 
     /**
-     * @brief Callback after Writing Data, Check Errors.
+     * @brief Callback after Writing Data, Check For Errors.
      * @param error
      */
     void handleWrite(const boost::system::error_code& error)
@@ -227,9 +228,9 @@ public:
     }
 
     /**
-     * @brief Handle to launch the dialing directory for local sessions!
+     * @brief Handle to launching the dialing directory for local sessions!
      */
-    void start_menu_instance()
+    void startMenuInstance()
     {
         // Allocate a new Dialing Directory Instance on existing placeholder.
         std::cout << "Starting Menu Instatnce:" << std::endl;
@@ -255,7 +256,6 @@ public:
      */
     void update()
     {
-
         // If Menu System, Check for Input to passthrough to the Menu System
         if (m_is_dial_directory)
         {
@@ -275,11 +275,11 @@ public:
             if (input_sequence.size() > 0)
             {
                 // Pass to the Socket once we have that setup,
-                // deliver(input_sequence);
+                deliver(input_sequence);
             }
         }
 
-        // Check for Processed Session Data waiting to display.
+        // Check for Processed/Received Session Data waiting to display.
         MessageQueue msgQueue;
         bool was_data_received = !m_data_queue.is_empty();
         while(!m_data_queue.is_empty())
@@ -300,7 +300,7 @@ public:
                 //std::cout << "m_sequence_ textInput" << std::endl;
                 m_sequence_parser->textInput(msgQueue.m_text);
             }
-            msgQueue.clear();            
+            msgQueue.clear();
         }
 
         // Render Changes on updates only, save CPU usage!
@@ -312,15 +312,23 @@ public:
     }
 
     /**
-     * @brief Cleanups Up Session by popping pointer off stack when done.
+     * @brief Cleanups Up Current Session by popping pointer off SessionManager
      */
-    void close_this_session()
+    void closeThisSession()
     {
         // Remove our session from the list close the session.
-        broad_caster_ptr session = m_weak_session_list.lock();
-        if (session)
+        session_manager_ptr session_mgr = m_weak_session_manager.lock();
+        if (session_mgr)
         {
-            session->leave(shared_from_this());
+            // If dialing directory is closed, then shutdown all windows/sessions
+            if (m_is_dial_directory)
+            {
+                session_mgr->shutdown();
+            }
+            else
+            {
+                session_mgr->leave(shared_from_this());
+            }
         }
     }
 
@@ -332,7 +340,7 @@ public:
     std::string              m_program_path;
 
     // Handle to List of Sessions to Keep Active.
-    broad_caster_wptr        m_weak_session_list;
+    session_manager_wptr     m_weak_session_manager;
 
     // Window Managers Creates and Handles Input/Mouse Events Rendering per active instance.
     window_manager_ptr       m_window_manager;

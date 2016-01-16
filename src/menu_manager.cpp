@@ -734,7 +734,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                     --m_current_page;
                     // reset Bar to first Listing on each Page.
                     m_lightbar_position = m_current_page * m_box_size;
-                    m_link_list.drawVectorList(m_current_page,m_lightbar_position);
+                    m_link_list.drawVectorList(m_current_page, m_lightbar_position);
                 }
                 break;
 
@@ -744,7 +744,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                     ++m_current_page;
                     // reset Bar to first Listing on each Page.
                     m_lightbar_position = m_current_page * m_box_size;
-                    m_link_list.drawVectorList(m_current_page,m_lightbar_position);
+                    m_link_list.drawVectorList(m_current_page, m_lightbar_position);
                 }
                 break;
 
@@ -868,6 +868,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 m_link_list.drawVectorList(m_current_page, m_lightbar_position);
                 break;
             }
+
             case '[': // Previous Theme
             {
                 int idx = m_current_theme_index;
@@ -892,7 +893,22 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 parseHeader(m_menu_config.m_ansi_filename);
                 m_link_list.drawVectorList(m_current_page, m_lightbar_position);
                 break;
-            }
+            }            
+
+            case 'F': // HOME / Front of List
+                m_current_page = 0;
+                // Reset Bar to first System in Listing
+                m_lightbar_position = m_current_page * m_box_size;
+                m_link_list.drawVectorList(m_current_page, m_lightbar_position);
+                break;
+
+            case 'B': // END / Back of List
+                m_current_page = m_link_list.m_total_pages-1;
+                // Reset Bar to Last System in Listing.
+                m_lightbar_position = m_link_list.m_total_lines-1;
+                m_link_list.drawVectorList(m_current_page, m_lightbar_position);
+                break;
+
             default :
                 break;
         }

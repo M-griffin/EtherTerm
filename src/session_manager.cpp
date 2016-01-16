@@ -1,16 +1,16 @@
-#include "broad_caster.hpp"
+#include "session_manager.hpp"
 #include "session.hpp"
 
 #include <algorithm>
 #include <boost/bind.hpp>
 
 
-BroadCaster::BroadCaster()
+SessionManager::SessionManager()
 {
     std::cout << "BroadCaster Created" << std::endl;
 }
 
-BroadCaster::~BroadCaster()
+SessionManager::~SessionManager()
 {
     std::cout << "~BroadCaster" << std::endl;
 
@@ -22,7 +22,7 @@ BroadCaster::~BroadCaster()
  * @brief Notifies that a user has joined the room
  * @param participant
  */
-void BroadCaster::join(session_ptr session)
+void SessionManager::join(session_ptr session)
 {
     std::cout << "joined session BroadCaster" << std::endl;
     m_sessions.insert(session);
@@ -32,7 +32,7 @@ void BroadCaster::join(session_ptr session)
  * @brief Notifies that a user has left the room
  * @param participant
  */
-void BroadCaster::leave(session_ptr session)
+void SessionManager::leave(session_ptr session)
 {
     std::cout << "left session BroadCaster" << std::endl;
 
@@ -44,7 +44,7 @@ void BroadCaster::leave(session_ptr session)
  * @brief Sends message to all users in the current room.
  * @param participant
  */
-void BroadCaster::deliver(std::string msg)
+void SessionManager::deliver(std::string msg)
 {
     if(msg.size() == 0)
         return;
@@ -59,7 +59,7 @@ void BroadCaster::deliver(std::string msg)
  * Also helpful for determinging next node number.
  * @return
  */
-int BroadCaster::numberOfSessions()
+int SessionManager::numberOfSessions()
 {
     return m_sessions.size();
 }
@@ -68,7 +68,7 @@ int BroadCaster::numberOfSessions()
  * @brief Update, Hits Session Updates for processing Data Queue.
  * @return
  */
-void BroadCaster::update()
+void SessionManager::update()
 {
     for(auto it = m_sessions.begin(); it != m_sessions.end(); ++it)
     {
@@ -80,7 +80,7 @@ void BroadCaster::update()
  * @brief Broacaster Anchors the Sessions, shutdown all session.
  * @return
  */
-void BroadCaster::shutdown()
+void SessionManager::shutdown()
 {
     // Swap to pop all enteries off the stack.
     std::set<session_ptr>().swap(m_sessions);

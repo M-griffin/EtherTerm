@@ -2,7 +2,7 @@
 #define INTERFACE_HPP
 
 #include "session.hpp"
-#include "broad_caster.hpp"
+#include "session_manager.hpp"
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -43,12 +43,12 @@ public:
     Interface(std::string program_path)
         : m_work(m_io_service)
         , m_program_path(program_path)
-        , m_session_list(new BroadCaster())
+        , m_session_manager(new SessionManager())
         , m_is_global_shutdown(false)
     {
         std::cout << "Interface Created" << std::endl;
-        // Startup worker thread of ASIO. We want socket communications in a separate thread.
-        // We only spawn a single thread for IO_Service on startup.
+        // Start up worker thread of ASIO. We want socket communications in a separate thread.
+        // We only spawn a single thread for IO_Service on start up
         m_thread = create_thread();
     }
 
@@ -73,7 +73,7 @@ public:
         SDL_Event event;
 
         // Send the event along for each session
-        if (m_session_list->numberOfSessions() == 0)
+        if (m_session_manager->numberOfSessions() == 0)
         {
             std::cout << "Startup Unsuccessful, Shutting Down!" << std::endl;
             m_is_global_shutdown = true;
@@ -91,7 +91,7 @@ public:
         {
 
             // Send the event along for each session
-            if (m_session_list->numberOfSessions() == 0)
+            if (m_session_manager->numberOfSessions() == 0)
             {
                 std::cout << "Shutting Down!" << std::endl;
                 m_is_global_shutdown = true;
@@ -103,9 +103,9 @@ public:
             {
                 process_event(event);
             }
-            
+
             // All sessions Closed, then exit.
-            if (m_session_list->numberOfSessions() == 0)
+            if (m_session_manager->numberOfSessions() == 0)
             {
                 std::cout << "Shutting Down!" << std::endl;
                 m_is_global_shutdown = true;
@@ -113,16 +113,16 @@ public:
             }
 
             // Process Data Queue for Each Active Session.
-            m_session_list->update();
+            m_session_manager->update();
 
             // Check for Spawned Connection here. System connection container will be populated
             // With connection info and data to be passed and spawned.
-            if (m_session_list)
+            if (m_session_manager)
             {
-                while (!m_session_list->m_new_connections.is_empty())
+                while (!m_session_manager->m_new_connections.is_empty())
                 {
                     system_connection_ptr new_system;
-                    new_system = std::move(m_session_list->m_new_connections.dequeue());
+                    new_system = std::move(m_session_manager->m_new_connections.dequeue());
                     spawnConnectionSession(new_system);
                 }
             }
@@ -136,20 +136,17 @@ public:
      */
     void spawnLocalSession()
     {
-        //Mock up connection which will not be used.
-        // connection_ptr new_connection(new tcp_connection(m_io_service));
-        //connection_ptr new_connection;
-        //session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
-        session_ptr new_session = Session::create(nullptr, m_session_list, m_program_path, nullptr);
+        // Pass Nullptr on Connection and System Connection since this is a local session.
+        session_ptr new_session = Session::create(nullptr, m_session_manager, m_program_path, nullptr);
 
-        // Join the Broadcaster to keep instance properly active!
-        m_session_list->join(new_session);
+        // Join the SessionManager to keep instance properly active!
+        m_session_manager->join(new_session);
 
-        // Call Startup outside of constrctor for shared_from_this() handle.
+        // Call Startup outside of constructor for shared_from_this() handle.
         new_session->startup();
 
         // Start the Dialing Directory on the local instance
-        new_session->start_menu_instance();                
+        new_session->startMenuInstance();
     }
 
     /**
@@ -158,13 +155,24 @@ public:
      */
     void spawnConnectionSession(system_connection_ptr system_connection)
     {
+        if (!system_connection)
+        {
+            return;
+        }
 
-        // Connection Mock up, add passing for this later on!
-        std::string hostname;
-        std::string port;
+        // Basic Debugging.
+        std::cout << "Connecting to: "
+                  << system_connection->protocol
+                  << " "
+                  << system_connection->name
+                  << " "
+                  << system_connection->ip
+                  << " "
+                  << system_connection->port
+                  << std::endl;
 
         tcp::resolver resolver(m_io_service);
-        tcp::resolver::query query(hostname, port);
+        tcp::resolver::query query(system_connection->ip, std::to_string(system_connection->port));
 
         // Use all end pointer for IPV4 & IPV6 support
         tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
@@ -182,16 +190,15 @@ public:
             {
                 std::cout << "Connected" << std::endl;
 
-                // Were good, spawn the session
-                //session_ptr new_session = Session::create(m_io_service, new_connection, m_session_list, m_program_path);
-                session_ptr new_session = Session::create(new_connection, m_session_list, m_program_path, system_connection);
+                // Create a Session on Successful Connection.
+                session_ptr new_session = Session::create(new_connection, m_session_manager, m_program_path, system_connection);
 
-                m_session_list->join(new_session);
-                // Start Async Read/Writes for Session Socket Data.
+                // Add Session to the SessionManager
+                m_session_manager->join(new_session);
+
+                // Start Async Read/Writes Loop for Session Socket Data.
                 // Required only for Sessions that make connections, Local sessions do not use this.
-                new_session->wait_for_data();                
-
-                //  Or just pass in msession_list to the session!  so it can pop itself off.
+                new_session->waitForSocketData();
             }
             else
             {
@@ -202,19 +209,19 @@ public:
     }
 
     /**
-     * @brief Process Input Events per session
+     * @brief Process SDL_TextInput and SDL_Window Events per session
      * @param event
      */
     void process_event(SDL_Event &event)
     {
-        int num_sesisons = m_session_list->numberOfSessions();
+        int num_sesisons = m_session_manager->numberOfSessions();
         if(num_sesisons > 0 && !m_is_global_shutdown)
         {
-            std::set<session_ptr>::iterator itEnd = end(m_session_list->m_sessions);
-            for(auto it = begin(m_session_list->m_sessions); it != itEnd; ++it)
+            std::set<session_ptr>::iterator itEnd = end(m_session_manager->m_sessions);
+            for(auto it = begin(m_session_manager->m_sessions); it != itEnd; ++it)
             {
                 // If number of sessions changed, (Window was Closed) restart loop.
-                if (m_session_list->numberOfSessions() == num_sesisons)
+                if (m_session_manager->numberOfSessions() == num_sesisons)
                 {
                     // If the window id matches the current event, then
                     // send through the event to the specific session for processing.
@@ -227,9 +234,10 @@ public:
                 else
                 {
                     // Restart the Loop so we don't miss any events on Window Closes.
-                    if (m_session_list->numberOfSessions() > 0)
+                    // The number or sessions will change on a close, so we need to re-initialize the Iterators.
+                    if (m_session_manager->numberOfSessions() > 0)
                     {
-                        it = begin(m_session_list->m_sessions);
+                        it = begin(m_session_manager->m_sessions);
                         if((*it)->m_window_manager->getWindowId() == event.window.windowID)
                         {
                             // Pass the Events to the specific Session for Specific Window and Input Events.
@@ -239,7 +247,7 @@ public:
                     else
                     {
                         // No more sessions exist, exit
-                        std::cout << "No more sesisons exist, Complete Shutdown!" << std::endl;
+                        std::cout << "No more sessions exist, Complete Shutdown!" << std::endl;
                         return;
                     }
                 }
@@ -253,7 +261,7 @@ public:
     std::string                    m_program_path;
 
     // Spawned Session List
-    broad_caster_ptr               m_session_list;
+    session_manager_ptr            m_session_manager;
 
     std::thread                    m_thread;
     bool                           m_is_global_shutdown;

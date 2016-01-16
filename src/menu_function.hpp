@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 /**
  * @class MenuRecord
@@ -93,7 +94,7 @@ public:
     MenuRecord                 m_menu_record;
     std::vector<CommandRecord> m_command_record;
     std::vector<int>           m_command_index;
-    std::vector<int>           m_command_index_lightbar;
+    std::map<std::string, int> m_command_index_function;
 
     // Below here are Menu Processing Functions
     bool m_isLoadNewMenu;

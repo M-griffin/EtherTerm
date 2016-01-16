@@ -58,8 +58,8 @@
     <File Name="src/tinyxml.hpp"/>
     <File Name="src/tinyxmlerror.cpp"/>
     <File Name="src/tinyxmlparser.cpp"/>
-    <File Name="src/broad_caster.hpp"/>
-    <File Name="src/broad_caster.cpp"/>
+    <File Name="src/session_manager.cpp"/>
+    <File Name="src/session_manager.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

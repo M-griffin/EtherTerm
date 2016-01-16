@@ -42,7 +42,7 @@ MenuFunction::~MenuFunction()
     std::cout << "~MenuFunction" << std::endl;
     std::vector<CommandRecord>().swap(m_command_record);
     std::vector<int>().swap(m_command_index);
-    std::vector<int>().swap(m_command_index_lightbar);
+    std::map<std::string, int>().swap(m_command_index_function);
 }
 
 /*
@@ -308,10 +308,14 @@ int MenuFunction::commandsExist(std::string MenuName, int idx)
     // Loop Through and Find the The Command
     sprintf(sText,"[CommandRec%.03d]",idx);
     std::string cfgdata;
-    while(std::getline(iFS2,cfgdata,'\n'))
+    std::string::size_type id1 = 0;
+    while(std::getline(iFS2, cfgdata, '\n'))
     {
-        if(cfgdata.find(sText,0) != std::string::npos)
+        id1 = cfgdata.find(sText, 0);
+        if (id1 != std::string::npos)
+        {
             ret = true;
+        }
     }
     iFS2.close();
     return ret;
@@ -325,7 +329,7 @@ int MenuFunction::commandsExist(std::string MenuName, int idx)
 int MenuFunction::commandsCount(std::string MenuName)
 {
     int  cnt = 0;
-    while(commandsExist(MenuName,cnt))
+    while(commandsExist(MenuName, cnt))
     {
         ++cnt;
     }
@@ -390,7 +394,7 @@ void MenuFunction::menuReload()
     m_y_position          = 1;   // Holds Y Coord
     m_num_commands        = 0;   // Number of Commands.
     m_num_lightbar_commands = 0;   // Holds Light-bar # of choices
-    m_num_esc_commands         = 0;   // Number of ESC Commands.
+    m_num_esc_commands      = 0;   // Number of ESC Commands.
 
     m_sequence  = '\0';
     m_second_sequence = '\0';                 // Hold Input / Light-bar Key
@@ -473,10 +477,8 @@ void MenuFunction::menuStart(std::string currentMenu)
     {
         // Reset Vector Lists.
         menuClearObjects();
-
-        m_num_lightbar_commands = 0;
         m_first_commands_executed = 0;
-        m_num_esc_commands = 0;
+
         for(int i = 0; i != m_num_commands; i++)
         {
             // If we find a FIRSTCMD, Execute it right away!
@@ -484,6 +486,7 @@ void MenuFunction::menuStart(std::string currentMenu)
             {
                 menuDoCommands(&m_command_record[i]);
                 ++m_first_commands_executed;
+                continue;
             }
 
             // Get Light-bar Number of Commands
@@ -491,57 +494,74 @@ void MenuFunction::menuStart(std::string currentMenu)
             if(m_command_record[i].is_lightbar)
             {
                 m_command_index.push_back(i);
-                ++m_num_lightbar_commands;
             }
 
             // Check for Function Key Commands.
             if(m_command_record[i].control_key == "ESC")
             {
-                m_command_index_lightbar.push_back(i);
-                ++m_num_esc_commands;
+                //m_command_index_function.push_back(i);
+                m_command_index_function.insert(
+                    std::make_pair(m_command_record[i].control_key, i)
+                );
             }
             else if(m_command_record[i].control_key == "LEFT")
             {
-                m_command_index_lightbar.push_back(i);
-                ++m_num_esc_commands;
+                //m_command_index_function.push_back(i);
+                m_command_index_function.insert(
+                    std::make_pair(m_command_record[i].control_key, i)
+                );
             }
             else if(m_command_record[i].control_key == "RIGHT")
             {
-                m_command_index_lightbar.push_back(i);
-                ++m_num_esc_commands;
+                //m_command_index_function.push_back(i);
+                m_command_index_function.insert(
+                    std::make_pair(m_command_record[i].control_key, i)
+                );
             }
             else if(m_command_record[i].control_key == "UP")
             {
-                m_command_index_lightbar.push_back(i);
-                ++m_num_esc_commands;
+                //m_command_index_function.push_back(i);
+                m_command_index_function.insert(
+                    std::make_pair(m_command_record[i].control_key, i)
+                );
             }
             else if(m_command_record[i].control_key == "DOWN")
             {
-                m_command_index_lightbar.push_back(i);
-                ++m_num_esc_commands;
+                //m_command_index_function.push_back(i);
+                m_command_index_function.insert(
+                    std::make_pair(m_command_record[i].control_key, i)
+                );
             }
-
             else if(m_command_record[i].control_key == "HOME")
             {
-                m_command_index_lightbar.push_back(i);
-                ++m_num_esc_commands;
+                //m_command_index_function.push_back(i);
+                m_command_index_function.insert(
+                    std::make_pair(m_command_record[i].control_key, i)
+                );
             }
             else if(m_command_record[i].control_key == "END")
             {
-                m_command_index_lightbar.push_back(i);
-                ++m_num_esc_commands;
+                //m_command_index_function.push_back(i);
+                m_command_index_function.insert(
+                    std::make_pair(m_command_record[i].control_key, i)
+                );
             }
             else if(m_command_record[i].control_key == "PAGEUP")
             {
-                m_command_index_lightbar.push_back(i);
-                ++m_num_esc_commands;
+                //m_command_index_function.push_back(i);
+                m_command_index_function.insert(
+                    std::make_pair(m_command_record[i].control_key, i)
+                );
             }
             else if(m_command_record[i].control_key == "PAGEDN")
             {
-                m_command_index_lightbar.push_back(i);
-                ++m_num_esc_commands;
+                //m_command_index_function.push_back(i);
+                m_command_index_function.insert(
+                    std::make_pair(m_command_record[i].control_key, i)
+                );
             }
         }
+
         // Return if we executed all commands as FIRSTCMD!
         if(m_first_commands_executed == m_num_commands)
         {
@@ -550,6 +570,10 @@ void MenuFunction::menuStart(std::string currentMenu)
         m_previous_menu = m_curent_menu;
     }
     m_output.clear();
+
+    // Set the Sizes
+    m_num_esc_commands = m_command_index_function.size();
+    m_num_lightbar_commands = m_command_index.size();
 
     if(m_num_lightbar_commands != 0)
     {
@@ -616,7 +640,7 @@ void MenuFunction::menuStart(std::string currentMenu)
 void MenuFunction::menuClearObjects()
 {
     std::vector<int>().swap(m_command_index);
-    std::vector<int>().swap(m_command_index_lightbar);
+    std::map<std::string, int>().swap(m_command_index_function);
 }
 
 /**
@@ -663,75 +687,100 @@ void MenuFunction::menuLightBars(char *returnParameters,
         // Run through and check for any Menu commands that overdrive default pass-through!
         if(m_num_esc_commands > 0)
         {
-            // ESC Commands in Menu might override light-bars.
-            for(int ckey = 0; ckey != (signed)m_num_esc_commands; ckey++)
+            if(m_second_sequence == '\0')  // Straight ESC Key
             {
-                if(m_second_sequence == '\0')  // Straight ESC Key
+                // If we have ESC
+                if(m_command_index_function.find("ESC") != m_command_index_function.end())
                 {
-                    if(m_command_record[m_command_index_lightbar[ckey]].control_key == "ESC")
-                    {
-                        ++m_commands_executed;
-                        menuDoCommands(&m_command_record[m_command_index_lightbar[ckey]]);
-                        strcpy(returnParameters,(const char*)m_command_record[m_command_index_lightbar[ckey]].command.c_str());
-                    }
-                }
-                else if(m_second_sequence == 'A')
-                {
-                    if(m_command_record[m_command_index_lightbar[ckey]].control_key == "UP")
-                    {
-                        ++m_commands_executed;
-                        menuDoCommands(&m_command_record[m_command_index_lightbar[ckey]]);
-                        strcpy(returnParameters,(const char*)m_command_record[m_command_index_lightbar[ckey]].command.c_str());
-                    }
-                }
-                else if(m_second_sequence == 'B')
-                {
-                    if(m_command_record[m_command_index_lightbar[ckey]].control_key == "DOWN")
-                    {
-                        ++m_commands_executed;
-                        menuDoCommands(&m_command_record[m_command_index_lightbar[ckey]]);
-                        strcpy(returnParameters,(const char*)m_command_record[m_command_index_lightbar[ckey]].command.c_str());
-                    }
-                }
-                else if(m_second_sequence == 'C')
-                {
-                    if(m_command_record[m_command_index_lightbar[ckey]].control_key == "RIGHT")
-                    {
-                        ++m_commands_executed;
-                        menuDoCommands(&m_command_record[m_command_index_lightbar[ckey]]);
-                        strcpy(returnParameters,(const char*)m_command_record[m_command_index_lightbar[ckey]].command.c_str());
-                    }
-                }
-                else if(m_second_sequence == 'D')
-                {
-                    if(m_command_record[m_command_index_lightbar[ckey]].control_key == "LEFT")
-                    {
-                        ++m_commands_executed;
-                        menuDoCommands(&m_command_record[m_command_index_lightbar[ckey]]);
-                        strcpy(returnParameters,(const char*)m_command_record[m_command_index_lightbar[ckey]].command.c_str());
-                    }
-                }
-                else if(m_second_sequence == 'V' ||
-                        (m_second_sequence == '5' && inputSequence[3] == '~'))
-                {
-                    if(m_command_record[m_command_index_lightbar[ckey]].control_key == "PAGEUP")
-                    {
-                        ++m_commands_executed;
-                        menuDoCommands(&m_command_record[m_command_index_lightbar[ckey]]);
-                        strcpy(returnParameters,(const char*)m_command_record[m_command_index_lightbar[ckey]].command.c_str());
-                    }
-                }
-                else if(m_second_sequence == 'U' ||
-                        (m_second_sequence == '6' && inputSequence[3] == '~'))
-                {
-                    if(m_command_record[m_command_index_lightbar[ckey]].control_key == "PAGEDN")
-                    {
-                        ++m_commands_executed;
-                        menuDoCommands(&m_command_record[m_command_index_lightbar[ckey]]);
-                        strcpy(returnParameters,(const char*)m_command_record[m_command_index_lightbar[ckey]].command.c_str());
-                    }
+                    int cmdIndex = m_command_index_function["ESC"];
+                    ++m_commands_executed;
+                    menuDoCommands(&m_command_record[cmdIndex]);
+                    strcpy(returnParameters,(const char*)m_command_record[cmdIndex].command.c_str());
                 }
             }
+            else if(m_second_sequence == 'A')
+            {
+                if(m_command_index_function.find("UP") != m_command_index_function.end())
+                {
+                    int cmdIndex = m_command_index_function["UP"];
+                    ++m_commands_executed;
+                    menuDoCommands(&m_command_record[cmdIndex]);
+                    strcpy(returnParameters,(const char*)m_command_record[cmdIndex].command.c_str());
+                }
+            }
+            else if(m_second_sequence == 'B')
+            {
+                if(m_command_index_function.find("DOWN") != m_command_index_function.end())
+                {
+                    int cmdIndex = m_command_index_function["DOWN"];
+                    ++m_commands_executed;
+                    menuDoCommands(&m_command_record[cmdIndex]);
+                    strcpy(returnParameters,(const char*)m_command_record[cmdIndex].command.c_str());
+                }
+            }
+            else if(m_second_sequence == 'C')
+            {
+                if(m_command_index_function.find("RIGHT") != m_command_index_function.end())
+                {
+                    int cmdIndex = m_command_index_function["RIGHT"];
+                    ++m_commands_executed;
+                    menuDoCommands(&m_command_record[cmdIndex]);
+                    strcpy(returnParameters,(const char*)m_command_record[cmdIndex].command.c_str());
+                }
+            }
+            else if(m_second_sequence == 'D')
+            {
+                if(m_command_index_function.find("LEFT") != m_command_index_function.end())
+                {
+                    int cmdIndex = m_command_index_function["LEFT"];
+                    ++m_commands_executed;
+                    menuDoCommands(&m_command_record[cmdIndex]);
+                    strcpy(returnParameters,(const char*)m_command_record[cmdIndex].command.c_str());
+                }
+            }
+            else if(m_second_sequence == 'V' ||
+                    (m_second_sequence == '5' && inputSequence[3] == '~'))
+            {
+                if(m_command_index_function.find("PAGEUP") != m_command_index_function.end())
+                {
+                    int cmdIndex = m_command_index_function["PAGEUP"];
+                    ++m_commands_executed;
+                    menuDoCommands(&m_command_record[cmdIndex]);
+                    strcpy(returnParameters,(const char*)m_command_record[cmdIndex].command.c_str());
+                }
+            }
+            else if(m_second_sequence == 'U' ||
+                    (m_second_sequence == '6' && inputSequence[3] == '~'))
+            {
+                if(m_command_index_function.find("PAGEDN") != m_command_index_function.end())
+                {
+                    int cmdIndex = m_command_index_function["PAGEDN"];
+                    ++m_commands_executed;
+                    menuDoCommands(&m_command_record[cmdIndex]);
+                    strcpy(returnParameters,(const char*)m_command_record[cmdIndex].command.c_str());
+                }
+            }
+            else if(m_second_sequence == 'H')
+            {
+                if(m_command_index_function.find("HOME") != m_command_index_function.end())
+                {
+                    int cmdIndex = m_command_index_function["HOME"];
+                    ++m_commands_executed;
+                    menuDoCommands(&m_command_record[cmdIndex]);
+                    strcpy(returnParameters,(const char*)m_command_record[cmdIndex].command.c_str());
+                }
+            }
+            else if(m_second_sequence == 'K')
+            {
+                if(m_command_index_function.find("END") != m_command_index_function.end())
+                {
+                    int cmdIndex = m_command_index_function["END"];
+                    ++m_commands_executed;
+                    menuDoCommands(&m_command_record[cmdIndex]);
+                    strcpy(returnParameters,(const char*)m_command_record[cmdIndex].command.c_str());
+                }
+            }
+
             // Executed == 0, Then Key Pressed was not valid! :)
             // Pass through the ESC then
             if(m_commands_executed == 0)

@@ -1,4 +1,13 @@
 
+Change Log 3.0.28 - 2016-01-16
+	- Refactored Broadcaster to SessionManager for better description of function
+	- Update shutdown procedure, if DialDirectory Window/Session is closed, then 
+	  all Sessions are closed and program is shutdown.  Otherwise individual 
+	  sessions are closed only when clicking X on the window.
+	- Added HOME and END to DialDirectory to move quickly to First and Last entry.
+	- Also reworked the menu system a bit changing ESC Functions keys from looping
+	  vector to a single std::map for KeyValue and quicker lookups.
+
 Change Log 3.0.27 - 2016-01-15
     - Worked in KeyMaps passed from Sessions to InputHandler
       By default ANSI mapping is selected for dial directory

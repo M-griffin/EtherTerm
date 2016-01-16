@@ -1,5 +1,5 @@
-#ifndef BROAD_CASTER_HPP
-#define BROAD_CASTER_HPP
+#ifndef SESSION_MANAGER_HPP
+#define SESSION_MANAGER_HPP
 
 #include "safe_queue.hpp"
 
@@ -18,17 +18,17 @@ class SystemConnection;
 typedef boost::shared_ptr<SystemConnection> system_connection_ptr;
 
 /**
- * @class BroadCaster
+ * @class SessionManager
  * @author Michael Griffin
  * @date 15/08/2015
- * @file boad_caster.hpp
+ * @file session_manager.hpp
  * @brief Keep's Sessions Active, good for adding and removing.
  */
-class BroadCaster
+class SessionManager
 {
 public:
-    BroadCaster();
-    ~BroadCaster();
+    SessionManager();
+    ~SessionManager();
 
     /**
      * @brief Notifies that a user has joined the room
@@ -80,7 +80,7 @@ public:
     std::set<session_ptr> m_sessions;
 };
 
-typedef boost::shared_ptr<BroadCaster>	broad_caster_ptr;
-typedef boost::weak_ptr<BroadCaster>	broad_caster_wptr;
+typedef boost::shared_ptr<SessionManager>  session_manager_ptr;
+typedef boost::weak_ptr<SessionManager>	   session_manager_wptr;
 
 #endif // BROAD_CASTER_HPP
