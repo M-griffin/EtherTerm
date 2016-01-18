@@ -178,56 +178,47 @@ public:
         // Connection handles TCP_Socket
         connection_ptr new_connection(new tcp_connection(m_io_service));
 
+        // Create the Session before passing to the Connection (Async Thread)
+        session_ptr new_session = Session::create(new_connection, m_session_manager, m_program_path, system_connection);
+        std::cout << "Connected Session Created" << std::endl;
+
+        // Call Startup outside of constructor for shared_from_this() handle.
+        new_session->startup();
+
+        // If Telnet Session spawn it, Add Other Instances later on, SSH, IRC, FTP etc..
+        if (system_connection->protocol == "TELNET")
+        {
+            std::cout << "Starting TelnetManager in Interface" << std::endl;
+            new_session->startTelnetManager();
+        }
+
+        // Start Async Read/Writes Loop for Session Socket Data.
+        // Required only for Sessions that make connections, Local sessions do not use this.
+        // Add Session to the SessionManager
+        m_session_manager->join(new_session);
+        std::cout << "New Connection Session pre-added to Session Manager" << std::endl;
+
+
         // Start Async Connection
         boost::asio::async_connect(new_connection->socket(),
                                    endpoint_iterator,
-                                   [this, new_connection, system_connection]
+                                   [this, new_connection, system_connection, new_session]
                                    (boost::system::error_code ec, tcp::resolver::iterator)
         {
             if(!ec)
             {
-
-                /**
-                    TRY taking the system connection out of here,, this is a thread!! (async_connect)
-                    and the { if (!es) is whats executed afterwords in the io_service thread!
-                     *
-                     * This will be a bit tricky, i need to track the connection, and pass it back to the interface
-                     * somehow to spawn the session so the SDL Events can see the window!  gosh!!
-                     *
-                    We need to queue that the connection is made, then create the session accordingly!!
-                */
-                std::cout << "Connected" << std::endl;
-
-                // Create a Session on Successful Connection.
-                session_ptr new_session = Session::create(new_connection, m_session_manager, m_program_path, system_connection);
-                std::cout << "Connected Session Created" << std::endl;
-
-                // Call Startup outside of constructor for shared_from_this() handle.
-                new_session->startup();
-
-                // If Telnet Session spawn it, Add Other Instances later on, SSH, IRC, FTP etc..
-                if (system_connection->protocol == "TELNET")
-                {
-                    std::cout << "Starting TelnetManager in Interface" << std::endl;
-                    new_session->startTelnetManager();
-                }               
-
-                // Start Async Read/Writes Loop for Session Socket Data.
-                // Required only for Sessions that make connections, Local sessions do not use this.
-                // Add Session to the SessionManager
-                m_session_manager->join(new_session);
-                std::cout << "Connected Session added to Session Manager" << std::endl;
-
-                std::cout << "Connected Session Wait for SocketData Starting." << std::endl;
-                new_session->waitForSocketData();
-                
+                std::cout << "new_session waitForSocketData() executed on success." << std::endl;
+                new_session->waitForSocketData();                
             }
             else
             {
-                std::cout << "Unable to Connect" << std::endl;
+                std::cout << "Unable to Connect, closing down session." << std::endl;
+
+                // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
+                new_connection->socket().close();
+                m_session_manager->leave(new_session);
             }
         });
-
     }
 
     /**
@@ -237,9 +228,6 @@ public:
     void process_event(SDL_Event &event)
     {
         int num_sesisons = m_session_manager->numberOfSessions();
-
-        std::cout << "num_sesisons: " << num_sesisons << std::endl;
-
         if(num_sesisons > 0 && !m_is_global_shutdown)
         {
             std::set<session_ptr>::iterator itEnd = end(m_session_manager->m_sessions);
@@ -258,7 +246,6 @@ public:
                 }
                 else
                 {
-                    std::cout << "*** EXTRA SESSION ADDED CATCH HERE! " << std::endl;
                     // Restart the Loop so we don't miss any events on Window Closes.
                     // The number or sessions will change on a close, so we need to re-initialize the Iterators.
                     if (m_session_manager->numberOfSessions() > 0)

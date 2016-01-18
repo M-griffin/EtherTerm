@@ -46,7 +46,7 @@ public:
      * @brief Sends message to all users in the current room.
      * @param participant
      */
-    void deliver(std::string msg);
+    // void deliver(std::string msg);
 
     /**
      * @brief Retrieve Number of users connected

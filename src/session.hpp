@@ -183,13 +183,10 @@ public:
         memset(&m_raw_data, 0, max_length);
         if(m_connection->is_open())
         {
-            std::cout << "Connected, waiting for read async" << std::endl;
             m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data, max_length),
                     boost::bind(&Session::handleRead, shared_from_this(),
                                 boost::asio::placeholders::error,
                                 boost::asio::placeholders::bytes_transferred));
-
-            std::cout << "Connected, waiting for read async Done." << std::endl;
         }
         else
         {
@@ -269,16 +266,6 @@ public:
 
                         if(m_connection->is_open())
                         {
-                            std::cout << "Leaving Client IP: "
-                                      << m_connection->socket().remote_endpoint().address().to_string()
-                                      << std::endl << "Host-name: "
-                                      //<< boost::asio::ip::host_name() // Local host_name
-                                      << m_connection->socket().remote_endpoint()
-                                      << std::endl
-                                      << "Bytes: "
-                                      << bytes_transferred
-                                      << std::endl;
-
                             m_connection->socket().shutdown(tcp::socket::shutdown_both);
                             m_connection->socket().close();
                         }
@@ -299,8 +286,6 @@ public:
      */
     void deliver(const std::string &msg)
     {
-        std::cout << "SESSION DELIVER" << std::endl;
-
         if(msg.size() == 0 || msg[0] == '\0')
         {
             return;
@@ -308,6 +293,7 @@ public:
 
         if(m_connection->is_open())
         {
+            std::cout << "deliver" << std::endl;
             boost::asio::async_write(m_connection->socket(),
                                      boost::asio::buffer(msg, msg.size()),
                                      boost::bind(
@@ -441,7 +427,6 @@ public:
         if (was_data_received)
         {
             // Render Screen
-            std::cout << "Render Screen" << std::endl;
             m_renderer->renderScreen();
             m_renderer->drawTextureScreen();
         }

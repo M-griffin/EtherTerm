@@ -41,6 +41,15 @@ public:
         return m_socket;
     }
 
+    void close()
+    {
+        if (m_socket.is_open())
+        {
+            m_socket.shutdown(tcp::socket::shutdown_both);
+            m_socket.close();
+        }
+    }
+
     boost::asio::ip::tcp::socket m_socket;
 };
 

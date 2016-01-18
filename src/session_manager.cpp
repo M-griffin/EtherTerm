@@ -13,7 +13,6 @@ SessionManager::SessionManager()
 SessionManager::~SessionManager()
 {
     std::cout << "~SessionManager" << std::endl;
-
     // Clear Any new Waiting connections on shutdown.
     m_new_connections.clear();
 }
@@ -24,7 +23,7 @@ SessionManager::~SessionManager()
  */
 void SessionManager::join(session_ptr session)
 {
-    std::cout << "joined session BroadCaster" << std::endl;
+    std::cout << "Joined SessionManager" << std::endl;
     m_sessions.insert(session);
 }
 
@@ -34,25 +33,31 @@ void SessionManager::join(session_ptr session)
  */
 void SessionManager::leave(session_ptr session)
 {
-    std::cout << "left session BroadCaster" << std::endl;
+    std::cout << "Left SessionManager" << std::endl;
 
-    // Clear Session
+    // If session is connected, we need to disconnect it first
+    if (session->m_connection)
+    {
+        session->m_connection->close();
+    }
     m_sessions.erase(session);
 }
 
 /**
  * @brief Sends message to all users in the current room.
  * @param participant
- */
+ *
 void SessionManager::deliver(std::string msg)
 {
     if(msg.size() == 0)
         return;
 
-    std::cout << "deliver BroadCaster notices: " << msg << std::endl;
+    // This isn't used at this time!
+    std::cout << "Deliver Global SessionManager notices: " << msg << std::endl;
     std::for_each(m_sessions.begin(), m_sessions.end(),
                   boost::bind(&Session::deliver, _1, boost::ref(msg)));
 }
+*/
 
 /**
  * @brief Retrieve Number of users connected

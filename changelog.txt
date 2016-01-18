@@ -1,4 +1,12 @@
 
+Change Log 3.0.30 - 2016-01-18
+    - Fixed issues with create a new session in async thread.
+    - Also fixed shutdown issues when the system doesn't connect
+      The socket is still considered open, so you can only call 
+      close() on the socket, not both close() and shutdown()!
+    - Telnet Option passing still WIP, have to debug a little more
+      on system not passing the TermType which was just added to XML.
+
 Change Log 3.0.29 - 2016-01-17 / 18
     - Starting on Connections
     - Adding Creating and Connection Instance to SessionManager Queue from MenuManager.

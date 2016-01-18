@@ -28,7 +28,7 @@ TelnetManager::TelnetManager(session_ptr session)
 
 TelnetManager::~TelnetManager()
 {
-    std::cout << "Shutting Down ~TelnetManager" << std::endl;
+    std::cout << "~TelnetManager" << std::endl;
 }
 
 /**
@@ -377,7 +377,7 @@ void TelnetManager::telnetOptionNawsReply()
         {
             std::string outgoing_data;
             outgoing_data = (signed)temp;
-           // session->deliver(outgoing_data);
+            session->deliver(outgoing_data);
         }
         else
         {
@@ -416,7 +416,7 @@ void TelnetManager::telnetOptionTerminalTypeReply()
         {
             std::string outgoing_data;
             outgoing_data = (signed)temp;
-          //  session->deliver(outgoing_data);
+            session->deliver(outgoing_data);
         }
         else
         {
@@ -448,7 +448,7 @@ void TelnetManager::telnetSendIAC(unsigned char command, unsigned char option)
         {
             std::string outgoing_data;
             outgoing_data = (signed)temp;
-          //  session->deliver(outgoing_data);
+            session->deliver(outgoing_data);
         }
         else
         {
