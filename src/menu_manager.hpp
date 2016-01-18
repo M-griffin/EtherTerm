@@ -33,7 +33,8 @@ typedef struct SystemConnection
     std::string login;
     std::string password;  // Make this encrypted with more time.
     std::string font;
-    std::string keyMap;    // ANSI, VT100
+    std::string keyMap;    // ANSI, VT100 etc..
+    std::string termType;  // ANSI, XTERM etc..
 
 } SystemConnection;
 
@@ -94,6 +95,12 @@ public:
      * @brief Helper to append ansi path
      */
     std::string getAnsiPath();
+
+    /**
+     * @brief Helper Function to Handle left and right padding
+     * @return
+     */
+    std::string padString(const std::string &value, const std::string justify, int padding);
 
     std::vector<list_bar> buildDialList();
     void  readinAnsi(std::string FileName, std::string &buff);

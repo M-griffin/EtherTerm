@@ -2,6 +2,8 @@
 #include "menu_config.hpp"
 #include "renderer.hpp"
 #include "sequence_decoder.hpp"
+#include "session.hpp"
+#include "session_manager.hpp"
 
 // Temp, replace with boost later on.
 #include "tinyxml.hpp"
@@ -186,6 +188,34 @@ bool MenuManager::changeTheme(int index)
 }
 
 /**
+ * @brief Helper Function to Handle left and right padding
+ * @return
+ */
+std::string MenuManager::padString(const std::string &value, const std::string justify, int padding)
+{
+    std::string stringReplace = value;
+    if(justify == "LEFT")
+    {
+        m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
+        std::replace(
+            stringReplace.begin(),
+            stringReplace.end(),
+            ' ', '.'
+        );
+    }
+    else if(justify == "RIGHT")
+    {
+        m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
+        std::replace(
+            stringReplace.begin(),
+            stringReplace.end(),
+            ' ', '.'
+        );
+    }
+    return stringReplace;
+}
+
+/**
  * @brief Build the List of Systems to Display Lightbars.
  * @return
  */
@@ -322,21 +352,15 @@ std::vector<list_bar> MenuManager::buildDialList()
                             sprintf(temp2,"%lu", currentSystem+1);
                             if(isLeftPadding)
                             {
-                                std::string stringReplace = temp2;
-                                m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
-                                std::replace(
-                                    stringReplace.begin(), stringReplace.end(), ' ', '.');
-                                isLeftPadding = false;
+                                std::string stringReplace = std::move(padString(temp2, "LEFT", padding));
                                 stringBuilder += stringReplace;
+                                isLeftPadding = false;
                             }
                             else if(isRightPadding)
                             {
-                                std::string stringReplace = temp2;
-                                m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
-                                std::replace(
-                                    stringReplace.begin(), stringReplace.end(), ' ', '.');
-                                isRightPadding = false;
+                                std::string stringReplace = std::move(padString(temp2, "RIGHT", padding));
                                 stringBuilder += stringReplace;
+                                isRightPadding = false;
                             }
                         }
                         else if(strcmp(mciCode,"NA") == 0)
@@ -527,6 +551,7 @@ bool MenuManager::readDialDirectory()
             sysconn.password = pElem->Attribute("password");
             sysconn.font = pElem->Attribute("font");
             sysconn.keyMap = pElem->Attribute("keyMap");
+            sysconn.termType = pElem->Attribute("termType");
             // Add to Vector so we can parse in building the dialing directory.
             m_systemConnection.push_back(sysconn);
         }
@@ -566,6 +591,7 @@ void MenuManager::createDialDirectory()
     element3->SetAttribute("password", "");
     element3->SetAttribute("font", "vga8x16.bmp");
     element3->SetAttribute("keyMap", "ANSI");
+    element3->SetAttribute("termType", "ANSI");
 
     TiXmlElement *element4 = new TiXmlElement("BBS");
     element2->LinkEndChild(element4);
@@ -578,6 +604,7 @@ void MenuManager::createDialDirectory()
     element4->SetAttribute("password", "");
     element4->SetAttribute("font", "vga8x16.bmp");
     element4->SetAttribute("keyMap", "VT100");
+    element4->SetAttribute("termType", "ANSI");
     doc.SaveFile(path.c_str());
 }
 
@@ -615,6 +642,7 @@ void MenuManager::writeDialDirectory()
         system->SetAttribute("password", it.password);
         system->SetAttribute("font", it.font);
         system->SetAttribute("keyMap", it.keyMap);
+        system->SetAttribute("termType", it.termType);
     }
     doc.SaveFile(path.c_str());
 }
@@ -750,11 +778,25 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
 
                 // hit ENTER
             case 'E': // Selected Current System to Dial
-                // Pass the selected system to the TERM Instance so we can
-                // Pull it inside the Telnet State.
-//                TheRenderer::Instance()->setSystemConnection(m_systemConnection[m_lightbar_position]);
+            {
+                // Grab Handle to the Current Session/Session Manager to Add to Queue.
+                session_ptr session = m_renderer->m_weak_session.lock();
+                if (session)
+                {
+                    session_manager_ptr session_mgr = session->m_weak_session_manager.lock();
+                    if (session_mgr)
+                    {
+                        // Create a New System Connection Pointer of Selected System
+                        system_connection_ptr new_connection(
+                                                new SystemConnection(
+                                                    m_systemConnection[m_lightbar_position]
+                                                ));
+                        // Add the System to the Connection Queue.
+                        session_mgr->m_new_connections.enqueue(new_connection);
+                    }
+                }
                 return m_lightbar_position;
-
+            }
             case '+': // Next Message - Move Down
                 if(m_lightbar_position+1 >= m_link_list.m_listing.size() ||
                         m_link_list.m_listing.size() == 0)

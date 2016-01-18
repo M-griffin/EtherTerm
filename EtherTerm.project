@@ -60,6 +60,9 @@
     <File Name="src/tinyxmlparser.cpp"/>
     <File Name="src/session_manager.cpp"/>
     <File Name="src/session_manager.hpp"/>
+    <File Name="src/telnet.hpp"/>
+    <File Name="src/telnet_manager.cpp"/>
+    <File Name="src/telnet_manager.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

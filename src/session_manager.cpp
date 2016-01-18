@@ -7,12 +7,12 @@
 
 SessionManager::SessionManager()
 {
-    std::cout << "BroadCaster Created" << std::endl;
+    std::cout << "SessionManager Created" << std::endl;
 }
 
 SessionManager::~SessionManager()
 {
-    std::cout << "~BroadCaster" << std::endl;
+    std::cout << "~SessionManager" << std::endl;
 
     // Clear Any new Waiting connections on shutdown.
     m_new_connections.clear();

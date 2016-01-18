@@ -1,41 +1,41 @@
 <?xml version="1.0" ?>
 <EtherTerm>
     <Phonebook version="1.0">
-        <BBS name="Python Talker" ip="127.0.0.1" port="6023" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" />
-        <BBS name="hTc Enthral" ip="192.168.1.141" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="hTc x84" ip="192.168.1.141" port="6023" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="LINUX"/>
-        <BBS name="hTc x84 SSH" ip="192.168.1.141" port="6022" protocol="SSH" login="" password="" font="vga8x16.bmp" keyMap="LINUX"/>
-        <BBS name="mud.durismud.com" ip="mud.durismud.com" port="7777" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" />
-        <BBS name="Oddnetwork" ip="oddnetwork.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100"/>
-        <BBS name="Oddnetwork" ip="oddnetwork.org" port="22" protocol="SSH" login="mercyful" password="gs11" font="vga8x16.bmp" keyMap="VT100"/>
-        <BBS name="Black Flag (Mystic)" ip="blackflag.acid.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="Black Flag (Daydream)" ip="blackflag.acid.org" port="2627" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100"/>
-        <BBS name="Pharcyde" ip="bbs.pharcyde.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="1984" ip="1984.ws" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100"/>
-        <BBS name="1984" ip="1984.ws" port="22" protocol="SSH" login="" password="" font="vga8x16.bmp" keyMap="VT100"/>
-        <BBS name="Blood Island" ip="bloodisland.ph4.se" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100"/>
-        <BBS name="d1st" ip="d1st.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="fluph" ip="fluph.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="cyberia" ip="cyberia.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="montereybbs" ip="montereybbs.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100"/>
-        <BBS name="bbs.shroo.ms" ip="bbs.shroo.ms" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100"/>
-        <BBS name="dreamland" ip="dreamland.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="skulls.sytes.net" ip="skulls.sytes.net" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="entropybbs.co.nz" ip="entropybbs.co.nz" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100"/>
-        <BBS name="haciend" ip="haciend.bbs.fi" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="pibase.ufud.eu" ip="pibase.ufud.eu" port="6023" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100"/>
-        <BBS name="digitaldistortionbbs.com" ip="digitaldistortionbbs.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="lunatic.zapto.org" ip="lunatic.zapto.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="armageddonbbs.com" ip="bbs.armageddonbbs.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="necrobbs.strangled.net" ip="necrobbs.strangled.net" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="darksanctuary.darktech.org" ip="darksanctuary.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="capitolshrill.com" ip="capitolshrill.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="orbitbbs.com" ip="orbitbbs.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="crazyworldbbs.com" ip="crazyworldbbs.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="eob-bbs.com" ip="eob-bbs.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="xtcbox.org" ip="xtcbox.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="bbs.weather-station.org" ip="bbs.weather-station.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
-        <BBS name="Prism filegate.net" ip="filegate.net" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="LINUX"/>
-        <BBS name="clutch.darktech.org" ip="clutch.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI"/>
+        <BBS name="Python Talker" ip="127.0.0.1" port="6023" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" termType="ANSI" />
+        <BBS name="hTc Enthral" ip="192.168.1.141" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="hTc x84" ip="192.168.1.141" port="6023" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="LINUX" termType="ANSI" />
+        <BBS name="hTc x84 SSH" ip="192.168.1.141" port="6022" protocol="SSH" login="" password="" font="vga8x16.bmp" keyMap="LINUX" termType="ANSI" />
+        <BBS name="mud.durismud.com" ip="mud.durismud.com" port="7777" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" termType="ANSI" />
+        <BBS name="Oddnetwork" ip="oddnetwork.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" />
+        <BBS name="Oddnetwork" ip="oddnetwork.org" port="22" protocol="SSH" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" />
+        <BBS name="Black Flag (Mystic)" ip="blackflag.acid.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="Black Flag (Daydream)" ip="blackflag.acid.org" port="2627" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" termType="ANSI" />
+        <BBS name="Pharcyde" ip="bbs.pharcyde.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="1984" ip="1984.ws" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" />
+        <BBS name="1984" ip="1984.ws" port="22" protocol="SSH" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" />
+        <BBS name="Blood Island" ip="bloodisland.ph4.se" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" termType="ANSI" />
+        <BBS name="d1st" ip="d1st.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="fluph" ip="fluph.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="cyberia" ip="cyberia.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="montereybbs" ip="montereybbs.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" />
+        <BBS name="bbs.shroo.ms" ip="bbs.shroo.ms" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" />
+        <BBS name="dreamland" ip="dreamland.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="skulls.sytes.net" ip="skulls.sytes.net" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="entropybbs.co.nz" ip="entropybbs.co.nz" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" termType="ANSI" />
+        <BBS name="haciend" ip="haciend.bbs.fi" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="pibase.ufud.eu" ip="pibase.ufud.eu" port="6023" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" />
+        <BBS name="digitaldistortionbbs.com" ip="digitaldistortionbbs.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="lunatic.zapto.org" ip="lunatic.zapto.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="armageddonbbs.com" ip="bbs.armageddonbbs.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="necrobbs.strangled.net" ip="necrobbs.strangled.net" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="darksanctuary.darktech.org" ip="darksanctuary.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="capitolshrill.com" ip="capitolshrill.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="orbitbbs.com" ip="orbitbbs.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="crazyworldbbs.com" ip="crazyworldbbs.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="eob-bbs.com" ip="eob-bbs.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="xtcbox.org" ip="xtcbox.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="bbs.weather-station.org" ip="bbs.weather-station.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
+        <BBS name="Prism filegate.net" ip="filegate.net" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="LINUX" termType="ANSI" />
+        <BBS name="clutch.darktech.org" ip="clutch.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" />
     </Phonebook>
 </EtherTerm>

@@ -12,6 +12,7 @@
 #include "message_queue.hpp"
 #include "menu_manager.hpp"
 #include "session_manager.hpp"
+#include "telnet_manager.hpp"
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -60,6 +61,7 @@ public:
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_connection(connection)
         , m_system_connection(system_connection)
+        , m_is_leaving(false)
     {
         std::cout << "Session Created!" << std::endl;
         // NOTES Reallocate by using reset! When rending Term Height/Width Change, need to recreate.
@@ -177,11 +179,119 @@ public:
      */
     void waitForSocketData()
     {
+        // Important, clear out buffer before each read.
+        memset(&m_raw_data, 0, max_length);
+        if(m_connection->is_open())
+        {
+            std::cout << "Connected, waiting for read async" << std::endl;
+            m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data, max_length),
+                    boost::bind(&Session::handleRead, shared_from_this(),
+                                boost::asio::placeholders::error,
+                                boost::asio::placeholders::bytes_transferred));
 
-        // Add code to for call back on data received from Server!
-        // Handle Socket Data
-
+            std::cout << "Connected, waiting for read async Done." << std::endl;
+        }
+        else
+        {
+            std::cout << "waitForSocketData: Lost Connection." << std::endl;
+        }
     }
+
+    /**
+     * @brief Callback after data received. handles telnet options
+     * Then parses out normal text data from client to server.
+     * @param error
+     * @param bytes_transferred
+     */
+    void handleRead(const boost::system::error_code& error, size_t bytes_transferred)
+    {
+
+        std::cout << "handleRead()" << std::endl;
+
+        session_manager_ptr session_mgr = m_weak_session_manager.lock();
+        if(session_mgr)
+        {
+            if(!error)
+            {
+                // Parse incoming data, send through decoder
+                std::string incoming_data = m_raw_data;
+
+                if (m_system_connection->protocol == "TELNET")
+                {
+                    // Handle Telnet option parsing from incoming data.
+                    // Returns Test and ESC Sequence, All Options are Responsed to in the Manager.
+                    if (m_telnet_manager)
+                    {
+                        std::string parsed_data = m_telnet_manager->parseIncomingData(incoming_data);
+                        if (parsed_data.size() > 0)
+                        {
+                            m_sequence_decoder->decodeEscSequenceData(parsed_data);
+                        }
+                    }
+                    else
+                    {
+                        std::cout << "Error: m_telnet_manager inaccessable!" << std::endl;
+                    }                    
+                }
+                else
+                {
+                    if (incoming_data.size() > 0)
+                    {
+                        m_sequence_decoder->decodeEscSequenceData(incoming_data);
+                    }
+                }
+
+                // Restart Callback to wait for more data.
+                // If this step is skipped, then the node will exit
+                // since io_service will have no more work!
+                if(m_connection->is_open())
+                {
+                    std::cout << "waitForSocketData()" << std::endl;
+                    waitForSocketData();
+                }
+                else
+                {
+                    std::cout << "Error: Session Socket Closed!" << std::endl;
+                }
+            }
+            else
+            {
+                // First error, we mark leaving, if we loop again, ignore
+                if(!m_is_leaving)
+                {
+                    if(session_mgr && error)
+                    {
+                        m_is_leaving = true;
+
+                        // Disconenct the session.
+                        std::cout << "Disconnected, Leaving Session! " << std::endl;
+                        session_mgr->leave(shared_from_this());
+
+                        if(m_connection->is_open())
+                        {
+                            std::cout << "Leaving Client IP: "
+                                      << m_connection->socket().remote_endpoint().address().to_string()
+                                      << std::endl << "Host-name: "
+                                      //<< boost::asio::ip::host_name() // Local host_name
+                                      << m_connection->socket().remote_endpoint()
+                                      << std::endl
+                                      << "Bytes: "
+                                      << bytes_transferred
+                                      << std::endl;
+
+                            m_connection->socket().shutdown(tcp::socket::shutdown_both);
+                            m_connection->socket().close();
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            std::cout << "Error, Not connected to the board_caster!" << std::endl;
+        }
+    }
+
 
     /**
      * @brief Callback from The SessionManager to write data to the active sessions.
@@ -251,6 +361,29 @@ public:
     }
 
     /**
+     * @brief Startup for the Telnet Instatnces.
+     */
+    void startTelnetManager()
+    {
+        // Setup and Load Font from Dialing Directory for Selected System
+        if (m_system_connection->font != "")
+        {
+            m_surface_manager->setCurrentFont(m_system_connection->font);
+            m_surface_manager->loadBitmapFontImage();
+        }
+
+        // Make Sure Ansi Parser/Render is Setup for For connection with Black Screen.
+        m_sequence_decoder->resetParser();
+        m_renderer->renderScreen();
+        m_renderer->drawTextureScreen();
+
+        // Startup the Telnet Instatnce and pass the current session along.
+        m_telnet_manager.reset(
+            new TelnetManager(shared_from_this())
+        );
+    }
+
+    /**
      * @brief Process Waiting Data Buffer and pass to rendering
      * @return
      */
@@ -284,8 +417,9 @@ public:
         bool was_data_received = !m_data_queue.is_empty();
         while(!m_data_queue.is_empty())
         {
-            //std::cout << "Message dequeue in progress" << std::endl;
+            //std::cout << "Message dequeue in progress: size(): " << m_data_queue.size() << std::endl;
             msgQueue = std::move(m_data_queue.dequeue());
+            //std::cout << "Message dequeue after!" << std::endl;
             if(msgQueue.m_text.empty())
             {
                 // Make Sure Vector is not Empty!
@@ -297,7 +431,7 @@ public:
             }
             else
             {
-                //std::cout << "m_sequence_ textInput" << std::endl;
+                //std::cout << "m_sequence_ textInput:" << msgQueue.m_text << std::endl;
                 m_sequence_parser->textInput(msgQueue.m_text);
             }
             msgQueue.clear();
@@ -306,6 +440,8 @@ public:
         // Render Changes on updates only, save CPU usage!
         if (was_data_received)
         {
+            // Render Screen
+            std::cout << "Render Screen" << std::endl;
             m_renderer->renderScreen();
             m_renderer->drawTextureScreen();
         }
@@ -371,6 +507,13 @@ public:
 
     // Holds System Connection Information (struct resides/passed from MenuManager)
     system_connection_ptr    m_system_connection;
+
+    // Handle Telnet Option Negoiation and Responses.
+    telnet_manager_ptr       m_telnet_manager;
+
+    bool                     m_is_leaving;
+    enum                     { max_length = 4096 };
+    char                     m_raw_data[max_length];  // Raw Incoming
 
 };
 
