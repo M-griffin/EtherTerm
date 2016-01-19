@@ -1,4 +1,16 @@
 
+Change Log 3.0.31 - 2016-01-19
+    - Fixed issues with Telnet Option Parsing and Responses.
+      Added new Vector<unsigned char> buffer to better handle 
+      binary sequence data without losing values on socket.read()
+    - Also testing converting and sending out data on a new
+      Vector<unsigned char> to make sure data values are proper
+      for full 8 bit support.
+    - Also fixed ESC[6n replies on current character screen position.
+    - Need to look over rendering issues when scrolling, since were not
+      using the extra screen size clipping (Maybe go back to it?!?)
+      the last line doesn't seems to be clearing properly on long scrollers.
+
 Change Log 3.0.30 - 2016-01-18
     - Fixed issues with create a new session in async thread.
     - Also fixed shutdown issues when the system doesn't connect

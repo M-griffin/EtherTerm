@@ -29,10 +29,10 @@ public:
 
     /**
      * @brief Handles Telnet Options and Replies, Returns text data
-     * @param msg_buffer
+     * @param buffer
      * @return
      */
-    std::string parseIncomingData(std::string msg_buffer);
+    std::string parseIncomingData(const std::vector<unsigned char> &msg_buffer);
 
 private:
 

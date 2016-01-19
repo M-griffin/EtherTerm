@@ -41,22 +41,6 @@ SequenceParser::~SequenceParser()
     std::vector<ScreenPixel>().swap(m_screen_buffer.m_screen_buffer); // Clear
 }
 
-
-/**
- * @brief Sending Async Socket Replies to the Client
- * @param msg
- */
-void SequenceParser::deliver(std::string msg)
-{
-    if(msg.size() == 0)
-    {
-        return;
-    }
-
-    // Send Message via Session Instance.
-    boost::bind(&Session::deliver, _1, boost::ref(msg));
-}
-
 /**
  * @brief Reset AnsiParser Specific Class Attributes
  */
@@ -83,6 +67,25 @@ void SequenceParser::reset()
     m_renderer->setScrollRegion(0, 0, m_renderer->m_term_height);
 }
 
+/**
+ * @brief Handles Scrolling the Screen Up
+ * @param render_bottom_row
+ */
+void SequenceParser::scrollScreenUp(bool render_bottom_row)
+{
+
+    // Draws the Current last line before moving the screen up!
+    if (render_bottom_row)
+    {
+        // Surface to Texture of Bottom Row.
+        m_renderer->renderBottomScreen();
+    }
+
+    m_renderer->renderScreen();       // Surface to Texture
+    m_renderer->drawTextureScreen();  // Draw Texture to Screen
+    m_renderer->scrollScreenUp();     // Scroll the surface up
+    m_screen_buffer.scrollScreenBuffer();    
+}
 /**
  * @brief Handles parsing Text and formatting to the screen buffer
  * @param buffer
@@ -168,34 +171,21 @@ void SequenceParser::textInput(const std::string &buffer)
                 // Row by Row.
                 if(m_is_cleared_the_screen)
                 {
-                    m_renderer->renderScreen();       // Surface to Texture
-                    m_renderer->drawTextureScreen();  // Draw Texture to Screen
-                    m_renderer->scrollScreenUp();     // Scroll the surface up
-                    m_screen_buffer.scrollScreenBuffer();
-                    if(!m_renderer->m_is_scroll_region_active)
-                    {
-                        m_screen_buffer.m_y_position = m_renderer->m_term_height;
-                    }
-                    else
-                    {
-                        m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
-                    }
+                    scrollScreenUp(false);
                     m_is_cleared_the_screen = false;
                 }
                 else
                 {
-                    m_renderer->renderBottomScreen();   // Surface to Texture of Bottom Row.
-                    m_renderer->drawTextureScreen();    // Texture to Screen
-                    m_renderer->scrollScreenUp();       // Scroll up for next line.
-                    m_screen_buffer.scrollScreenBuffer();
-                    if(!m_renderer->m_is_scroll_region_active)
-                    {
-                        m_screen_buffer.m_y_position = m_renderer->m_term_height;
-                    }
-                    else
-                    {
-                        m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
-                    }
+                    scrollScreenUp(true);                    
+                }
+
+                if(!m_renderer->m_is_scroll_region_active)
+                {
+                    m_screen_buffer.m_y_position = m_renderer->m_term_height;
+                }
+                else
+                {
+                    m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
                 }
             }
             //printf("\r\n xpos %i, ypos %i \r\n",m_screen_buffer.m_x_position, m_screen_buffer.m_y_position);
@@ -251,14 +241,7 @@ void SequenceParser::textInput(const std::string &buffer)
                 // Since nothing has been drawn yet before we scroll the screen.
                 if(m_is_cleared_the_screen)
                 {
-                    m_renderer->renderScreen();       // Surface to Texture
-                    m_renderer->drawTextureScreen();  // Draw Texture to Screen
-                    m_renderer->scrollScreenUp();     // Scroll the surface up
-                    m_screen_buffer.scrollScreenBuffer();
-                    if(!m_renderer->m_is_scroll_region_active)
-                        m_screen_buffer.m_y_position = m_renderer->m_term_height;
-                    else
-                        m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
+                    scrollScreenUp(false);                                     
                     m_is_cleared_the_screen = false;
                 }
                 else
@@ -266,14 +249,16 @@ void SequenceParser::textInput(const std::string &buffer)
                     // Else we want to just append to the last line
                     // Move the last line to the Texture, then
                     // Re-display the screen.
-                    m_renderer->renderBottomScreen();   // Surface to Texture of Bottom Row.
-                    m_renderer->drawTextureScreen();    // Texture to Screen
-                    m_renderer->scrollScreenUp();       // Scroll up for next line.
-                    m_screen_buffer.scrollScreenBuffer();
-                    if(!m_renderer->m_is_scroll_region_active)
-                        m_screen_buffer.m_y_position = m_renderer->m_term_height;
-                    else
-                        m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
+                    scrollScreenUp(true);
+                }
+
+                if(!m_renderer->m_is_scroll_region_active)
+                {
+                    m_screen_buffer.m_y_position = m_renderer->m_term_height;
+                }
+                else
+                {
+                    m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
                 }
             }
             continue;
@@ -312,24 +297,19 @@ void SequenceParser::textInput(const std::string &buffer)
                         m_screen_buffer.m_y_position >= m_renderer->m_top_margin &&
                         m_screen_buffer.m_y_position <= m_renderer->m_bottom_margin)
                 {
-                    m_renderer->renderScreen();       // Surface to Texture
-                    m_renderer->drawTextureScreen();  // Draw Texture to Screen
-                    m_renderer->scrollScreenUp();     // Scroll the surface up
-                    m_screen_buffer.scrollScreenBuffer();
-                    m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
+                    scrollScreenUp(false);
                     m_is_cleared_the_screen = false;
+
+                    m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
                     // Reset to beginning of line.
                     if(m_screen_buffer.m_x_position > m_renderer->m_term_width)
                         m_screen_buffer.m_x_position = 1;
                 }
                 else if(m_screen_buffer.m_y_position > m_renderer->m_term_height)
                 {
-                    m_renderer->renderScreen();       // Surface to Texture
-                    m_renderer->drawTextureScreen();  // Draw Texture to Screen
-                    m_renderer->scrollScreenUp();     // Scroll the surface up
-                    m_screen_buffer.scrollScreenBuffer();
-                    m_screen_buffer.m_y_position = m_renderer->m_term_height;
+                    scrollScreenUp(false);
                     m_is_cleared_the_screen = false;
+                    m_screen_buffer.m_y_position = m_renderer->m_term_height;
                 }
             }
             else
@@ -342,10 +322,8 @@ void SequenceParser::textInput(const std::string &buffer)
                         m_screen_buffer.m_y_position >= m_renderer->m_top_margin &&
                         m_screen_buffer.m_y_position <= m_renderer->m_bottom_margin)
                 {
-                    m_renderer->renderBottomScreen();   // Surface to Texture of Bottom Row.
-                    m_renderer->drawTextureScreen();    // Texture to Screen
-                    m_renderer->scrollScreenUp();       // Scroll up for next line.
-                    m_screen_buffer.scrollScreenBuffer();
+                    scrollScreenUp(true);
+
                     // Reset to beginning of line.
                     if(m_screen_buffer.m_x_position > m_renderer->m_term_width)
                         m_screen_buffer.m_x_position = 1;
@@ -353,10 +331,8 @@ void SequenceParser::textInput(const std::string &buffer)
                 }
                 else if(m_screen_buffer.m_y_position > m_renderer->m_term_height)
                 {
-                    m_renderer->renderBottomScreen();   // Surface to Texture of Bottom Row.
-                    m_renderer->drawTextureScreen();    // Texture to Screen
-                    m_renderer->scrollScreenUp();       // Scroll up for next line.
-                    m_screen_buffer.scrollScreenBuffer();
+                    scrollScreenUp(true);
+
                     m_screen_buffer.m_y_position = m_renderer->m_term_height;
                 }
             }
@@ -1637,16 +1613,28 @@ void SequenceParser::sequenceResetAndResponses()
                     current_y_position = m_screen_buffer.m_y_position;
                 }
 
-                std::string currentPosition;
-                std::stringstream streamBuffer;
-                streamBuffer << "\x1b[" << current_y_position << ";" << m_screen_buffer.m_x_position << "R";
-                currentPosition = streamBuffer.str();
+                std::stringstream stm;
+                std::string       buf;
 
-                // Use the Socket Conenction to Reply the current x/y position
-                if (m_connection->is_open())
+                stm << "\x1b[";
+                stm << std::to_string(current_y_position);
+                stm << ";";
+                stm << std::to_string(m_screen_buffer.m_x_position);
+                stm << "R";
+                buf = stm.str();
+
+                // Grab an instance of the session and socket connection.
+                session_ptr session = m_renderer->m_weak_session.lock();
+                if (session)
                 {
-                    // Make Async Write to the Socket using Session Callback.
-                    deliver(currentPosition);
+                    if(session->m_connection->is_open())
+                    {
+                        session->deliver(buf);
+                    }
+                    else
+                    {
+                        std::cout << "Error: SequenceParser ESC[6n Reply()" << std::endl;
+                    }
                 }
             }
             break;

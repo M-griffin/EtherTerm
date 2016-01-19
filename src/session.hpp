@@ -64,6 +64,9 @@ public:
         , m_is_leaving(false)
     {
         std::cout << "Session Created!" << std::endl;
+
+        m_raw_data_vector.reserve(8024);
+        m_raw_data_vector.resize(8024);
         // NOTES Reallocate by using reset! When rending Term Height/Width Change, need to recreate.
         // m_sequence_parser.reset(new SequenceParser(m_renderer, connection));
     }
@@ -180,13 +183,18 @@ public:
     void waitForSocketData()
     {
         // Important, clear out buffer before each read.
-        memset(&m_raw_data, 0, max_length);
+        //memset(&m_raw_data, 0, max_length);
+        std::vector<unsigned char>().swap(m_raw_data_vector);
+        m_raw_data_vector.reserve(8024);
+        m_raw_data_vector.resize(8024);
+
         if(m_connection->is_open())
         {
-            m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data, max_length),
+            //m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data, max_length),
+            m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data_vector),
                     boost::bind(&Session::handleRead, shared_from_this(),
-                                boost::asio::placeholders::error,
-                                boost::asio::placeholders::bytes_transferred));
+                                boost::asio::placeholders::error)); //,
+                                //boost::asio::placeholders::bytes_transferred));
         }
         else
         {
@@ -200,18 +208,15 @@ public:
      * @param error
      * @param bytes_transferred
      */
-    void handleRead(const boost::system::error_code& error, size_t bytes_transferred)
+    void handleRead(const boost::system::error_code& error) //, size_t bytes_transferred)
     {
-
-        std::cout << "handleRead()" << std::endl;
-
         session_manager_ptr session_mgr = m_weak_session_manager.lock();
         if(session_mgr)
         {
             if(!error)
             {
                 // Parse incoming data, send through decoder
-                std::string incoming_data = m_raw_data;
+                //std::string incoming_data = m_raw_data;
 
                 if (m_system_connection->protocol == "TELNET")
                 {
@@ -219,7 +224,9 @@ public:
                     // Returns Test and ESC Sequence, All Options are Responsed to in the Manager.
                     if (m_telnet_manager)
                     {
-                        std::string parsed_data = m_telnet_manager->parseIncomingData(incoming_data);
+                        //std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data);
+                        std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data_vector);
+
                         if (parsed_data.size() > 0)
                         {
                             m_sequence_decoder->decodeEscSequenceData(parsed_data);
@@ -232,8 +239,16 @@ public:
                 }
                 else
                 {
-                    if (incoming_data.size() > 0)
+                    /** Not in use yet, when time comes change to support m_raw_data_vector
+                     *  as needed.  Still deciding best way to handle this.
+                     */
+                    if (m_raw_data_vector.size() != 0)
                     {
+                        // Copy the vector into a string.
+                        std::string incoming_data(
+                            m_raw_data_vector.begin(),
+                            m_raw_data_vector.end()
+                        );
                         m_sequence_decoder->decodeEscSequenceData(incoming_data);
                     }
                 }
@@ -243,7 +258,6 @@ public:
                 // since io_service will have no more work!
                 if(m_connection->is_open())
                 {
-                    std::cout << "waitForSocketData()" << std::endl;
                     waitForSocketData();
                 }
                 else
@@ -275,10 +289,9 @@ public:
         }
         else
         {
-            std::cout << "Error, Not connected to the board_caster!" << std::endl;
+            std::cout << "Error, Not connected to the SessionManager!" << std::endl;
         }
     }
-
 
     /**
      * @brief Callback from The SessionManager to write data to the active sessions.
@@ -291,11 +304,18 @@ public:
             return;
         }
 
+        // Send all outgoing data as unsigned data, want to make sure when
+        // Time comes we support UTF8 bytes properly.
+        std::vector<unsigned char> buffer;
+        buffer.reserve(msg.size());
+        buffer.resize(msg.size());
+        boost::asio::buffer_copy(boost::asio::buffer(buffer), boost::asio::buffer(msg));
+
         if(m_connection->is_open())
         {
-            std::cout << "deliver" << std::endl;
             boost::asio::async_write(m_connection->socket(),
-                                     boost::asio::buffer(msg, msg.size()),
+                                     //boost::asio::buffer(msg, msg.size()),
+                                     boost::asio::buffer(buffer),
                                      boost::bind(
                                          &Session::handleWrite,
                                          shared_from_this(),
@@ -497,8 +517,9 @@ public:
     telnet_manager_ptr       m_telnet_manager;
 
     bool                     m_is_leaving;
-    enum                     { max_length = 4096 };
+    enum                     { max_length = 8024 };
     char                     m_raw_data[max_length];  // Raw Incoming
+    std::vector<unsigned char> m_raw_data_vector;
 
 };
 

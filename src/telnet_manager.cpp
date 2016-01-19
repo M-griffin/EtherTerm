@@ -7,6 +7,8 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <vector>
 
 TelnetManager::TelnetManager(session_ptr session)
     : m_weak_session(session)
@@ -36,12 +38,8 @@ TelnetManager::~TelnetManager()
  * @param msg_buffer
  * @return
  */
-std::string TelnetManager::parseIncomingData(std::string msg_buffer)
-{
-    // Ignore empty buffers.
-    if(msg_buffer.size() == 0)
-        return "";
-
+std::string TelnetManager::parseIncomingData(const std::vector<unsigned char> &msg_buffer)
+{    
     std::string output;
     unsigned char ch = 0;
 
@@ -51,9 +49,18 @@ std::string TelnetManager::parseIncomingData(std::string msg_buffer)
 //    sout << msgBuffer << std::flush;
 //    sout.close();
 
-    // Loop through data for IAC Telnet Commands
-    for(unsigned char c : msg_buffer)
+    // Make sure buffer isn't empty
+    if (msg_buffer.size() == 0)
     {
+        return "";
+    }
+
+    // Loop through data for IAC Telnet Commands (Unsigned Characters)
+    for (auto c : msg_buffer)
+    {
+        //c = static_cast<unsigned char>(msg_buffer[i]);
+        //c = msg_buffer[i];
+
         // for debugging server output, mainly esc sequence
         // and output that might mess up screens when needed.
 #ifdef _DEBUG
@@ -344,40 +351,47 @@ unsigned char TelnetManager::telnetOptionDeny(unsigned char cmd)
  */
 void TelnetManager::telnetOptionNawsReply()
 {
-    unsigned char temp[50] = {0};
     session_ptr session = m_weak_session.lock();
     if(session)
     {
-        // Setup the Response String
-        sprintf(
-            (char *) temp, "%c%c%c%c%c%c%c%c%c",
-            IAC,
-            SB,
-            TELOPT_NAWS,
-            // If Row Height above 255, split into 255 and remaining
-            (session->m_renderer->m_term_height) > 255 ?
-            session->m_renderer->m_term_height - 255 :
-            0,
-            (session->m_renderer->m_term_height) > 255 ?
-            255 :
-            session->m_renderer->m_term_height,
-            // If Row Width above 255, split into 255 and remaining
-            (session->m_renderer->m_term_width) > 255 ?
-            session->m_renderer->m_term_width - 255 :
-            0,
-            (session->m_renderer->m_term_width) > 255 ?
-            255 :
-            session->m_renderer->m_term_width,
-            IAC,
-            SE
-        ); // 9
+        std::stringstream stm;
+        std::string       buf;
 
-        // Check if Connection is good, Send the Option Response to Server.
+        stm << static_cast<char>(IAC);
+        stm << static_cast<char>(SB);
+        stm << static_cast<char>(TELOPT_NAWS);
+
+        //I believe it's [0] + [1] * 256 for resolution.  Fix this!!
+
+        // If Col Width above 255, split into 255 and remaining
+        stm << static_cast<char>(
+                (session->m_renderer->m_term_width) > 255 ?
+                session->m_renderer->m_term_width - 255 : 0
+            );
+
+        stm << static_cast<char>(
+                (session->m_renderer->m_term_width) > 255 ?
+                255 : session->m_renderer->m_term_width
+            );
+
+        // If Row Height above 255, split into 255 and remaining
+        stm << static_cast<char>(
+                (session->m_renderer->m_term_height) > 255 ?
+                session->m_renderer->m_term_height - 255 : 0
+            );
+
+        stm << static_cast<char>(
+                (session->m_renderer->m_term_height) > 255 ?
+                255 : session->m_renderer->m_term_height
+            );
+
+        stm << static_cast<char>(IAC);
+        stm << static_cast<char>(SE);
+        buf = stm.str();
+
         if(session->m_connection->is_open())
         {
-            std::string outgoing_data;
-            outgoing_data = (signed)temp;
-            session->deliver(outgoing_data);
+            session->deliver(buf);
         }
         else
         {
@@ -392,7 +406,6 @@ void TelnetManager::telnetOptionNawsReply()
  */
 void TelnetManager::telnetOptionTerminalTypeReply()
 {
-    unsigned char temp[50] = {0};
     session_ptr session = m_weak_session.lock();
     if(session)
     {
@@ -400,23 +413,23 @@ void TelnetManager::telnetOptionTerminalTypeReply()
         std::string terminal = session->m_system_connection->termType;
         boost::algorithm::to_lower(terminal);
 
-        sprintf((char *) temp, "%c%c%c%c%s%c%c",
-                IAC,
-                SB,
-                TELOPT_TTYPE,
-                TELQUAL_IS,
-                // Pass the current Terminal Type ANSI/XTERM etc..
-                terminal.c_str(),
-                IAC,
-                SE
-               ); // 10
+        std::cout << "TermType: " << terminal << std::endl;
 
-        // Check if Connection is good, Send the Option Response to Server.
+        std::stringstream stm;
+        std::string       buf;
+
+        stm << static_cast<char>(IAC);
+        stm << static_cast<char>(SB);
+        stm << static_cast<char>(TELOPT_TTYPE);
+        stm << static_cast<char>(TELQUAL_IS);
+        stm << terminal;
+        stm << static_cast<char>(IAC);
+        stm << static_cast<char>(SE);
+        buf = stm.str();
+
         if(session->m_connection->is_open())
         {
-            std::string outgoing_data;
-            outgoing_data = (signed)temp;
-            session->deliver(outgoing_data);
+            session->deliver(buf);
         }
         else
         {
@@ -433,22 +446,20 @@ void TelnetManager::telnetOptionTerminalTypeReply()
  */
 void TelnetManager::telnetSendIAC(unsigned char command, unsigned char option)
 {
-    unsigned char temp[50]= {0};
     session_ptr session = m_weak_session.lock();
     if(session)
     {
-        // Grab the Terminal Type, make sure we send lowercase.
-        std::string terminal = session->m_system_connection->termType;
-        boost::algorithm::to_lower(terminal);
+        std::stringstream stm;
+        std::string       buf;
 
-        sprintf((char *) temp, "%c%c%c", IAC, command, option);
+        stm << static_cast<char>(IAC);
+        stm << command;
+        stm << static_cast<char>(option);
+        buf = stm.str();
 
-        // Check if Connection is good, Send the Option Response to Server.
         if(session->m_connection->is_open())
         {
-            std::string outgoing_data;
-            outgoing_data = (signed)temp;
-            session->deliver(outgoing_data);
+            session->deliver(buf);
         }
         else
         {

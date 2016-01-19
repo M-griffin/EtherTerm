@@ -113,15 +113,15 @@ public:
     };
 
     /**
-     * @brief Sending Socket Replies to the Client
-     * @param msg
-     */
-    void deliver(std::string msg);
-
-    /**
      * @brief Reset AnsiParser Specific Class Attributes
      */
     void reset();
+
+    /**
+     * @brief Handles Scrolling the Screen Up
+     * @param render_bottom_row
+     */
+    void scrollScreenUp(bool render_bottom_row);
 
     /**
      * @brief Handles parsing Text and formatting to the screen buffer

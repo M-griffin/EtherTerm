@@ -534,6 +534,9 @@ void Renderer::scrollScreenUp()
         nullptr,
         surface
     );
+
+    // Clear the last line after scrolling up!!
+    //renderClearLineScreen()
 }
 
 /**
