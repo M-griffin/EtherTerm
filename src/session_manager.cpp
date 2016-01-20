@@ -38,6 +38,11 @@ void SessionManager::leave(session_ptr session)
     // If session is connected, we need to disconnect it first
     if (session->m_connection)
     {
+        if (session->m_is_connected)
+        {
+            // Shutdown the Connection before closing
+            session->m_connection->shutdown();
+        }
         session->m_connection->close();
     }
     m_sessions.erase(session);

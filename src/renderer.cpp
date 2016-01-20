@@ -523,8 +523,22 @@ void Renderer::scrollScreenUp()
     memmove(pixelOldPos, pixelNewPos,
             (surface->w * (surface->h - m_surface_manager->m_characterHeight)) * bpp);
 
+    
+
     // Unlock when modification is done.
     m_surface_manager->unlockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
+
+    /* This did nothing!
+    // Clear Out bottom Row
+    SDL_Rect rect;
+    rect.x = 0;
+    rect.y = m_surface_manager->m_characterHeight * (m_bottom_margin-1);
+    rect.w = m_surface_manager->m_surfaceWidth;
+    rect.h = m_surface_manager->m_characterHeight;
+
+    // Clear out very last line of surface region.
+    m_window_manager->renderFill(&rect);
+    */
 
     // Update Pixels in the Texture
     m_window_manager->updateTexture(
@@ -535,8 +549,6 @@ void Renderer::scrollScreenUp()
         surface
     );
 
-    // Clear the last line after scrolling up!!
-    //renderClearLineScreen()
 }
 
 /**

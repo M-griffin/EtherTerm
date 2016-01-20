@@ -26,26 +26,49 @@ public:
         std::cout << "~tcp_connection" << std::endl;
         if (m_socket.is_open())
         {
-            m_socket.shutdown(tcp::socket::shutdown_both);
+            // Only Shutdown When Conencted, if were get here
+            // Connection is already killed.
+            //m_socket.shutdown(tcp::socket::shutdown_both);
             m_socket.close();
         }
     }
 
+    /**
+     * @brief Is the Socket Created and Open
+     * @return
+     */
     bool is_open()
     {
         return m_socket.is_open();
     }
 
+    /**
+     * @brief Handle to Socket
+     * @return
+     */
     boost::asio::ip::tcp::socket& socket()
     {
         return m_socket;
     }
 
-    void close()
+    /**
+     * @brief Shutdowns an Open Connection
+     */
+    void shutdown()
     {
         if (m_socket.is_open())
         {
             m_socket.shutdown(tcp::socket::shutdown_both);
+        }
+    }
+
+    /**
+     * @brief Closes an Open (Maybe Not Connected Socket)
+     */
+    void close()
+    {
+        if (m_socket.is_open())
+        {
             m_socket.close();
         }
     }

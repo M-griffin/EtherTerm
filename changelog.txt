@@ -1,4 +1,8 @@
 
+Change Log 3.0.32 - 2016-01-20
+    - Added Shutdown Procedures for Connections not yet established.
+      Eg.. Closing a the Window during a connection is now handled.
+
 Change Log 3.0.31 - 2016-01-19
     - Fixed issues with Telnet Option Parsing and Responses.
       Added new Vector<unsigned char> buffer to better handle 

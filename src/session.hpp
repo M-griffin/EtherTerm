@@ -61,6 +61,7 @@ public:
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_connection(connection)
         , m_system_connection(system_connection)
+        , m_is_connected(false)
         , m_is_leaving(false)
     {
         std::cout << "Session Created!" << std::endl;
@@ -280,7 +281,11 @@ public:
 
                         if(m_connection->is_open())
                         {
-                            m_connection->socket().shutdown(tcp::socket::shutdown_both);
+                            // Only Shutdown when Connected!
+                            if (m_is_connected)
+                            {
+                                m_connection->socket().shutdown(tcp::socket::shutdown_both);
+                            }
                             m_connection->socket().close();
                         }
                     }
@@ -337,7 +342,11 @@ public:
 
             if(m_connection->is_open())
             {
-                m_connection->socket().shutdown(tcp::socket::shutdown_both);
+                // Only Shutdown when Connected!
+                if (m_is_connected)
+                {
+                    m_connection->socket().shutdown(tcp::socket::shutdown_both);
+                }
                 m_connection->socket().close();
             }
         }
@@ -516,6 +525,7 @@ public:
     // Handle Telnet Option Negoiation and Responses.
     telnet_manager_ptr       m_telnet_manager;
 
+    bool                     m_is_connected;
     bool                     m_is_leaving;
     enum                     { max_length = 8024 };
     char                     m_raw_data[max_length];  // Raw Incoming

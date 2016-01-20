@@ -207,6 +207,8 @@ public:
         {
             if(!ec)
             {
+                // Mark Session Connected
+                new_session->m_is_connected = true;
                 std::cout << "new_session waitForSocketData() executed on success." << std::endl;
                 new_session->waitForSocketData();                
             }
@@ -215,7 +217,10 @@ public:
                 std::cout << "Unable to Connect, closing down session." << std::endl;
 
                 // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
-                new_connection->socket().close();
+                if (new_connection->socket().is_open())
+                {
+                    new_connection->socket().close();
+                }
                 m_session_manager->leave(new_session);
             }
         });
