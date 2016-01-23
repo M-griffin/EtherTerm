@@ -1160,6 +1160,11 @@ bool InputHandler::handleKeyDownEvents(SDL_Event &event)
  */
 bool InputHandler::update(SDL_Event &event)
 {
+    if (m_globalShutdown)
+    {
+        return false;
+    }
+
     switch(event.type)
     {
         //case SDL_QUIT:

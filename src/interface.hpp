@@ -110,7 +110,11 @@ public:
             }
 
             // Process Data Queue for Each Active Session.
+            std::cout << "Interface session manager update()" << std::endl;
+
             m_session_manager->update();
+
+            std::cout << "Interface session manager end upodate()" << std::endl;
 
             // Check for Spawned Connection here. System connection container will be populated
             // With connection info and data to be passed and spawned.
@@ -209,13 +213,11 @@ public:
             {
                 // Mark Session Connected
                 new_session->m_is_connected = true;
-                std::cout << "new_session waitForSocketData() executed on success." << std::endl;
                 new_session->waitForSocketData();                
             }
             else
             {
                 std::cout << "Unable to Connect, closing down session." << std::endl;
-
                 // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
                 if (new_connection->socket().is_open())
                 {
@@ -228,6 +230,7 @@ public:
 
     /**
      * @brief Process SDL_TextInput and SDL_Window Events per session
+     * I beleive this should be a Single Event at a time passed through!
      * @param event
      */
     void process_event(SDL_Event &event)
@@ -247,6 +250,7 @@ public:
                     {
                         // Pass the Events to the specific Session for Specific Window and Input Events.
                         (*it)->m_input_handler->update(event);
+                        return;
                     }
                 }
                 else
@@ -260,6 +264,7 @@ public:
                         {
                             // Pass the Events to the specific Session for Specific Window and Input Events.
                             (*it)->m_input_handler->update(event);
+                            return;
                         }
                     }
                     else

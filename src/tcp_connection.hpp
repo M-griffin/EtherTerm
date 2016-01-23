@@ -28,8 +28,7 @@ public:
         {
             // Only Shutdown When Conencted, if were get here
             // Connection is already killed.
-            //m_socket.shutdown(tcp::socket::shutdown_both);
-            m_socket.close();
+            // m_socket.close();
         }
     }
 

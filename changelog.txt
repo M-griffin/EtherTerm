@@ -1,4 +1,9 @@
 
+Change Log 3.0.33 - 2016-01-23
+    - Fixed issues with multiple connections, more then 1, the program would freeze
+      in the input loop.  Added a return after processing event so it doesn't
+      Iterate to the next session when the Iterator pointer is no longer valid.
+            
 Change Log 3.0.32 - 2016-01-20
     - Added Shutdown Procedures for Connections not yet established.
       Eg.. Closing a the Window during a connection is now handled.

@@ -42,6 +42,7 @@ void SessionManager::leave(session_ptr session)
         {
             // Shutdown the Connection before closing
             session->m_connection->shutdown();
+            session->m_is_connected = false;
         }
         session->m_connection->close();
     }
@@ -92,6 +93,8 @@ void SessionManager::update()
  */
 void SessionManager::shutdown()
 {
+    // FIXME First check for connection, then loop and pop off stact, better procedure!
+
     // Swap to pop all enteries off the stack.
     std::set<session_ptr>().swap(m_sessions);
 }

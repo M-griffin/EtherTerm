@@ -75,6 +75,10 @@ public:
     ~Session()
     {
         std::cout << "~Session" << std::endl;
+
+        // Clear any Data left over in the Buffer.
+        std::vector<unsigned char>().swap(m_raw_data_vector);
+
     }
 
     /**
@@ -527,8 +531,8 @@ public:
 
     bool                     m_is_connected;
     bool                     m_is_leaving;
-    enum                     { max_length = 8024 };
-    char                     m_raw_data[max_length];  // Raw Incoming
+
+    // Input Raw Data Buffer.
     std::vector<unsigned char> m_raw_data_vector;
 
 };
