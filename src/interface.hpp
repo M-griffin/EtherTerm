@@ -109,12 +109,8 @@ public:
                 break;
             }
 
-            // Process Data Queue for Each Active Session.
-            std::cout << "Interface session manager update()" << std::endl;
-
+            // Process Each Event and Data Queue of Sessions in the Manager.
             m_session_manager->update();
-
-            std::cout << "Interface session manager end upodate()" << std::endl;
 
             // Check for Spawned Connection here. System connection container will be populated
             // With connection info and data to be passed and spawned.

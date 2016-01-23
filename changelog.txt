@@ -1,4 +1,9 @@
 
+Change Log 3.0.34 - 2016-01-23
+    - Fixed Rendering and Normal Screen Scrolling on long ANSI screen
+      Added new code to clear the last line when scrolling up the screen up
+      So there is nothing left over when the new line is drawn.
+
 Change Log 3.0.33 - 2016-01-23
     - Fixed issues with multiple connections, more then 1, the program would freeze
       in the input loop.  Added a return after processing event so it doesn't

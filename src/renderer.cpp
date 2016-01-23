@@ -442,14 +442,6 @@ void Renderer::setScrollRegion(int top, int bot, int term_height)
  */
 void Renderer::scrollRegionUp()
 {
-    SDL_Rect area;
-
-    // Clear Out last line after Scrolling up.
-    area.x = 0;
-    area.y = m_surface_manager->m_characterHeight * (m_bottom_margin-1);
-    area.w = m_surface_manager->m_surfaceWidth;
-    area.h = m_surface_manager->m_characterHeight;
-
     // Get handle to the Surface
     SDL_Surface *surface = m_surface_manager
                            ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
@@ -458,12 +450,16 @@ void Renderer::scrollRegionUp()
     int bpp = surface->format->BytesPerPixel;
     Uint8 *pixelNewPos = (Uint8 *)surface->pixels;
     Uint8 *pixelTopPos = (Uint8 *)surface->pixels;
+    Uint8 *pixelLastRowPos = (Uint8 *)surface->pixels;
 
     // Move position to start
     pixelTopPos += surface->w * (m_surface_manager->m_characterHeight * (m_top_margin -1)) * bpp;
 
     // Start from One line below the Top Margin.
     pixelNewPos += surface->w * (m_surface_manager->m_characterHeight * m_top_margin) * bpp;
+
+    // Jump to last line, we want to clear this out after we move everything up!
+    pixelLastRowPos +=  surface->w * (m_surface_manager->m_characterHeight * (m_bottom_margin -1)) * bpp;
 
     // Lock the Surface to Modify Pixels
     m_surface_manager->lockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
@@ -474,11 +470,11 @@ void Renderer::scrollRegionUp()
         pixelNewPos,
         (surface->w * (m_surface_manager->m_characterHeight * (m_bottom_margin - m_top_margin))) * bpp);
 
+    // clear the last line on the surface.
+    memset(pixelLastRowPos, 0, (surface->w * m_surface_manager->m_characterHeight) * bpp);
+
     // Unlock when modification is done.
     m_surface_manager->unlockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
-
-    // Clear out very last line of surface region.
-    m_window_manager->renderFill(&area);
 
     // Update Pixels in the Texture
     m_window_manager->updateTexture(
@@ -511,10 +507,14 @@ void Renderer::scrollScreenUp()
     int bpp = surface->format->BytesPerPixel;
     Uint8 *pixelNewPos = (Uint8 *)surface->pixels;
     Uint8 *pixelOldPos = (Uint8 *)surface->pixels;
+    Uint8 *pixelLastRowPos = (Uint8 *)surface->pixels;
 
     // Move position to start of 2nd Line,
     // Then copying greater line down to previous.
     pixelNewPos += (surface->w * m_surface_manager->m_characterHeight) * bpp;
+
+    // Jump to last line, we want to clear this out after we move everything up!
+    pixelLastRowPos +=  surface->w * (m_surface_manager->m_characterHeight * (m_term_height - 1)) * bpp;
 
     // Lock the Surface
     m_surface_manager->lockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
@@ -523,22 +523,12 @@ void Renderer::scrollScreenUp()
     memmove(pixelOldPos, pixelNewPos,
             (surface->w * (surface->h - m_surface_manager->m_characterHeight)) * bpp);
 
-    
+
+    // clear the last line on the surface.
+    memset(pixelLastRowPos, 0, (surface->w * m_surface_manager->m_characterHeight) * bpp);
 
     // Unlock when modification is done.
     m_surface_manager->unlockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
-
-    /* This did nothing!
-    // Clear Out bottom Row
-    SDL_Rect rect;
-    rect.x = 0;
-    rect.y = m_surface_manager->m_characterHeight * (m_bottom_margin-1);
-    rect.w = m_surface_manager->m_surfaceWidth;
-    rect.h = m_surface_manager->m_characterHeight;
-
-    // Clear out very last line of surface region.
-    m_window_manager->renderFill(&rect);
-    */
 
     // Update Pixels in the Texture
     m_window_manager->updateTexture(
