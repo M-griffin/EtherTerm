@@ -1273,7 +1273,6 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                 /*
                  * Build Message Queue Broken Down Sequences
                  */
-                //TheAnsiParser::Instance()->sequenceInput(params);
                 {
                     m_message_queue.m_queueParams.swap(m_sequence_params);
 
@@ -1306,7 +1305,6 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
     // Catch any echo'ed input that passed through with no sequences
     if(m_sequence_state == SEQ_NORMAL && m_valid_output_data.size() > 0)
     {
-        //TheAnsiParser::Instance()->textInput(validOutputData);
         /*
          * Build Queue with Passthrough Message Test
          */

@@ -59,6 +59,11 @@ public:
         return false;
     }
 
+    void globalShutdown()
+    {
+        m_globalShutdown = true;
+    }
+
     bool isGlobalShutdown() const
     {
         return m_globalShutdown;

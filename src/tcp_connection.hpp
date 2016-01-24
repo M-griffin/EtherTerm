@@ -24,12 +24,6 @@ public:
     ~tcp_connection()
     {
         std::cout << "~tcp_connection" << std::endl;
-        if (m_socket.is_open())
-        {
-            // Only Shutdown When Conencted, if were get here
-            // Connection is already killed.
-            // m_socket.close();
-        }
     }
 
     /**

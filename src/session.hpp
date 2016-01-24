@@ -278,19 +278,13 @@ public:
                     if(session_mgr && error)
                     {
                         m_is_leaving = true;
-
                         // Disconenct the session.
-                        std::cout << "Disconnected, Leaving Session! " << std::endl;
-                        session_mgr->leave(shared_from_this());
+                        std::cout << "Connection Closed, Leaving Session! " << std::endl;
 
-                        if(m_connection->is_open())
+                        // Shutdown the Input handler.
+                        if (!m_input_handler->isGlobalShutdown())
                         {
-                            // Only Shutdown when Connected!
-                            if (m_is_connected)
-                            {
-                                m_connection->socket().shutdown(tcp::socket::shutdown_both);
-                            }
-                            m_connection->socket().close();
+                            session_mgr->leave(shared_from_this());
                         }
                     }
                 }

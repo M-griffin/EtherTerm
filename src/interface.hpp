@@ -116,6 +116,10 @@ public:
             // With connection info and data to be passed and spawned.
             if (m_session_manager)
             {
+                // First Check for any Disconnected systems, If so, regrab window focus
+                m_session_manager->grabNewWindowFocus();
+
+                // Now test for any waiting connection spawns
                 while (!m_session_manager->m_new_connections.is_empty())
                 {
                     system_connection_ptr new_system;
@@ -125,6 +129,8 @@ public:
                     spawnConnectionSession(new_system);
                 }
             }
+
+            // Delay for CPU Usage, 10 ms is pretty good.
             SDL_Delay(10);
         }
     }
@@ -245,7 +251,7 @@ public:
                     if((*it)->m_window_manager->getWindowId() == event.window.windowID)
                     {
                         // Pass the Events to the specific Session for Specific Window and Input Events.
-                        (*it)->m_input_handler->update(event);
+                        (*it)->m_input_handler->update(event);                        
                         return;
                     }
                 }

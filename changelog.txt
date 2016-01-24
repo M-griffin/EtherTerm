@@ -1,4 +1,13 @@
 
+Change Log 3.0.35 - 2016-01-24
+    - Set Focus to first available window once a session window is closed.
+      This has been reworked a few time, Now setup to use the session manager
+      to set a flag on any disconnected system during the session->leave()
+      Once a system is detected in the main thread, a call to reset focus
+      to the first available window in the session_manager is made.
+    - Added back copy selection into clip board for copy/paste functionality.
+    - WIP add back cursor and blinking next.
+
 Change Log 3.0.34 - 2016-01-23
     - Fixed Rendering and Normal Screen Scrolling on long ANSI screen
       Added new code to clear the last line when scrolling up the screen up

@@ -33,32 +33,32 @@ Renderer::Renderer(surface_manager_ptr surface,
     , m_input_handler(input)
     , m_weak_session(session)
     , BLACK( {   0,   0,   0,   0 })
-, BLUE( {   0,   0, 171,   0 })
-, GREEN( {   0, 171,   0,   0 })
-, CYAN( {   0, 171, 171,   0 })
-, RED( { 171,   0,   0,   0 })
-, MAGENTA( { 171,   0, 171,   0 })
-, BROWN( { 171,  87,   0,   0 })
-, GREY( { 171, 171, 171,   0 })
-, DARK_GREY( {  87,  87,  87,   0 })
-, LIGHT_BLUE( {  87,  87, 255,   0 })
-, LIGHT_GREEN( {  87, 255,  87,   0 })
-, LIGHT_CYAN( {  87, 255, 255,   0 })
-, LIGHT_RED( { 255,  87,  87,   0 })
-, LIGHT_MAGENTA( { 255,  87, 255,   0 })
-, YELLOW( { 255, 255,  87,   0 })
-, WHITE( { 255, 255, 255,   0 })
-, m_current_fg_color(GREY)
-, m_current_bg_color(BLACK)
-, m_term_width(80)
-, m_term_height(25)
-, m_is_scroll_region_active(false)
-, m_top_margin(0)
-, m_bottom_margin(0)
-, m_cursor_x_position(0)
-, m_cursor_y_position(0)
-, m_is_scalling_surface(false)
-, m_is_utf8_output(false)
+    , BLUE( {   0,   0, 171,   0 })
+    , GREEN( {   0, 171,   0,   0 })
+    , CYAN( {   0, 171, 171,   0 })
+    , RED( { 171,   0,   0,   0 })
+    , MAGENTA( { 171,   0, 171,   0 })
+    , BROWN( { 171,  87,   0,   0 })
+    , GREY( { 171, 171, 171,   0 })
+    , DARK_GREY( {  87,  87,  87,   0 })
+    , LIGHT_BLUE( {  87,  87, 255,   0 })
+    , LIGHT_GREEN( {  87, 255,  87,   0 })
+    , LIGHT_CYAN( {  87, 255, 255,   0 })
+    , LIGHT_RED( { 255,  87,  87,   0 })
+    , LIGHT_MAGENTA( { 255,  87, 255,   0 })
+    , YELLOW( { 255, 255,  87,   0 })
+    , WHITE( { 255, 255, 255,   0 })
+    , m_current_fg_color(GREY)
+    , m_current_bg_color(BLACK)
+    , m_term_width(80)
+    , m_term_height(25)
+    , m_is_scroll_region_active(false)
+    , m_top_margin(0)
+    , m_bottom_margin(0)
+    , m_cursor_x_position(0)
+    , m_cursor_y_position(0)
+    , m_is_scalling_surface(false)
+    , m_is_utf8_output(false)
 {
     std::cout << "Renderer Created" << std::endl;
     // Startup Surface and Texture Creation
@@ -262,11 +262,17 @@ void Renderer::pullSelectionBuffer(int x, int y)
     int numberRows  = rect.h / char_height;
 
     // Use coords to pull screen text directly from screen buffer.
-    /*
-     * Rework once the ansi parser is reworked!
-     *
-    TheSequenceParser::Instance()->bufferToClipboard(
-        startColumn, startRow, length, numberRows);*/
+    session_ptr session = m_weak_session.lock();
+    if (session)
+    {
+        // Push the Text Buffer to the Clipboard.
+        session->m_sequence_parser->m_screen_buffer.bufferToClipboard(
+            startColumn,
+            startRow,
+            length,
+            numberRows
+        );
+    }
 }
 
 /**
@@ -523,7 +529,6 @@ void Renderer::scrollScreenUp()
     memmove(pixelOldPos, pixelNewPos,
             (surface->w * (surface->h - m_surface_manager->m_characterHeight)) * bpp);
 
-
     // clear the last line on the surface.
     memset(pixelLastRowPos, 0, (surface->w * m_surface_manager->m_characterHeight) * bpp);
 
@@ -538,7 +543,6 @@ void Renderer::scrollScreenUp()
         nullptr,
         surface
     );
-
 }
 
 /**

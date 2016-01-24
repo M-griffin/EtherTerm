@@ -131,11 +131,14 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
         case SDL_WINDOWEVENT_CLOSE:
             {
                 SDL_Log("Window %d closed received by user!", event.window.windowID);
-                m_globalShutdown = true;
-                session_ptr session = m_weak_session.lock();
-                if(session)
+                if (!m_globalShutdown)
                 {
-                    session->closeThisSession();
+                    m_globalShutdown = true;
+                    session_ptr session = m_weak_session.lock();
+                    if(session)
+                    {
+                        session->closeThisSession();
+                    }
                 }
                 return;
             }

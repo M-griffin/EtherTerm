@@ -43,6 +43,11 @@ public:
     void leave(session_ptr session);
 
     /**
+     * @brief Window Session is Killed we want to switch focus to the first available window.
+     */
+    void grabNewWindowFocus();
+
+    /**
      * @brief Sends message to all users in the current room.
      * @param participant
      */
@@ -72,6 +77,10 @@ public:
      * @return
      */
     bool hasNewConnections();
+
+    // Detect anytime a system is removed, is so, we need to reset focus
+    // To the first available window from the main thread!
+    bool hasSystemDisconnected;
 
     // Queue of new connections to spawn.
     SafeQueue<system_connection_ptr> m_new_connections;

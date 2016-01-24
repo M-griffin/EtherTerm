@@ -57,6 +57,14 @@ WindowManager::~WindowManager()
 }
 
 /**
+ * @brief Set Current Window to Focus
+ */
+void WindowManager::grabWindow()
+{
+    SDL_RaiseWindow(m_window);
+}
+
+/**
  * @brief Override default Window Height
  * @param value
  */

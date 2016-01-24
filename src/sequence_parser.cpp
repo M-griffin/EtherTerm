@@ -1562,7 +1562,7 @@ void SequenceParser::sequenceResetAndResponses()
                     case 25:
                         // Show Cursor (DECTCEM).
                         m_is_cursor_shown = true;
-                        std::cout << "Cursor Shown" << std::endl;
+                        //std::cout << "Cursor Shown" << std::endl;
                         break;
                     default:
                         break;
@@ -1583,7 +1583,7 @@ void SequenceParser::sequenceResetAndResponses()
                     case 25:
                         // Hide Cursor (DECTCEM).
                         m_is_cursor_shown = false;
-                        std::cout << "Cursor hidden" << std::endl;
+                        //std::cout << "Cursor hidden" << std::endl;
                         break;
                     default:
                         break;
@@ -1627,7 +1627,7 @@ void SequenceParser::sequenceResetAndResponses()
                 session_ptr session = m_renderer->m_weak_session.lock();
                 if (session)
                 {
-                    if(session->m_connection->is_open())
+                    if(session->m_connection->is_open() && session->m_is_connected)
                     {
                         session->deliver(buf);
                     }

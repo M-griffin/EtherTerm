@@ -41,6 +41,11 @@ public:
     }
 
     /**
+     * @brief Set Current Window to Focus
+     */
+    void grabWindow();
+
+    /**
      * @brief Override default Window Height
      * @param value
      */

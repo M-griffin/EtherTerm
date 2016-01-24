@@ -6,6 +6,7 @@
 
 
 SessionManager::SessionManager()
+    : hasSystemDisconnected(false)
 {
     std::cout << "SessionManager Created" << std::endl;
 }
@@ -36,17 +37,47 @@ void SessionManager::leave(session_ptr session)
     std::cout << "Left SessionManager" << std::endl;
 
     // If session is connected, we need to disconnect it first
-    if (session->m_connection)
+    if(session->m_connection)
     {
-        if (session->m_is_connected)
+        if(session->m_is_connected)
         {
             // Shutdown the Connection before closing
             session->m_connection->shutdown();
+            // Force no longer being connected now.
             session->m_is_connected = false;
         }
         session->m_connection->close();
     }
+
+    // Remove the Session
     m_sessions.erase(session);
+
+    // Mark that a system has disconnect to reset window focus
+    hasSystemDisconnected = true;
+}
+
+/**
+ * @brief Window Session is Killed we want to switch focus to the first available window.
+ */
+void SessionManager::grabNewWindowFocus()
+{
+    // If a system hasn't diconnected then return;
+    if (!hasSystemDisconnected)
+    {
+        return;
+    }
+
+    // Move to the first window in the list and raise that
+    // Window for focus once the current windows closes.
+    auto it = m_sessions.begin();
+    if(it != m_sessions.end())
+    {
+        std::cout << "raising window for id: " << (*it)->m_window_manager->getWindowId() << std::endl;
+        (*it)->m_window_manager->grabWindow();
+    }
+
+    // Reset for next system detected.
+    hasSystemDisconnected = false;
 }
 
 /**
