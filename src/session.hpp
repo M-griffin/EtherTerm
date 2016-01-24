@@ -68,6 +68,7 @@ public:
 
         m_raw_data_vector.reserve(8024);
         m_raw_data_vector.resize(8024);
+
         // NOTES Reallocate by using reset! When rending Term Height/Width Change, need to recreate.
         // m_sequence_parser.reset(new SequenceParser(m_renderer, connection));
     }
@@ -232,6 +233,16 @@ public:
                         //std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data);
                         std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data_vector);
 
+                        // Debugging on Raw data coming in Shows Screen with bad ANSI Sequences!
+                        // Testing and Debugging to make sure were not going insane! :)
+                        /*
+                        std::string parsed_data = ""; //m_telnet_manager->parseIncomingData(m_raw_data_vector);
+                        for (auto c : m_raw_data_vector)
+                        {
+                            if ((int)c != 255 && c != '\0')
+                            parsed_data += c;
+                        }*/
+
                         if (parsed_data.size() > 0)
                         {
                             m_sequence_decoder->decodeEscSequenceData(parsed_data);
@@ -250,10 +261,19 @@ public:
                     if (m_raw_data_vector.size() != 0)
                     {
                         // Copy the vector into a string.
-                        std::string incoming_data(
-                            m_raw_data_vector.begin(),
-                            m_raw_data_vector.end()
-                        );
+                        //std::string incoming_data(
+                        //    m_raw_data_vector.begin(),
+                        //    m_raw_data_vector.end()
+                        //);
+
+                        std::string incoming_data = "";
+                        for (auto c : m_raw_data_vector)
+                        {
+                            // Ignore null's
+                            if (c != '\0')
+                            incoming_data += c;
+                        }
+
                         m_sequence_decoder->decodeEscSequenceData(incoming_data);
                     }
                 }
@@ -453,8 +473,27 @@ public:
         // Render Changes on updates only, save CPU usage!
         if (was_data_received)
         {
-            // Render Screen
+            // Render Screen Buffer to Texture
             m_renderer->renderScreen();
+
+            // Make sure Sequence Parser is still active.
+            if(m_sequence_parser)
+            {
+                // Setup and render the cursor after rending new screen.
+                if(m_sequence_parser->isCursorActive())
+                {
+
+                     // Issue, when closing connection, this somehow gets through and freezes shutdown!
+                     // Need to research this more, maybe a better place to handle this
+                     // this should be executed (Main Thread)
+                    if (m_is_connected)
+                    {
+                        //m_renderer->setupCursorCharacter();
+                        //m_renderer->renderCursorOnScreen();
+                    }
+                }
+            }
+            // Push the Texture to the Screen.
             m_renderer->drawTextureScreen();
         }
     }
