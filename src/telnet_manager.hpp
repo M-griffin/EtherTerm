@@ -47,11 +47,11 @@ private:
          m_isECHOCompleted;
 
     // Then set these as Completed!
-    bool m_is_active_sga,
-         m_is_active_ttype,
-         m_is_active_naws,
-         m_is_active_bin,
-         m_is_active_echo;
+    bool m_finishedSGA,
+         m_finishedTTYPE,
+         m_finishedNAWS,
+         m_finishedBIN,
+         m_finishedECHO;
 
     bool m_isShutdown;
 

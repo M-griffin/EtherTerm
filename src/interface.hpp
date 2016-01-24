@@ -6,7 +6,6 @@
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
-#include <boost/exception/all.hpp>
 #include <boost/asio/io_service.hpp>
 
 #include <iostream>
@@ -68,6 +67,7 @@ public:
         // Startup the initial Menu/Dialing Directory Sessions
         spawnLocalSession();
 
+
         // Send the event along for each session
         if (m_session_manager->numberOfSessions() == 0)
         {
@@ -87,59 +87,51 @@ public:
         // Read, then passed through to each session to handle per instance.
         while (!m_is_global_shutdown)
         {
-            try
+            // Send the event along for each session
+            if (m_session_manager->numberOfSessions() == 0)
             {
-                // Send the event along for each session
-                if (m_session_manager->numberOfSessions() == 0)
-                {
-                    std::cout << "Shutting Down!" << std::endl;
-                    m_is_global_shutdown = true;
-                    return;
-                }
-
-                // Process SDL Events for Window and Key Input
-                while(SDL_PollEvent(&event) != 0 && !m_is_global_shutdown)
-                {
-                    process_event(event);
-                }
-
-                // All sessions Closed, then exit.
-                if (m_session_manager->numberOfSessions() == 0)
-                {
-                    std::cout << "Shutting Down!" << std::endl;
-                    m_is_global_shutdown = true;
-                    break;
-                }
-
-                // Process Each Event and Data Queue of Sessions in the Manager.
-                m_session_manager->update();
-
-                // Check for Spawned Connection here. System connection container will be populated
-                // With connection info and data to be passed and spawned.
-                if (m_session_manager)
-                {
-                    // First Check for any Disconnected systems, If so, regrab window focus
-                    m_session_manager->grabNewWindowFocus();
-
-                    // Now test for any waiting connection spawns
-                    while (!m_session_manager->m_new_connections.is_empty())
-                    {
-                        system_connection_ptr new_system;
-                        new_system = std::move(m_session_manager->m_new_connections.dequeue());
-
-                        std::cout << "Swaping a new system connection from Interface!" << std::endl;
-                        spawnConnectionSession(new_system);
-                    }
-                }
-
-                // Delay for CPU Usage, 10 ms is pretty good.
-                SDL_Delay(10);
-
+                std::cout << "Shutting Down!" << std::endl;
+                m_is_global_shutdown = true;
+                return;
             }
-            catch (boost::exception &e)
+
+            // Process SDL Events for Window and Key Input
+            while(SDL_PollEvent(&event) != 0 && !m_is_global_shutdown)
             {
-                std::cerr << boost::diagnostic_information(e);
+                process_event(event);
             }
+
+            // All sessions Closed, then exit.
+            if (m_session_manager->numberOfSessions() == 0)
+            {
+                std::cout << "Shutting Down!" << std::endl;
+                m_is_global_shutdown = true;
+                break;
+            }
+
+            // Process Each Event and Data Queue of Sessions in the Manager.
+            m_session_manager->update();
+
+            // Check for Spawned Connection here. System connection container will be populated
+            // With connection info and data to be passed and spawned.
+            if (m_session_manager)
+            {
+                // First Check for any Disconnected systems, If so, regrab window focus
+                m_session_manager->grabNewWindowFocus();
+
+                // Now test for any waiting connection spawns
+                while (!m_session_manager->m_new_connections.is_empty())
+                {
+                    system_connection_ptr new_system;
+                    new_system = std::move(m_session_manager->m_new_connections.dequeue());
+
+                    std::cout << "Swaping a new system connection from Interface!" << std::endl;
+                    spawnConnectionSession(new_system);
+                }
+            }
+
+            // Delay for CPU Usage, 10 ms is pretty good.
+            SDL_Delay(10);
         }
     }
 
@@ -212,8 +204,6 @@ public:
         m_session_manager->join(new_session);
         std::cout << "New Connection Session pre-added to Session Manager" << std::endl;
 
-        // Start Cursor for new connection: (TESTING!)
-        new_session->m_sequence_parser->setCursorActive(true);
 
         // Start Async Connection
         boost::asio::async_connect(new_connection->socket(),
@@ -225,7 +215,7 @@ public:
             {
                 // Mark Session Connected
                 new_session->m_is_connected = true;
-                new_session->waitForSocketData();
+                new_session->waitForSocketData();                
             }
             else
             {
@@ -237,7 +227,7 @@ public:
                 }
                 m_session_manager->leave(new_session);
             }
-        });        
+        });
     }
 
     /**

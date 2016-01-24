@@ -1,12 +1,4 @@
 
-Change Log 3.0.36 - 2016-01-24 - WIP
-    - Added Boost::Exception handling on main Interface loop to catch
-      exceptions in io_service when execute Async systems like connection.
-      Exceptions are thrown on unknown hostname when connecting out.      
-    - Working expect ion on displaying the cursor, then disconnecting,  shutdown
-      seems to be access something it shouldn't so need to spend time tracking
-      this down, I'm thinking a surface that is no longer existing.  
-
 Change Log 3.0.35 - 2016-01-24
     - Set Focus to first available window once a session window is closed.
       This has been reworked a few time, Now setup to use the session manager

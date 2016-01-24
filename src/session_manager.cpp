@@ -72,10 +72,7 @@ void SessionManager::grabNewWindowFocus()
     auto it = m_sessions.begin();
     if(it != m_sessions.end())
     {
-        std::cout << "Changing Window Focus to WindowId: "
-                  << (*it)->m_window_manager->getWindowId()
-                  << std::endl;
-
+        std::cout << "raising window for id: " << (*it)->m_window_manager->getWindowId() << std::endl;
         (*it)->m_window_manager->grabWindow();
     }
 
@@ -115,18 +112,8 @@ int SessionManager::numberOfSessions()
  */
 void SessionManager::update()
 {
-    // Becasue disconnects can happen in a thread, we need to double check
-    // If a session was poped off in the middle of the Iteration
-    std::string::size_type num_sessions = m_sessions.size();
     for(auto it = m_sessions.begin(); it != m_sessions.end(); ++it)
     {
-        // Make sure handle is valid once we call it.
-        if (num_sessions != m_sessions.size())
-        {
-            return;
-        }
-
-        // Run Session Update for Event Processing.
         (*it)->update();
     }
 }
@@ -137,6 +124,8 @@ void SessionManager::update()
  */
 void SessionManager::shutdown()
 {
+    // FIXME First check for connection, then loop and pop off stact, better procedure!
+
     // Swap to pop all enteries off the stack.
     std::set<session_ptr>().swap(m_sessions);
 }

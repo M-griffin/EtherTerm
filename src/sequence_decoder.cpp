@@ -864,7 +864,7 @@ void SequenceDecoder::validateSequence()
     // Handle SyncTerm Font Switching sequences here.
     // Makes it quicker to no go through extra parsing.
     // Default CP437 VGA8x16
-//    handleFontChangeSequences();
+    handleFontChangeSequences();
 
 #ifdef _DEBUG
     std::cout << "Params Size(): " << m_sequence_params.size() << std::endl;
@@ -1025,9 +1025,9 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
         result = input_string.find("\x1b\x1b");
         if(result != std::string::npos)
         {
-//#ifdef _DEBUG
+#ifdef _DEBUG
             std::cout << "Found Double ESC!" << std::endl;
-//#endif
+#endif
             try
             {
                 //input_string.replace(result,1,"^");
@@ -1103,7 +1103,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
             case SEQ_ERROR:
                 // Validating the Sequence Bombed, Clear the vector and continue.
                 std::vector<int>().swap(m_sequence_params); // Clear for next run.
-                m_sequence_builder.erase();                 // Clear Any Prebuilt.
+                m_sequence_builder.erase();         // Clear Any Prebuilt.
                 m_sequence_state = SEQ_NORMAL;
                 continue;
         }
@@ -1117,11 +1117,6 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
 #ifdef _DEBUG
                 std::cout << "Invalid Sequence, ESC in current sequence"
                           << std::endl;
-
-
-                std::cout << "*** Invalid ESC SeqBuilder: [" << m_sequence_builder << "]" << std::endl;
-                std::cout << "*** Invalid ESC Seq: [" << m_sequence << "]" << std::endl;
-                std::cout << "*** Invalid ESC Seq Level: [" << m_sequence_level << "]" << std::endl;
 #endif
                 // We now determine the preceding sequence is invalid
                 // And remove the ESC, then proceed with the current sequence
@@ -1223,16 +1218,6 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
 #ifdef _DEBUG
             std::cout << " *** SequenceInvalid!" << std::endl;
 #endif
-            std::cout << "*** Invalid ESC SeqBuilder: [" << m_sequence_builder << "]" << std::endl;
-
-            for (unsigned char c : m_sequence_builder)
-            {
-                std::cout << "*** Invalid ESC SeqBuilder[0]: [" << int(c) << "]" << std::endl;
-            }
-
-            std::cout << "*** Invalid ESC Seq: [" << m_sequence << "]" << std::endl;
-            std::cout << "*** Invalid ESC Seq Level: [" << m_sequence_level << "]" << std::endl;
-
             // Handle Invalid Sequences by removing the ESC character, then
             // Continue on to the next sequence.
             /*
