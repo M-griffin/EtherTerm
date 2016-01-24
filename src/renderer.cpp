@@ -1080,7 +1080,7 @@ void Renderer::setupCursorCharacter()
 {
     // Grab handle from weak pointer.
     session_ptr session = m_weak_session.lock();
-    if(session)
+    if(session && session->m_sequence_parser)
     {
         // If cursor is not active then don't waste processing.
         if(!session->m_sequence_parser->isCursorActive())
@@ -1185,8 +1185,8 @@ void Renderer::setupCursorCharacter()
     memcpy(pixelNew, pixelTemp, (surfaceCharacter->w * 2) * bpp);
     m_surface_manager->unlockSurface(m_surface_manager->SURFACE_CURSOR_ON);
 
-    renderCursorOnScreen();
-    drawTextureScreen();
+   // renderCursorOnScreen();
+   // drawTextureScreen();
 }
 
 /**

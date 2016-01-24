@@ -58,14 +58,14 @@ private:
         SEQ_ERROR      = 4  // Bad Sequence, Kill it!
     };
 
-    int unsigned m_sequence_state;
-    char         m_sequence;
-    int          m_parameter;
-    bool         m_is_sequence;
-    bool         m_is_parameter;
-    bool         m_is_invalid_sequence;
-    bool         m_is_sequence_completed;
-    int          m_sequence_level;
+    int unsigned  m_sequence_state;
+    unsigned char m_sequence;
+    int           m_parameter;
+    bool          m_is_sequence;
+    bool          m_is_parameter;
+    bool          m_is_invalid_sequence;
+    bool          m_is_sequence_completed;
+    int           m_sequence_level;
 
     // Holds the intern data while we build the sequence,
     // This is needed if inputString doesn't have a complete sequence

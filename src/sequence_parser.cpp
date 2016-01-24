@@ -28,7 +28,7 @@ SequenceParser::SequenceParser(renderer_ptr renderer, connection_ptr connection)
     , m_prev_color_attribute(0)
     , m_is_line_wrapped(false)
     , m_is_cleared_the_screen(false)
-    , m_is_cursor_shown(true)
+    , m_is_cursor_shown(false)
 {
     // Set Default Region to Off!
     std::cout << "SequenceParser Created" << std::endl;

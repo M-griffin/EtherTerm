@@ -17,11 +17,11 @@ TelnetManager::TelnetManager(session_ptr session)
     , m_isSGACompleted(false)
     , m_isBINCompleted(false)
     , m_isECHOCompleted(true) // Default to True for MUD'S etc.
-    , m_finishedSGA(false)
-    , m_finishedTTYPE(false)
-    , m_finishedNAWS(false)
-    , m_finishedBIN(false)
-    , m_finishedECHO(false)
+    , m_is_active_sga(false)
+    , m_is_active_ttype(false)
+    , m_is_active_naws(false)
+    , m_is_active_bin(false)
+    , m_is_active_echo(false)
     , m_isShutdown(false)
     , m_currentOption(0)
 {
@@ -489,10 +489,7 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                 return c;
             }
             else
-            {
-                // Sequence Found with IAC, set to next Stage.
-                //printf("\r\n ========================================== \r\n");
-                //printf("\r\n Received #255 = IAC \r\n");
+            {                
                 m_teloptStage++;
             }
             break;
@@ -501,14 +498,23 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
         case 1:
             if(c == IAC)
             {
-                // Restart on next character
-                // Double IAC = IAC character, not valid so skip it for now.
-                // Telnet states binary mode, double IAC mean pass through
-                // Char 255.  But this doesn't equal any text in ExtASCII
-                // So we going to stuff it.
-                //std::cout << "\r\n Got double IAC!!\r\n" << std::endl;
-                m_teloptStage = 0;
-                return IAC;
+                // If binary, then we expect double IAC for actual characer
+                if (m_is_active_bin)
+                {
+                    std::cout << "\r\n Got double IAC w/ Binary!!\r\n" << std::endl;
+                    m_teloptStage = 0;
+                    return IAC;
+                }
+                else
+                {
+                    // Restart on next character
+                    // Double IAC = IAC character, not valid so skip it for now.
+                    // Telnet states binary mode, double IAC mean pass through
+                    // Char 255.  But this doesn't equal any text in ExtASCII
+                    // So we going to stuff it.
+                    std::cout << "\r\n Got double IAC!!\r\n" << std::endl;
+                    break;
+                }
             }
             if(c != IAC)
             {
@@ -582,7 +588,7 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                         case TELOPT_ECHO:
                             std::cout << "[IAC] DO TELOPT_ECHO [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                             telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
-                            m_finishedECHO = true;
+                            m_is_active_echo = true;
                             m_isECHOCompleted = true;
                             break;
 
@@ -590,27 +596,27 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                             std::cout << "[IAC] DO TELOPT_BINARY [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                             telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
                             m_isBINCompleted = true;
-                            m_finishedBIN = true;
+                            m_is_active_bin = true;
                             break;
 
                         case TELOPT_SGA:
                             std::cout << "[IAC] DO TELOPT_SGA [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                             telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
                             m_isSGACompleted = true;
-                            m_finishedSGA = true;
+                            m_is_active_sga = true;
                             break;
 
                         case TELOPT_TTYPE:
                             std::cout << "[IAC] DO TELOPT_TTYPE [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                             telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
-                            m_finishedTTYPE = true;
+                            m_is_active_ttype = true;
                             break;
 
                         case TELOPT_NAWS:
                             std::cout << "[IAC] DO TELOPT_NAWS [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                             telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
                             telnetOptionNawsReply();
-                            m_finishedNAWS = true;
+                            m_is_active_naws = true;
                             break;
                             /*
                             case IAC :
@@ -635,31 +641,31 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                     switch(c)
                     {
                         case TELOPT_ECHO:
-                            if(!m_finishedECHO)
+                            if(!m_is_active_echo)
                             {
                                 std::cout << "[IAC] WILL TELOPT_ECHO [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                                 telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
-                                m_finishedECHO = true;
+                                m_is_active_echo = true;
                                 m_isECHOCompleted = false;
                             }
                             break;
 
                         case TELOPT_BINARY :
-                            if(!m_finishedBIN)
+                            if(!m_is_active_bin)
                             {
                                 std::cout << "[IAC] WILL TELOPT_BINARY [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                                 telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
-                                m_finishedBIN = true;
+                                m_is_active_bin = true;
                                 m_isBINCompleted = true;
                             }
                             break;
 
                         case TELOPT_SGA :
-                            if(!m_finishedSGA)
+                            if(!m_is_active_sga)
                             {
                                 std::cout << "[IAC] WILL TELOPT_SGA [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                                 telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
-                                m_finishedSGA = true;
+                                m_is_active_sga = true;
                                 m_isSGACompleted = true;
                             }
                             break;
@@ -759,5 +765,7 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
             }
             break;
     }
+
+    //std::cout << "[IAC] null return [" << (int)c << "] " << std::endl;
     return '\0';
 }
