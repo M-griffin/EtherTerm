@@ -33,32 +33,32 @@ Renderer::Renderer(surface_manager_ptr surface,
     , m_input_handler(input)
     , m_weak_session(session)
     , BLACK( {   0,   0,   0,   0 })
-    , BLUE( {   0,   0, 171,   0 })
-    , GREEN( {   0, 171,   0,   0 })
-    , CYAN( {   0, 171, 171,   0 })
-    , RED( { 171,   0,   0,   0 })
-    , MAGENTA( { 171,   0, 171,   0 })
-    , BROWN( { 171,  87,   0,   0 })
-    , GREY( { 171, 171, 171,   0 })
-    , DARK_GREY( {  87,  87,  87,   0 })
-    , LIGHT_BLUE( {  87,  87, 255,   0 })
-    , LIGHT_GREEN( {  87, 255,  87,   0 })
-    , LIGHT_CYAN( {  87, 255, 255,   0 })
-    , LIGHT_RED( { 255,  87,  87,   0 })
-    , LIGHT_MAGENTA( { 255,  87, 255,   0 })
-    , YELLOW( { 255, 255,  87,   0 })
-    , WHITE( { 255, 255, 255,   0 })
-    , m_current_fg_color(GREY)
-    , m_current_bg_color(BLACK)
-    , m_term_width(80)
-    , m_term_height(25)
-    , m_is_scroll_region_active(false)
-    , m_top_margin(0)
-    , m_bottom_margin(0)
-    , m_cursor_x_position(0)
-    , m_cursor_y_position(0)
-    , m_is_scalling_surface(false)
-    , m_is_utf8_output(false)
+, BLUE( {   0,   0, 171,   0 })
+, GREEN( {   0, 171,   0,   0 })
+, CYAN( {   0, 171, 171,   0 })
+, RED( { 171,   0,   0,   0 })
+, MAGENTA( { 171,   0, 171,   0 })
+, BROWN( { 171,  87,   0,   0 })
+, GREY( { 171, 171, 171,   0 })
+, DARK_GREY( {  87,  87,  87,   0 })
+, LIGHT_BLUE( {  87,  87, 255,   0 })
+, LIGHT_GREEN( {  87, 255,  87,   0 })
+, LIGHT_CYAN( {  87, 255, 255,   0 })
+, LIGHT_RED( { 255,  87,  87,   0 })
+, LIGHT_MAGENTA( { 255,  87, 255,   0 })
+, YELLOW( { 255, 255,  87,   0 })
+, WHITE( { 255, 255, 255,   0 })
+, m_current_fg_color(GREY)
+, m_current_bg_color(BLACK)
+, m_term_width(80)
+, m_term_height(25)
+, m_is_scroll_region_active(false)
+, m_top_margin(0)
+, m_bottom_margin(0)
+, m_cursor_x_position(0)
+, m_cursor_y_position(0)
+, m_is_scalling_surface(false)
+, m_is_utf8_output(false)
 {
     std::cout << "Renderer Created" << std::endl;
     // Startup Surface and Texture Creation
@@ -263,7 +263,7 @@ void Renderer::pullSelectionBuffer(int x, int y)
 
     // Use coords to pull screen text directly from screen buffer.
     session_ptr session = m_weak_session.lock();
-    if (session)
+    if(session)
     {
         // Push the Text Buffer to the Clipboard.
         session->m_sequence_parser->m_screen_buffer.bufferToClipboard(
@@ -362,9 +362,9 @@ void Renderer::renderSelectionScreen(int x, int y)
         m_window_manager->setRenderTarget(nullptr);
     }
 
-     texture = m_surface_manager
-               ->m_textureList[m_surface_manager->TEXTURE_SELECTION]
-               ->getTexture();
+    texture = m_surface_manager
+              ->m_textureList[m_surface_manager->TEXTURE_SELECTION]
+              ->getTexture();
 
     // We need to Translate the Screen Width vs Rows and Width to
     // get actual the grid size of the Characters to snap everything correctly.
@@ -873,10 +873,8 @@ void Renderer::renderCursorOnScreen()
     if(session)
     {
         // Check if the position has changed, if so, then skip!
-        if(m_cursor_x_position !=
-                session->m_sequence_parser->m_screen_buffer.m_x_position-1 ||
-                m_cursor_y_position !=
-                session->m_sequence_parser->m_screen_buffer.m_y_position-1)
+        if(m_cursor_x_position != session->m_sequence_parser->m_screen_buffer.m_x_position-1 ||
+                m_cursor_y_position != session->m_sequence_parser->m_screen_buffer.m_y_position-1)
         {
             return;
         }
@@ -1096,23 +1094,26 @@ void Renderer::setupCursorCharacter()
         return;
     }
 
-    SDL_Rect pick, area;
+    //SDL_Rect pick, area;
+    SDL_Rect pick, area, cursor, cursor2;
 
     // Transform The underscore to a Cursor.
     int asciicode = '_';
+    int char_width = m_surface_manager->m_characterWidth;
+    int char_height = m_surface_manager->m_characterHeight;
 
     // Quad for Char Cell in Bitmap
     // 32 Cols by 8 Rows.
-    pick.x = (asciicode % 32) * m_surface_manager->m_characterWidth;
-    pick.y = round(asciicode / 32) * m_surface_manager->m_characterHeight;
-    pick.w = m_surface_manager->m_characterWidth;
-    pick.h = m_surface_manager->m_characterHeight;
+    pick.x = (asciicode % 32) * char_width;
+    pick.y = round(asciicode / 32) * char_height;
+    pick.w = char_width;
+    pick.h = char_height;
 
     // Quad for Char Cell to Map to Screen
-    area.x = m_cursor_x_position * m_surface_manager->m_characterWidth;
-    area.y = m_cursor_y_position * m_surface_manager->m_characterHeight;
-    area.w = m_surface_manager->m_characterWidth;
-    area.h = m_surface_manager->m_characterHeight;
+    area.x = m_cursor_x_position * char_width;
+    area.y = m_cursor_y_position * char_height;
+    area.w = char_width;
+    area.h = char_height;
 
     // Handles to Surfaces, when using more than once per method.
     SDL_Surface *surfaceFont = m_surface_manager
@@ -1158,35 +1159,37 @@ void Renderer::setupCursorCharacter()
         SDL_Log("setupCursorChar() SURFACE_CURSOR_OFF: %s", SDL_GetError());
     }
 
-    // We'll Copy over the Underscore and overall it on the cursor on
-    int bpp = surfaceMain->format->BytesPerPixel;
-    Uint8 *pixelTemp = (Uint8 *)surfaceCharacter->pixels;
-    Uint8 *pixelNew  = (Uint8 *)surfaceOn->pixels;
-
-    // Transpose the underscore character to the same
-    // Character cell as the current x/y position were at.
+    // Grab Underscore Character from Font Serface, and overwrite the current character cell.
     if(m_surface_manager->m_currentFont == "vga8x16.bmp")
     {
-        //std::cout << "current font VGA" << std::endl;
-        // VGA font starts higher
-        pixelTemp += (13 * surfaceCharacter->w) * bpp;
-        pixelNew  += (15 * surfaceOn->w) * bpp;
+        cursor.x = 0;
+        cursor.y = 13;
+        cursor.w = char_width;
+        cursor.h = 2;
+
+        cursor2.x = 0;
+        cursor2.y = 15;
+        cursor2.w = char_width;
+        cursor2.h = 2;
     }
     else
     {
-        //std::cout << "current font NOT VGA" << std::endl;
-        // Amiga fonts already at bottom of cell.
-        pixelTemp += (15 * surfaceCharacter->w) * bpp;
-        pixelNew  += (15 * surfaceOn->w) * bpp;
+        cursor.x = 0;
+        cursor.y = 15;
+        cursor.w = char_width;
+        cursor.h = 2;
+
+        cursor2.x = 0;
+        cursor2.y = 15;
+        cursor2.w = char_width;
+        cursor2.h = 2;
     }
 
-    // Copy (2) Rows of Pixels from underscore for the Cursor
-    m_surface_manager->lockSurface(m_surface_manager->SURFACE_CURSOR_ON);
-    memcpy(pixelNew, pixelTemp, (surfaceCharacter->w * 2) * bpp);
-    m_surface_manager->unlockSurface(m_surface_manager->SURFACE_CURSOR_ON);
-
-   // renderCursorOnScreen();
-   // drawTextureScreen();
+    // Add the Underscore to the surfaceOn
+    if(SDL_BlitSurface(surfaceCharacter, &cursor, surfaceOn, &cursor2) < 0)
+    {
+        SDL_Log("setupCursorChar() SURFACE_CURSOR_OFF: %s", SDL_GetError());
+    }
 }
 
 /**

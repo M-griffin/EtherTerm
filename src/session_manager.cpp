@@ -6,7 +6,11 @@
 
 
 SessionManager::SessionManager()
-    : hasSystemDisconnected(false)
+    : m_is_system_disconnected(false)
+    , m_cursor_blink(2)
+    , m_start_blinking(false)
+    , m_ttime(0)
+    , m_ttime2(0)
 {
     std::cout << "SessionManager Created" << std::endl;
 }
@@ -53,7 +57,7 @@ void SessionManager::leave(session_ptr session)
     m_sessions.erase(session);
 
     // Mark that a system has disconnect to reset window focus
-    hasSystemDisconnected = true;
+    m_is_system_disconnected = true;
 }
 
 /**
@@ -62,7 +66,7 @@ void SessionManager::leave(session_ptr session)
 void SessionManager::grabNewWindowFocus()
 {
     // If a system hasn't diconnected then return;
-    if (!hasSystemDisconnected)
+    if (!m_is_system_disconnected)
     {
         return;
     }
@@ -80,7 +84,7 @@ void SessionManager::grabNewWindowFocus()
     }
 
     // Reset for next system detected.
-    hasSystemDisconnected = false;
+    m_is_system_disconnected = false;
 }
 
 /**
@@ -110,6 +114,16 @@ int SessionManager::numberOfSessions()
 }
 
 /**
+ * @brief Toggles off the Blinking of the cursor while data is displayed.
+ */
+void SessionManager::stopBlinkingCursor()
+{
+    m_ttime = SDL_GetTicks();
+    m_start_blinking = false;
+    m_cursor_blink = 0;
+}
+
+/**
  * @brief Update, Hits Session Updates for processing Data Queue.
  * @return
  */
@@ -128,6 +142,63 @@ void SessionManager::update()
 
         // Run Session Update for Event Processing.
         (*it)->update();
+
+        // If socket data was received and processed
+        // Then Redraw Blinking Cursor
+        if ((*it)->m_received_data)
+        {
+            // Setup and render the cursor after rending new screen.
+            if((*it)->m_sequence_parser->isCursorActive())
+            {
+                if ((*it)->m_is_connected)
+                {
+                    // Cursor Character fucks it up!
+                    (*it)->m_renderer->setupCursorCharacter();
+                    (*it)->m_renderer->renderCursorOnScreen();
+                    (*it)->m_renderer->drawTextureScreen();
+                }
+            }
+            (*it)->m_received_data = false;
+        }
+        else
+        {
+            // Setup and render the cursor after rending new screen.
+            if((*it)->m_sequence_parser->isCursorActive())
+            {
+                // Loop here to blink the cursor.
+                if ((*it)->m_is_connected)
+                {
+                    if((*it)->m_sequence_parser->isCursorActive())
+                    {
+                        m_start_blinking = true;
+                        // Setup Timer for Blinking Cursor
+                        // Initial State = On, then Switch to off in next loop.
+                        if(m_cursor_blink % 2 == 0)
+                        {
+                            m_ttime2 = SDL_GetTicks();
+                            if(m_start_blinking && (m_ttime2 - m_ttime) > 400)
+                            {
+                                (*it)->m_renderer->renderCursorOffScreen();
+                                (*it)->m_renderer->drawTextureScreen();
+                                --m_cursor_blink;
+                                m_ttime = SDL_GetTicks();
+                            }
+                        }
+                        else
+                        {
+                            m_ttime2 = SDL_GetTicks();
+                            if(m_start_blinking && (m_ttime2 - m_ttime) > 400)
+                            {
+                                (*it)->m_renderer->renderCursorOnScreen();
+                                (*it)->m_renderer->drawTextureScreen();
+                                ++m_cursor_blink;
+                                m_ttime = SDL_GetTicks();
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

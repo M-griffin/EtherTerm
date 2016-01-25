@@ -1,4 +1,8 @@
 
+Change Log 3.0.37 - 2016-01-25
+	- Exception issue with Cursor display is now resolved.
+	- Blinking cursor is now working 
+
 Change Log 3.0.36 - 2016-01-24
     - Added Boost::Exception handling on main Interface loop to catch
       exceptions in io_service when execute Async systems like connection.

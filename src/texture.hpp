@@ -34,7 +34,8 @@ public:
     ~Textures()
     {
         std::cout << "~A Texture was removed!" << std::endl;
-        SDL_DestroyTexture(m_texture);
+        if (m_texture)
+            SDL_DestroyTexture(m_texture);
         m_texture = nullptr;
     }
 

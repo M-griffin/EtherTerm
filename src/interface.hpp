@@ -230,6 +230,7 @@ public:
             else
             {
                 std::cout << "Unable to Connect, closing down session." << std::endl;
+
                 // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
                 if (new_connection->socket().is_open())
                 {

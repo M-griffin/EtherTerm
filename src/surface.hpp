@@ -35,7 +35,8 @@ public:
     ~Surfaces()
     {
         std::cout << "~A Surface was Removed!" << std::endl;
-        SDL_FreeSurface(m_surface);
+        if (m_surface)
+            SDL_FreeSurface(m_surface);
         m_surface = nullptr;
     }
 

@@ -63,6 +63,7 @@ public:
         , m_system_connection(system_connection)
         , m_is_connected(false)
         , m_is_leaving(false)
+        , m_received_data(true)
     {
         std::cout << "Session Created!" << std::endl;
 
@@ -448,6 +449,17 @@ public:
         // Check for Processed/Received Session Data waiting to display.
         MessageQueue msgQueue;
         bool was_data_received = !m_data_queue.is_empty();
+
+        // If we received data, turn off blinking while displaying screens.
+        if (was_data_received)
+        {
+            session_manager_ptr session_mgr = m_weak_session_manager.lock();
+            if (session_mgr)
+            {
+                session_mgr->stopBlinkingCursor();
+            }
+        }
+
         while(!m_data_queue.is_empty())
         {
             //std::cout << "Message dequeue in progress: size(): " << m_data_queue.size() << std::endl;
@@ -473,28 +485,9 @@ public:
         // Render Changes on updates only, save CPU usage!
         if (was_data_received)
         {
-            // Render Screen Buffer to Texture
             m_renderer->renderScreen();
-
-            // Make sure Sequence Parser is still active.
-            if(m_sequence_parser)
-            {
-                // Setup and render the cursor after rending new screen.
-                if(m_sequence_parser->isCursorActive())
-                {
-
-                     // Issue, when closing connection, this somehow gets through and freezes shutdown!
-                     // Need to research this more, maybe a better place to handle this
-                     // this should be executed (Main Thread)
-                    if (m_is_connected)
-                    {
-                        //m_renderer->setupCursorCharacter();
-                        //m_renderer->renderCursorOnScreen();
-                    }
-                }
-            }
-            // Push the Texture to the Screen.
             m_renderer->drawTextureScreen();
+            m_received_data = true;
         }
     }
 
@@ -564,6 +557,7 @@ public:
 
     bool                     m_is_connected;
     bool                     m_is_leaving;
+    bool                     m_received_data;
 
     // Input Raw Data Buffer.
     std::vector<unsigned char> m_raw_data_vector;
