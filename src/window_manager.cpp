@@ -26,6 +26,10 @@ WindowManager::WindowManager()
 {
     std::cout << "WindowManager Created!" << std::endl;
 
+    static long position_placement = 0;
+    m_position_placement = position_placement;
+    ++position_placement;
+
     // Startup create the Window NOT Fullscreen.
     if(createWindow(false))
     {
@@ -230,12 +234,15 @@ bool WindowManager::createWindow(bool fullScreen)
         m_window = nullptr;
     }
 
+    int display_height = (m_height / 2);
+    int display_width  = (m_width / 2);
+
     // create window in in full screen or windowed mode.
     if(fullScreen)
     {
         m_window = SDL_CreateWindow("EtherTerm 3.0 Demo - Full Screen",
-                                    SDL_WINDOWPOS_UNDEFINED, //SDL_WINDOWPOS_CENTERED,
-                                    SDL_WINDOWPOS_UNDEFINED, //SDL_WINDOWPOS_CENTERED,
+                                    (m_position_placement % 2 == 0) ? SDL_WINDOWPOS_CENTERED : display_width,
+                                    (m_position_placement % 2 == 0) ? SDL_WINDOWPOS_CENTERED : display_height,
                                     m_width,
                                     m_height,
                                     SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -250,8 +257,8 @@ bool WindowManager::createWindow(bool fullScreen)
     else
     {
         m_window = SDL_CreateWindow("EtherTerm 3.0 Demo - Windowed",
-                                    SDL_WINDOWPOS_UNDEFINED, //SDL_WINDOWPOS_CENTERED,
-                                    SDL_WINDOWPOS_UNDEFINED, //SDL_WINDOWPOS_CENTERED,
+                                    (m_position_placement % 2 == 0) ? SDL_WINDOWPOS_CENTERED : display_width,
+                                    (m_position_placement % 2 == 0) ? SDL_WINDOWPOS_CENTERED : display_height,
                                     m_width,
                                     m_height,
                                     SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
@@ -262,7 +269,6 @@ bool WindowManager::createWindow(bool fullScreen)
             assert(m_window);
         }
     }
-
 
     // Set the Window ID
     m_window_id = SDL_GetWindowID(m_window);

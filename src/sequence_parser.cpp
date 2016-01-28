@@ -582,6 +582,70 @@ void SequenceParser::sequenceCursorAndDisplay()
                     m_screen_buffer.m_x_position = 1;
                 }
             }
+            // Font Switch Handling.
+            else if (m_parameters.size() == 3)
+            {
+                // Check for Font Changing Sequences here.
+                for (int i : m_parameters)
+                {
+                    std::cout << "ESC m_param[ " << i << " ] " << std::endl;
+                }
+                // Default CP437 VGA
+                // "\x1b[0;0 D"
+                if (m_parameters[1] == 0 && m_parameters[2] == 0)
+                {
+                    std::cout << std::endl << "Switched to CP437 Font" << std::endl;
+
+                    m_renderer->m_surface_manager->setCurrentFont("vga8x16.bmp");
+                    if (m_renderer->m_surface_manager->didFontChange()) {
+                        m_renderer->m_surface_manager->loadBitmapFontImage();
+                    }
+                }
+                //37 - P0T NOoDLE (Amiga)
+                // "\x1b[0;37 D"
+                else
+                if (m_parameters[1] == 0 && m_parameters[2] == 37)
+                {
+                    std::cout << std::endl << "Switched to Pot-Noodle Font" << std::endl;
+                    m_renderer->m_surface_manager->setCurrentFont("potNoodle-8x16.bmp");
+                    if (m_renderer->m_surface_manager->didFontChange()) {
+                        m_renderer->m_surface_manager->loadBitmapFontImage();
+                    }
+                }
+                //38 - mO'sOul (Amiga)
+                // "\x1b[0;38 D"
+                else
+                if (m_parameters[1] == 0 && m_parameters[2] == 38)
+                {
+                    std::cout << std::endl << "Switched to mO'sOul Font" << std::endl;
+                    m_renderer->m_surface_manager->setCurrentFont("mo'soul-8x16.bmp");
+                    if (m_renderer->m_surface_manager->didFontChange()) {
+                        m_renderer->m_surface_manager->loadBitmapFontImage();
+                    }
+                }
+                //39 - MicroKnight (Amiga)
+                //"\x1b[0;39 D"
+                else
+                if (m_parameters[1] == 0 && m_parameters[2] == 39)
+                {
+                    std::cout << std::endl << "Switched to Micro-Knight+ Font" << std::endl;
+                    m_renderer->m_surface_manager->setCurrentFont("microKnightPlus-8x16.bmp");
+                    if (m_renderer->m_surface_manager->didFontChange()) {
+                        m_renderer->m_surface_manager->loadBitmapFontImage();
+                    }
+                }
+                //40 - Topaz (Amiga)
+                // \x1b[0;40 D
+                else
+                if (m_parameters[1] == 0 && m_parameters[2] == 40)
+                {
+                    std::cout << std::endl << "Switched to Topaz+ Font" << std::endl;
+                    m_renderer->m_surface_manager->setCurrentFont("topazPlus-8x16.bmp");
+                    if (m_renderer->m_surface_manager->didFontChange()) {
+                        m_renderer->m_surface_manager->loadBitmapFontImage();
+                    }
+                }
+            }
             break;
 
         case SAVE_CURSOR_POS:

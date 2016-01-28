@@ -154,7 +154,7 @@ private:
     Uint32         m_window_id;
     int            m_width;
     int            m_height;
-
+    long           m_position_placement;
     std::string    m_hint_vSync;          // "0" or "1" Disabled or Enabled
     std::string    m_hint_textureFilter;  // "0" or "1" for none or linear
     std::string    m_hint_acceleration;   // "0" or "1" Disabled or Enabled
