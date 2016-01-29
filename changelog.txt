@@ -1,14 +1,29 @@
 
+Change Log 3.0.39 - 2016-01-28
+    - Cursor issue is now fixed and setup per session basis,
+      Move out of the SessionManager.
+    - Cursor and incoming events are also placed on hold per session
+      when their event is doing text selection, this stops the cursor
+      blinking from overwrite the text selection box being drawn.
+    - ISSUE: When a background window disconnects the first window gains 
+      focus causing the last active window to look input.
+      
+      1. Need to mark windows active and only switch focus if the Active window
+      closed.
+      
+      2. Need to add input grab to make sure the new focused window has full 
+      text input available.
+
 Change Log 3.0.38 - 2016-01-28
-	- Added New Window Position Cascading to move around next window created
-	  So each window is not exactly spawned on top of each other.
-	- Added back Font Switching by Syncterm ESC Sequences
-	- ISSUE: Cursor blinks on first connection, but not on second connection.
-	- ISSUE: Need to toggle cursor off during text selection for copy/paste.
+    - Added New Window Position Cascading to move around next window created
+      So each window is not exactly spawned on top of each other.
+    - Added back Font Switching by Syncterm ESC Sequences
+    - ISSUE: Cursor blinks on first connection, but not on second connection.
+    - ISSUE: Need to toggle cursor off during text selection for copy/paste.
 
 Change Log 3.0.37 - 2016-01-25
-	- Exception issue with Cursor display is now resolved.
-	- Blinking cursor is now working 
+    - Exception issue with Cursor display is now resolved.
+    - Blinking cursor is now working 
 
 Change Log 3.0.36 - 2016-01-24
     - Added Boost::Exception handling on main Interface loop to catch

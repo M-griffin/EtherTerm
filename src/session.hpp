@@ -63,7 +63,10 @@ public:
         , m_system_connection(system_connection)
         , m_is_connected(false)
         , m_is_leaving(false)
-        , m_received_data(true)
+        , m_cursor_blink(2)
+        , m_start_blinking(false)
+        , m_ttime(0)
+        , m_ttime2(0)
     {
         std::cout << "Session Created!" << std::endl;
 
@@ -80,7 +83,6 @@ public:
 
         // Clear any Data left over in the Buffer.
         std::vector<unsigned char>().swap(m_raw_data_vector);
-
     }
 
     /**
@@ -418,6 +420,16 @@ public:
     }
 
     /**
+     * @brief Toggles off the Blinking of the cursor while data is displayed.
+     */
+    void toggleBlinkingCursor(bool blink)
+    {
+        m_ttime = SDL_GetTicks();
+        m_start_blinking = blink;
+        m_cursor_blink = 2;
+    }
+
+    /**
      * @brief Process Waiting Data Buffer and pass to rendering
      * @return
      */
@@ -446,6 +458,15 @@ public:
             }
         }
 
+        // If were in the middle of a text selection then
+        // Exit and wait till next loop to process data,
+        // We want to avoid blinking cursor and rendering while
+        // were in the middle of capturing text!
+        if(m_input_handler->isMouseSelection())
+        {
+            return;
+        }
+
         // Check for Processed/Received Session Data waiting to display.
         MessageQueue msgQueue;
         bool was_data_received = !m_data_queue.is_empty();
@@ -453,11 +474,9 @@ public:
         // If we received data, turn off blinking while displaying screens.
         if (was_data_received)
         {
-            session_manager_ptr session_mgr = m_weak_session_manager.lock();
-            if (session_mgr)
-            {
-                session_mgr->stopBlinkingCursor();
-            }
+            // Turn off the cursor while we process data.
+            //m_sequence_parser->setCursorActive(false);
+            toggleBlinkingCursor(false);
         }
 
         while(!m_data_queue.is_empty())
@@ -485,9 +504,63 @@ public:
         // Render Changes on updates only, save CPU usage!
         if (was_data_received)
         {
+            // Render all screen data waiting to be seen.
             m_renderer->renderScreen();
+
+            // Setup and render the cursor after rending new screen.
+            if(m_sequence_parser->isCursorActive())
+            {
+                if (m_is_connected)
+                {
+                    m_renderer->setupCursorCharacter();
+                    m_renderer->renderCursorOnScreen();
+                    m_renderer->drawTextureScreen();
+                }
+            }
+
+            // Render Entire Screen now.
             m_renderer->drawTextureScreen();
-            m_received_data = true;
+
+            // Don't reset while it's active, only flip from inactive to active!
+            if (!m_start_blinking)
+            {
+                toggleBlinkingCursor(true);
+            }
+        }
+        else
+        {
+            // Setup and render the cursor after rending new screen.
+            if(m_sequence_parser->isCursorActive())
+            {
+                // Loop here to blink the cursor.
+                if (m_is_connected)
+                {                    
+                    // Setup Timer for Blinking Cursor
+                    // Initial State = On, then Switch to off in next loop.
+                    if(m_cursor_blink % 2 == 0)
+                    {
+                        m_ttime2 = SDL_GetTicks();
+                        if(m_start_blinking && (m_ttime2 - m_ttime) > 400)
+                        {
+                            m_renderer->renderCursorOffScreen();
+                            m_renderer->drawTextureScreen();
+                            --m_cursor_blink;
+                            m_ttime = SDL_GetTicks();
+                        }
+                    }
+                    else
+                    {
+                        m_ttime2 = SDL_GetTicks();
+                        if(m_start_blinking && (m_ttime2 - m_ttime) > 400)
+                        {
+                            m_renderer->renderCursorOnScreen();
+                            m_renderer->drawTextureScreen();
+                            ++m_cursor_blink;
+                            m_ttime = SDL_GetTicks();
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -557,7 +630,11 @@ public:
 
     bool                     m_is_connected;
     bool                     m_is_leaving;
-    bool                     m_received_data;
+
+    // Handle Blinking cursor
+    int                      m_cursor_blink;
+    bool                     m_start_blinking;
+    time_t                   m_ttime, m_ttime2;
 
     // Input Raw Data Buffer.
     std::vector<unsigned char> m_raw_data_vector;

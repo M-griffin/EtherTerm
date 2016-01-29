@@ -61,11 +61,6 @@ public:
     int numberOfSessions();
 
     /**
-     * @brief Toggles off the Blinking of the cursor while data is displayed.
-     */
-    void stopBlinkingCursor();
-
-    /**
      * @brief Update, Hits Session Updates for processing Data Queue.
      * @return
      */
@@ -85,12 +80,7 @@ public:
 
     // Detect anytime a system is removed, is so, we need to reset focus
     // To the first available window from the main thread!
-    bool m_is_system_disconnected;
-
-    // Handle Blinking cursor
-    int  m_cursor_blink;
-    bool m_start_blinking;
-    time_t m_ttime, m_ttime2;
+    bool m_is_system_disconnected;    
 
     // Queue of new connections to spawn.
     SafeQueue<system_connection_ptr> m_new_connections;
