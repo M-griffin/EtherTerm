@@ -4,21 +4,10 @@
 #include "surface_manager.hpp"
 #include "window_manager.hpp"
 
-#ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
+
 #ifdef _DEBBUG
 #include <SDL2/SDL_ttf.h>
-#endif
-#elif _WIN32
-#include <SDL2/SDL.h>
-#ifdef _DEBBUG
-#include <SDL_ttf.h>
-#endif
-#else
-#include <SDL2/SDL.h>
-#ifdef _DEBBUG
-#include <SDL2/SDL_ttf.h>
-#endif
 #endif
 
 #include <iostream>

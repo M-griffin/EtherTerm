@@ -1,13 +1,7 @@
 #ifndef SURFACE_HPP
 #define SURFACE_HPP
 
-#ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
-#elif _WIN32
-#include <SDL2/SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
 
 #include <iostream>
 #include <string>

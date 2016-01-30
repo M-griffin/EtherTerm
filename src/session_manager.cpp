@@ -67,18 +67,25 @@ void SessionManager::grabNewWindowFocus()
         return;
     }
 
-    // Move to the first window in the list and raise that
-    // Window for focus once the current windows closes.
-    auto it = m_sessions.begin();
-    if(it != m_sessions.end())
+    // Only reset focus if there are no active windows!
+    bool found_active_window = false;
+    for (auto it = m_sessions.begin(); it != m_sessions.end(); ++it)
     {
-        std::cout << "Changing Window Focus to WindowId: "
-                  << (*it)->m_window_manager->getWindowId()
-                  << std::endl;
-
-        (*it)->m_window_manager->grabWindow();
+        if ((*it)->m_window_manager->isActiveWindow())
+        {
+            found_active_window = true;
+        }
     }
 
+    // A Window closed, and there is no active window.
+    // Reset to first session as long as it exists.
+    if (!found_active_window && m_sessions.begin() != m_sessions.end())
+    {
+        std::cout << "No Active Window, resetting Focus to first available window" << std::endl;
+        auto session = m_sessions.begin();
+        (*session)->m_window_manager->grabWindow();
+    }
+  
     // Reset for next system detected.
     m_is_system_disconnected = false;
 }

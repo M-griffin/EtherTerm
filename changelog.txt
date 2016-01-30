@@ -1,4 +1,11 @@
 
+Change Log 3.0.40 - 2016-01-30
+    - Source Cleanup and Resync
+    - Fixed issues with background window/connection disconnecting
+      leaving the input for the active window hung.
+    - Reset to Active Window when closing down a 
+      session is now handled better.
+
 Change Log 3.0.39 - 2016-01-28
     - Cursor issue is now fixed and setup per session basis,
       Move out of the SessionManager.

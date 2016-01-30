@@ -112,7 +112,9 @@ void MenuManager::readinAnsi(std::string FileName, std::string &buff)
     {
         sequence = getc(fp);
         if(sequence != EOF)
+        {
             buff += (char)sequence;
+        }
     }
     while(sequence != EOF);
     fclose(fp);
@@ -265,7 +267,7 @@ std::vector<list_bar> MenuManager::buildDialList()
 
     // Process the Second Mid Ansi File
     path = getDirectoryPath();
-    path.append(m_menu_config.m_mid_ansi_2);   
+    path.append(m_menu_config.m_mid_ansi_2);
     if((inStream = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         std::cout << "Error Mid ANSI 2: " <<  path << std::endl;
@@ -935,7 +937,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 parseHeader(m_menu_config.m_ansi_filename);
                 m_link_list.drawVectorList(m_current_page, m_lightbar_position);
                 break;
-            }            
+            }
 
             case 'F': // HOME / Front of List
                 m_current_page = 0;

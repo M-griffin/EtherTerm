@@ -29,7 +29,6 @@ public:
     SequenceDecoder(session_ptr session);
     ~SequenceDecoder();
 
-
     /**
      * @brief Queue the Pasred Data back to the Session for Display
      * @return

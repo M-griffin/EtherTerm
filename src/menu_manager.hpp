@@ -80,7 +80,6 @@ public:
     std::vector<list_bar>         m_result;
     std::vector<SystemConnection> m_systemConnection;
 
-    // Methods
     /**
      * @brief Helper to append folder to path
      */

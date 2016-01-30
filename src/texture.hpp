@@ -49,15 +49,6 @@ public:
     }
 
     /**
-     * @brief Clear the Surface with all Black.
-     * @return
-     */
-    void clear()
-    {
-        //SDL_FillRect(m_surface, nullptr, SDL_MapRGBA(m_surface->format, 0, 0, 0, 0));
-    }
-
-    /**
      * @brief Make sure Surface is not null!
      * @return
      */

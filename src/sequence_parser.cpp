@@ -14,6 +14,7 @@
 SequenceParser::SequenceParser(renderer_ptr renderer, connection_ptr connection)
     : m_renderer(renderer)
     , m_connection(connection)
+    // Init Screen Buffer
     , m_screen_buffer(
         m_renderer->m_term_width,
         m_renderer->m_term_height
@@ -84,7 +85,7 @@ void SequenceParser::scrollScreenUp(bool render_bottom_row)
     m_renderer->renderScreen();       // Surface to Texture
     m_renderer->drawTextureScreen();  // Draw Texture to Screen
     m_renderer->scrollScreenUp();     // Scroll the surface up
-    m_screen_buffer.scrollScreenBuffer();    
+    m_screen_buffer.scrollScreenBuffer();
 }
 /**
  * @brief Handles parsing Text and formatting to the screen buffer
@@ -176,7 +177,7 @@ void SequenceParser::textInput(const std::string &buffer)
                 }
                 else
                 {
-                    scrollScreenUp(true);                    
+                    scrollScreenUp(true);
                 }
 
                 if(!m_renderer->m_is_scroll_region_active)
@@ -241,7 +242,7 @@ void SequenceParser::textInput(const std::string &buffer)
                 // Since nothing has been drawn yet before we scroll the screen.
                 if(m_is_cleared_the_screen)
                 {
-                    scrollScreenUp(false);                                     
+                    scrollScreenUp(false);
                     m_is_cleared_the_screen = false;
                 }
                 else
@@ -303,7 +304,9 @@ void SequenceParser::textInput(const std::string &buffer)
                     m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
                     // Reset to beginning of line.
                     if(m_screen_buffer.m_x_position > m_renderer->m_term_width)
+                       {
                         m_screen_buffer.m_x_position = 1;
+                    }
                 }
                 else if(m_screen_buffer.m_y_position > m_renderer->m_term_height)
                 {
@@ -326,13 +329,14 @@ void SequenceParser::textInput(const std::string &buffer)
 
                     // Reset to beginning of line.
                     if(m_screen_buffer.m_x_position > m_renderer->m_term_width)
+                       {
                         m_screen_buffer.m_x_position = 1;
+                    }
                     m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
                 }
                 else if(m_screen_buffer.m_y_position > m_renderer->m_term_height)
                 {
                     scrollScreenUp(true);
-
                     m_screen_buffer.m_y_position = m_renderer->m_term_height;
                 }
             }
@@ -597,7 +601,8 @@ void SequenceParser::sequenceCursorAndDisplay()
                     std::cout << std::endl << "Switched to CP437 Font" << std::endl;
 
                     m_renderer->m_surface_manager->setCurrentFont("vga8x16.bmp");
-                    if (m_renderer->m_surface_manager->didFontChange()) {
+                    if (m_renderer->m_surface_manager->didFontChange())
+                    {
                         m_renderer->m_surface_manager->loadBitmapFontImage();
                     }
                 }
@@ -608,7 +613,8 @@ void SequenceParser::sequenceCursorAndDisplay()
                 {
                     std::cout << std::endl << "Switched to Pot-Noodle Font" << std::endl;
                     m_renderer->m_surface_manager->setCurrentFont("potNoodle-8x16.bmp");
-                    if (m_renderer->m_surface_manager->didFontChange()) {
+                    if (m_renderer->m_surface_manager->didFontChange())
+                    {
                         m_renderer->m_surface_manager->loadBitmapFontImage();
                     }
                 }
@@ -619,7 +625,8 @@ void SequenceParser::sequenceCursorAndDisplay()
                 {
                     std::cout << std::endl << "Switched to mO'sOul Font" << std::endl;
                     m_renderer->m_surface_manager->setCurrentFont("mo'soul-8x16.bmp");
-                    if (m_renderer->m_surface_manager->didFontChange()) {
+                    if (m_renderer->m_surface_manager->didFontChange())
+                    {
                         m_renderer->m_surface_manager->loadBitmapFontImage();
                     }
                 }
@@ -630,7 +637,8 @@ void SequenceParser::sequenceCursorAndDisplay()
                 {
                     std::cout << std::endl << "Switched to Micro-Knight+ Font" << std::endl;
                     m_renderer->m_surface_manager->setCurrentFont("microKnightPlus-8x16.bmp");
-                    if (m_renderer->m_surface_manager->didFontChange()) {
+                    if (m_renderer->m_surface_manager->didFontChange())
+                    {
                         m_renderer->m_surface_manager->loadBitmapFontImage();
                     }
                 }
@@ -641,7 +649,8 @@ void SequenceParser::sequenceCursorAndDisplay()
                 {
                     std::cout << std::endl << "Switched to Topaz+ Font" << std::endl;
                     m_renderer->m_surface_manager->setCurrentFont("topazPlus-8x16.bmp");
-                    if (m_renderer->m_surface_manager->didFontChange()) {
+                    if (m_renderer->m_surface_manager->didFontChange())
+                    {
                         m_renderer->m_surface_manager->loadBitmapFontImage();
                     }
                 }
@@ -733,7 +742,6 @@ void SequenceParser::sequenceCursorAndDisplay()
                 //    m_screen_buffer.m_x_position,
                 //    m_screen_buffer.m_y_position
                 //);
-
                 m_renderer->renderClearLineScreen(
                     m_screen_buffer.m_y_position-1,
                     m_screen_buffer.m_x_position-1,
@@ -776,7 +784,7 @@ void SequenceParser::sequenceCursorAndDisplay()
 
 /**
  * @brief Handle Switching Modes and Colors
- */ 
+ */
 void SequenceParser::sequenceGraphicsModeDisplay()
 {
     // Switch on Sequence Terminator

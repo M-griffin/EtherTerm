@@ -62,7 +62,6 @@ public:
     }
 
     // Add Item to Queue.
-    //void enqueue(const T& t)
     void enqueue(T t)
     {
         std::lock_guard<std::mutex> lock(m);

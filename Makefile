@@ -6,3 +6,4 @@ All:
 clean:
 	@echo "----------Cleaning project:[ EtherTerm - Debug ]----------"
 	@"$(MAKE)" -f  "EtherTerm.mk" clean
+

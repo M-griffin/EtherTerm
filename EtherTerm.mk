@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=1/19/2016
+Date                   :=1/30/2016
 CodeLitePath           :="C:\Program Files (x86)\CodeLite"
 LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
@@ -52,8 +52,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:/Users/Blu
 AR       := C:/MinGW-5.1.0/mingw32/bin/ar.exe rcu
 CXX      := C:/MinGW-5.1.0/mingw32/bin/g++.exe
 CC       := C:/MinGW-5.1.0/mingw32/bin/gcc.exe
-CXXFLAGS :=  -g -O0 -pedantic -W -std=c++11 -Wall -Wno-deprecated -Wno-unused-local-typedefs -mmmx -msse -m3dnow -DWIN32 $(Preprocessors)
-CFLAGS   :=  -g -O0 -pedantic -W -std=c++11 -Wall -Wno-deprecated -Wno-unused-local-typedefs -mmmx -msse -m3dnow -DWIN32 $(Preprocessors)
+CXXFLAGS :=  -g -O0 -pedantic -W -std=c++11 -Wall -Wno-deprecated -Wno-unused-local-typedefs $(Preprocessors)
+CFLAGS   :=  -g -O0 -pedantic -W -std=c++11 -Wall -Wno-deprecated -Wno-unused-local-typedefs $(Preprocessors)
 ASFLAGS  := 
 AS       := C:/MinGW-5.1.0/mingw32/bin/as.exe
 

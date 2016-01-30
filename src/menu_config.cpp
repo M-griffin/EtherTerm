@@ -50,7 +50,6 @@ std::string MenuConfig::getDirectoryPath()
     return path;
 }
 
-
 /**
  * Start of Dial-directory INI Class
  */
@@ -206,7 +205,7 @@ void MenuConfig::ddirectory_check(std::string &cfgdata)
  * Read / Parse INI File
  */
 bool MenuConfig::ddirectory_parse(int index)
-{    
+{
     std::string path = getDirectoryPath();
     if (index == 0)
     {
@@ -251,4 +250,3 @@ bool MenuConfig::ddirectory_parse(int index)
     inStream.close();
     return true;
 }
-

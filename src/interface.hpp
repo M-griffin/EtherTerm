@@ -212,7 +212,7 @@ public:
         m_session_manager->join(new_session);
         std::cout << "New Connection Session pre-added to Session Manager" << std::endl;
 
-        // Start Cursor for new connection: (TESTING!)
+        // Start Blinking Cursor for Active connection session.
         new_session->m_sequence_parser->setCursorActive(true);
 
         // Start Async Connection
@@ -238,7 +238,7 @@ public:
                 }
                 m_session_manager->leave(new_session);
             }
-        });        
+        });
     }
 
     /**
@@ -262,7 +262,7 @@ public:
                     if((*it)->m_window_manager->getWindowId() == event.window.windowID)
                     {
                         // Pass the Events to the specific Session for Specific Window and Input Events.
-                        (*it)->m_input_handler->update(event);                        
+                        (*it)->m_input_handler->update(event);
                         return;
                     }
                 }

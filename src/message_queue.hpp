@@ -33,3 +33,4 @@ public:
 };
 
 #endif // MESSAGEQUEUE_HPP
+

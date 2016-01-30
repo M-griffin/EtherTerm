@@ -4,13 +4,7 @@
 #include "surface.hpp"
 #include "texture.hpp"
 
-#ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
-#elif _WIN32
-#include <SDL2/SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
 
 #include <iostream>
 #include <cmath>
@@ -58,7 +52,7 @@ public:
 
     // Handle to Current Window
     window_manager_weak_ptr  m_weak_window_manager;
-   
+
     std::string    m_programPath;
     std::string    m_currentFont;
     std::string    m_previousFont;

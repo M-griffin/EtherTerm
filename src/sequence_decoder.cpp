@@ -56,24 +56,24 @@ void SequenceDecoder::processSequenceLevel0()
             //ESC % G Select UTF-8 character set (ISO 2022).
         case '(':
             //ESC ( C
-            //C = U → CP437 Character Set. (Not shown on most! MF)
-            //C = 0 → DEC Special Character and Line Drawing Set.
-            //C = < → DEC Supplementary (VT200).
-            //C = % 5 → DEC Supplementary Graphics (VT300).
-            //C = > → DEC Technical (VT300).
-            //C = A → United Kingdom (UK).
-            //C = B → United States (USASCII).
-            //C = 4 → Dutch.
-            //C = C or 5 → Finnish.
-            //C = R or f → French.
-            //C = Q or 9 → French Canadian (VT200, VT300).
-            //C = K → German.
-            //C = Y → Italian.
-            //C = ` , E or 6 → Norwegian/Danish.
-            //C = % 6 → Portuguese (VT300).
-            //C = Z → Spanish.
-            //C = H or 7 → Swedish.
-            //C = = → Swiss.
+            //C = U ? CP437 Character Set. (Not shown on most! MF)
+            //C = 0 ? DEC Special Character and Line Drawing Set.
+            //C = < ? DEC Supplementary (VT200).
+            //C = % 5 ? DEC Supplementary Graphics (VT300).
+            //C = > ? DEC Technical (VT300).
+            //C = A ? United Kingdom (UK).
+            //C = B ? United States (USASCII).
+            //C = 4 ? Dutch.
+            //C = C or 5 ? Finnish.
+            //C = R or f ? French.
+            //C = Q or 9 ? French Canadian (VT200, VT300).
+            //C = K ? German.
+            //C = Y ? Italian.
+            //C = ` , E or 6 ? Norwegian/Danish.
+            //C = % 6 ? Portuguese (VT300).
+            //C = Z ? Spanish.
+            //C = H or 7 ? Swedish.
+            //C = = ? Swiss.
         case ')':
             //Designate G1 Character Set (ISO 2022, VT100).
             //The same character sets apply as for ESC ( C.
@@ -112,7 +112,7 @@ void SequenceDecoder::processSequenceLevel0()
         case '/':
             //ESC / C Designate G3 Character Set (VT300).
             //These work for 96-character sets only.
-            //C = A → ISO Latin-1 Supplemental.
+            //C = A ? ISO Latin-1 Supplemental.
         case '6':  // ESC 6 Back Index (DECBI), VT420 and up.
         case '7':  // ESC 7 Save Cursor (DECSC).
         case '8':  // ESC 8 Restore Cursor (DECRC).
@@ -190,15 +190,15 @@ void SequenceDecoder::processSequenceLevel1()
         case 'I': // Cursor Forward Tabulation P s tab stops (default = 1) (CHT).
         case 'J':
             // Erase in Display (ED). - DECSED has ESC[?J
-            //P s = 0 → Erase Below (default).
-            //P s = 1 → Erase Above.
-            //P s = 2 → Erase All.
-            //P s = 3 → Erase Saved Lines (xterm).
+            //P s = 0 ? Erase Below (default).
+            //P s = 1 ? Erase Above.
+            //P s = 2 ? Erase All.
+            //P s = 3 ? Erase Saved Lines (xterm).
         case 'K':
             // Erase in Line (EL). - DECSED has ESC[?K
-            //P s = 0 → Erase to Right (default).
-            //P s = 1 → Erase to Left.
-            //P s = 2 → Erase All.
+            //P s = 0 ? Erase to Right (default).
+            //P s = 1 ? Erase to Left.
+            //P s = 2 ? Erase All.
         case 'L': // Insert P s Line(s) (default = 1) (IL).
         case 'M': // Delete P s Line(s) (default = 1) (DL).
         case 'P': // Delete P s Character(s) (default = 1) (DCH).
@@ -212,227 +212,227 @@ void SequenceDecoder::processSequenceLevel1()
         case 'b': // Repeat the preceding graphic character P s times (REP).
         case 'c':
             // Send Device Attributes (Primary DA).
-            //P s = 0 or omitted → request attributes from terminal. The response depends on the decTerminalID resource setting.
-            //→  CSI ? 1 ; 2 c (‘‘VT100 with Advanced Video Option’’)
-            //→  CSI ? 1 ; 0 c (‘‘VT101 with No Options’’)
-            //→  CSI ? 6 c (‘‘VT102’’)
-            //→  CSI ? 6 2 ; P s c (‘‘VT220’’)
-            //→  CSI ? 6 3 ; P s c (‘‘VT320’’)
-            //→  CSI ? 6 4 ; P s c (‘‘VT420’’)
+            //P s = 0 or omitted ? request attributes from terminal. The response depends on the decTerminalID resource setting.
+            //?  CSI ? 1 ; 2 c (‘‘VT100 with Advanced Video Option’’)
+            //?  CSI ? 1 ; 0 c (‘‘VT101 with No Options’’)
+            //?  CSI ? 6 c (‘‘VT102’’)
+            //?  CSI ? 6 2 ; P s c (‘‘VT220’’)
+            //?  CSI ? 6 3 ; P s c (‘‘VT320’’)
+            //?  CSI ? 6 4 ; P s c (‘‘VT420’’)
             // The VT100-style response parameters do not mean anything by themselves. VT220 (and higher) parameters do, telling the host what features the terminal supports:
-            //P s = 1 → 132-columns.
-            //P s = 2 → Printer.
-            //P s = 3 → ReGIS graphics.
-            //P s = 4 → Sixel graphics.
-            //P s = 6 → Selective erase.
-            //P s = 8 → User-defined keys.
-            //P s = 9 → National Replacement Character sets.
-            //P s = 1 5 → Technical characters.
-            //P s = 1 8 → User windows.
-            //P s = 2 1 → Horizontal scrolling.
-            //P s = 2 2 → ANSI color, e.g., VT525.
-            //P s = 2 9 → ANSI text locator (i.e., DEC Locator mode).
+            //P s = 1 ? 132-columns.
+            //P s = 2 ? Printer.
+            //P s = 3 ? ReGIS graphics.
+            //P s = 4 ? Sixel graphics.
+            //P s = 6 ? Selective erase.
+            //P s = 8 ? User-defined keys.
+            //P s = 9 ? National Replacement Character sets.
+            //P s = 1 5 ? Technical characters.
+            //P s = 1 8 ? User windows.
+            //P s = 2 1 ? Horizontal scrolling.
+            //P s = 2 2 ? ANSI color, e.g., VT525.
+            //P s = 2 9 ? ANSI text locator (i.e., DEC Locator mode).
         case 'd': // Line Position Absolute [row] (default = [1,column]) (VPA).
         case 'e': // Line Position Relative [rows] (default = [row+1,column]) (VPR).
         case 'f': // equivalent to 'H'
         case 'g': // Tab Clear (TBC).
         case 'h':
             // Set Mode (SM).
-            //P s = 2 → Keyboard Action Mode (AM).
-            //P s = 4 → Insert Mode (IRM).
-            //P s = 1 2 → Send/receive (SRM).
-            //P s = 2 0 → Automatic Newline (LNM).
+            //P s = 2 ? Keyboard Action Mode (AM).
+            //P s = 4 ? Insert Mode (IRM).
+            //P s = 1 2 ? Send/receive (SRM).
+            //P s = 2 0 ? Automatic Newline (LNM).
 
             // DEC Private Mode Set (DECSET). ESC [ ? h
-            //P s = 1 → Application Cursor Keys (DECCKM).
-            //P s = 2 → Designate USASCII for character sets G0-G3 (DECANM), and set VT100 mode.
-            //P s = 3 → 132 Column Mode (DECCOLM).
-            //P s = 4 → Smooth (Slow) Scroll (DECSCLM).
-            //P s = 5 → Reverse Video (DECSCNM).
-            //P s = 6 → Origin Mode (DECOM).
-            //P s = 7 → Wraparound Mode (DECAWM).
-            //P s = 8 → Auto-repeat Keys (DECARM).
-            //P s = 9 → Send Mouse X & Y on button press. See the section Mouse Tracking. This is the X10 xterm mouse protocol.
-            //P s = 1 0 → Show toolbar (rxvt).
-            //P s = 1 2 → Start Blinking Cursor (att610).
-            //P s = 1 8 → Print form feed (DECPFF).
-            //P s = 1 9 → Set print extent to full screen (DECPEX).
-            //P s = 2 5 → Show Cursor (DECTCEM).
-            //P s = 3 0 → Show scrollbar (rxvt).
-            //P s = 3 5 → Enable font-shifting functions (rxvt).
-            //P s = 3 8 → Enter Tektronix Mode (DECTEK).
-            //P s = 4 0 → Allow 80 → 132 Mode.
-            //P s = 4 1 → more(1) fix (see curses resource).
-            //P s = 4 2 → Enable National Replacement Character sets (DECNRCM).
-            //P s = 4 4 → Turn On Margin Bell.
-            //P s = 4 5 → Reverse-wraparound Mode.
-            //P s = 4 6 → Start Logging. This is normally disabled by a compile-time option.
-            //P s = 4 7 → Use Alternate Screen Buffer. (This may be disabled by the titeInhibit resource).
-            //P s = 6 6 → Application keypad (DECNKM).
-            //P s = 6 7 → Backarrow key sends backspace (DECBKM).
-            //P s = 6 9 → Enable left and right margin mode (DECLRMM), VT420 and up.
-            //P s = 9 5 → Do not clear screen when DECCOLM is set/reset (DECNCSM), VT510 and up.
-            //P s = 1 0 0 0 → Send Mouse X & Y on button press and release. See the section Mouse Tracking. This is the X11 xterm mouse protocol.
-            //P s = 1 0 0 1 → Use Hilite Mouse Tracking.
-            //P s = 1 0 0 2 → Use Cell Motion Mouse Tracking.
-            //P s = 1 0 0 3 → Use All Motion Mouse Tracking.
-            //P s = 1 0 0 4 → Send FocusIn/FocusOut events.
-            //P s = 1 0 0 5 → Enable UTF-8 Mouse Mode.
-            //P s = 1 0 0 6 → Enable SGR Mouse Mode.
-            //P s = 1 0 0 7 → Enable Alternate Scroll Mode.
-            //P s = 1 0 1 0 → Scroll to bottom on tty output (rxvt).
-            //P s = 1 0 1 1 → Scroll to bottom on key press (rxvt).
-            //P s = 1 0 1 5 → Enable urxvt Mouse Mode.
-            //P s = 1 0 3 4 → Interpret "meta" key, sets eighth bit. (enables the eightBitInput resource).
-            //P s = 1 0 3 5 → Enable special modifiers for Alt and NumLock keys. (This enables the numLock resource).
-            //P s = 1 0 3 6 → Send ESC when Meta modifies a key. (This enables the metaSendsEscape resource).
-            //P s = 1 0 3 7 → Send DEL from the editing-keypad Delete key.
-            //P s = 1 0 3 9 → Send ESC when Alt modifies a key. (This enables the altSendsEscape resource).
-            //P s = 1 0 4 0 → Keep selection even if not highlighted. (This enables the keepSelection resource).
-            //P s = 1 0 4 1 → Use the CLIPBOARD selection. (This enables the selectToClipboard resource).
-            //P s = 1 0 4 2 → Enable Urgency window manager hint when Control-G is received. (This enables the bellIsUrgent resource).
-            //P s = 1 0 4 3 → Enable raising of the window when Control-G is received. (enables the popOnBell resource).
-            //P s = 1 0 4 7 → Use Alternate Screen Buffer. (This may be disabled by the titeInhibit resource).
-            //P s = 1 0 4 8 → Save cursor as in DECSC. (This may be disabled by the titeInhibit resource).
-            //P s = 1 0 4 9 → Save cursor as in DECSC and use Alternate Screen Buffer, clearing it first. (This may be disabled by the titeInhibit resource). This combines the effects of the 1 0 4 7 and 1 0 4 8 modes. Use this with terminfo-based applications rather than the 4 7 mode.
-            //P s = 1 0 5 0 → Set terminfo/termcap function-key mode.
-            //P s = 1 0 5 1 → Set Sun function-key mode.
-            //P s = 1 0 5 2 → Set HP function-key mode.
-            //P s = 1 0 5 3 → Set SCO function-key mode.
-            //P s = 1 0 6 0 → Set legacy keyboard emulation (X11R6).
-            //P s = 1 0 6 1 → Set VT220 keyboard emulation.
-            //P s = 2 0 0 4 → Set bracketed paste mode.
+            //P s = 1 ? Application Cursor Keys (DECCKM).
+            //P s = 2 ? Designate USASCII for character sets G0-G3 (DECANM), and set VT100 mode.
+            //P s = 3 ? 132 Column Mode (DECCOLM).
+            //P s = 4 ? Smooth (Slow) Scroll (DECSCLM).
+            //P s = 5 ? Reverse Video (DECSCNM).
+            //P s = 6 ? Origin Mode (DECOM).
+            //P s = 7 ? Wraparound Mode (DECAWM).
+            //P s = 8 ? Auto-repeat Keys (DECARM).
+            //P s = 9 ? Send Mouse X & Y on button press. See the section Mouse Tracking. This is the X10 xterm mouse protocol.
+            //P s = 1 0 ? Show toolbar (rxvt).
+            //P s = 1 2 ? Start Blinking Cursor (att610).
+            //P s = 1 8 ? Print form feed (DECPFF).
+            //P s = 1 9 ? Set print extent to full screen (DECPEX).
+            //P s = 2 5 ? Show Cursor (DECTCEM).
+            //P s = 3 0 ? Show scrollbar (rxvt).
+            //P s = 3 5 ? Enable font-shifting functions (rxvt).
+            //P s = 3 8 ? Enter Tektronix Mode (DECTEK).
+            //P s = 4 0 ? Allow 80 ? 132 Mode.
+            //P s = 4 1 ? more(1) fix (see curses resource).
+            //P s = 4 2 ? Enable National Replacement Character sets (DECNRCM).
+            //P s = 4 4 ? Turn On Margin Bell.
+            //P s = 4 5 ? Reverse-wraparound Mode.
+            //P s = 4 6 ? Start Logging. This is normally disabled by a compile-time option.
+            //P s = 4 7 ? Use Alternate Screen Buffer. (This may be disabled by the titeInhibit resource).
+            //P s = 6 6 ? Application keypad (DECNKM).
+            //P s = 6 7 ? Backarrow key sends backspace (DECBKM).
+            //P s = 6 9 ? Enable left and right margin mode (DECLRMM), VT420 and up.
+            //P s = 9 5 ? Do not clear screen when DECCOLM is set/reset (DECNCSM), VT510 and up.
+            //P s = 1 0 0 0 ? Send Mouse X & Y on button press and release. See the section Mouse Tracking. This is the X11 xterm mouse protocol.
+            //P s = 1 0 0 1 ? Use Hilite Mouse Tracking.
+            //P s = 1 0 0 2 ? Use Cell Motion Mouse Tracking.
+            //P s = 1 0 0 3 ? Use All Motion Mouse Tracking.
+            //P s = 1 0 0 4 ? Send FocusIn/FocusOut events.
+            //P s = 1 0 0 5 ? Enable UTF-8 Mouse Mode.
+            //P s = 1 0 0 6 ? Enable SGR Mouse Mode.
+            //P s = 1 0 0 7 ? Enable Alternate Scroll Mode.
+            //P s = 1 0 1 0 ? Scroll to bottom on tty output (rxvt).
+            //P s = 1 0 1 1 ? Scroll to bottom on key press (rxvt).
+            //P s = 1 0 1 5 ? Enable urxvt Mouse Mode.
+            //P s = 1 0 3 4 ? Interpret "meta" key, sets eighth bit. (enables the eightBitInput resource).
+            //P s = 1 0 3 5 ? Enable special modifiers for Alt and NumLock keys. (This enables the numLock resource).
+            //P s = 1 0 3 6 ? Send ESC when Meta modifies a key. (This enables the metaSendsEscape resource).
+            //P s = 1 0 3 7 ? Send DEL from the editing-keypad Delete key.
+            //P s = 1 0 3 9 ? Send ESC when Alt modifies a key. (This enables the altSendsEscape resource).
+            //P s = 1 0 4 0 ? Keep selection even if not highlighted. (This enables the keepSelection resource).
+            //P s = 1 0 4 1 ? Use the CLIPBOARD selection. (This enables the selectToClipboard resource).
+            //P s = 1 0 4 2 ? Enable Urgency window manager hint when Control-G is received. (This enables the bellIsUrgent resource).
+            //P s = 1 0 4 3 ? Enable raising of the window when Control-G is received. (enables the popOnBell resource).
+            //P s = 1 0 4 7 ? Use Alternate Screen Buffer. (This may be disabled by the titeInhibit resource).
+            //P s = 1 0 4 8 ? Save cursor as in DECSC. (This may be disabled by the titeInhibit resource).
+            //P s = 1 0 4 9 ? Save cursor as in DECSC and use Alternate Screen Buffer, clearing it first. (This may be disabled by the titeInhibit resource). This combines the effects of the 1 0 4 7 and 1 0 4 8 modes. Use this with terminfo-based applications rather than the 4 7 mode.
+            //P s = 1 0 5 0 ? Set terminfo/termcap function-key mode.
+            //P s = 1 0 5 1 ? Set Sun function-key mode.
+            //P s = 1 0 5 2 ? Set HP function-key mode.
+            //P s = 1 0 5 3 ? Set SCO function-key mode.
+            //P s = 1 0 6 0 ? Set legacy keyboard emulation (X11R6).
+            //P s = 1 0 6 1 ? Set VT220 keyboard emulation.
+            //P s = 2 0 0 4 ? Set bracketed paste mode.
         case 'i':
             // Media Copy (MC).  (DEC-specific) ESC [ ? i
-            //P s = 0 → Print screen (default).
-            //P s = 4 → Turn off printer controller mode.
-            //P s = 5 → Turn on printer controller mode.
+            //P s = 0 ? Print screen (default).
+            //P s = 4 ? Turn off printer controller mode.
+            //P s = 5 ? Turn on printer controller mode.
 
         case 'l':
             // Reset Mode (RM).
-            //P s = 2 → Keyboard Action Mode (AM).
-            //P s = 4 → Replace Mode (IRM).
-            //P s = 1 2 → Send/receive (SRM).
-            //P s = 2 0 → Normal Linefeed (LNM).
+            //P s = 2 ? Keyboard Action Mode (AM).
+            //P s = 4 ? Replace Mode (IRM).
+            //P s = 1 2 ? Send/receive (SRM).
+            //P s = 2 0 ? Normal Linefeed (LNM).
 
             // DEC Private Mode Reset (DECRST).
-            //P s = 1 → Normal Cursor Keys (DECCKM).
-            //P s = 2 → Designate VT52 mode (DECANM).
-            //P s = 3 → 80 Column Mode (DECCOLM).
-            //P s = 4 → Jump (Fast) Scroll (DECSCLM).
-            //P s = 5 → Normal Video (DECSCNM).
-            //P s = 6 → Normal Cursor Mode (DECOM).
-            //P s = 7 → No Wraparound Mode (DECAWM).
-            //P s = 8 → No Auto-repeat Keys (DECARM).
-            //P s = 9 → Don’t send Mouse X & Y on button press.
-            //P s = 1 0 → Hide toolbar (rxvt).
-            //P s = 1 2 → Stop Blinking Cursor (att610).
-            //P s = 1 8 → Don’t print form feed (DECPFF).
-            //P s = 1 9 → Limit print to scrolling region (DECPEX).
-            //P s = 2 5 → Hide Cursor (DECTCEM).
-            //P s = 3 0 → Don’t show scrollbar (rxvt).
-            //P s = 3 5 → Disable font-shifting functions (rxvt).
-            //P s = 4 0 → Disallow 80 → 132 Mode.
-            //P s = 4 1 → No more(1) fix (see curses resource).
-            //P s = 4 2 → Disable National Replacement Character sets (DECNRCM).
-            //P s = 4 4 → Turn Off Margin Bell.
-            //P s = 4 5 → No Reverse-wraparound Mode.
-            //P s = 4 6 → Stop Logging. (This is normally disabled by a compile-time option).
-            //P s = 4 7 → Use Normal Screen Buffer.
-            //P s = 6 6 → Numeric keypad (DECNKM).
-            //P s = 6 7 → Backarrow key sends delete (DECBKM).
-            //P s = 6 9 → Disable left and right margin mode (DECLRMM), VT420 and up.
-            //P s = 9 5 → Clear screen when DECCOLM is set/reset (DECNCSM), VT510 and up.
-            //P s = 1 0 0 0 → Don’t send Mouse X & Y on button press and release. See the section Mouse Tracking.
-            //P s = 1 0 0 1 → Don’t use Hilite Mouse Tracking.
-            //P s = 1 0 0 2 → Don’t use Cell Motion Mouse Tracking.
-            //P s = 1 0 0 3 → Don’t use All Motion Mouse Tracking.
-            //P s = 1 0 0 4 → Don’t send FocusIn/FocusOut events.
-            //P s = 1 0 0 5 → Disable UTF-8 Mouse Mode.
-            //P s = 1 0 0 6 → Disable SGR Mouse Mode.
-            //P s = 1 0 0 7 → Disable Alternate Scroll Mode.
-            //P s = 1 0 1 0 → Don’t scroll to bottom on tty output (rxvt).
-            //P s = 1 0 1 1 → Don’t scroll to bottom on key press (rxvt).
-            //P s = 1 0 1 5 → Disable urxvt Mouse Mode.
-            //P s = 1 0 3 4 → Don’t interpret "meta" key. (This disables the eightBitInput resource).
-            //P s = 1 0 3 5 → Disable special modifiers for Alt and NumLock keys. (This disables the numLock resource).
-            //P s = 1 0 3 6 → Don’t send ESC when Meta modifies a key. (This disables the metaSendsEscape resource).
-            //P s = 1 0 3 7 → Send VT220 Remove from the editing-keypad Delete key.
-            //P s = 1 0 3 9 → Don’t send ESC when Alt modifies a key. (This disables the altSendsEscape resource).
-            //P s = 1 0 4 0 → Do not keep selection when not highlighted. (This disables the keepSelection resource).
-            //P s = 1 0 4 1 → Use the PRIMARY selection. (This disables the selectToClipboard resource).
-            //P s = 1 0 4 2 → Disable Urgency window manager hint when Control-G is received. (This disables the bellIsUrgent resource).
-            //P s = 1 0 4 3 → Disable raising of the window when Control-G is received. (This disables the popOnBell resource).
-            //P s = 1 0 4 7 → Use Normal Screen Buffer, clearing screen first if in the Alternate Screen. (This may be disabled by the titeInhibit resource).
-            //P s = 1 0 4 8 → Restore cursor as in DECRC. (This may be disabled by the titeInhibit resource).
-            //P s = 1 0 4 9 → Use Normal Screen Buffer and restore cursor as in DECRC. (This may be disabled by the titeInhibit resource). This combines the effects of the 1 0 4 7 and 1 0 4 8 modes. Use this with terminfo-based applications rather than the 4 7 mode.
-            //P s = 1 0 5 0 → Reset terminfo/termcap function-key mode.
-            //P s = 1 0 5 1 → Reset Sun function-key mode.
-            //P s = 1 0 5 2 → Reset HP function-key mode.
-            //P s = 1 0 5 3 → Reset SCO function-key mode.
-            //P s = 1 0 6 0 → Reset legacy keyboard emulation (X11R6).
-            //P s = 1 0 6 1 → Reset keyboard emulation to Sun/PC style.
-            //P s = 2 0 0 4 → Reset bracketed paste mode.
+            //P s = 1 ? Normal Cursor Keys (DECCKM).
+            //P s = 2 ? Designate VT52 mode (DECANM).
+            //P s = 3 ? 80 Column Mode (DECCOLM).
+            //P s = 4 ? Jump (Fast) Scroll (DECSCLM).
+            //P s = 5 ? Normal Video (DECSCNM).
+            //P s = 6 ? Normal Cursor Mode (DECOM).
+            //P s = 7 ? No Wraparound Mode (DECAWM).
+            //P s = 8 ? No Auto-repeat Keys (DECARM).
+            //P s = 9 ? Don’t send Mouse X & Y on button press.
+            //P s = 1 0 ? Hide toolbar (rxvt).
+            //P s = 1 2 ? Stop Blinking Cursor (att610).
+            //P s = 1 8 ? Don’t print form feed (DECPFF).
+            //P s = 1 9 ? Limit print to scrolling region (DECPEX).
+            //P s = 2 5 ? Hide Cursor (DECTCEM).
+            //P s = 3 0 ? Don’t show scrollbar (rxvt).
+            //P s = 3 5 ? Disable font-shifting functions (rxvt).
+            //P s = 4 0 ? Disallow 80 ? 132 Mode.
+            //P s = 4 1 ? No more(1) fix (see curses resource).
+            //P s = 4 2 ? Disable National Replacement Character sets (DECNRCM).
+            //P s = 4 4 ? Turn Off Margin Bell.
+            //P s = 4 5 ? No Reverse-wraparound Mode.
+            //P s = 4 6 ? Stop Logging. (This is normally disabled by a compile-time option).
+            //P s = 4 7 ? Use Normal Screen Buffer.
+            //P s = 6 6 ? Numeric keypad (DECNKM).
+            //P s = 6 7 ? Backarrow key sends delete (DECBKM).
+            //P s = 6 9 ? Disable left and right margin mode (DECLRMM), VT420 and up.
+            //P s = 9 5 ? Clear screen when DECCOLM is set/reset (DECNCSM), VT510 and up.
+            //P s = 1 0 0 0 ? Don’t send Mouse X & Y on button press and release. See the section Mouse Tracking.
+            //P s = 1 0 0 1 ? Don’t use Hilite Mouse Tracking.
+            //P s = 1 0 0 2 ? Don’t use Cell Motion Mouse Tracking.
+            //P s = 1 0 0 3 ? Don’t use All Motion Mouse Tracking.
+            //P s = 1 0 0 4 ? Don’t send FocusIn/FocusOut events.
+            //P s = 1 0 0 5 ? Disable UTF-8 Mouse Mode.
+            //P s = 1 0 0 6 ? Disable SGR Mouse Mode.
+            //P s = 1 0 0 7 ? Disable Alternate Scroll Mode.
+            //P s = 1 0 1 0 ? Don’t scroll to bottom on tty output (rxvt).
+            //P s = 1 0 1 1 ? Don’t scroll to bottom on key press (rxvt).
+            //P s = 1 0 1 5 ? Disable urxvt Mouse Mode.
+            //P s = 1 0 3 4 ? Don’t interpret "meta" key. (This disables the eightBitInput resource).
+            //P s = 1 0 3 5 ? Disable special modifiers for Alt and NumLock keys. (This disables the numLock resource).
+            //P s = 1 0 3 6 ? Don’t send ESC when Meta modifies a key. (This disables the metaSendsEscape resource).
+            //P s = 1 0 3 7 ? Send VT220 Remove from the editing-keypad Delete key.
+            //P s = 1 0 3 9 ? Don’t send ESC when Alt modifies a key. (This disables the altSendsEscape resource).
+            //P s = 1 0 4 0 ? Do not keep selection when not highlighted. (This disables the keepSelection resource).
+            //P s = 1 0 4 1 ? Use the PRIMARY selection. (This disables the selectToClipboard resource).
+            //P s = 1 0 4 2 ? Disable Urgency window manager hint when Control-G is received. (This disables the bellIsUrgent resource).
+            //P s = 1 0 4 3 ? Disable raising of the window when Control-G is received. (This disables the popOnBell resource).
+            //P s = 1 0 4 7 ? Use Normal Screen Buffer, clearing screen first if in the Alternate Screen. (This may be disabled by the titeInhibit resource).
+            //P s = 1 0 4 8 ? Restore cursor as in DECRC. (This may be disabled by the titeInhibit resource).
+            //P s = 1 0 4 9 ? Use Normal Screen Buffer and restore cursor as in DECRC. (This may be disabled by the titeInhibit resource). This combines the effects of the 1 0 4 7 and 1 0 4 8 modes. Use this with terminfo-based applications rather than the 4 7 mode.
+            //P s = 1 0 5 0 ? Reset terminfo/termcap function-key mode.
+            //P s = 1 0 5 1 ? Reset Sun function-key mode.
+            //P s = 1 0 5 2 ? Reset HP function-key mode.
+            //P s = 1 0 5 3 ? Reset SCO function-key mode.
+            //P s = 1 0 6 0 ? Reset legacy keyboard emulation (X11R6).
+            //P s = 1 0 6 1 ? Reset keyboard emulation to Sun/PC style.
+            //P s = 2 0 0 4 ? Reset bracketed paste mode.
         case 'm':
             // Character Attributes (SGR).
 
-            //P s = 0 → Normal (default).
-            //P s = 1 → Bold.
-            //P s = 2 → Faint, decreased intensity (ISO 6429).
-            //P s = 3 → Italicized (ISO 6429).
-            //P s = 4 → Underlined.
-            //P s = 5 → Blink (appears as Bold).
-            //P s = 7 → Inverse.
-            //P s = 8 → Invisible, i.e., hidden (VT300).
-            //P s = 9 → Crossed-out characters (ISO 6429).
-            //P s = 2 1 → Doubly-underlined (ISO 6429).
-            //P s = 2 2 → Normal (neither bold nor faint).
-            //P s = 2 3 → Not italicized (ISO 6429).
-            //P s = 2 4 → Not underlined.
-            //P s = 2 5 → Steady (not blinking).
-            //P s = 2 7 → Positive (not inverse).
-            //P s = 2 8 → Visible, i.e., not hidden (VT300).
-            //P s = 2 9 → Not crossed-out (ISO 6429).
-            //P s = 3 0 → Set foreground color to Black.
-            //P s = 3 1 → Set foreground color to Red.
-            //P s = 3 2 → Set foreground color to Green.
-            //P s = 3 3 → Set foreground color to Yellow.
-            //P s = 3 4 → Set foreground color to Blue.
-            //P s = 3 5 → Set foreground color to Magenta.
-            //P s = 3 6 → Set foreground color to Cyan.
-            //P s = 3 7 → Set foreground color to White.
-            //P s = 3 9 → Set foreground color to default (original).
-            //P s = 4 0 → Set background color to Black.
-            //P s = 4 1 → Set background color to Red.
-            //P s = 4 2 → Set background color to Green.
-            //P s = 4 3 → Set background color to Yellow.
-            //P s = 4 4 → Set background color to Blue.
-            //P s = 4 5 → Set background color to Magenta.
-            //P s = 4 6 → Set background color to Cyan.
-            //P s = 4 7 → Set background color to White.
-            //P s = 4 9 → Set background color to default (original).
+            //P s = 0 ? Normal (default).
+            //P s = 1 ? Bold.
+            //P s = 2 ? Faint, decreased intensity (ISO 6429).
+            //P s = 3 ? Italicized (ISO 6429).
+            //P s = 4 ? Underlined.
+            //P s = 5 ? Blink (appears as Bold).
+            //P s = 7 ? Inverse.
+            //P s = 8 ? Invisible, i.e., hidden (VT300).
+            //P s = 9 ? Crossed-out characters (ISO 6429).
+            //P s = 2 1 ? Doubly-underlined (ISO 6429).
+            //P s = 2 2 ? Normal (neither bold nor faint).
+            //P s = 2 3 ? Not italicized (ISO 6429).
+            //P s = 2 4 ? Not underlined.
+            //P s = 2 5 ? Steady (not blinking).
+            //P s = 2 7 ? Positive (not inverse).
+            //P s = 2 8 ? Visible, i.e., not hidden (VT300).
+            //P s = 2 9 ? Not crossed-out (ISO 6429).
+            //P s = 3 0 ? Set foreground color to Black.
+            //P s = 3 1 ? Set foreground color to Red.
+            //P s = 3 2 ? Set foreground color to Green.
+            //P s = 3 3 ? Set foreground color to Yellow.
+            //P s = 3 4 ? Set foreground color to Blue.
+            //P s = 3 5 ? Set foreground color to Magenta.
+            //P s = 3 6 ? Set foreground color to Cyan.
+            //P s = 3 7 ? Set foreground color to White.
+            //P s = 3 9 ? Set foreground color to default (original).
+            //P s = 4 0 ? Set background color to Black.
+            //P s = 4 1 ? Set background color to Red.
+            //P s = 4 2 ? Set background color to Green.
+            //P s = 4 3 ? Set background color to Yellow.
+            //P s = 4 4 ? Set background color to Blue.
+            //P s = 4 5 ? Set background color to Magenta.
+            //P s = 4 6 ? Set background color to Cyan.
+            //P s = 4 7 ? Set background color to White.
+            //P s = 4 9 ? Set background color to default (original).
 
             // If 16-color support is compiled, the following apply. Assume that xterm’s resources are set so that the ISO color codes are the first 8 of a set of 16.
             // Then the aixterm colors are the bright versions of the ISO colors:
-            //P s = 9 0 → Set foreground color to Black.
-            //P s = 9 1 → Set foreground color to Red.
-            //P s = 9 2 → Set foreground color to Green.
-            //P s = 9 3 → Set foreground color to Yellow.
-            //P s = 9 4 → Set foreground color to Blue.
-            //P s = 9 5 → Set foreground color to Magenta.
-            //P s = 9 6 → Set foreground color to Cyan.
-            //P s = 9 7 → Set foreground color to White.
-            //P s = 1 0 0 → Set background color to Black.
-            //P s = 1 0 1 → Set background color to Red.
-            //P s = 1 0 2 → Set background color to Green.
-            //P s = 1 0 3 → Set background color to Yellow.
-            //P s = 1 0 4 → Set background color to Blue.
-            //P s = 1 0 5 → Set background color to Magenta.
-            //P s = 1 0 6 → Set background color to Cyan.
-            //P s = 1 0 7 → Set background color to White.
+            //P s = 9 0 ? Set foreground color to Black.
+            //P s = 9 1 ? Set foreground color to Red.
+            //P s = 9 2 ? Set foreground color to Green.
+            //P s = 9 3 ? Set foreground color to Yellow.
+            //P s = 9 4 ? Set foreground color to Blue.
+            //P s = 9 5 ? Set foreground color to Magenta.
+            //P s = 9 6 ? Set foreground color to Cyan.
+            //P s = 9 7 ? Set foreground color to White.
+            //P s = 1 0 0 ? Set background color to Black.
+            //P s = 1 0 1 ? Set background color to Red.
+            //P s = 1 0 2 ? Set background color to Green.
+            //P s = 1 0 3 ? Set background color to Yellow.
+            //P s = 1 0 4 ? Set background color to Blue.
+            //P s = 1 0 5 ? Set background color to Magenta.
+            //P s = 1 0 6 ? Set background color to Cyan.
+            //P s = 1 0 7 ? Set background color to White.
 
             // If xterm is compiled with the 16-color support disabled, it supports the following, from rxvt:
-            //P s = 1 0 0 → Set foreground and background color to default.
+            //P s = 1 0 0 ? Set foreground and background color to default.
             // Xterm maintains a color palette whose entries are identified by an index beginning with zero. If 88- or 256-color support is compiled, the following apply:
 
             //All parameters are decimal integers.
@@ -440,16 +440,16 @@ void SequenceDecoder::processSequenceLevel1()
             //ISO-8613-3 can be interpreted in more than one way; xterm allows the semicolons in this control to be replaced by colons (but after the first colon, colons must be used).
 
             // These ISO-8613-3 controls are supported:
-            //P s = 3 8 ; 2 ; P r ; P g ; P b → Set foreground color to the closest match in xterm’s palette for the given RGB P r /P g /P b .
-            //P s = 3 8 ; 5 ; P s → Set foreground color to the second P s .
-            //P s = 4 8 ; 2 ; P r ; P g ; P b → Set background color to the closest match in xterm’s palette for the given RGB P r /P g /P b .
-            //P s = 4 8 ; 5 ; P s → Set background color to the second P s .
+            //P s = 3 8 ; 2 ; P r ; P g ; P b ? Set foreground color to the closest match in xterm’s palette for the given RGB P r /P g /P b .
+            //P s = 3 8 ; 5 ; P s ? Set foreground color to the second P s .
+            //P s = 4 8 ; 2 ; P r ; P g ; P b ? Set background color to the closest match in xterm’s palette for the given RGB P r /P g /P b .
+            //P s = 4 8 ; 5 ; P s ? Set background color to the second P s .
 
         case 'n':
             // Device Status Report (DSR).
-            //P s = 5 → Status Report. Result (‘‘OK’’) is
+            //P s = 5 ? Status Report. Result (‘‘OK’’) is
             //CSI 0 n
-            //P s = 6 → Report Cursor Position (CPR) [row;column]. Result is
+            //P s = 6 ? Report Cursor Position (CPR) [row;column]. Result is
             //CSI r ; c R
 
             // Note: it is possible for this sequence to be sent by a function
@@ -462,13 +462,13 @@ void SequenceDecoder::processSequenceLevel1()
         case 'p':
         case 'q':
             // Load LEDs (DECLL).
-            //P s = 0 → Clear all LEDS (default).
-            //P s = 1 → Light Num Lock.
-            //P s = 2 → Light Caps Lock.
-            //P s = 3 → Light Scroll Lock.
-            //P s = 2 1 → Extinguish Num Lock.
-            //P s = 2 2 → Extinguish Caps Lock.
-            //P s = 2 3 → Extinguish Scroll Lock.
+            //P s = 0 ? Clear all LEDS (default).
+            //P s = 1 ? Light Num Lock.
+            //P s = 2 ? Light Caps Lock.
+            //P s = 3 ? Light Scroll Lock.
+            //P s = 2 1 ? Extinguish Num Lock.
+            //P s = 2 2 ? Extinguish Caps Lock.
+            //P s = 2 3 ? Extinguish Scroll Lock.
 
         case 'r':  // Set Scrolling Region [top;bottom] (default = full size of window) (DECSTBM).
         case 's':  // Save cursor position (ANSI.SYS), available only when DECLRMM is disabled.
@@ -480,13 +480,13 @@ void SequenceDecoder::processSequenceLevel1()
             // if P s is a "0" (default) or "1", and xterm is emulating VT100,
             // the control sequence elicits a response of the same form whose
             // parameters describe the terminal:
-            //P s → the given P s incremented by 2.
-            //P n = 1 ← no parity.
-            //P n = 1 ← eight bits.
-            //P n = 1 ← 2 8 transmit 38.4k baud.
-            //P n = 1 ← 2 8 receive 38.4k baud.
-            //P n = 1 ← clock multiplier.
-            //P n = 0 ← STP flags.
+            //P s ? the given P s incremented by 2.
+            //P n = 1 ? no parity.
+            //P n = 1 ? eight bits.
+            //P n = 1 ? 2 8 transmit 38.4k baud.
+            //P n = 1 ? 2 8 receive 38.4k baud.
+            //P n = 1 ? clock multiplier.
+            //P n = 0 ? STP flags.
         case '!':  // Soft terminal reset (DECSTR).
             // Valid Sequences Ended.
             m_is_sequence_completed = true;
@@ -576,170 +576,170 @@ void SequenceDecoder::processSequenceLevel2()
             // First we are catching DEC Style ESC[? Parameters here.
         case 'J':
             // Erase in Display (ED). - DECSED has ESC[?J
-            //P s = 0 → Erase Below (default).
-            //P s = 1 → Erase Above.
-            //P s = 2 → Erase All.
+            //P s = 0 ? Erase Below (default).
+            //P s = 1 ? Erase Above.
+            //P s = 2 ? Erase All.
         case 'K':
             // Erase in Line (EL). - DECSED has ESC[?K
-            //P s = 0 → Erase to Right (default).
-            //P s = 1 → Erase to Left.
-            //P s = 2 → Erase All.
+            //P s = 0 ? Erase to Right (default).
+            //P s = 1 ? Erase to Left.
+            //P s = 2 ? Erase All.
         case 'h':
             // DEC Private Mode Set (DECSET). ESC [ ? h
-            //P s = 1 → Application Cursor Keys (DECCKM).
-            //P s = 2 → Designate USASCII for character sets G0-G3 (DECANM), and set VT100 mode.
-            //P s = 3 → 132 Column Mode (DECCOLM).
-            //P s = 4 → Smooth (Slow) Scroll (DECSCLM).
-            //P s = 5 → Reverse Video (DECSCNM).
-            //P s = 6 → Origin Mode (DECOM).
-            //P s = 7 → Wraparound Mode (DECAWM).
-            //P s = 8 → Auto-repeat Keys (DECARM).
-            //P s = 9 → Send Mouse X & Y on button press. See the section Mouse Tracking. This is the X10 xterm mouse protocol.
-            //P s = 1 0 → Show toolbar (rxvt).
-            //P s = 1 2 → Start Blinking Cursor (att610).
-            //P s = 1 8 → Print form feed (DECPFF).
-            //P s = 1 9 → Set print extent to full screen (DECPEX).
-            //P s = 2 5 → Show Cursor (DECTCEM).
-            //P s = 3 0 → Show scrollbar (rxvt).
-            //P s = 3 5 → Enable font-shifting functions (rxvt).
-            //P s = 3 8 → Enter Tektronix Mode (DECTEK).
-            //P s = 4 0 → Allow 80 → 132 Mode.
-            //P s = 4 1 → more(1) fix (see curses resource).
-            //P s = 4 2 → Enable National Replacement Character sets (DECNRCM).
-            //P s = 4 4 → Turn On Margin Bell.
-            //P s = 4 5 → Reverse-wraparound Mode.
-            //P s = 4 6 → Start Logging. This is normally disabled by a compile-time option.
-            //P s = 4 7 → Use Alternate Screen Buffer. (This may be disabled by the titeInhibit resource).
-            //P s = 6 6 → Application keypad (DECNKM).
-            //P s = 6 7 → Backarrow key sends backspace (DECBKM).
-            //P s = 6 9 → Enable left and right margin mode (DECLRMM), VT420 and up.
-            //P s = 9 5 → Do not clear screen when DECCOLM is set/reset (DECNCSM), VT510 and up.
-            //P s = 1 0 0 0 → Send Mouse X & Y on button press and release. See the section Mouse Tracking. This is the X11 xterm mouse protocol.
-            //P s = 1 0 0 1 → Use Hilite Mouse Tracking.
-            //P s = 1 0 0 2 → Use Cell Motion Mouse Tracking.
-            //P s = 1 0 0 3 → Use All Motion Mouse Tracking.
-            //P s = 1 0 0 4 → Send FocusIn/FocusOut events.
-            //P s = 1 0 0 5 → Enable UTF-8 Mouse Mode.
-            //P s = 1 0 0 6 → Enable SGR Mouse Mode.
-            //P s = 1 0 0 7 → Enable Alternate Scroll Mode.
-            //P s = 1 0 1 0 → Scroll to bottom on tty output (rxvt).
-            //P s = 1 0 1 1 → Scroll to bottom on key press (rxvt).
-            //P s = 1 0 1 5 → Enable urxvt Mouse Mode.
-            //P s = 1 0 3 4 → Interpret "meta" key, sets eighth bit. (enables the eightBitInput resource).
-            //P s = 1 0 3 5 → Enable special modifiers for Alt and NumLock keys. (This enables the numLock resource).
-            //P s = 1 0 3 6 → Send ESC when Meta modifies a key. (This enables the metaSendsEscape resource).
-            //P s = 1 0 3 7 → Send DEL from the editing-keypad Delete key.
-            //P s = 1 0 3 9 → Send ESC when Alt modifies a key. (This enables the altSendsEscape resource).
-            //P s = 1 0 4 0 → Keep selection even if not highlighted. (This enables the keepSelection resource).
-            //P s = 1 0 4 1 → Use the CLIPBOARD selection. (This enables the selectToClipboard resource).
-            //P s = 1 0 4 2 → Enable Urgency window manager hint when Control-G is received. (This enables the bellIsUrgent resource).
-            //P s = 1 0 4 3 → Enable raising of the window when Control-G is received. (enables the popOnBell resource).
-            //P s = 1 0 4 7 → Use Alternate Screen Buffer. (This may be disabled by the titeInhibit resource).
-            //P s = 1 0 4 8 → Save cursor as in DECSC. (This may be disabled by the titeInhibit resource).
-            //P s = 1 0 4 9 → Save cursor as in DECSC and use Alternate Screen Buffer, clearing it first. (This may be disabled by the titeInhibit resource). This combines the effects of the 1 0 4 7 and 1 0 4 8 modes. Use this with terminfo-based applications rather than the 4 7 mode.
-            //P s = 1 0 5 0 → Set terminfo/termcap function-key mode.
-            //P s = 1 0 5 1 → Set Sun function-key mode.
-            //P s = 1 0 5 2 → Set HP function-key mode.
-            //P s = 1 0 5 3 → Set SCO function-key mode.
-            //P s = 1 0 6 0 → Set legacy keyboard emulation (X11R6).
-            //P s = 1 0 6 1 → Set VT220 keyboard emulation.
-            //P s = 2 0 0 4 → Set bracketed paste mode.
+            //P s = 1 ? Application Cursor Keys (DECCKM).
+            //P s = 2 ? Designate USASCII for character sets G0-G3 (DECANM), and set VT100 mode.
+            //P s = 3 ? 132 Column Mode (DECCOLM).
+            //P s = 4 ? Smooth (Slow) Scroll (DECSCLM).
+            //P s = 5 ? Reverse Video (DECSCNM).
+            //P s = 6 ? Origin Mode (DECOM).
+            //P s = 7 ? Wraparound Mode (DECAWM).
+            //P s = 8 ? Auto-repeat Keys (DECARM).
+            //P s = 9 ? Send Mouse X & Y on button press. See the section Mouse Tracking. This is the X10 xterm mouse protocol.
+            //P s = 1 0 ? Show toolbar (rxvt).
+            //P s = 1 2 ? Start Blinking Cursor (att610).
+            //P s = 1 8 ? Print form feed (DECPFF).
+            //P s = 1 9 ? Set print extent to full screen (DECPEX).
+            //P s = 2 5 ? Show Cursor (DECTCEM).
+            //P s = 3 0 ? Show scrollbar (rxvt).
+            //P s = 3 5 ? Enable font-shifting functions (rxvt).
+            //P s = 3 8 ? Enter Tektronix Mode (DECTEK).
+            //P s = 4 0 ? Allow 80 ? 132 Mode.
+            //P s = 4 1 ? more(1) fix (see curses resource).
+            //P s = 4 2 ? Enable National Replacement Character sets (DECNRCM).
+            //P s = 4 4 ? Turn On Margin Bell.
+            //P s = 4 5 ? Reverse-wraparound Mode.
+            //P s = 4 6 ? Start Logging. This is normally disabled by a compile-time option.
+            //P s = 4 7 ? Use Alternate Screen Buffer. (This may be disabled by the titeInhibit resource).
+            //P s = 6 6 ? Application keypad (DECNKM).
+            //P s = 6 7 ? Backarrow key sends backspace (DECBKM).
+            //P s = 6 9 ? Enable left and right margin mode (DECLRMM), VT420 and up.
+            //P s = 9 5 ? Do not clear screen when DECCOLM is set/reset (DECNCSM), VT510 and up.
+            //P s = 1 0 0 0 ? Send Mouse X & Y on button press and release. See the section Mouse Tracking. This is the X11 xterm mouse protocol.
+            //P s = 1 0 0 1 ? Use Hilite Mouse Tracking.
+            //P s = 1 0 0 2 ? Use Cell Motion Mouse Tracking.
+            //P s = 1 0 0 3 ? Use All Motion Mouse Tracking.
+            //P s = 1 0 0 4 ? Send FocusIn/FocusOut events.
+            //P s = 1 0 0 5 ? Enable UTF-8 Mouse Mode.
+            //P s = 1 0 0 6 ? Enable SGR Mouse Mode.
+            //P s = 1 0 0 7 ? Enable Alternate Scroll Mode.
+            //P s = 1 0 1 0 ? Scroll to bottom on tty output (rxvt).
+            //P s = 1 0 1 1 ? Scroll to bottom on key press (rxvt).
+            //P s = 1 0 1 5 ? Enable urxvt Mouse Mode.
+            //P s = 1 0 3 4 ? Interpret "meta" key, sets eighth bit. (enables the eightBitInput resource).
+            //P s = 1 0 3 5 ? Enable special modifiers for Alt and NumLock keys. (This enables the numLock resource).
+            //P s = 1 0 3 6 ? Send ESC when Meta modifies a key. (This enables the metaSendsEscape resource).
+            //P s = 1 0 3 7 ? Send DEL from the editing-keypad Delete key.
+            //P s = 1 0 3 9 ? Send ESC when Alt modifies a key. (This enables the altSendsEscape resource).
+            //P s = 1 0 4 0 ? Keep selection even if not highlighted. (This enables the keepSelection resource).
+            //P s = 1 0 4 1 ? Use the CLIPBOARD selection. (This enables the selectToClipboard resource).
+            //P s = 1 0 4 2 ? Enable Urgency window manager hint when Control-G is received. (This enables the bellIsUrgent resource).
+            //P s = 1 0 4 3 ? Enable raising of the window when Control-G is received. (enables the popOnBell resource).
+            //P s = 1 0 4 7 ? Use Alternate Screen Buffer. (This may be disabled by the titeInhibit resource).
+            //P s = 1 0 4 8 ? Save cursor as in DECSC. (This may be disabled by the titeInhibit resource).
+            //P s = 1 0 4 9 ? Save cursor as in DECSC and use Alternate Screen Buffer, clearing it first. (This may be disabled by the titeInhibit resource). This combines the effects of the 1 0 4 7 and 1 0 4 8 modes. Use this with terminfo-based applications rather than the 4 7 mode.
+            //P s = 1 0 5 0 ? Set terminfo/termcap function-key mode.
+            //P s = 1 0 5 1 ? Set Sun function-key mode.
+            //P s = 1 0 5 2 ? Set HP function-key mode.
+            //P s = 1 0 5 3 ? Set SCO function-key mode.
+            //P s = 1 0 6 0 ? Set legacy keyboard emulation (X11R6).
+            //P s = 1 0 6 1 ? Set VT220 keyboard emulation.
+            //P s = 2 0 0 4 ? Set bracketed paste mode.
         case 'i':
             // Media Copy (MC, DEC-specific).
-            //P s = 1 → Print line containing cursor.
-            //P s = 4 → Turn off autoprint mode.
-            //P s = 5 → Turn on autoprint mode.
-            //P s = 1 0 → Print composed display, ignores DECPEX.
-            //P s = 1 1 → Print all pages.
+            //P s = 1 ? Print line containing cursor.
+            //P s = 4 ? Turn off autoprint mode.
+            //P s = 5 ? Turn on autoprint mode.
+            //P s = 1 0 ? Print composed display, ignores DECPEX.
+            //P s = 1 1 ? Print all pages.
 
         case 'l':
             // DEC Private Mode Reset (DECRST).
-            //P s = 1 → Normal Cursor Keys (DECCKM).
-            //P s = 2 → Designate VT52 mode (DECANM).
-            //P s = 3 → 80 Column Mode (DECCOLM).
-            //P s = 4 → Jump (Fast) Scroll (DECSCLM).
-            //P s = 5 → Normal Video (DECSCNM).
-            //P s = 6 → Normal Cursor Mode (DECOM).
-            //P s = 7 → No Wraparound Mode (DECAWM).
-            //P s = 8 → No Auto-repeat Keys (DECARM).
-            //P s = 9 → Don’t send Mouse X & Y on button press.
-            //P s = 1 0 → Hide toolbar (rxvt).
-            //P s = 1 2 → Stop Blinking Cursor (att610).
-            //P s = 1 8 → Don’t print form feed (DECPFF).
-            //P s = 1 9 → Limit print to scrolling region (DECPEX).
-            //P s = 2 5 → Hide Cursor (DECTCEM).
-            //P s = 3 0 → Don’t show scrollbar (rxvt).
-            //P s = 3 5 → Disable font-shifting functions (rxvt).
-            //P s = 4 0 → Disallow 80 → 132 Mode.
-            //P s = 4 1 → No more(1) fix (see curses resource).
-            //P s = 4 2 → Disable National Replacement Character sets (DECNRCM).
-            //P s = 4 4 → Turn Off Margin Bell.
-            //P s = 4 5 → No Reverse-wraparound Mode.
-            //P s = 4 6 → Stop Logging. (This is normally disabled by a compile-time option).
-            //P s = 4 7 → Use Normal Screen Buffer.
-            //P s = 6 6 → Numeric keypad (DECNKM).
-            //P s = 6 7 → Backarrow key sends delete (DECBKM).
-            //P s = 6 9 → Disable left and right margin mode (DECLRMM), VT420 and up.
-            //P s = 9 5 → Clear screen when DECCOLM is set/reset (DECNCSM), VT510 and up.
-            //P s = 1 0 0 0 → Don’t send Mouse X & Y on button press and release. See the section Mouse Tracking.
-            //P s = 1 0 0 1 → Don’t use Hilite Mouse Tracking.
-            //P s = 1 0 0 2 → Don’t use Cell Motion Mouse Tracking.
-            //P s = 1 0 0 3 → Don’t use All Motion Mouse Tracking.
-            //P s = 1 0 0 4 → Don’t send FocusIn/FocusOut events.
-            //P s = 1 0 0 5 → Disable UTF-8 Mouse Mode.
-            //P s = 1 0 0 6 → Disable SGR Mouse Mode.
-            //P s = 1 0 0 7 → Disable Alternate Scroll Mode.
-            //P s = 1 0 1 0 → Don’t scroll to bottom on tty output (rxvt).
-            //P s = 1 0 1 1 → Don’t scroll to bottom on key press (rxvt).
-            //P s = 1 0 1 5 → Disable urxvt Mouse Mode.
-            //P s = 1 0 3 4 → Don’t interpret "meta" key. (This disables the eightBitInput resource).
-            //P s = 1 0 3 5 → Disable special modifiers for Alt and NumLock keys. (This disables the numLock resource).
-            //P s = 1 0 3 6 → Don’t send ESC when Meta modifies a key. (This disables the metaSendsEscape resource).
-            //P s = 1 0 3 7 → Send VT220 Remove from the editing-keypad Delete key.
-            //P s = 1 0 3 9 → Don’t send ESC when Alt modifies a key. (This disables the altSendsEscape resource).
-            //P s = 1 0 4 0 → Do not keep selection when not highlighted. (This disables the keepSelection resource).
-            //P s = 1 0 4 1 → Use the PRIMARY selection. (This disables the selectToClipboard resource).
-            //P s = 1 0 4 2 → Disable Urgency window manager hint when Control-G is received. (This disables the bellIsUrgent resource).
-            //P s = 1 0 4 3 → Disable raising of the window when Control-G is received. (This disables the popOnBell resource).
-            //P s = 1 0 4 7 → Use Normal Screen Buffer, clearing screen first if in the Alternate Screen. (This may be disabled by the titeInhibit resource).
-            //P s = 1 0 4 8 → Restore cursor as in DECRC. (This may be disabled by the titeInhibit resource).
-            //P s = 1 0 4 9 → Use Normal Screen Buffer and restore cursor as in DECRC. (This may be disabled by the titeInhibit resource). This combines the effects of the 1 0 4 7 and 1 0 4 8 modes. Use this with terminfo-based applications rather than the 4 7 mode.
-            //P s = 1 0 5 0 → Reset terminfo/termcap function-key mode.
-            //P s = 1 0 5 1 → Reset Sun function-key mode.
-            //P s = 1 0 5 2 → Reset HP function-key mode.
-            //P s = 1 0 5 3 → Reset SCO function-key mode.
-            //P s = 1 0 6 0 → Reset legacy keyboard emulation (X11R6).
-            //P s = 1 0 6 1 → Reset keyboard emulation to Sun/PC style.
-            //P s = 2 0 0 4 → Reset bracketed paste mode.
+            //P s = 1 ? Normal Cursor Keys (DECCKM).
+            //P s = 2 ? Designate VT52 mode (DECANM).
+            //P s = 3 ? 80 Column Mode (DECCOLM).
+            //P s = 4 ? Jump (Fast) Scroll (DECSCLM).
+            //P s = 5 ? Normal Video (DECSCNM).
+            //P s = 6 ? Normal Cursor Mode (DECOM).
+            //P s = 7 ? No Wraparound Mode (DECAWM).
+            //P s = 8 ? No Auto-repeat Keys (DECARM).
+            //P s = 9 ? Don’t send Mouse X & Y on button press.
+            //P s = 1 0 ? Hide toolbar (rxvt).
+            //P s = 1 2 ? Stop Blinking Cursor (att610).
+            //P s = 1 8 ? Don’t print form feed (DECPFF).
+            //P s = 1 9 ? Limit print to scrolling region (DECPEX).
+            //P s = 2 5 ? Hide Cursor (DECTCEM).
+            //P s = 3 0 ? Don’t show scrollbar (rxvt).
+            //P s = 3 5 ? Disable font-shifting functions (rxvt).
+            //P s = 4 0 ? Disallow 80 ? 132 Mode.
+            //P s = 4 1 ? No more(1) fix (see curses resource).
+            //P s = 4 2 ? Disable National Replacement Character sets (DECNRCM).
+            //P s = 4 4 ? Turn Off Margin Bell.
+            //P s = 4 5 ? No Reverse-wraparound Mode.
+            //P s = 4 6 ? Stop Logging. (This is normally disabled by a compile-time option).
+            //P s = 4 7 ? Use Normal Screen Buffer.
+            //P s = 6 6 ? Numeric keypad (DECNKM).
+            //P s = 6 7 ? Backarrow key sends delete (DECBKM).
+            //P s = 6 9 ? Disable left and right margin mode (DECLRMM), VT420 and up.
+            //P s = 9 5 ? Clear screen when DECCOLM is set/reset (DECNCSM), VT510 and up.
+            //P s = 1 0 0 0 ? Don’t send Mouse X & Y on button press and release. See the section Mouse Tracking.
+            //P s = 1 0 0 1 ? Don’t use Hilite Mouse Tracking.
+            //P s = 1 0 0 2 ? Don’t use Cell Motion Mouse Tracking.
+            //P s = 1 0 0 3 ? Don’t use All Motion Mouse Tracking.
+            //P s = 1 0 0 4 ? Don’t send FocusIn/FocusOut events.
+            //P s = 1 0 0 5 ? Disable UTF-8 Mouse Mode.
+            //P s = 1 0 0 6 ? Disable SGR Mouse Mode.
+            //P s = 1 0 0 7 ? Disable Alternate Scroll Mode.
+            //P s = 1 0 1 0 ? Don’t scroll to bottom on tty output (rxvt).
+            //P s = 1 0 1 1 ? Don’t scroll to bottom on key press (rxvt).
+            //P s = 1 0 1 5 ? Disable urxvt Mouse Mode.
+            //P s = 1 0 3 4 ? Don’t interpret "meta" key. (This disables the eightBitInput resource).
+            //P s = 1 0 3 5 ? Disable special modifiers for Alt and NumLock keys. (This disables the numLock resource).
+            //P s = 1 0 3 6 ? Don’t send ESC when Meta modifies a key. (This disables the metaSendsEscape resource).
+            //P s = 1 0 3 7 ? Send VT220 Remove from the editing-keypad Delete key.
+            //P s = 1 0 3 9 ? Don’t send ESC when Alt modifies a key. (This disables the altSendsEscape resource).
+            //P s = 1 0 4 0 ? Do not keep selection when not highlighted. (This disables the keepSelection resource).
+            //P s = 1 0 4 1 ? Use the PRIMARY selection. (This disables the selectToClipboard resource).
+            //P s = 1 0 4 2 ? Disable Urgency window manager hint when Control-G is received. (This disables the bellIsUrgent resource).
+            //P s = 1 0 4 3 ? Disable raising of the window when Control-G is received. (This disables the popOnBell resource).
+            //P s = 1 0 4 7 ? Use Normal Screen Buffer, clearing screen first if in the Alternate Screen. (This may be disabled by the titeInhibit resource).
+            //P s = 1 0 4 8 ? Restore cursor as in DECRC. (This may be disabled by the titeInhibit resource).
+            //P s = 1 0 4 9 ? Use Normal Screen Buffer and restore cursor as in DECRC. (This may be disabled by the titeInhibit resource). This combines the effects of the 1 0 4 7 and 1 0 4 8 modes. Use this with terminfo-based applications rather than the 4 7 mode.
+            //P s = 1 0 5 0 ? Reset terminfo/termcap function-key mode.
+            //P s = 1 0 5 1 ? Reset Sun function-key mode.
+            //P s = 1 0 5 2 ? Reset HP function-key mode.
+            //P s = 1 0 5 3 ? Reset SCO function-key mode.
+            //P s = 1 0 6 0 ? Reset legacy keyboard emulation (X11R6).
+            //P s = 1 0 6 1 ? Reset keyboard emulation to Sun/PC style.
+            //P s = 2 0 0 4 ? Reset bracketed paste mode.
 
         case 'n':
             // Device Status Report (DSR, DEC-specific).
-            //P s = 6 → Report Cursor Position (DECXCPR) [row;column] as CSI ? r ; c R (assumes the default page, i.e., "1").
-            //P s = 1 5 → Report Printer status as CSI ? 1 0 n (ready). or CSI ? 1 1 n (not ready).
-            //P s = 2 5 → Report UDK status as CSI ? 2 0 n (unlocked) or CSI ? 2 1 n (locked).
-            //P s = 2 6 → Report Keyboard status as
+            //P s = 6 ? Report Cursor Position (DECXCPR) [row;column] as CSI ? r ; c R (assumes the default page, i.e., "1").
+            //P s = 1 5 ? Report Printer status as CSI ? 1 0 n (ready). or CSI ? 1 1 n (not ready).
+            //P s = 2 5 ? Report UDK status as CSI ? 2 0 n (unlocked) or CSI ? 2 1 n (locked).
+            //P s = 2 6 ? Report Keyboard status as
             //CSI ? 2 7 ; 1 ; 0 ; 0 n (North American).
             //The last two parameters apply to VT400 & up, and denote keyboard ready and LK01 respectively.
-            //P s = 5 3 → Report Locator status as CSI ? 5 3 n Locator available, if compiled-in, or CSI ? 5 0 n No Locator, if not.
-            //P s = 5 5 → Report Locator status as CSI ? 5 3 n Locator available, if compiled-in, or CSI ? 5 0 n No Locator, if not.
-            //P s = 5 6 → Report Locator type as CSI ? 5 7 ; 1 n Mouse, if compiled-in, or CSI ? 5 7 ; 0 n Cannot identify, if not.
-            //P s = 6 2 → Report macro space (DECMSR) as CSI P n \* {
-            //P s = 6 3 → Report memory checksum (DECCKSR) as DCS P t ! x x x x ST
+            //P s = 5 3 ? Report Locator status as CSI ? 5 3 n Locator available, if compiled-in, or CSI ? 5 0 n No Locator, if not.
+            //P s = 5 5 ? Report Locator status as CSI ? 5 3 n Locator available, if compiled-in, or CSI ? 5 0 n No Locator, if not.
+            //P s = 5 6 ? Report Locator type as CSI ? 5 7 ; 1 n Mouse, if compiled-in, or CSI ? 5 7 ; 0 n Cannot identify, if not.
+            //P s = 6 2 ? Report macro space (DECMSR) as CSI P n \* {
+            //P s = 6 3 ? Report memory checksum (DECCKSR) as DCS P t ! x x x x ST
             //P t is the request id (from an optional parameter to the request).
             //The x’s are hexadecimal digits 0-9 and A-F.
-            //P s = 7 5 → Report data integrity as CSI ? 7 0 n (ready, no errors)
-            //P s = 8 5 → Report multi-session configuration as CSI ? 8 3 n (not configured for multiple-session operation).
+            //P s = 7 5 ? Report data integrity as CSI ? 7 0 n (ready, no errors)
+            //P s = 8 5 ? Report multi-session configuration as CSI ? 8 3 n (not configured for multiple-session operation).
 
         case 'p':
         case 'q':
             // Load LEDs (DECLL).
-            //P s = 0 → Clear all LEDS (default).
-            //P s = 1 → Light Num Lock.
-            //P s = 2 → Light Caps Lock.
-            //P s = 3 → Light Scroll Lock.
-            //P s = 2 1 → Extinguish Num Lock.
-            //P s = 2 2 → Extinguish Caps Lock.
-            //P s = 2 3 → Extinguish Scroll Lock.
+            //P s = 0 ? Clear all LEDS (default).
+            //P s = 1 ? Light Num Lock.
+            //P s = 2 ? Light Caps Lock.
+            //P s = 3 ? Light Scroll Lock.
+            //P s = 2 1 ? Extinguish Num Lock.
+            //P s = 2 2 ? Extinguish Caps Lock.
+            //P s = 2 3 ? Extinguish Scroll Lock.
 
         case 'r':  // Restore DEC Private Mode Values. The value of P s previously saved is restored. P s values are the same as for DECSET.
         case 's':  // Save DEC Private Mode Values. P s values are the same as for DECSET.
@@ -1164,7 +1164,9 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                     processSequenceLevel0();
                     // Move to next Level if valid.
                     if(!m_is_invalid_sequence)
+                    {
                         ++m_sequence_level;
+                    }
                     break;
 
                 case 1: // Process second char after ESC [ 'c'
@@ -1293,7 +1295,9 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
 
                     // Queue the Data back to the Session
                     if (!sessionQueue())
+                    {
                         return;
+                    }
 
                     std::vector<int>().swap(m_sequence_params); // Clear for next run.
                     m_sequence_state = SEQ_NORMAL; // Reset The State
@@ -1327,8 +1331,9 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
 
         // Queue the Data back to the Session
         if (!sessionQueue())
+        {
             return;
-
+        }
         m_valid_output_data.erase();
     }
 }

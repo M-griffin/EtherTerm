@@ -72,3 +72,4 @@ public:
 typedef boost::shared_ptr<tcp_connection> connection_ptr;
 
 #endif // TCP_CONNECTION_HPP
+

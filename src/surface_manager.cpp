@@ -1,15 +1,8 @@
 #include "surface_manager.hpp"
 #include "window_manager.hpp"
 
-#ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
-#elif _WIN32
-#include <SDL2/SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
 
-// Temp, replace with boost later on.
 #include "tinyxml.hpp"
 
 #include <iostream>
@@ -42,7 +35,7 @@ SurfaceManager::SurfaceManager(window_manager_ptr window_manager, std::string pr
     , m_characterWidth(8)
     , m_characterHeight(16)
 {
-    std::cout << "SurfaceManager Created!" << std::endl;    
+    std::cout << "SurfaceManager Created!" << std::endl;
 }
 
 SurfaceManager::~SurfaceManager()

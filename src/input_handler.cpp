@@ -20,13 +20,12 @@ InputHandler::InputHandler(surface_manager_ptr surface_manager, session_ptr sess
     , m_keyMap("ANSI")
 {
     std::cout << "InputHandler Created" << std::endl;
-    SDL_StartTextInput();
 
     // Setup default keymapping, grab from session
     session_ptr weak_session = m_weak_session.lock();
-    if (weak_session)
+    if(weak_session)
     {
-        if (weak_session->m_system_connection)
+        if(weak_session->m_system_connection)
         {
             // System Connection is populated from DialDirectory.XML File for each system
             m_keyMap = weak_session->m_system_connection->keyMap;
@@ -36,10 +35,19 @@ InputHandler::InputHandler(surface_manager_ptr surface_manager, session_ptr sess
 
 InputHandler::~InputHandler()
 {
-    SDL_StopTextInput();
+    //SDL_StopTextInput();
     std::cout << "~InputHandler" << std::endl;
 }
 
+
+/**
+ * @brief Used to Restart the SDL_GetText Event on changeing focus.
+ */
+void InputHandler::resetTextInput()
+{
+    SDL_StopTextInput();
+    SDL_StartTextInput();
+}
 
 // case SDL_WINDOWEVENT:
 void InputHandler::handleWindowEvents(SDL_Event &event)
@@ -62,18 +70,18 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_EXPOSED:
-        /*
-        {
-            SDL_Log("Window %d exposed", event.window.windowID);
-            session_ptr session = m_weak_session.lock();
-            if(session)
+            /*
             {
-                session->m_renderer->renderScreen();
-                session->m_renderer->drawTextureScreen();
+                SDL_Log("Window %d exposed", event.window.windowID);
+                session_ptr session = m_weak_session.lock();
+                if(session)
+                {
+                    session->m_renderer->renderScreen();
+                    session->m_renderer->drawTextureScreen();
+                }
+                break;
             }
-            break;
-        }
-        */
+            */
             break;
         case SDL_WINDOWEVENT_MOVED:
             /*
@@ -131,7 +139,7 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
         case SDL_WINDOWEVENT_CLOSE:
             {
                 SDL_Log("Window %d closed received by user!", event.window.windowID);
-                if (!m_globalShutdown)
+                if(!m_globalShutdown)
                 {
                     m_globalShutdown = true;
                     session_ptr session = m_weak_session.lock();
@@ -152,15 +160,36 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_FOCUS_GAINED:
-            //SDL_Log("Window %d gained keyboard focus",
-            //event.window.windowID);
-            break;
+            {
+                SDL_Log("Window %d gained keyboard focus",
+                        event.window.windowID);
 
+                if(!m_globalShutdown)
+                    SDL_StartTextInput();
+
+                // Mark the current window as active.
+                session_ptr session = m_weak_session.lock();
+                if(session)
+                {
+                    session->m_window_manager->setActiveWindow(true);
+                }
+                break;
+            }
         case SDL_WINDOWEVENT_FOCUS_LOST:
-            //SDL_Log("Window %d lost keyboard focus",
-            //event.window.windowID);
-            break;
+            {
+                SDL_Log("Window %d lost keyboard focus",
+                        event.window.windowID);
 
+                if(!m_globalShutdown)
+                    SDL_StopTextInput();
+                // Mark the current window as inactive.
+                session_ptr session = m_weak_session.lock();
+                if(session)
+                {
+                    session->m_window_manager->setActiveWindow(false);
+                }
+                break;
+            }
         default:
             //SDL_Log("Window %d got unknown event %d",
             //event.window.windowID, event.window.event);
@@ -1105,7 +1134,7 @@ bool InputHandler::handleSCOKeyMapFunctionKeys(SDL_Event &event)
  */
 bool InputHandler::handleKeyDownEvents(SDL_Event &event)
 {
-    
+
     // Handle Shift + CTRL + _
     if(event.key.keysym.mod & KMOD_SHIFT &&
             event.key.keysym.mod & KMOD_CTRL)
@@ -1163,15 +1192,15 @@ bool InputHandler::handleKeyDownEvents(SDL_Event &event)
  */
 bool InputHandler::update(SDL_Event &event)
 {
-    if (m_globalShutdown)
+    if(m_globalShutdown)
     {
         return false;
     }
 
     switch(event.type)
     {
-        //case SDL_QUIT:
-        //    return false;
+            //case SDL_QUIT:
+            //    return false;
 
         case SDL_WINDOWEVENT:
             handleWindowEvents(event);

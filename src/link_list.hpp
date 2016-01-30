@@ -28,7 +28,7 @@ typedef struct list_bar
 class LinkList
 {
 
-public:    
+public:
 
     int m_current_row;
     int m_top_margin;

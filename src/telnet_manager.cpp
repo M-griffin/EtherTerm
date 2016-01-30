@@ -39,7 +39,7 @@ TelnetManager::~TelnetManager()
  * @return
  */
 std::string TelnetManager::parseIncomingData(const std::vector<unsigned char> &msg_buffer)
-{    
+{
     std::string output;
     unsigned char ch = 0;
 
@@ -58,9 +58,6 @@ std::string TelnetManager::parseIncomingData(const std::vector<unsigned char> &m
     // Loop through data for IAC Telnet Commands (Unsigned Characters)
     for (auto c : msg_buffer)
     {
-        //c = static_cast<unsigned char>(msg_buffer[i]);
-        //c = msg_buffer[i];
-
         // for debugging server output, mainly esc sequence
         // and output that might mess up screens when needed.
 #ifdef _DEBUG
@@ -109,200 +106,6 @@ std::string TelnetManager::parseIncomingData(const std::vector<unsigned char> &m
     output.erase();
     return "";
 }
-
-/*
- * Handles User Input.
- *
-void TelnetManager::update()
-{
-    //std::cout << "TelnetState::update()" << std::endl;
-    int ret = 0;
-    // Keeps a count of how many loops we run with no server data, if were waiting
-    // For input, add a slight Delay in the loop so were not hogging CPU Usage.
-    // reset the count when we get data or type input.
-    static int inputCount = 0;
-    if(m_isShutdown || TheInputHandler::Instance()->isGlobalShutdown())
-    {
-        std::cout << "TelnetState::shutdown - changeState(new MainMenuState()" << std::endl;
-        TheStateMachine::Instance()->changeState(new MainMenuState());
-        m_isShutdown = false;
-        return;
-    }
-
-    // Handles User Input and Window Events.
-    if(TheInputHandler::Instance()->update())
-    {
-        inputCount = 0;  // reset counter.
-        if (TheInputHandler::Instance()->getInputSequence(inputSequence))
-        {
-            if(TheSocketHandler::Instance()->isActive())
-            {
-                ret = TheSocketHandler::Instance()->send((unsigned char *)inputSequence.c_str(), (int)inputSequence.size());
-                // Check return value later on on, not used at the moment.
-                // Server is not echoing input back to us, we need to do it ourselves.
-                // Jump into LINE MODE Editing here.
-
-                if(m_isECHOCompleted)
-                {
-                    TheSequenceManager::Instance()->decode(inputSequence);
-                }
-            }
-            else
-            {
-                std::cout << "ERROR !TheSocketHandler::Instance()->isActive()" << std::endl;
-                m_isShutdown = true;
-            }
-        }
-    }
-
-    // Polling the Socket for Connection Status and Data, -1 on lost connection
-    // 0 = No Data, and -1 = Dead Connection
-    if(TheSocketHandler::Instance()->isActive())
-    {
-        // Poll the Socket for Incoming Data from Server.
-        ret = TheSocketHandler::Instance()->update();
-        switch(ret)
-        {
-            case 0:
-                // No Data Waiting from Server, Return
-                if(inputCount % 3 == 0)
-                {
-                    // If we loop 3 times with no data, add input delay
-                    // To Save CPU Usage.
-                    SDL_Delay(10);
-                }
-                else
-                    ++inputCount;
-                break;
-            case -1:
-                // Lost connection, return to mainMenu. Maybe Prompt or freeze?
-                inputCount = 0;
-                m_isShutdown = true;
-                break;
-            default:
-                // received data, process it.
-                inputCount = 0;
-                handleSession();
-                break;
-        }
-    }
-    else
-    {
-        std::cout << "ERROR TelnetState::update() >isActive()" << std::endl;
-        m_isShutdown = true;
-    }
-}
-*/
-
-/*
-bool TelnetManager::onEnter()
-{
-    std::cout << "entering TelnetState\n";
-    m_isShutdown = false;
-
-    // initialize SDL_net
-    if(SDLNet_Init() < 0)
-    {
-        SDL_Log(
-            "Terminal::init() SDLNet_Init: %s",
-            SDL_GetError());
-        return false;
-    }
-
-    std::cout << "SDLNet_Init success" << std::endl;
-
-    //char host[255]= {"entropybbs.co.nz"};
-    //char host[255]= {"montereybbs.ath.cx"};
-    //char host[255]= {"1984.ws"};
-    //char host[255]= {"clutch.darktech.org"};
-    //char host[255]= {"fluph.darktech.org"};
-    //char host[255]= {"oddnetwork.org"};
-    //char host[255]= {"192.168.1.131"};
-    //char host[255]= {"blackflag.acid.org"};
-    //char host[255]= {"d1st.org"};
-    //char host[255]= {"bbs.pharcyde.org"};
-    //char host[255]= {"bloodisland.ph4.se"};
-    //char host[255]= {"maze.io"};
-    //char host[255]= {"skulls.sytes.net"};
-    //char host[255]= {"cyberia.darktech.org"};
-    //char host[255]= {"eob-bbs.com"};
-    //char host[255]= {"192.168.1.126"};
-//    char host[255]= {"127.0.0.1"};
-    //char host[255]= {"192.168.1.145"}; // vmware
-    //char host[255]= {"arcade.demon.co.uk"};
-    //char host[255]= {"hq.pyffle.com"};
-    //char host[255]= {"bbs.outpostbbs.net"};
-    //char host[255]= {"htc.zapto.org"};
-    //char host[255]= {"darksorrow.us"};
-
-    TheRenderer::SystemConnection sysconn;
-    sysconn = TheRenderer::Instance()->getSystemConnection();
-
-    TheRenderer::Instance()->setCurrentFont(sysconn.font);
-    if(TheRenderer::Instance()->didFontChange())
-    {
-        std::cout << "TelnetState: font: " << TheRenderer::Instance()->getCurrentFont() << std::endl;
-        if (!TheRenderer::Instance()->loadBitmapImage(
-            TheRenderer::Instance()->getCurrentFont()))
-            {
-                SDL_Delay(1500);
-                TheRenderer::Instance()->quit();
-                std::cout << "TelnetState: Error Changeing Font in syscon!" << std::endl;
-                return false;
-            }
-    }
-
-    std::string initConnection = "|CS|15|16Initiating connection to: [|07";
-    initConnection += sysconn.name + "|15]";
-
-    MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
-
-    if(!TheSocketHandler::Instance()->initTelnet(sysconn.ip, sysconn.port))
-    {
-        initConnection = "|CR|CR|04|16Unable to establish connection.";
-        MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
-        SDL_Delay(1000);
-        std::cout << "Error Connecting!" << std::endl;
-        m_isShutdown = true;
-        return false;
-    }
-    else
-    {
-        std::cout << "Connection Successful. " << std::endl;
-        initConnection = "|CR|CR|10|16Connection established.";
-        MenuFunction::sequenceToAnsi((char *)initConnection.c_str());
-        SDL_Delay(1000);
-    }
-
-    TheSequenceParser::Instance()->setCursorActive(true);
-    // Clear Renderer and ANSI Parser for Fresh Connection.
-    TheRenderer::Instance()->clearScreenSurface();
-    TheRenderer::Instance()->renderScreen();
-    TheRenderer::Instance()->drawTextureScreen();
-    TheSequenceParser::Instance()->reset();
-    return true;
-}
-*/
-
-/*
-bool TelnetManager::onExit()
-{
-    // reset the handler(s)
-    TheInputHandler::Instance()->reset();
-    TheSequenceParser::Instance()->reset();
-    TheSocketHandler::Instance()->reset();
-
-    std::cout << "TelnetState::onExit()" << std::endl;
-
-    std::cout << "Shutting Down SDL_Net" << std::endl;
-    SDLNet_Quit();
-    std::cout << "SDL_Net Done." << std::endl;
-
-    std::cout << "exiting TelnetState" << std::endl;
-    m_isShutdown = true;
-    return true;
-}
-*/
 
 /**
  * @brief Telnet Acknowledge Responses.
@@ -489,7 +292,7 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                 return c;
             }
             else
-            {                
+            {
                 m_teloptStage++;
             }
             break;

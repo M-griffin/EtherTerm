@@ -1,15 +1,7 @@
 #ifndef WINDOW_MANAGER_HPP
 #define WINDOW_MANAGER_HPP
 
-#ifdef TARGET_OS_MAC // OSX
-#include <SDL.h>
-
-#elif _WIN32 // Windows
 #include <SDL2/SDL.h>
-
-#else // LINUX
-#include <SDL2/SDL.h>
-#endif
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 
@@ -74,6 +66,20 @@ public:
      * @param value
      */
     void setHintAcceleration(bool value);
+
+    /**
+     * @brief Check if the Currnet window is active
+     */
+    bool isActiveWindow() const { return m_is_active_window; }
+
+    /**
+     * @brief sets if the current window is active.
+     * @param isActive
+     */
+    void setActiveWindow(bool isActive)
+    {
+        m_is_active_window = isActive;
+    }
 
     /**
      * @brief Sets the Hints for Texture/Renderer
@@ -158,6 +164,7 @@ private:
     std::string    m_hint_vSync;          // "0" or "1" Disabled or Enabled
     std::string    m_hint_textureFilter;  // "0" or "1" for none or linear
     std::string    m_hint_acceleration;   // "0" or "1" Disabled or Enabled
+    bool           m_is_active_window;
 
 };
 

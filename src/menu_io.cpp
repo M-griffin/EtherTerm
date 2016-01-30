@@ -1,10 +1,4 @@
-#ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
-#elif _WIN32
-#include <SDL2/SDL.h>
-#else
-#include <SDL2/SDL.h>
-#endif
 
 #include "menu_io.hpp"
 #include "sequence_decoder.hpp"

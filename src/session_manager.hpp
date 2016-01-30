@@ -48,12 +48,6 @@ public:
     void grabNewWindowFocus();
 
     /**
-     * @brief Sends message to all users in the current room.
-     * @param participant
-     */
-    // void deliver(std::string msg);
-
-    /**
      * @brief Retrieve Number of users connected
      * Also helpful for determinging next node number.
      * @return
@@ -80,7 +74,7 @@ public:
 
     // Detect anytime a system is removed, is so, we need to reset focus
     // To the first available window from the main thread!
-    bool m_is_system_disconnected;    
+    bool m_is_system_disconnected;
 
     // Queue of new connections to spawn.
     SafeQueue<system_connection_ptr> m_new_connections;
@@ -90,6 +84,6 @@ public:
 };
 
 typedef boost::shared_ptr<SessionManager>  session_manager_ptr;
-typedef boost::weak_ptr<SessionManager>	   session_manager_wptr;
+typedef boost::weak_ptr<SessionManager>       session_manager_wptr;
 
 #endif // BROAD_CASTER_HPP

@@ -1,13 +1,7 @@
 #ifndef __InputHandler__
 #define __InputHandler__
 
-#ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
-#elif _WIN32
-#include <SDL2/SDL.h>
-#else // LINUX
-#include <SDL2/SDL.h>
-#endif
 
 #include <iostream>
 #include <string>
@@ -38,6 +32,11 @@ public:
 
     InputHandler(surface_manager_ptr surface_manager, session_ptr session);
     ~InputHandler();
+
+    /**
+     * @brief Used to Restart the SDL_GetText Event on changeing focus.
+     */
+    void resetTextInput();
 
     // keyboard events, True if Data Available.
     bool update(SDL_Event &event);

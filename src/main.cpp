@@ -15,20 +15,15 @@
 
 #define SDL_MAIN_HANDLED
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_Main.h>
+
 #ifdef TARGET_OS_MAC // OSX
-#include <SDL.h>
-#include <SDL_Main.h>
 #include <mach-o/dyld.h>
 
 #elif _WIN32 // Windows
-#include <SDL2/SDL.h>
 #include <winsock2.h>
 #include <windows.h>
-#include <SDL2/SDL_Main.h>
-
-#else // LINUX
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_main.h>
 #endif
 
 #include <cstdio>
@@ -65,7 +60,7 @@ bool SDLStartUp()
 int main(int argc, char* argv[])
 {
     bool is_headless = false;
-    SDL_SetMainReady();   
+    SDL_SetMainReady();
     /*
      * Interfaces to be added later on
      * h = headless
