@@ -27,7 +27,9 @@
 Renderer::Renderer(surface_manager_ptr surface,
                    window_manager_ptr  window,
                    input_handler_ptr   input,
-                   session_ptr         session)
+                   session_ptr         session,
+                   int                 term_height,
+                   int                 term_width)
     : m_surface_manager(surface)
     , m_window_manager(window)
     , m_input_handler(input)
@@ -50,8 +52,8 @@ Renderer::Renderer(surface_manager_ptr surface,
     , WHITE( { 255, 255, 255,   0 })
     , m_current_fg_color(GREY)
     , m_current_bg_color(BLACK)
-    , m_term_width(80)
-    , m_term_height(25)
+    , m_term_width(term_width)
+    , m_term_height(term_height)
     , m_is_scroll_region_active(false)
     , m_top_margin(0)
     , m_bottom_margin(0)

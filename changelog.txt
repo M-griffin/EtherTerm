@@ -1,10 +1,14 @@
 
+Change Log 3.0.41 - 2016-01-31
+    - Added initial support for new term sizes, temp hard coded but creating sessions
+      in 80x25, 80x50 etc.. are working.  Still need to add to dialing directory or 
+      xml file to set for each connection individually.
+
 Change Log 3.0.40 - 2016-01-30
     - Source Cleanup and Resync
     - Fixed issues with background window/connection disconnecting
-      leaving the input for the active window hung.
-    - Reset to Active Window when closing down a 
-      session is now handled better.
+      leaving the input for the activee hung.
+    - Reset to Active Window when closing down a session is now handled better.
 
 Change Log 3.0.39 - 2016-01-28
     - Cursor issue is now fixed and setup per session basis,

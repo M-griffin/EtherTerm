@@ -15,7 +15,7 @@
 class WindowManager
 {
 public:
-    WindowManager();
+    WindowManager(int window_height, int window_width);
     ~WindowManager();
 
     // Handles to Window and Renderer
@@ -43,11 +43,15 @@ public:
      */
     void setWindowHeight(int value);
 
+    int getWindowHeight() const { return m_height; }
+
     /**
      * @brief Override default Window Width
      * @param value
      */
     void setWindowWidth(int value);
+
+    int getWindowWidth() const { return m_width; }
 
     /**
      * @brief Toggle Vertical Sync with GPU

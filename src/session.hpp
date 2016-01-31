@@ -52,12 +52,23 @@ public:
         connection_ptr           connection,
         std::string              program_path,
         session_manager_ptr      session_manager,
-        system_connection_ptr    system_connection
+        system_connection_ptr    system_connection,
+        int                      term_height,
+        int                      term_width
     )
         : m_is_dial_directory(false)
+        , m_term_height(term_height)
+        , m_term_width(term_width)
+        , m_char_height(16)
+        , m_char_width(8)
         , m_program_path(program_path)
         , m_weak_session_manager(session_manager)
-        , m_window_manager(new WindowManager())
+        , m_window_manager(
+            new WindowManager(
+                (m_term_height * m_char_height),
+                (m_term_width * m_char_width)
+            )
+        )
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_connection(connection)
         , m_system_connection(system_connection)
@@ -93,13 +104,22 @@ public:
     {
         // Can't Pass Shared_From_This in itializer list, must wait till object is constructed.
         m_input_handler.reset(new InputHandler(m_surface_manager, shared_from_this()));
-        m_renderer.reset(new Renderer(m_surface_manager, m_window_manager, m_input_handler, shared_from_this()));
+        m_renderer.reset(
+            new Renderer(
+                m_surface_manager,
+                m_window_manager,
+                m_input_handler,
+                shared_from_this(),
+                m_term_height,
+                m_term_width
+            )
+        );
         m_sequence_parser.reset(new SequenceParser(m_renderer, m_connection));
         m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));
 
         // On creation, load a list of Font Sets XML
         bool is_loaded = m_surface_manager->readFontSets();
-        if (!is_loaded)
+        if(!is_loaded)
         {
             std::cout << "Error: m_surface_manager->readFontSets()" << std::endl;
             assert(false);
@@ -178,11 +198,22 @@ public:
         connection_ptr           connection,
         session_manager_ptr      session_manager,
         std::string              program_path,
-        system_connection_ptr    system_connection)
+        system_connection_ptr    system_connection,
+        int                      term_height,
+        int                      term_width)
 
     {
         // Create and Pass back the new Session Instance.
-        session_ptr new_session(new Session(connection, program_path, session_manager, system_connection));
+        session_ptr new_session(
+            new Session(
+                connection,
+                program_path,
+                session_manager,
+                system_connection,
+                term_height,
+                term_width
+            )
+        );
         return new_session;
     }
 
@@ -201,9 +232,9 @@ public:
         {
             //m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data, max_length),
             m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data_vector),
-                    boost::bind(&Session::handleRead, shared_from_this(),
-                                boost::asio::placeholders::error)); //,
-                                //boost::asio::placeholders::bytes_transferred));
+                                                   boost::bind(&Session::handleRead, shared_from_this(),
+                                                           boost::asio::placeholders::error)); //,
+            //boost::asio::placeholders::bytes_transferred));
         }
         else
         {
@@ -227,11 +258,11 @@ public:
                 // Parse incoming data, send through decoder
                 //std::string incoming_data = m_raw_data;
 
-                if (m_system_connection->protocol == "TELNET")
+                if(m_system_connection->protocol == "TELNET")
                 {
                     // Handle Telnet option parsing from incoming data.
                     // Returns Test and ESC Sequence, All Options are Responsed to in the Manager.
-                    if (m_telnet_manager)
+                    if(m_telnet_manager)
                     {
                         //std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data);
                         std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data_vector);
@@ -246,7 +277,7 @@ public:
                             parsed_data += c;
                         }*/
 
-                        if (parsed_data.size() > 0)
+                        if(parsed_data.size() > 0)
                         {
                             m_sequence_decoder->decodeEscSequenceData(parsed_data);
                         }
@@ -254,27 +285,21 @@ public:
                     else
                     {
                         std::cout << "Error: m_telnet_manager inaccessable!" << std::endl;
-                    }                    
+                    }
                 }
                 else
                 {
                     /** Not in use yet, when time comes change to support m_raw_data_vector
                      *  as needed.  Still deciding best way to handle this.
                      */
-                    if (m_raw_data_vector.size() != 0)
+                    if(m_raw_data_vector.size() != 0)
                     {
-                        // Copy the vector into a string.
-                        //std::string incoming_data(
-                        //    m_raw_data_vector.begin(),
-                        //    m_raw_data_vector.end()
-                        //);
-
                         std::string incoming_data = "";
-                        for (auto c : m_raw_data_vector)
+                        for(auto c : m_raw_data_vector)
                         {
                             // Ignore null's
-                            if (c != '\0')
-                            incoming_data += c;
+                            if(c != '\0')
+                                incoming_data += c;
                         }
 
                         m_sequence_decoder->decodeEscSequenceData(incoming_data);
@@ -305,7 +330,7 @@ public:
                         std::cout << "Connection Closed, Leaving Session! " << std::endl;
 
                         // Shutdown the Input handler.
-                        if (!m_input_handler->isGlobalShutdown())
+                        if(!m_input_handler->isGlobalShutdown())
                         {
                             session_mgr->leave(shared_from_this());
                         }
@@ -364,7 +389,7 @@ public:
             if(m_connection->is_open())
             {
                 // Only Shutdown when Connected!
-                if (m_is_connected)
+                if(m_is_connected)
                 {
                     m_connection->socket().shutdown(tcp::socket::shutdown_both);
                 }
@@ -402,7 +427,7 @@ public:
     void startTelnetManager()
     {
         // Setup and Load Font from Dialing Directory for Selected System
-        if (m_system_connection->font != "")
+        if(m_system_connection->font != "")
         {
             m_surface_manager->setCurrentFont(m_system_connection->font);
             m_surface_manager->loadBitmapFontImage();
@@ -436,11 +461,11 @@ public:
     void update()
     {
         // If Menu System, Check for Input to passthrough to the Menu System
-        if (m_is_dial_directory)
+        if(m_is_dial_directory)
         {
             std::string input_sequence;
             m_input_handler->getInputSequence(input_sequence);
-            if (input_sequence.size() > 0)
+            if(input_sequence.size() > 0)
             {
                 m_menu_manager->handleMenuUpdates(input_sequence);
                 m_menu_manager->updateDialDirectory();
@@ -451,7 +476,7 @@ public:
             // We have Socket Connection, pass input back to the server.
             std::string input_sequence;
             m_input_handler->getInputSequence(input_sequence);
-            if (input_sequence.size() > 0)
+            if(input_sequence.size() > 0)
             {
                 // Pass to the Socket once we have that setup,
                 deliver(input_sequence);
@@ -472,7 +497,7 @@ public:
         bool was_data_received = !m_data_queue.is_empty();
 
         // If we received data, turn off blinking while displaying screens.
-        if (was_data_received)
+        if(was_data_received)
         {
             // Turn off the cursor while we process data.
             //m_sequence_parser->setCursorActive(false);
@@ -502,7 +527,7 @@ public:
         }
 
         // Render Changes on updates only, save CPU usage!
-        if (was_data_received)
+        if(was_data_received)
         {
             // Render all screen data waiting to be seen.
             m_renderer->renderScreen();
@@ -510,7 +535,7 @@ public:
             // Setup and render the cursor after rending new screen.
             if(m_sequence_parser->isCursorActive())
             {
-                if (m_is_connected)
+                if(m_is_connected)
                 {
                     m_renderer->setupCursorCharacter();
                     m_renderer->renderCursorOnScreen();
@@ -522,7 +547,7 @@ public:
             m_renderer->drawTextureScreen();
 
             // Don't reset while it's active, only flip from inactive to active!
-            if (!m_start_blinking)
+            if(!m_start_blinking)
             {
                 toggleBlinkingCursor(true);
             }
@@ -533,8 +558,8 @@ public:
             if(m_sequence_parser->isCursorActive())
             {
                 // Loop here to blink the cursor.
-                if (m_is_connected)
-                {                    
+                if(m_is_connected)
+                {
                     // Setup Timer for Blinking Cursor
                     // Initial State = On, then Switch to off in next loop.
                     if(m_cursor_blink % 2 == 0)
@@ -571,10 +596,10 @@ public:
     {
         // Remove our session from the list close the session.
         session_manager_ptr session_mgr = m_weak_session_manager.lock();
-        if (session_mgr)
+        if(session_mgr)
         {
             // If dialing directory is closed, then shutdown all windows/sessions
-            if (m_is_dial_directory)
+            if(m_is_dial_directory)
             {
                 session_mgr->shutdown();
             }
@@ -588,6 +613,14 @@ public:
 
     // Is this a local session used for the Dialing Directory.
     bool                     m_is_dial_directory;
+
+    // Setup the initial terminal window size by characters
+    // This will used to calculate the generated surface and texture sizes
+    // ie 80x25, 80x50 etc..
+    int                      m_term_height;
+    int                      m_term_width;
+    int                      m_char_height;
+    int                      m_char_width;
 
     // Program Path for File locations.
     std::string              m_program_path;

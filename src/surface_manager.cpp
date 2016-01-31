@@ -27,10 +27,6 @@ SurfaceManager::SurfaceManager(window_manager_ptr window_manager, std::string pr
     , m_blueMask(0x00ff0000)
     , m_alphaMask(0xff000000)
 #endif
-    , m_surfaceWidth(640)   // Main Surface vs Window/Texture Size
-    , m_surfaceHeight(400)
-    , m_windowWidth(640)    // Default Windoow, not passed to window yet!?!
-    , m_windowHeight(400)
     , m_surfaceBits(32)
     , m_characterWidth(8)
     , m_characterHeight(16)
@@ -568,18 +564,22 @@ void SurfaceManager::createSurface(int surfaceType)
                     delSurface(surfaceType);
                 }
 
-                // Create Surface with Smart pointer
-                surface_ptr surface(
-                    new Surfaces(
-                        SDL_CreateRGBSurface(
-                            SDL_SWSURFACE,
-                            m_surfaceWidth, m_surfaceHeight, m_surfaceBits,
-                            m_redMask, m_greenMask, m_blueMask, m_alphaMask
+                window_manager_ptr window = m_weak_window_manager.lock();
+                if (window)
+                {
+                    // Create Surface with Smart pointer
+                    surface_ptr surface(
+                        new Surfaces(
+                            SDL_CreateRGBSurface(
+                                SDL_SWSURFACE,
+                                window->getWindowWidth(), window->getWindowHeight(), m_surfaceBits,
+                                m_redMask, m_greenMask, m_blueMask, m_alphaMask
+                            )
                         )
-                    )
-                );
+                    );
 
-                convertAndAdd(surfaceType, surface);
+                    convertAndAdd(surfaceType, surface);
+                }
             }
             break;
 

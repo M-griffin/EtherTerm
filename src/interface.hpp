@@ -69,7 +69,7 @@ public:
         spawnLocalSession();
 
         // Send the event along for each session
-        if (m_session_manager->numberOfSessions() == 0)
+        if(m_session_manager->numberOfSessions() == 0)
         {
             std::cout << "Startup Unsuccessful, Shutting Down!" << std::endl;
             m_is_global_shutdown = true;
@@ -85,12 +85,12 @@ public:
         // Main Loop SDL Event Polling must always be done in main thread.
         // Along with All Rendering. This is how SDL works. Events are therefore
         // Read, then passed through to each session to handle per instance.
-        while (!m_is_global_shutdown)
+        while(!m_is_global_shutdown)
         {
             try
             {
                 // Send the event along for each session
-                if (m_session_manager->numberOfSessions() == 0)
+                if(m_session_manager->numberOfSessions() == 0)
                 {
                     std::cout << "Shutting Down!" << std::endl;
                     m_is_global_shutdown = true;
@@ -104,7 +104,7 @@ public:
                 }
 
                 // All sessions Closed, then exit.
-                if (m_session_manager->numberOfSessions() == 0)
+                if(m_session_manager->numberOfSessions() == 0)
                 {
                     std::cout << "Shutting Down!" << std::endl;
                     m_is_global_shutdown = true;
@@ -116,13 +116,13 @@ public:
 
                 // Check for Spawned Connection here. System connection container will be populated
                 // With connection info and data to be passed and spawned.
-                if (m_session_manager)
+                if(m_session_manager)
                 {
                     // First Check for any Disconnected systems, If so, regrab window focus
                     m_session_manager->grabNewWindowFocus();
 
                     // Now test for any waiting connection spawns
-                    while (!m_session_manager->m_new_connections.is_empty())
+                    while(!m_session_manager->m_new_connections.is_empty())
                     {
                         system_connection_ptr new_system;
                         new_system = std::move(m_session_manager->m_new_connections.dequeue());
@@ -136,7 +136,7 @@ public:
                 SDL_Delay(10);
 
             }
-            catch (boost::exception &e)
+            catch(boost::exception &e)
             {
                 std::cerr << boost::diagnostic_information(e);
             }
@@ -148,8 +148,20 @@ public:
      */
     void spawnLocalSession()
     {
+
+        // Hard Coded for testing, move this to direcotry.ini!
+        int height = 25;
+        int width = 80;
+
         // Pass Nullptr on Connection and System Connection since this is a local session.
-        session_ptr new_session = Session::create(nullptr, m_session_manager, m_program_path, nullptr);
+        session_ptr new_session = Session::create(
+                                      nullptr,
+                                      m_session_manager,
+                                      m_program_path,
+                                      nullptr,
+                                      height,
+                                      width
+                                  );
 
         // Join the SessionManager to keep instance properly active!
         m_session_manager->join(new_session);
@@ -167,7 +179,7 @@ public:
      */
     void spawnConnectionSession(system_connection_ptr system_connection)
     {
-        if (!system_connection)
+        if(!system_connection)
         {
             return;
         }
@@ -192,15 +204,26 @@ public:
         // Connection handles TCP_Socket
         connection_ptr new_connection(new tcp_connection(m_io_service));
 
+        // Hard Coded for testing, move this to direcotry.ini!
+        int height = 50;
+        int width = 80;
+
         // Create the Session before passing to the Connection (Async Thread)
-        session_ptr new_session = Session::create(new_connection, m_session_manager, m_program_path, system_connection);
+        session_ptr new_session = Session::create(
+                                      new_connection,
+                                      m_session_manager,
+                                      m_program_path,
+                                      system_connection,
+                                      height,
+                                      width
+                                  );
         std::cout << "Connected Session Created" << std::endl;
 
         // Call Startup outside of constructor for shared_from_this() handle.
         new_session->startup();
 
         // If Telnet Session spawn it, Add Other Instances later on, SSH, IRC, FTP etc..
-        if (system_connection->protocol == "TELNET")
+        if(system_connection->protocol == "TELNET")
         {
             std::cout << "Starting TelnetManager in Interface" << std::endl;
             new_session->startTelnetManager();
@@ -232,7 +255,7 @@ public:
                 std::cout << "Unable to Connect, closing down session." << std::endl;
 
                 // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
-                if (new_connection->socket().is_open())
+                if(new_connection->socket().is_open())
                 {
                     new_connection->socket().close();
                 }
@@ -255,7 +278,7 @@ public:
             for(auto it = begin(m_session_manager->m_sessions); it != itEnd; ++it)
             {
                 // If number of sessions changed, (Window was Closed) restart loop.
-                if (m_session_manager->numberOfSessions() == num_sesisons)
+                if(m_session_manager->numberOfSessions() == num_sesisons)
                 {
                     // If the window id matches the current event, then
                     // send through the event to the specific session for processing.
@@ -270,7 +293,7 @@ public:
                 {
                     // Restart the Loop so we don't miss any events on Window Closes.
                     // The number or sessions will change on a close, so we need to re-initialize the Iterators.
-                    if (m_session_manager->numberOfSessions() > 0)
+                    if(m_session_manager->numberOfSessions() > 0)
                     {
                         it = begin(m_session_manager->m_sessions);
                         if((*it)->m_window_manager->getWindowId() == event.window.windowID)

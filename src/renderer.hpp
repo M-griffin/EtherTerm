@@ -41,7 +41,9 @@ public:
     Renderer(surface_manager_ptr surface,
              window_manager_ptr  window,
              input_handler_ptr   input,
-             session_ptr         session);
+             session_ptr         session,
+             int                 term_height,
+             int                 term_width);
     ~Renderer();
 
     // Handle to Managers

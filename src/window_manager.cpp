@@ -14,12 +14,12 @@
 
 #include <iostream>
 
-WindowManager::WindowManager()
+WindowManager::WindowManager(int window_height, int window_width)
     : m_window(nullptr)
     , m_renderer(nullptr)
     , m_window_id(0)
-    , m_width(640)
-    , m_height(400)
+    , m_width(window_width)
+    , m_height(window_height)
     , m_hint_vSync("0")          // "0" or "1" Disabled or Enabled
     , m_hint_textureFilter("0")  // "0" or "1", "2" for none or linear, bi-linear
     , m_hint_acceleration("1")   // "0" or "1" Disabled or Enabled

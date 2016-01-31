@@ -89,10 +89,6 @@ public:
            m_blueMask,
            m_alphaMask;
 
-    int m_surfaceWidth;
-    int m_surfaceHeight;
-    int m_windowWidth;
-    int m_windowHeight;
     int m_surfaceBits;
     int m_characterWidth;
     int m_characterHeight;
