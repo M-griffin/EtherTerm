@@ -623,12 +623,12 @@ bool Renderer::loadBitmapImage(std::string fontName)
     // Redraw Cursor with new font!
     // When no data received, this is when we want to show the cursor!
     // Setup cursor in current x/y position Cursor.
-    if(TheSequenceParser::Instance()->isCursorActive())
+    /*if(TheSequenceParser::Instance()->isCursorActive())
     {
         setupCursorChar();
         renderCursorOnScreen();
         drawTextureScreen();
-    }
+    }*/
 
     m_previousFont = m_currentFont; // Current to Previous
     m_currentFont  = fontName;    // New to Current.
