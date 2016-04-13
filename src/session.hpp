@@ -1,5 +1,5 @@
-#ifndef SESSION_BASE_HPP
-#define SESSION_BASE_HPP
+#ifndef SESSION_HPP
+#define SESSION_HPP
 
 #include "window_manager.hpp"
 #include "surface_manager.hpp"
@@ -22,7 +22,6 @@
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/io_service.hpp>
-
 
 // For IO service!
 #include <thread>
@@ -102,7 +101,7 @@ public:
      */
     void startup()
     {
-        // Can't Pass Shared_From_This in itializer list, must wait till object is constructed.
+        // Can't Pass Shared_From_This() in initializer list, must wait till object is constructed.
         m_input_handler.reset(new InputHandler(m_surface_manager, shared_from_this()));
         m_renderer.reset(
             new Renderer(
@@ -117,7 +116,7 @@ public:
         m_sequence_parser.reset(new SequenceParser(m_renderer, m_connection));
         m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));
 
-        // On creation, load a list of Font Sets XML
+        // On creation, load a list of Available Font Sets XML
         bool is_loaded = m_surface_manager->readFontSets();
         if(!is_loaded)
         {
@@ -128,64 +127,6 @@ public:
         {
             std::cout << "Fontset Created!" << std::endl;
         }
-
-        // Interface Testing USE ONLY
-        // Don't Startup menu_managers for other sessions, this is one off!
-        //m_menu_manager.reset(new MenuManager(m_program_path, m_renderer, m_sequence_decoder));
-
-        // Load the Font set and set the default colors for testing!
-        /*
-        m_surface_manager->setCurrentFont("topazPlus-8x16.bmp");
-        m_surface_manager->loadBitmapImage();
-
-        m_renderer->m_current_fg_color = m_renderer->WHITE;
-        m_renderer->m_current_bg_color = m_renderer->BLACK;
-
-        std::cout << "display ET2.ans" << std::endl;
-        m_menu_manager->m_menu_function.m_menu_io.displayAnsiFile("et2.ans");
-
-        std::cout << "message queue" << std::endl;
-        MessageQueue msgQueue;
-        while(!m_data_queue.is_empty())
-        {
-            std::cout << "message dequeue" << std::endl;
-            msgQueue = std::move(m_data_queue.dequeue());
-            if(msgQueue.m_text.empty())
-            {
-                // Make Sure Vector is not Empty!
-                if(msgQueue.m_queueParams.size() > 0)
-                {
-                    std::cout << "m_sequence_ Input" << std::endl;
-                    m_sequence_parser->sequenceInput(msgQueue.m_queueParams);
-                }
-            }
-            else
-            {
-                std::cout << "m_sequence_ textInput" << std::endl;
-                m_sequence_parser->textInput(msgQueue.m_text);
-            }
-            msgQueue.clear();
-        }
-
-        m_renderer->renderScreen();
-        m_renderer->drawTextureScreen();
-
-        std::cout << "Done!" << std::endl;
-        */
-
-        // Test
-        //m_sequence_decoder->decodeEscSequenceData("Testing");
-
-        // Test initial Graphics with writting out the Character set.
-        /*
-        m_surface_manager->loadBitmapImage();
-
-        m_renderer->m_current_fg_color = m_renderer->WHITE;
-        m_renderer->m_current_bg_color = m_renderer->BLACK;
-
-        m_renderer->drawCharSet(0, 0);
-        m_renderer->renderScreen();
-        m_renderer->drawTextureScreen();*/
     }
 
     /**
@@ -223,14 +164,12 @@ public:
     void waitForSocketData()
     {
         // Important, clear out buffer before each read.
-        //memset(&m_raw_data, 0, max_length);
         std::vector<unsigned char>().swap(m_raw_data_vector);
         m_raw_data_vector.reserve(8024);
         m_raw_data_vector.resize(8024);
 
         if(m_connection->is_open())
         {
-            //m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data, max_length),
             m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data_vector),
                                                    boost::bind(&Session::handleRead, shared_from_this(),
                                                            boost::asio::placeholders::error)); //,
@@ -277,6 +216,7 @@ public:
                             parsed_data += c;
                         }*/
 
+                        // Process Only if data in the buffer.
                         if(parsed_data.size() > 0)
                         {
                             m_sequence_decoder->decodeEscSequenceData(parsed_data);
@@ -298,10 +238,12 @@ public:
                         for(auto c : m_raw_data_vector)
                         {
                             // Ignore null's
-                            if(c != '\0')
-                                incoming_data += c;
+                            if(c == '\0')
+                            {
+                                break;
+                            }
+                            incoming_data += c;
                         }
-
                         m_sequence_decoder->decodeEscSequenceData(incoming_data);
                     }
                 }
@@ -365,7 +307,6 @@ public:
         if(m_connection->is_open())
         {
             boost::asio::async_write(m_connection->socket(),
-                                     //boost::asio::buffer(msg, msg.size()),
                                      boost::asio::buffer(buffer),
                                      boost::bind(
                                          &Session::handleWrite,
@@ -386,14 +327,21 @@ public:
             std::cout << "async_write error: " << error.message() << std::endl;
             std::cout << "Session Closed()" << std::endl;
 
-            if(m_connection->is_open())
+            try
             {
-                // Only Shutdown when Connected!
-                if(m_is_connected)
+                if(m_connection->is_open())
                 {
-                    m_connection->socket().shutdown(tcp::socket::shutdown_both);
+                    // Only Shutdown when Connected!
+                    if(m_is_connected)
+                    {
+                        m_connection->socket().shutdown(tcp::socket::shutdown_both);
+                    }
+                    m_connection->socket().close();
                 }
-                m_connection->socket().close();
+            }
+            catch (std::exception ex)
+            {
+                std::cout << "handleWrite() - Caught Exception on shutdown: " << ex.what();
             }
         }
     }
@@ -506,21 +454,17 @@ public:
 
         while(!m_data_queue.is_empty())
         {
-            //std::cout << "Message dequeue in progress: size(): " << m_data_queue.size() << std::endl;
             msgQueue = std::move(m_data_queue.dequeue());
-            //std::cout << "Message dequeue after!" << std::endl;
             if(msgQueue.m_text.empty())
             {
                 // Make Sure Vector is not Empty!
                 if(msgQueue.m_queueParams.size() > 0)
                 {
-                    //std::cout << "m_sequence_ Input" << std::endl;
                     m_sequence_parser->sequenceInput(msgQueue.m_queueParams);
                 }
             }
             else
             {
-                //std::cout << "m_sequence_ textInput:" << msgQueue.m_text << std::endl;
                 m_sequence_parser->textInput(msgQueue.m_text);
             }
             msgQueue.clear();
@@ -539,7 +483,6 @@ public:
                 {
                     m_renderer->setupCursorCharacter();
                     m_renderer->renderCursorOnScreen();
-                    m_renderer->drawTextureScreen();
                 }
             }
 

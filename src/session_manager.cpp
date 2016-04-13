@@ -36,24 +36,31 @@ void SessionManager::leave(session_ptr session)
 {
     std::cout << "Left SessionManager" << std::endl;
 
-    // If session is connected, we need to disconnect it first
-    if(session->m_connection)
+    try
     {
-        if(session->m_is_connected)
+        // If session is connected, we need to disconnect it first
+        if(session->m_connection)
         {
-            // Shutdown the Connection before closing
-            session->m_connection->shutdown();
-            // Force no longer being connected now.
-            session->m_is_connected = false;
+            if(session->m_is_connected)
+            {
+                // Shutdown the Connection before closing
+                session->m_connection->shutdown();
+                // Force no longer being connected now.
+                session->m_is_connected = false;
+            }
+            session->m_connection->close();
         }
-        session->m_connection->close();
+
+        // Remove the Session
+        m_sessions.erase(session);
+
+        // Mark that a system has disconnect to reset window focus
+        m_is_system_disconnected = true;
     }
-
-    // Remove the Session
-    m_sessions.erase(session);
-
-    // Mark that a system has disconnect to reset window focus
-    m_is_system_disconnected = true;
+    catch (std::exception ex)
+    {
+        std::cout << "SessionManager::leave() - Caught Exception on shutdown: " << ex.what();
+    }
 }
 
 /**

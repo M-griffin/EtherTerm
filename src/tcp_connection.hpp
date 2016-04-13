@@ -49,9 +49,16 @@ public:
      */
     void shutdown()
     {
-        if (m_socket.is_open())
+        try
         {
-            m_socket.shutdown(tcp::socket::shutdown_both);
+            if (m_socket.is_open())
+            {
+                m_socket.shutdown(tcp::socket::shutdown_both);
+            }
+        }
+        catch (std::exception ex)
+        {
+            std::cout << "tcp_connection shutdown() - Caught exception: " << ex.what();
         }
     }
 
@@ -60,9 +67,16 @@ public:
      */
     void close()
     {
-        if (m_socket.is_open())
+        try
         {
-            m_socket.close();
+            if (m_socket.is_open())
+            {
+                m_socket.close();
+            }
+        }
+        catch (std::exception ex)
+        {
+            std::cout << "tcp_connection close() - Caught exception: " << ex.what();
         }
     }
 
@@ -72,4 +86,3 @@ public:
 typedef boost::shared_ptr<tcp_connection> connection_ptr;
 
 #endif // TCP_CONNECTION_HPP
-

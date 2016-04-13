@@ -1,4 +1,8 @@
 
+Change Log 3.0.42 - 2016-04-12
+    - Added some exception handing on closeing sockets to lock down some freezing
+      on system disconnects or session closes.
+
 Change Log 3.0.41 - 2016-01-31
     - Added initial support for new term sizes, temp hard coded but creating sessions
       in 80x25, 80x50 etc.. are working.  Still need to add to dialing directory or 
