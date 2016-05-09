@@ -554,6 +554,8 @@ bool MenuManager::readDialDirectory()
             sysconn.font = pElem->Attribute("font");
             sysconn.keyMap = pElem->Attribute("keyMap");
             sysconn.termType = pElem->Attribute("termType");
+            sysconn.termSize = pElem->Attribute("termSize");
+            pElem->QueryIntAttribute("textureFilter", &sysconn.textureFilter);
             // Add to Vector so we can parse in building the dialing directory.
             m_systemConnection.push_back(sysconn);
         }
@@ -594,6 +596,8 @@ void MenuManager::createDialDirectory()
     element3->SetAttribute("font", "vga8x16.bmp");
     element3->SetAttribute("keyMap", "ANSI");
     element3->SetAttribute("termType", "ANSI");
+    element3->SetAttribute("termSize", "80x25");
+    element3->SetAttribute("textureFilter", "0");
 
     TiXmlElement *element4 = new TiXmlElement("BBS");
     element2->LinkEndChild(element4);
@@ -607,6 +611,9 @@ void MenuManager::createDialDirectory()
     element4->SetAttribute("font", "vga8x16.bmp");
     element4->SetAttribute("keyMap", "VT100");
     element4->SetAttribute("termType", "ANSI");
+    element4->SetAttribute("termSize", "80x25");
+    element4->SetAttribute("textureFilter", "0");
+
     doc.SaveFile(path.c_str());
 }
 
@@ -645,6 +652,8 @@ void MenuManager::writeDialDirectory()
         system->SetAttribute("font", it.font);
         system->SetAttribute("keyMap", it.keyMap);
         system->SetAttribute("termType", it.termType);
+        system->SetAttribute("termSize", it.termSize);
+        system->SetAttribute("textureFilter", it.textureFilter);
     }
     doc.SaveFile(path.c_str());
 }

@@ -2,19 +2,11 @@
 
 #include <iostream>
 
-#ifdef TARGET_OS_MAC // OSX
-#include <SDL.h>
-
-#elif _WIN32 // Windows
 #include <SDL2/SDL.h>
-
-#else // LINUX
-#include <SDL2/SDL.h>
-#endif
 
 #include <iostream>
 
-WindowManager::WindowManager(int window_height, int window_width)
+WindowManager::WindowManager(int window_height, int window_width, int texture_filter)
     : m_window(nullptr)
     , m_renderer(nullptr)
     , m_window_id(0)
@@ -24,12 +16,16 @@ WindowManager::WindowManager(int window_height, int window_width)
     , m_hint_textureFilter("0")  // "0" or "1", "2" for none or linear, bi-linear
     , m_hint_acceleration("1")   // "0" or "1" Disabled or Enabled
     , m_is_active_window(false)
+    , m_texture_filter(texture_filter)
 {
     std::cout << "WindowManager Created!" << std::endl;
 
     static long position_placement = 0;
     m_position_placement = position_placement;
     ++position_placement;
+
+    // Set the default texture filter.
+    setTextureFilter(m_texture_filter);
 
     // Startup create the Window NOT Fullscreen.
     if(createWindow(false))
@@ -139,6 +135,10 @@ void WindowManager::setHintAcceleration(bool value)
  */
 void WindowManager::createHints()
 {
+
+    // Turn off, might make a toggle for this later on.
+    SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+
     /*
      * 0 = disable vsync
      * 1 = enable vsync
@@ -202,7 +202,7 @@ void WindowManager::createRenderer()
         return;
     }
 
-    if(SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE) < 0)
+    if(SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND) < 0)
     {
         SDL_Log("createRenderer SDL_SetRenderDrawBlendMode globalRenderer: %s",
                 SDL_GetError());

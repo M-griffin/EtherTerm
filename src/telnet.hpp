@@ -346,4 +346,3 @@ extern const char *enctype_names[];
 #define    ENCTYPE_NAME(x)        enctype_names[x]
 
 #endif // TELNET_HPP
-

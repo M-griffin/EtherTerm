@@ -77,4 +77,3 @@ private:
 typedef boost::shared_ptr<TelnetManager> telnet_manager_ptr;
 
 #endif
-

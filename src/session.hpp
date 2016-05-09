@@ -53,19 +53,22 @@ public:
         session_manager_ptr      session_manager,
         system_connection_ptr    system_connection,
         int                      term_height,
-        int                      term_width
+        int                      term_width,
+        int                      texture_filter
     )
         : m_is_dial_directory(false)
         , m_term_height(term_height)
         , m_term_width(term_width)
         , m_char_height(16)
         , m_char_width(8)
+        , m_texture_filter(texture_filter)
         , m_program_path(program_path)
         , m_weak_session_manager(session_manager)
         , m_window_manager(
             new WindowManager(
                 (m_term_height * m_char_height),
-                (m_term_width * m_char_width)
+                (m_term_width * m_char_width),
+                m_texture_filter
             )
         )
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
@@ -141,7 +144,8 @@ public:
         std::string              program_path,
         system_connection_ptr    system_connection,
         int                      term_height,
-        int                      term_width)
+        int                      term_width,
+        int                      texture_filter)
 
     {
         // Create and Pass back the new Session Instance.
@@ -152,7 +156,8 @@ public:
                 session_manager,
                 system_connection,
                 term_height,
-                term_width
+                term_width,
+                texture_filter
             )
         );
         return new_session;
@@ -415,7 +420,14 @@ public:
             m_input_handler->getInputSequence(input_sequence);
             if(input_sequence.size() > 0)
             {
-                m_menu_manager->handleMenuUpdates(input_sequence);
+                int result = m_menu_manager->handleMenuUpdates(input_sequence);
+                if (result == EOF)
+                {
+                    // Quit from Dialing Directory, Exit Program
+                    closeThisSession();
+                    return;
+                }
+
                 m_menu_manager->updateDialDirectory();
             }
         }
@@ -564,6 +576,7 @@ public:
     int                      m_term_width;
     int                      m_char_height;
     int                      m_char_width;
+    int                      m_texture_filter;
 
     // Program Path for File locations.
     std::string              m_program_path;

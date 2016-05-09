@@ -204,4 +204,3 @@ void ScreenBuffer::bufferToClipboard(
     // Copy Resulting text to the Clipboard.
     SDL_SetClipboardText(textBuffer.c_str());
 }
-

@@ -1,6 +1,15 @@
 
+Change Log 3.0.43 - 2016-05-09
+	- Added Height/Width settings Terminal settings to dialing directory xml
+	- Added Texture Filtering settings to the dialing directory xml
+		- Note, that current window setup is to resize the screen to the window
+		  This just happens ignore texture filtering. So part II needs to 
+		  set a static screen size and allow to GPU to resize window like in 2.x
+	- Also testing some new scaled font surface and alpha recolor which 
+	  speeds up the display.
+
 Change Log 3.0.42 - 2016-04-12
-    - Added some exception handing on closeing sockets to lock down some freezing
+    - Added some exception handing on closing sockets to lock down some freezing
       on system disconnects or session closes.
 
 Change Log 3.0.41 - 2016-01-31
@@ -9,9 +18,9 @@ Change Log 3.0.41 - 2016-01-31
       xml file to set for each connection individually.
 
 Change Log 3.0.40 - 2016-01-30
-    - Source Cleanup and Resync
+    - Source Cleanup and Re sync
     - Fixed issues with background window/connection disconnecting
-      leaving the input for the activee hung.
+      leaving the input for the active hung.
     - Reset to Active Window when closing down a session is now handled better.
 
 Change Log 3.0.39 - 2016-01-28

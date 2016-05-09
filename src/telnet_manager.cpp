@@ -73,6 +73,7 @@ std::string TelnetManager::parseIncomingData(const std::vector<unsigned char> &m
         else
             std::cout << c << std::flush;
 #endif
+
         try
         {
             // Run the Telnet Options Parser

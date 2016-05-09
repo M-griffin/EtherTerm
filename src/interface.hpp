@@ -9,6 +9,7 @@
 #include <boost/exception/all.hpp>
 #include <boost/asio/io_service.hpp>
 
+#include <sstream>
 #include <iostream>
 #include <thread>
 #include <set>
@@ -152,6 +153,9 @@ public:
         // Hard Coded for testing, move this to direcotry.ini!
         int height = 25;
         int width = 80;
+        int texture_filter = 0; // Default none!
+
+        std::cout << "texture_filter: " << texture_filter << std::endl;
 
         // Pass Nullptr on Connection and System Connection since this is a local session.
         session_ptr new_session = Session::create(
@@ -160,7 +164,8 @@ public:
                                       m_program_path,
                                       nullptr,
                                       height,
-                                      width
+                                      width,
+                                      texture_filter
                                   );
 
         // Join the SessionManager to keep instance properly active!
@@ -172,6 +177,44 @@ public:
         // Start the Dialing Directory on the local instance
         new_session->startMenuInstance();
     }
+
+
+    /**
+     * @brief Template for String to Integer.
+     * @param Text
+     * @return
+     */
+    template <typename T>
+    T stringToNumber ( const std::string &Text )
+    {
+        std::istringstream ss(Text);
+        T result;
+        return ss >> result ? result : 0;
+    }
+
+
+    /**
+     * @brief Parses the SystemConnection and Sets Hight and Width
+     * @param height
+     * @param width
+     */
+    void parseTermSize(std::string termSize, int &height, int &width)
+    {
+        std::string::size_type index = termSize.find("x", 0);
+
+        if (index != std::string::npos)
+        {
+            std::string str_width = termSize.substr(0, index);
+            std::cout << "termSize Width: " << str_width << std::endl;
+            width = stringToNumber<int>(str_width);
+
+
+            std::string str_height = termSize.substr(index+1);
+            std::cout << "termSize Height: " << str_height << std::endl;
+            height = stringToNumber<int>(str_height);
+        }
+    }
+
 
     /**
      * @brief Spawn Connection Sessions
@@ -204,9 +247,16 @@ public:
         // Connection handles TCP_Socket
         connection_ptr new_connection(new tcp_connection(m_io_service));
 
-        // Hard Coded for testing, move this to direcotry.ini!
-        int height = 50;
+
+        // Setup the connection height and width
+        int height = 25;
         int width = 80;
+        int texture_filter = 0;
+
+        parseTermSize(system_connection->termSize, height, width);
+        texture_filter = system_connection->textureFilter;
+
+        std::cout << "texture_filter: " << texture_filter << std::endl;
 
         // Create the Session before passing to the Connection (Async Thread)
         session_ptr new_session = Session::create(
@@ -215,7 +265,8 @@ public:
                                       m_program_path,
                                       system_connection,
                                       height,
-                                      width
+                                      width,
+                                      texture_filter
                                   );
         std::cout << "Connected Session Created" << std::endl;
 
@@ -238,6 +289,9 @@ public:
         // Start Blinking Cursor for Active connection session.
         new_session->m_sequence_parser->setCursorActive(true);
 
+        //new_connection->socket().set_option(boost::asio::ip::tcp::no_delay(false));
+        
+
         // Start Async Connection
         boost::asio::async_connect(new_connection->socket(),
                                    endpoint_iterator,
@@ -246,6 +300,19 @@ public:
         {
             if(!ec)
             {
+                // set TCP Keep Alive.
+                boost::system::error_code errCode;
+                boost::asio::socket_base::keep_alive option(true);
+                new_connection->socket().set_option(option, errCode);
+                if (errCode)
+                {
+                    std::cout << "Unable to set TCP Keep Alive!: " << ec.message() << std::endl;
+                }
+                else
+                {
+                    std::cout << "TCP Keep Alive is set!" << std::endl;
+                }
+
                 // Mark Session Connected
                 new_session->m_is_connected = true;
                 new_session->waitForSocketData();

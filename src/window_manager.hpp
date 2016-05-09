@@ -15,7 +15,7 @@
 class WindowManager
 {
 public:
-    WindowManager(int window_height, int window_width);
+    WindowManager(int window_height, int window_width, int texture_filter);
     ~WindowManager();
 
     // Handles to Window and Renderer
@@ -169,6 +169,7 @@ private:
     std::string    m_hint_textureFilter;  // "0" or "1" for none or linear
     std::string    m_hint_acceleration;   // "0" or "1" Disabled or Enabled
     bool           m_is_active_window;
+    int            m_texture_filter;      // Conversion for settign the filter.
 
 };
 

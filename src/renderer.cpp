@@ -1,21 +1,10 @@
 #include "renderer.hpp"
 #include "session.hpp"
 
-#ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
+
 #ifdef _DEBBUG
 #include <SDL2/SDL_ttf.h>
-#endif
-#elif _WIN32
-#include <SDL2/SDL.h>
-#ifdef _DEBBUG
-#include <SDL2/SDL_ttf.h>
-#endif
-#else
-#include <SDL2/SDL.h>
-#ifdef _DEBBUG
-#include <SDL2/SDL_ttf.h>
-#endif
 #endif
 
 #include <iostream>
@@ -23,6 +12,8 @@
 #include <cstdio>
 #include <assert.h>
 
+
+#include <chrono>
 
 Renderer::Renderer(surface_manager_ptr surface,
                    window_manager_ptr  window,
@@ -35,32 +26,32 @@ Renderer::Renderer(surface_manager_ptr surface,
     , m_input_handler(input)
     , m_weak_session(session)
     , BLACK( {   0,   0,   0,   0 })
-    , BLUE( {   0,   0, 171,   0 })
-    , GREEN( {   0, 171,   0,   0 })
-    , CYAN( {   0, 171, 171,   0 })
-    , RED( { 171,   0,   0,   0 })
-    , MAGENTA( { 171,   0, 171,   0 })
-    , BROWN( { 171,  87,   0,   0 })
-    , GREY( { 171, 171, 171,   0 })
-    , DARK_GREY( {  87,  87,  87,   0 })
-    , LIGHT_BLUE( {  87,  87, 255,   0 })
-    , LIGHT_GREEN( {  87, 255,  87,   0 })
-    , LIGHT_CYAN( {  87, 255, 255,   0 })
-    , LIGHT_RED( { 255,  87,  87,   0 })
-    , LIGHT_MAGENTA( { 255,  87, 255,   0 })
-    , YELLOW( { 255, 255,  87,   0 })
-    , WHITE( { 255, 255, 255,   0 })
-    , m_current_fg_color(GREY)
-    , m_current_bg_color(BLACK)
-    , m_term_width(term_width)
-    , m_term_height(term_height)
-    , m_is_scroll_region_active(false)
-    , m_top_margin(0)
-    , m_bottom_margin(0)
-    , m_cursor_x_position(0)
-    , m_cursor_y_position(0)
-    , m_is_scalling_surface(false)
-    , m_is_utf8_output(false)
+, BLUE( {   0,   0, 171,   0 })
+, GREEN( {   0, 171,   0,   0 })
+, CYAN( {   0, 171, 171,   0 })
+, RED( { 171,   0,   0,   0 })
+, MAGENTA( { 171,   0, 171,   0 })
+, BROWN( { 171,  87,   0,   0 })
+, GREY( { 171, 171, 171,   0 })
+, DARK_GREY( {  87,  87,  87,   0 })
+, LIGHT_BLUE( {  87,  87, 255,   0 })
+, LIGHT_GREEN( {  87, 255,  87,   0 })
+, LIGHT_CYAN( {  87, 255, 255,   0 })
+, LIGHT_RED( { 255,  87,  87,   0 })
+, LIGHT_MAGENTA( { 255,  87, 255,   0 })
+, YELLOW( { 255, 255,  87,   0 })
+, WHITE( { 255, 255, 255,   0 })
+, m_current_fg_color(GREY)
+, m_current_bg_color(BLACK)
+, m_term_width(term_width)
+, m_term_height(term_height)
+, m_is_scroll_region_active(false)
+, m_top_margin(0)
+, m_bottom_margin(0)
+, m_cursor_x_position(0)
+, m_cursor_y_position(0)
+, m_is_scalling_surface(false)
+, m_is_utf8_output(false)
 {
     std::cout << "Renderer Created" << std::endl;
     // Startup Surface and Texture Creation
@@ -958,30 +949,6 @@ void Renderer::renderCursorOffScreen()
  */
 void Renderer::drawTextureScreen()
 {
-    /*
-    SDL_Rect pick, rect;
-
-    // Get The Actual size of the Render/Window.
-    int screen_width, screen_height;
-    m_window_manager->renderOutputSize(screen_width, screen_height);
-
-    // Handle to Cursor Off Surface
-    SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
-                           ->getSurface();
-
-    // Used when cliping larger screen then texture size.
-    pick.w = surface->w; //  - 40; // 680 - 640 = 40
-    pick.h = surface->h; // - 80; // 480 - 400 = 80
-    pick.x = 0;
-    pick.y = 0;
-
-    // Destination
-    rect.w = screen_width;
-    rect.h = screen_height;
-    rect.x = 0;
-    rect.y = 0;*/
-
     SDL_Rect dest;
     int screen_width, screen_height;
     m_window_manager->renderOutputSize(screen_width, screen_height);
@@ -1221,7 +1188,26 @@ void Renderer::drawCharacterCell(int X, int Y, int ascii_code)
                            ->m_surfaceList[m_surface_manager->SURFACE_CHARACTER]
                            ->getSurface();
 
-    m_surface_manager->clearSurface(m_surface_manager->SURFACE_CHARACTER);
+    //m_surface_manager->clearSurface(m_surface_manager->SURFACE_CHARACTER);
+
+    // New Alpha Blending Test:
+    m_surface_manager->fillSurfaceColor(m_surface_manager->SURFACE_CHARACTER, nullptr, &m_current_bg_color);
+
+/*
+    SDL_SetSurfaceAlphaMod( m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_FONT]
+                           ->getSurface(), 255 );*/
+
+    //auto start_time = std::chrono::high_resolution_clock::now();
+
+    // Set the foreground color using mod.
+    SDL_SetSurfaceColorMod(m_surface_manager
+                           ->m_surfaceList[m_surface_manager->SURFACE_FONT]
+                           ->getSurface(),
+                           m_current_fg_color.r,
+                           m_current_fg_color.g,
+                           m_current_fg_color.b);
+
 
     // Copy from font surface to character surface.
     if(SDL_BlitSurface(
@@ -1235,12 +1221,17 @@ void Renderer::drawCharacterCell(int X, int Y, int ascii_code)
         SDL_Log("drawChar() SDL_BlitSurface tmpSurface: %s", SDL_GetError());
     }
 
+
+    /*
     // Replace the Character Cell Color
     replaceColor(
         SDL_MapRGB(surface->format, m_current_fg_color.r,
                    m_current_fg_color.g, m_current_fg_color.b),
         SDL_MapRGB(surface->format, m_current_bg_color.r,
                    m_current_bg_color.g, m_current_bg_color.b));
+    */
+
+
 
     // Write to Back Buffer for Scrolling the Screen.
     if(SDL_BlitSurface(
@@ -1253,6 +1244,9 @@ void Renderer::drawCharacterCell(int X, int Y, int ascii_code)
     {
         SDL_Log("drawChar() SDL_BlitSurface screenSurface: %s", SDL_GetError());
     }
+
+    //auto current_time = std::chrono::high_resolution_clock::now();
+   // std::cout << "Program has been running for " << std::chrono::duration_cast<std::chrono::duration<float>>(current_time - start_time).count() << " seconds" << std::endl;
 }
 
 /**
