@@ -13,6 +13,7 @@
 #include "menu_manager.hpp"
 #include "session_manager.hpp"
 #include "telnet_manager.hpp"
+#include "protocol.hpp"
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/smart_ptr/shared_ptr.hpp>
@@ -21,7 +22,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
-#include <boost/asio/io_service.hpp>
+//#include <boost/asio/io_service.hpp>
 
 // For IO service!
 #include <thread>
@@ -56,7 +57,8 @@ public:
         int                      term_width,
         int                      texture_filter
     )
-        : m_is_dial_directory(false)
+        : m_is_transfer(false)
+        , m_is_dial_directory(false)
         , m_term_height(term_height)
         , m_term_width(term_width)
         , m_char_height(16)
@@ -83,8 +85,8 @@ public:
     {
         std::cout << "Session Created!" << std::endl;
 
-        m_raw_data_vector.reserve(8024);
-        m_raw_data_vector.resize(8024);
+        m_raw_data_vector.reserve(0);
+        m_raw_data_vector.resize(0);
 
         // NOTES Reallocate by using reset! When rending Term Height/Width Change, need to recreate.
         // m_sequence_parser.reset(new SequenceParser(m_renderer, connection));
@@ -97,6 +99,7 @@ public:
         // Clear any Data left over in the Buffer.
         std::vector<unsigned char>().swap(m_raw_data_vector);
     }
+
 
     /**
      * @brief Starts up the Rendering and Sequence Decoder which needs a handle back to the session.
@@ -119,6 +122,9 @@ public:
         m_sequence_parser.reset(new SequenceParser(m_renderer, m_connection));
         m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));
 
+
+        m_protocol.reset(new Protocol(shared_from_this(), m_connection, m_program_path));
+
         // On creation, load a list of Available Font Sets XML
         bool is_loaded = m_surface_manager->readFontSets();
         if(!is_loaded)
@@ -131,6 +137,7 @@ public:
             std::cout << "Fontset Created!" << std::endl;
         }
     }
+
 
     /**
      * @brief Active Connections etc are send to new sessions on creation.
@@ -146,7 +153,6 @@ public:
         int                      term_height,
         int                      term_width,
         int                      texture_filter)
-
     {
         // Create and Pass back the new Session Instance.
         session_ptr new_session(
@@ -163,6 +169,7 @@ public:
         return new_session;
     }
 
+
     /**
      * @brief Setup the initial Async Socket Data Calls for Managing the connection.
      */
@@ -170,21 +177,28 @@ public:
     {
         // Important, clear out buffer before each read.
         std::vector<unsigned char>().swap(m_raw_data_vector);
-        m_raw_data_vector.reserve(8024);
-        m_raw_data_vector.resize(8024);
 
-        if(m_connection->is_open())
-        {
-            m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data_vector),
-                                                   boost::bind(&Session::handleRead, shared_from_this(),
-                                                           boost::asio::placeholders::error)); //,
-            //boost::asio::placeholders::bytes_transferred));
+        try {
+            if (m_connection && m_connection->is_open()) {
+                m_raw_data_vector.reserve(m_connection->socket().available());
+                m_raw_data_vector.resize(m_connection->socket().available());
+
+                m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data_vector),
+                                                       boost::bind(&Session::handleRead, shared_from_this(),
+                                                               boost::asio::placeholders::error)); //,
+                //boost::asio::placeholders::bytes_transferred));
+            }
+            else
+            {
+                std::cout << "waitForSocketData: Lost Connection." << std::endl;
+            }
         }
-        else
+        catch (std::exception ex)
         {
-            std::cout << "waitForSocketData: Lost Connection." << std::endl;
+            std::cout << "waitForSocketData: Exception - " << ex.what() << std::endl;
         }
     }
+
 
     /**
      * @brief Callback after data received. handles telnet options
@@ -208,8 +222,17 @@ public:
                     // Returns Test and ESC Sequence, All Options are Responsed to in the Manager.
                     if(m_telnet_manager)
                     {
-                        //std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data);
-                        std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data_vector);
+                        std::string parsed_data = "";
+                        if(!m_is_transfer)
+                        {
+                            parsed_data = m_telnet_manager->parseIncomingData(m_raw_data_vector);
+                        }
+                        else
+                        {
+                            // Were in a file transfer, forward
+                            parsed_data = std::string(m_raw_data_vector.begin(), m_raw_data_vector.end());
+                            return;
+                        }
 
                         // Debugging on Raw data coming in Shows Screen with bad ANSI Sequences!
                         // Testing and Debugging to make sure were not going insane! :)
@@ -291,6 +314,7 @@ public:
         }
     }
 
+
     /**
      * @brief Callback from The SessionManager to write data to the active sessions.
      * @param msg
@@ -321,6 +345,7 @@ public:
         }
     }
 
+
     /**
      * @brief Callback after Writing Data, Check For Errors.
      * @param error
@@ -329,8 +354,8 @@ public:
     {
         if(error)
         {
-            std::cout << "async_write error: " << error.message() << std::endl;
-            std::cout << "Session Closed()" << std::endl;
+            std::cout << "handleWrite async_write error: " << error.message() << std::endl;
+            std::cout << "handleWrite Session Closed()" << std::endl;
 
             try
             {
@@ -344,12 +369,13 @@ public:
                     m_connection->socket().close();
                 }
             }
-            catch (std::exception ex)
+            catch(std::exception ex)
             {
                 std::cout << "handleWrite() - Caught Exception on shutdown: " << ex.what();
             }
         }
     }
+
 
     /**
      * @brief Handle to launching the dialing directory for local sessions!
@@ -374,6 +400,7 @@ public:
         m_menu_manager->updateDialDirectory();
     }
 
+
     /**
      * @brief Startup for the Telnet Instatnces.
      */
@@ -397,6 +424,7 @@ public:
         );
     }
 
+
     /**
      * @brief Toggles off the Blinking of the cursor while data is displayed.
      */
@@ -406,6 +434,7 @@ public:
         m_start_blinking = blink;
         m_cursor_blink = 2;
     }
+
 
     /**
      * @brief Process Waiting Data Buffer and pass to rendering
@@ -421,7 +450,7 @@ public:
             if(input_sequence.size() > 0)
             {
                 int result = m_menu_manager->handleMenuUpdates(input_sequence);
-                if (result == EOF)
+                if(result == EOF)
                 {
                     // Quit from Dialing Directory, Exit Program
                     closeThisSession();
@@ -544,6 +573,7 @@ public:
         }
     }
 
+
     /**
      * @brief Cleanups Up Current Session by popping pointer off SessionManager
      */
@@ -565,6 +595,8 @@ public:
         }
     }
 
+    // Are are transfering files.
+    bool                     m_is_transfer;
 
     // Is this a local session used for the Dialing Directory.
     bool                     m_is_dial_directory;
@@ -613,6 +645,9 @@ public:
 
     // Holds System Connection Information (struct resides/passed from MenuManager)
     system_connection_ptr    m_system_connection;
+
+    // Handle to external protocols (file transfers)
+    protocol_ptr             m_protocol;
 
     // Handle Telnet Option Negoiation and Responses.
     telnet_manager_ptr       m_telnet_manager;

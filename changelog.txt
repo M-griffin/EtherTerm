@@ -1,4 +1,10 @@
 
+Change Log 3.0.44 - 2016-05-19
+	- Added support for external protocols for file transfers.
+	- Initial tests with Zmodem download are working
+	- Probably add options and create protocol.xml file for x, y, z modem
+          and the command lines for each.
+
 Change Log 3.0.43 - 2016-05-09
 	- Added Height/Width settings Terminal settings to dialing directory xml
 	- Added Texture Filtering settings to the dialing directory xml

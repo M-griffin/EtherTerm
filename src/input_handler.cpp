@@ -413,7 +413,41 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
     switch(event.key.keysym.sym)
     {
         case 'h': // ALT H - Hangup
-//            TheSocketHandler::Instance()->reset();
+            if(!m_globalShutdown)
+            {
+                session_ptr session = m_weak_session.lock();
+                if(session && !session->m_is_dial_directory)
+                {
+                    m_globalShutdown = true;
+                    session->closeThisSession();
+                }
+            }
+            return false;
+
+        case 'd': // ALT D - Start Download
+            if(!m_globalShutdown)
+            {
+                session_ptr session = m_weak_session.lock();
+                if(session && !session->m_is_dial_directory)
+                {
+                    // Start External Protocol Session
+                    if (session->m_is_transfer) {
+                        std::cout << "ALT - D [End Download]" << std::endl;
+                        session->m_is_transfer = false;
+
+                        // Important need to reset the socket back to async to receive.
+                        session->waitForSocketData();
+
+                    }
+                    else
+                    {
+                        std::cout << "ALT - D [Start Download]" << std::endl;
+                        session->m_protocol->executeProtocols();
+                        session->m_is_transfer = true;
+                    }
+
+                }
+            }
             return false;
 
         case SDLK_RETURN:

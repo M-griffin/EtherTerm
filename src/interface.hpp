@@ -1,6 +1,8 @@
 #ifndef INTERFACE_HPP
 #define INTERFACE_HPP
 
+//#define BOOST_ASIO_DISABLE_IOCP 1
+
 #include "session.hpp"
 #include "session_manager.hpp"
 
@@ -380,6 +382,7 @@ public:
             }
         }
     }
+
 
     // Client ASIO Service Specific
     boost::asio::io_service        m_io_service;

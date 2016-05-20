@@ -1,6 +1,9 @@
 #ifndef TCP_CONNECTION_HPP
 #define TCP_CONNECTION_HPP
 
+#include <boost/smart_ptr/shared_ptr.hpp>
+#include <boost/smart_ptr/weak_ptr.hpp>
+
 #include <boost/asio.hpp>
 
 using boost::asio::ip::tcp;
@@ -84,5 +87,6 @@ public:
 };
 
 typedef boost::shared_ptr<tcp_connection> connection_ptr;
+typedef boost::weak_ptr<tcp_connection> connection_wptr;
 
 #endif // TCP_CONNECTION_HPP
