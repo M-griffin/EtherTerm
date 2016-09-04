@@ -1,18 +1,22 @@
 
+Change Log 3.0.45 - 2016-09-04
+    - Added Some Extra Checks in Telnet Options to remove responses for 
+      For invalid arguments, to avoid option looks.
+
 Change Log 3.0.44 - 2016-05-19
-	- Added support for external protocols for file transfers.
-	- Initial tests with Zmodem download are working
-	- Probably add options and create protocol.xml file for x, y, z modem
+    - Added support for external protocols for file transfers.
+    - Initial tests with Zmodem download are working
+    - Probably add options and create protocol.xml file for x, y, z modem
           and the command lines for each.
 
 Change Log 3.0.43 - 2016-05-09
-	- Added Height/Width settings Terminal settings to dialing directory xml
-	- Added Texture Filtering settings to the dialing directory xml
-		- Note, that current window setup is to resize the screen to the window
-		  This just happens ignore texture filtering. So part II needs to 
-		  set a static screen size and allow to GPU to resize window like in 2.x
-	- Also testing some new scaled font surface and alpha recolor which 
-	  speeds up the display.
+    - Added Height/Width settings Terminal settings to dialing directory xml
+    - Added Texture Filtering settings to the dialing directory xml
+        - Note, that current window setup is to resize the screen to the window
+          This just happens ignore texture filtering. So part II needs to 
+          set a static screen size and allow to GPU to resize window like in 2.x
+    - Also testing some new scaled font surface and alpha recolor which 
+      speeds up the display.
 
 Change Log 3.0.42 - 2016-04-12
     - Added some exception handing on closing sockets to lock down some freezing

@@ -34,6 +34,121 @@ public:
      */
     std::string parseIncomingData(const std::vector<unsigned char> &msg_buffer);
 
+    /**
+     * @brief handles pending sequences waiting for reply responses
+     * @param option
+     * @return
+     */
+    bool checkReply(unsigned char option)
+    {
+        return checkSequence(reply_sequence, option);
+    }
+    void deleteReply(unsigned char option)
+    {
+        deleteSequence(reply_sequence, option);
+    }
+    void addReply(unsigned char option)
+    {
+        addSequence(reply_sequence, option);
+    }
+
+    /**
+     * @brief handles active sequences negotiated.
+     * @param option
+     * @return
+     */
+    bool checkActive(unsigned char option)
+    {
+        return checkSequence(active_sequence, option);
+    }
+    void deleteActive(unsigned char option)
+    {
+        deleteSequence(active_sequence, option);
+    }
+    void addActive(unsigned char option)
+    {
+        addSequence(active_sequence, option);
+    }
+
+    /**
+     * @class FindFirst
+     * @brief Comparatior for options in vectors.
+     */
+    struct FindFirst
+    {
+        FindFirst(unsigned char i) : to_find(i) { }
+        unsigned char to_find;
+        bool operator()
+        (const unsigned char &p)
+        {
+            return p == to_find;
+        }
+    };
+
+
+    /**
+     * @brief Templates for Handling Sequence Vector Operations
+     * @param t
+     * @param option
+     * @return
+     */
+    template <typename T>
+    bool checkSequence(T &t, unsigned char option)
+    {
+        typename T::iterator it =
+            find_if(t.begin(), t.end(), FindFirst(option));
+
+        if(it == t.end())
+        {
+            //std::cout << option << " not found" << std::endl;
+            return false;
+        }
+        else
+        {
+            //std::cout << option << " found" << std::endl;
+        }
+        return true;
+    }
+
+    template <typename T>
+    void addSequence(T &t, unsigned char option)
+    {
+        typename T::iterator it =
+            find_if(t.begin(), t.end(), FindFirst(option));
+
+        // Sequence Not Found, add new sequence.
+        if(it == t.end())
+            t.push_back(option);
+    }
+
+    template <typename T>
+    void deleteSequence(T &t, unsigned char option)
+    {
+        typename T::iterator it =
+            find_if(t.begin(), t.end(), FindFirst(option));
+
+        typename T::iterator it_back = t.end();
+
+        if(t.size() == 0)
+        {
+            return;
+        }
+        else if(t.size() > 1)
+        {
+            // If Sequence Found, Swap to Back and Remove Back.
+            if(it != t.end())
+            {
+                iter_swap(it, it_back);
+                t.pop_back();
+            }
+            else
+            {
+                // Clear all.
+                std::vector<unsigned char>().swap(t);
+            }
+        }
+    }
+
 private:
 
     // Global Option State for Telnet Options Parsing.
@@ -72,6 +187,11 @@ private:
 
     static const std::string telnetID;
     std::string inputSequence;
+
+    // Holds Sequences Waiting for Reply and Active.
+    std::vector<unsigned char> reply_sequence;
+    std::vector<unsigned char> active_sequence;
+
 };
 
 typedef boost::shared_ptr<TelnetManager> telnet_manager_ptr;

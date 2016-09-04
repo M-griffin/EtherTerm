@@ -30,6 +30,8 @@ TelnetManager::TelnetManager(session_ptr session)
 
 TelnetManager::~TelnetManager()
 {
+    std::vector<unsigned char>().swap(reply_sequence);
+    std::vector<unsigned char>().swap(active_sequence);
     std::cout << "~TelnetManager" << std::endl;
 }
 
@@ -378,9 +380,16 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                             break;
 
                         default:
-                            std::cout << "[IAC] DONT -> WONT [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
-                            telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
-                            m_teloptStage = 0;
+                            // Only Response Once, if we've already received this, then ignore it a second time!
+                            if (!checkActive(m_teloptCommand))
+                            {
+                                std::cout << "[IAC] DONT -> WONT [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
+                                m_teloptStage = 0;
+
+                                // Only Response once to Don't!
+                                addActive(m_teloptCommand);
+                            }
                             break;
                     }
                     break;
@@ -390,24 +399,33 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                     switch(c)
                     {
                         case TELOPT_ECHO:
-                            std::cout << "[IAC] DO TELOPT_ECHO [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
-                            telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
-                            m_is_active_echo = true;
-                            m_isECHOCompleted = true;
+                            if (!m_isECHOCompleted)
+                            {
+                                std::cout << "[IAC] DO TELOPT_ECHO [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
+                                m_is_active_echo = false;
+                                m_isECHOCompleted = false;
+                            }
                             break;
 
                         case TELOPT_BINARY:
-                            std::cout << "[IAC] DO TELOPT_BINARY [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
-                            telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
-                            m_isBINCompleted = true;
-                            m_is_active_bin = true;
+                            if (!m_isBINCompleted)
+                            {
+                                std::cout << "[IAC] DO TELOPT_BINARY [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
+                                m_isBINCompleted = true;
+                                m_is_active_bin = true;
+                            }
                             break;
 
                         case TELOPT_SGA:
-                            std::cout << "[IAC] DO TELOPT_SGA [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
-                            telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
-                            m_isSGACompleted = true;
-                            m_is_active_sga = true;
+                            if (!m_isSGACompleted)
+                            {
+                                std::cout << "[IAC] DO TELOPT_SGA [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
+                                m_isSGACompleted = true;
+                                m_is_active_sga = true;
+                            }
                             break;
 
                         case TELOPT_TTYPE:
@@ -430,8 +448,13 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                             */
 
                         default:
-                            std::cout << "[IAC] DO -> WONT [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
-                            telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
+                            // Only Response Once, if we've already received this, then ignore it a second time!
+                            if (!checkActive(m_teloptCommand))
+                            {
+                                std::cout << "[IAC] DO -> WONT [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
+                                addActive(m_teloptCommand);
+                            }
                             break;
                     }
                     m_teloptStage = 0;
@@ -445,17 +468,17 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                     switch(c)
                     {
                         case TELOPT_ECHO:
-                            if(!m_is_active_echo)
+                            if(!m_isECHOCompleted)
                             {
                                 std::cout << "[IAC] WILL TELOPT_ECHO [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
-                                telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
-                                m_is_active_echo = true;
-                                m_isECHOCompleted = false;
+                                telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
+                                m_is_active_echo = false;
+                                m_isECHOCompleted = true;
                             }
                             break;
 
                         case TELOPT_BINARY :
-                            if(!m_is_active_bin)
+                            if(!m_isBINCompleted)
                             {
                                 std::cout << "[IAC] WILL TELOPT_BINARY [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                                 telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
@@ -465,7 +488,7 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                             break;
 
                         case TELOPT_SGA :
-                            if(!m_is_active_sga)
+                            if(!m_isSGACompleted)
                             {
                                 std::cout << "[IAC] WILL TELOPT_SGA [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                                 telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
@@ -479,8 +502,13 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                                 return 255;
                             */
                         default :
-                            std::cout << "[IAC] WILL -> DONT [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
-                            telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
+                            // Only Response Once, if we've already received this, then ignore it a second time!
+                            if (!checkActive(m_teloptCommand))
+                            {
+                                std::cout << "[IAC] WILL -> DONT [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+                                telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
+                                addActive(m_teloptCommand);
+                            }
                             break;
                     }
                     m_teloptStage = 0;
@@ -489,7 +517,7 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                 case WONT:
                     // Don't respond to WONT
                     std::cout << "[IAC] RECEIVED WONT [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
-                    telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
+                    //telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
                     //printf("\r\n [WONT - responded DONT %i] \r\n",c);
                     m_teloptStage = 0;
                     break;
