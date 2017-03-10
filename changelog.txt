@@ -1,4 +1,7 @@
 
+Change Log 3.0.46 - 2017-10-03
+    - Fixed ESC[C Cursor Movement to not wrap when it hits end of Term Width.
+
 Change Log 3.0.45 - 2016-09-04
     - Added Some Extra Checks in Telnet Options to remove responses for 
       For invalid arguments, to avoid option looks.
