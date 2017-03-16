@@ -4,7 +4,7 @@
 Introduction
 ============
 
-.. image:: https://dl.dropboxusercontent.com/u/92792939/EtherTerm.png
+.. image:: http://i.imgur.com/0BaGSSq.png
    :alt: Screenshot
 
 EtherTerm is a portable terminal emulator and telnet/ssh client for Windows
