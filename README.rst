@@ -1,3 +1,10 @@
+
+Notes: Latest work has been done in 3.0 Demo Branch
+============
+_3.0 Demo Branch is the last fork of the code: https://github.com/M-griffin/EtherTerm/tree/3.0-Demo
+
+
+
 .. contents:: Table of Contents
    :depth: 3
 
