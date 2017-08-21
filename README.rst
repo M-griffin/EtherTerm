@@ -1,3 +1,13 @@
+3.0 Demo Branch
+===============
+The 3.0 Demo branch is a fork and rewrite of the internals for EtherTerm.  This version differs a bit as asynchronous sockets were added along with the ability to open several connections at the same each in their own window.  Other telnet option fixes and updated to the terminal have also been added along with some pre-testing of file upload/downloads.  Still very raw (Dialing Directory is still unfinished, and SSH support is disconnected at the moment).  This more of a POC (Proof of concept) rewrite to see what can be done differently.   Also some rendering changes were made and are in testing such as recolor blocks using alpha channels for a slight speed up.  Although some kinks need to be worked out on some background / foreground color swaps, this isn't 100% yet.  Blinking cursor code has also been improved however some issues the color of the cursor following the color of the current x/y position on the screen due to using Alpha channels for quick color changes.
+
+
+A second fork for 4.0 Demo should be in the near future as time permits.
+
+
+
+
 .. contents:: Table of Contents
    :depth: 3
 
