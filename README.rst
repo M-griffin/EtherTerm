@@ -1,18 +1,9 @@
-<<<<<<< HEAD
-3.0 Demo Branch
+
+4.0 Demo Branch is now the latest work is starting with a rewrite and reintegration of SSH.
+The removal of Boost libs is also being done and will be replace with standard c++ functionaly instead.
+
 ===============
-The 3.0 Demo branch is a fork and rewrite of the internals for EtherTerm.  This version differs a bit as asynchronous sockets were added along with the ability to open several connections at the same each in their own window.  Other telnet option fixes and updated to the terminal have also been added along with some pre-testing of file upload/downloads.  Still very raw (Dialing Directory is still unfinished, and SSH support is disconnected at the moment).  This more of a POC (Proof of concept) rewrite to see what can be done differently.   Also some rendering changes were made and are in testing such as recolor blocks using alpha channels for a slight speed up.  Although some kinks need to be worked out on some background / foreground color swaps, this isn't 100% yet.  Blinking cursor code has also been improved however some issues the color of the cursor following the color of the current x/y position on the screen due to using Alpha channels for quick color changes.
-
-
-A second fork for 4.0 Demo should be in the near future as time permits.
-
-=======
-
-Notes: Latest work has been done in 3.0 Demo Branch
-============
-_3.0 Demo Branch is the last fork of the code: https://github.com/M-griffin/EtherTerm/tree/3.0-Demo
->>>>>>> master
-
+The previous 3.0 Demo branch is a fork and rewrite of the internals for EtherTerm.  This version differs a bit as asynchronous sockets were added along with the ability to open several connections at the same each in their own window.  Other telnet option fixes and updated to the terminal have also been added along with some pre-testing of file upload/downloads.  Still very raw (Dialing Directory is still unfinished, and SSH support is disconnected at the moment).  This more of a POC (Proof of concept) rewrite to see what can be done differently.   Also some rendering changes were made and are in testing such as recolor blocks using alpha channels for a slight speed up.  Although some kinks need to be worked out on some background / foreground color swaps, this isn't 100% yet.  Blinking cursor code has also been improved however some issues the color of the cursor following the color of the current x/y position on the screen due to using Alpha channels for quick color changes.
 
 
 .. contents:: Table of Contents
@@ -119,79 +110,6 @@ For Windows, mingw32 or 64 is required.
   it is not (yet) a very "portable" executable.  At this stage, please execute only from the
   project folder.
 
-- ``./EtherTerm`` to run on unix systems, or just ``EtherTerm`` on Windows.
-
-Windows
--------
-
-Must compile with latest c++ environment flags:  At the very least and you can
-also replace 0x with 11 on newer compilers. Usually g++ (4.7)+ or compatible
-compiler:
-
-```
--std=gnu++11 or -std=c++11
-```
-
-To build windows you must already have a compiler and the requirements.
-You can use a good IDE like CodeLite, CodeBlocks, or Visual Studio.
-You must install the libs and setup the include paths, like any project.
-
-Makefile(s) are provided for g++ compiles on Windows.
-
-With Windows you will need to setup a command line environment appropriate
-for compilation of this project, or create a build target with the necessary
-settings using a project file of your preferred IDE::
-
-    make clean-win
-    make win
-
-OSX
----
-
-- Install HomeBrew http://brew.sh/
-- ``brew install sdl2 sdl2_net libssh``
-- ``make clean-osx``
-- ``make osx``
-
-Ubuntu, Mint, and Debian Linux
-------------------------------
-
-- ``sudo apt-get install build-essential libsdl2-dev libsdl2-net-dev libssh-dev``
-- ``make clean-linux``
-- ``make linux``
-
-Arch Linux
-----------
-
-- ``sudo pacman -S sdl2 sdl2_net extra/libssh``
-- ``make clean-linux``
-- ``make linux-arch``
-
-Changelog
-=========
-
-**v2.8**
-
-- Several fixes after the large re-factoring of code.
-- Updates for memory handling and data queue.
-- more fixes and restructing of the internals, no new features yet.
-
-**v2.7**
-
-- Reworking of the internal systems
-- Added buffering for input sequences
-- Updated make file for better optimizations and error checking.
-
-**v2.4 - 2.6**
-
-- Reworking of the internal systems and various fixes
-- fixes for public key authentication
-
-**v2.3**
-
-- ``ALT + H`` for quick disconnection ("hangup")
-- SSH login/password prompts when not specified in ``assets/dialdirectory.xml``
-- Selection of various input key mappings (VT100, ANSI, etc.)
 
 TODO
 ====
