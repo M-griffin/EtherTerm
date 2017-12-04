@@ -1,0 +1,17 @@
+[{
+		"file":	"C:\\Users\\Blue\\Desktop\\EtherTerm\\main.cpp",
+		"directory":	"C:\\Users\\Blue\\Desktop\\EtherTerm",
+		"command":	"C:\\MinGW-4.8.1\\bin\\g++.exe  -c C:\\Users\\Blue\\Desktop\\EtherTerm\\main.cpp -o C:\\Users\\Blue\\Desktop\\EtherTerm\\main.cpp.o  -g  -O0  -Wall  -std=gnu++0x -I. -I. -IC:/MinGW-4.8.1/include/SDL2 -IC:/Users/Blue/Downloads/SDL2_image-devel-2.0.0-mingw/SDL2_image-2.0.0/i686-w64-mingw32/include/SDL2 -IC:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2 -IC:/libssh-0.6.0/include"
+	}, {
+		"file":	"C:\\Users\\Blue\\Desktop\\EtherTerm\\renderer.cpp",
+		"directory":	"C:\\Users\\Blue\\Desktop\\EtherTerm",
+		"command":	"C:\\MinGW-4.8.1\\bin\\g++.exe  -c C:\\Users\\Blue\\Desktop\\EtherTerm\\renderer.cpp -o C:\\Users\\Blue\\Desktop\\EtherTerm\\renderer.cpp.o  -g  -O0  -Wall  -std=gnu++0x -I. -I. -IC:/MinGW-4.8.1/include/SDL2 -IC:/Users/Blue/Downloads/SDL2_image-devel-2.0.0-mingw/SDL2_image-2.0.0/i686-w64-mingw32/include/SDL2 -IC:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2 -IC:/libssh-0.6.0/include"
+	}, {
+		"file":	"C:\\Users\\Blue\\Desktop\\EtherTerm\\ansiparser.cpp",
+		"directory":	"C:\\Users\\Blue\\Desktop\\EtherTerm",
+		"command":	"C:\\MinGW-4.8.1\\bin\\g++.exe  -c C:\\Users\\Blue\\Desktop\\EtherTerm\\ansiparser.cpp -o C:\\Users\\Blue\\Desktop\\EtherTerm\\ansiparser.cpp.o  -g  -O0  -Wall  -std=gnu++0x -I. -I. -IC:/MinGW-4.8.1/include/SDL2 -IC:/Users/Blue/Downloads/SDL2_image-devel-2.0.0-mingw/SDL2_image-2.0.0/i686-w64-mingw32/include/SDL2 -IC:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2 -IC:/libssh-0.6.0/include"
+	}, {
+		"file":	"C:\\Users\\Blue\\Desktop\\EtherTerm\\socket.cpp",
+		"directory":	"C:\\Users\\Blue\\Desktop\\EtherTerm",
+		"command":	"C:\\MinGW-4.8.1\\bin\\g++.exe  -c C:\\Users\\Blue\\Desktop\\EtherTerm\\socket.cpp -o C:\\Users\\Blue\\Desktop\\EtherTerm\\socket.cpp.o  -g  -O0  -Wall  -std=gnu++0x -I. -I. -IC:/MinGW-4.8.1/include/SDL2 -IC:/Users/Blue/Downloads/SDL2_image-devel-2.0.0-mingw/SDL2_image-2.0.0/i686-w64-mingw32/include/SDL2 -IC:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2 -IC:/libssh-0.6.0/include"
+	}]

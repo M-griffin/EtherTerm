@@ -1,0 +1,371 @@
+
+Change Log 3.0.46 - 2017-10-03
+    - Fixed ESC[C Cursor Movement to not wrap when it hits end of Term Width.
+
+Change Log 3.0.45 - 2016-09-04
+    - Added Some Extra Checks in Telnet Options to remove responses for 
+      For invalid arguments, to avoid option looks.
+
+Change Log 3.0.44 - 2016-05-19
+    - Added support for external protocols for file transfers.
+    - Initial tests with Zmodem download are working
+    - Probably add options and create protocol.xml file for x, y, z modem
+          and the command lines for each.
+
+Change Log 3.0.43 - 2016-05-09
+    - Added Height/Width settings Terminal settings to dialing directory xml
+    - Added Texture Filtering settings to the dialing directory xml
+        - Note, that current window setup is to resize the screen to the window
+          This just happens ignore texture filtering. So part II needs to 
+          set a static screen size and allow to GPU to resize window like in 2.x
+    - Also testing some new scaled font surface and alpha recolor which 
+      speeds up the display.
+
+Change Log 3.0.42 - 2016-04-12
+    - Added some exception handing on closing sockets to lock down some freezing
+      on system disconnects or session closes.
+
+Change Log 3.0.41 - 2016-01-31
+    - Added initial support for new term sizes, temp hard coded but creating sessions
+      in 80x25, 80x50 etc.. are working.  Still need to add to dialing directory or 
+      xml file to set for each connection individually.
+
+Change Log 3.0.40 - 2016-01-30
+    - Source Cleanup and Re sync
+    - Fixed issues with background window/connection disconnecting
+      leaving the input for the active hung.
+    - Reset to Active Window when closing down a session is now handled better.
+
+Change Log 3.0.39 - 2016-01-28
+    - Cursor issue is now fixed and setup per session basis,
+      Move out of the SessionManager.
+    - Cursor and incoming events are also placed on hold per session
+      when their event is doing text selection, this stops the cursor
+      blinking from overwrite the text selection box being drawn.
+    - ISSUE: When a background window disconnects the first window gains 
+      focus causing the last active window to look input.
+      
+      1. Need to mark windows active and only switch focus if the Active window
+      closed.
+      
+      2. Need to add input grab to make sure the new focused window has full 
+      text input available.
+
+Change Log 3.0.38 - 2016-01-28
+    - Added New Window Position Cascading to move around next window created
+      So each window is not exactly spawned on top of each other.
+    - Added back Font Switching by Syncterm ESC Sequences
+    - ISSUE: Cursor blinks on first connection, but not on second connection.
+    - ISSUE: Need to toggle cursor off during text selection for copy/paste.
+
+Change Log 3.0.37 - 2016-01-25
+    - Exception issue with Cursor display is now resolved.
+    - Blinking cursor is now working 
+
+Change Log 3.0.36 - 2016-01-24
+    - Added Boost::Exception handling on main Interface loop to catch
+      exceptions in io_service when execute Async systems like connection.
+      Exceptions are thrown on unknown hostname when connecting out.      
+    - Working expect ion on displaying the cursor, then disconnecting,  shutdown
+      seems to be access something it shouldn't so need to spend time tracking
+      this down, I'm thinking a surface that is no longer existing.  
+
+Change Log 3.0.35 - 2016-01-24
+    - Set Focus to first available window once a session window is closed.
+      This has been reworked a few time, Now setup to use the session manager
+      to set a flag on any disconnected system during the session->leave()
+      Once a system is detected in the main thread, a call to reset focus
+      to the first available window in the session_manager is made.
+    - Added back copy selection into clip board for copy/paste functionality.
+    - WIP add back cursor and blinking next.
+
+Change Log 3.0.34 - 2016-01-23
+    - Fixed Rendering and Normal Screen Scrolling on long ANSI screen
+      Added new code to clear the last line when scrolling up the screen up
+      So there is nothing left over when the new line is drawn.
+
+Change Log 3.0.33 - 2016-01-23
+    - Fixed issues with multiple connections, more then 1, the program would freeze
+      in the input loop.  Added a return after processing event so it doesn't
+      Iterate to the next session when the Iterator pointer is no longer valid.
+            
+Change Log 3.0.32 - 2016-01-20
+    - Added Shutdown Procedures for Connections not yet established.
+      Eg.. Closing a the Window during a connection is now handled.
+
+Change Log 3.0.31 - 2016-01-19
+    - Fixed issues with Telnet Option Parsing and Responses.
+      Added new Vector<unsigned char> buffer to better handle 
+      binary sequence data without losing values on socket.read()
+    - Also testing converting and sending out data on a new
+      Vector<unsigned char> to make sure data values are proper
+      for full 8 bit support.
+    - Also fixed ESC[6n replies on current character screen position.
+    - Need to look over rendering issues when scrolling, since were not
+      using the extra screen size clipping (Maybe go back to it?!?)
+      the last line doesn't seems to be clearing properly on long scrollers.
+
+Change Log 3.0.30 - 2016-01-18
+    - Fixed issues with create a new session in async thread.
+    - Also fixed shutdown issues when the system doesn't connect
+      The socket is still considered open, so you can only call 
+      close() on the socket, not both close() and shutdown()!
+    - Telnet Option passing still WIP, have to debug a little more
+      on system not passing the TermType which was just added to XML.
+
+Change Log 3.0.29 - 2016-01-17 / 18
+    - Starting on Connections
+    - Adding Creating and Connection Instance to SessionManager Queue from MenuManager.
+    - Connections are working, however need to add in telnet option passing to handle
+      incoming data properly.  Also have to make sure Async Sockets in separate thread
+      are allowing the main thread to process the data properly. 
+    - Added In Telnet Definitions and created new TelnetManager class for option negotiations.
+    - Also added new TermType to the DialDirectoy XML file.  This is the Terminal type sent to the 
+      server on connections ANSI is default, others could be XTERM depend on the shell or server
+    * ISSUE:
+    - Just realized that Connection Swaps are done in the async.connection callback
+      which is threaded with IO_Service.  SDL Events can't hit Windows that are swapped in threads
+      go figure.  So right now it connects and renders, but then freezes because it can't handle
+      events.  So this needs to be reworked to register a connection, passing the socket, then
+      a new session needs to be swapped separately from the Interface class not in a thread! WIP!
+    
+Change Log 3.0.28 - 2016-01-16
+    - Refactored Broadcaster to SessionManager for better description of function
+    - Update shutdown procedure, if DialDirectory Window/Session is closed, then 
+      all Sessions are closed and program is shutdown.  Otherwise individual 
+      sessions are closed only when clicking X on the window.
+    - Added HOME and END to DialDirectory to move quickly to First and Last entry.
+    - Also reworked the menu system a bit changing ESC Functions keys from looping
+      vector to a single std::map for KeyValue and quicker lookups.
+
+Change Log 3.0.27 - 2016-01-15
+    - Worked in KeyMaps passed from Sessions to InputHandler
+      By default ANSI mapping is selected for dial directory
+    - Added SystemConnection passing from Interface class to spawn
+      new sessions with connection info and keyMapping which 
+      is then passed to the InputHandler
+    - Added Broadcaster new SafeQueue to hold connection spawn, this
+      can be populated from within the session then read by Interface Class
+      using the SafeQueue.
+    - WIP Added HOME/END to dial directory
+    - WIP Finishing Connection System to call out from dial directory.
+    
+Change Log 3.0.26 - 2016-01-11
+    - Added Back Window Resize Events
+    - Added Back Mouse Selection for Text Copy/Paste
+    - Window Resize on ALT + ENTER are still WIP.
+
+Change Log 3.0.25 - 2016-01-09
+    - Added Windows Close Event Handling to shutdown Windows on clicking X
+    - Still need to add switch to check for Main Session, So Closing dialing 
+      directory shuts down all windows, while just closing connection and secondary
+      sessions just kills each session.  The base is already setup.
+    - Update default ANSI theme screen names to match themes
+      Still WIP on second test Theme Fire_Theme. Might just to test switching.
+
+Change Log 3.0.24 - 2016-01-07
+    - Themes are reorganized and cleaner
+    - Created new folder in assets for to organize directory themes
+    - Created new folder for fonts
+    - Added Mid ANSI's for light bars to ini files
+    - Renamed files for better theme organization.
+
+Change Log 3.0.23 - 2016-01-06
+    - Added Themes to the Dialing Directory, The ANSI/ASCII screen along with
+      Light bars for both the systems list and light bar commands have always 
+      been open and customizable.  Now by created a new DialDirectory.ini
+      and appending 1..2..3.. like DialDirectory1.ini you can setup each ini to point
+      to different theme templates to personalize your interface use to some 
+      pre-make ones that will be created.  Themes can be quick switched using 
+      then brackets '[' and ']' keys for switching between next and previous themes.
+    - Todo, update the Redraw light bar commands once themes are switched.
+    - Checked that Themes are working with different font sets, now to test menu
+      templates for different light bar colors and positions alone with the system
+      listing light bars, colors, and box sizes.      
+
+Change Log 3.0.22 - 2016-01-05
+    - Created new Fontset.xml file to hold all system fonts with names, height,
+      width, filename and ESC sequence for automatic font switching.  
+      The availability to set the sequence in the XML is an added bonus to set
+      a preference.  For example.  If ESC[0;40 D is received for Amiga Topaz,
+      however you preference is to see Topaz Plus, you can set this ESC sequence
+      under the preferred font so it will be used instead.  All fonts are now
+      configurable.
+    - Also updated the Dialing Directory to pull front names from the new xml set.
+
+Change Log 3.0.21 - 2016-01-05
+    - Fixed Shutdown with Broadcaster
+    - Tested Initial Rendering with 640x400, still need to work on switching
+      modes and scaling for the best quality/performance.
+    - Working on reintegrating the menu system.
+    - Input passing to the menu system is now working.
+    - Dialing Directory is now displaying with input for light bar movements.
+      Right now only arrow keys are working. Need to look at default Key Mappings
+      to make sure PAGEUP/DN etc are all captured correctly on the local side.
+    
+Change Log 3.0.20 - 2015-12-24
+    - Good Progress, Finally have the Classes loading in sync and
+      clean destruction in sync.
+    - Also have added broadcaster to hold all active sessions.
+    - Move main loop from Main() to Interface->Startup()
+      This keeps sessions and windows alive, falling back to main
+      seems to have been clearing pointers.  
+    - Able to render the full VGA character setup in a basic window.
+WIP
+    - Still loads of work to do, test the SequenceDecoder.
+    - Add processing and passing events to each session.
+    - Getting session data and passing it back through to the decoder
+      so it reaches he SequenceParser and renders on the screen.
+    - Render scaling on the fly to different and pre-set sizes without blur
+      when using texture filtering.
+
+Change Log 3.0.19 - 2015-12-23
+    - Reworked the startup and shutdown sequences.
+    - Added weak_prt for shared_from_this() so the main session
+      instance being passed would not lock and stay alive.
+    - WIP SessionList container in the Interface, research the best 
+      container for the job to easily main and release sessions.
+
+Change Log 3.0.18 - 2015-12-22
+    - Initial Startup sequence of session is working now. 
+      Added startup() called externally to properly start the render
+      with shared_from_this() object.  Now to work on renderer startup.
+
+Change Log 3.0.17 - 2015-12-22
+    - Code Cleanup and Working the MenuManager into the Local Session
+      Which will be spawned from the Interface.  Have to rework code
+      From the Previous MainMenuState since were not using a state 
+      system any longer.
+
+Change Log 3.0.16 - 2015-12-22
+    - Initial rework of MenuManager and the menu system completed.
+    - Added back the SystemConnection structure
+    - Next is to incorporate into the interface to spawn the menu
+      session, then rework connection spawns from the MenuManager
+      with pointer to the Interface.
+    - Added back TinyXML to get things up and working again. 
+      The plan is to replace this with boost later on once the major
+      rework is completed.
+
+Change Log 3.0.15 - 2015-12-21
+    - Added MenuFunction and MenuManager.
+    - WIP Reworking MenuManager.
+      Need to rework the system connection structure that is used to hold
+      system information.  Also looking into replacing tinyxml with boost
+      to remove all GPL code.
+
+Change Log 3.0.14 - 2015-12-20
+    - Added MenuIO, MenuConfig and MenuFunction
+    - Did some initial rework on classes and methods.  Still need to finish up 
+      some more work on tying it all together. Still a bit of refactoring needed.
+
+Change Log 3.0.13 - 2015-12-20
+    - Added MessageQueue for storing text/esc sequences.
+    - Added SequenceDecoder for Parameterize incoming data and ESC Sequences
+    - Added SafeQueue for storing array of processed sequences and text data.    
+    - Worked initial SafeQueue into Session instance.
+    - Reworked and normalized variables and classes for newly added files.
+
+Change Log 3.0.12 - 2015-12-20
+    - Code cleanup and variable normalization.
+
+Change Log 3.0.11 - 2015-12-19
+    - Complete initial rework of Renderer class, along with
+      The ScreenBuffer and PixelScreen Structs.  
+    - NOTES: SetupCursorSurface() in renderer should be redone eventually
+      to not use the underscore from the current font set since it can be 
+      in different positions it's not ideal.  Should create a custom char
+      for this eventually.
+    - NOTES: Showing the blinking cursor is disabled at this time, get back
+      to this once we have everything going again.
+    - Next Items are the Data decoder, Input Data Queue, and Dialing Directory.
+
+Change Log 3.0.10 - 2015-12-17 / 18
+    - More rework on the renderer class and the following.
+    - Added in SequenceParser Class which uses the renderer.
+    - Added ScreenBuffer Class for rework which used by SequenceParser
+    - Lots of items to rework and update for the new flow.
+    - Main Rework on ScreenBuffer and SequenceParser
+    - Normalized a lot of extra variables for Term Height and Width
+      Also removing hard coded variables so we can adjust through settings.
+    - Pulled in a copy of the renderer
+    - Passing the Session Instance to the Renderer now so it can
+      Access the Session->SequenceParser->Screen Buffer without 
+      Direct Circle Dependencies.    
+    - Passing the Connection Instance to the SequenceParser
+      So Client can now reply with Cursor X/Y Positions
+
+Change Log 3.0.9 - 2015-12-15
+    - Little more Rendering completed.  About Half-way there now.
+    - Some more rework and optimizations (Code wise).
+
+Change Log 3.0.8 - 2015-12-15
+    - Split out Surface and Texture from SurfaceManager to their own files.
+    - Added more rendering to the WindowManager Class. 
+    - Refactoring more code in the texture selection
+    - Update first couple scroll methods for new rendering.
+    - Still WIP through the Rendering file.
+
+Change Log 3.0.7 - 2015-12-14
+    - Reworked SDL Rendering code into WindowManager
+      This keeps everything in line with the active renderer
+      and cuts down on some code.
+    - Also refactored rendering for TextureSelection 
+      Lots of new functions to and cleanup to keep the flow easier to follow.
+
+Change Log 3.0.6 - 2015-12-13
+    - Added Textures Class to SurfaceManager for handling Textures dynamically also.
+    - Added new TEXTURE_HILIGHT for future use in highlighting Menu Bars
+    - WIP Renderer rewrite.
+    
+Change Log 3.0.5 - 2015-12-13
+    - Some more code cleanup.
+    - Worked more Renderer code still a WIP.
+    - WIP add TextureManager to SurfaceManger so it works the same.
+    - Added Term Height/Width variables
+    - Added InputHandler to Renderer for text selections.
+    
+Change Log 3.0.4 - 2015-12-12
+    - Added Program path pass-through from main -> interface -> session -> SurfaceManager
+      Used for loading fonts and also for assets folder location in the session
+    - Separated SurfaceManager from Renderer.
+    - WIP rebuilding the Renderer now to use SurfaceManager and WindowManager Objects
+
+Change Log 3.0.3 - 2015-12-12
+    - WIP Surface Manager Class
+      Complete initial dynamic surface manager.
+      
+Change Log 3.0.2 - 2015-12-11
+    - Completed WindowManager Class
+    - WIP Surface and Texture Manager for Rendering
+
+Change Log 3.0.1 - 2015-11-17
+    - Created initial classes:
+    Window Manager  - For Sessions and Windows for each connection including the Dialing Directory
+    Surface Manager - Handles SDL Surface and Textures for Displaying Graphics
+    Input Handler   - Handles Local Input and SDL Window Events
+    Session         - Each Session will handle its own socket i/o, ANSI parser, window and rendering
+    Interface       - Handles Spawning sessions and outgoing connections
+    tcp_connection  - Initial socket class that spawn a new socket per session
+    
+    Initial goal to get the dialing directory up and going. Before this need to re-work
+    The previous graphic classes to new layout.  This will take some time.
+
+Change Log 3.0.0 Started - 2015-11-16
+    Reworking Project, Replacing SDLNet for Boost ASIO for Sockets
+    Updated from SDL-2.0.3 to SDL-2.0.4
+    Updated Compiler for Windows from Mingw32 4.8.1 to 5.1.0
+    Updated C+ standard flags from x0 to x11.
+
+    Key 3.0 Update Goals:
+    - Better Design to remove singleton as an overused pattern
+    - Ability to run connections headless for automation and testing
+    - Screen Size Detection, Go full screen first, get the screen size and
+      Then re-size to initial screen window that will fit the display best!
+    - Multiple and separate windows per concurrent connections (TABS).
+    - SSL Socket for Obv/2 XRM WFC Interface secures remote connectivity.
+    - Better Scaling with Quality and no blurring on Texture Filtering.
+    - Ability to re-size windows and auto scaling on the fly.
+    - Internal Configuration Options without editing INI file.
+    - IPv6 and IPv4 connections
+
