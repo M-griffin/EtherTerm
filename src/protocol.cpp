@@ -196,13 +196,13 @@ void Protocol::executeProcess(int socket_descriptor)
     }
 
     unsigned long exit   = 0;  // process exit code
-    unsigned long bread  = 0;  // bytes read
-    unsigned long avail  = 0;  // bytes available
+//    unsigned long bread  = 0;  // bytes read
+//    unsigned long avail  = 0;  // bytes available
 
-    const int RCVBUFSIZE = 4096;
+//    const int RCVBUFSIZE = 4096;
     //char echoBuffer[RCVBUFSIZE];
-    unsigned char buf[RCVBUFSIZE];
-    unsigned char tmpbuf[RCVBUFSIZE];
+//    unsigned char buf[RCVBUFSIZE];
+//    unsigned char tmpbuf[RCVBUFSIZE];
 
     // While process is active!!
     while(1)

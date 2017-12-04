@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="EtherTerm" InternalType="Console">
+<CodeLite_Project Name="EtherTerm" InternalType="Console" Version="10.0.0">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -63,6 +63,8 @@
     <File Name="src/telnet.hpp"/>
     <File Name="src/telnet_manager.cpp"/>
     <File Name="src/telnet_manager.hpp"/>
+    <File Name="src/protocol.cpp"/>
+    <File Name="src/protocol.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

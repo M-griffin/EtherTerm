@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Workspace Name="EtherTerm" Database="">
+<CodeLite_Workspace Name="EtherTerm" Database="" Version="10.0.0">
   <Project Name="EtherTerm" Path="EtherTerm.project" Active="Yes"/>
   <Environment>
     <![CDATA[]]>
   </Environment>
-  <Project Name="UnitTests" Path="UnitTests/UnitTests.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Project Name="EtherTerm" ConfigName="Debug"/>
@@ -18,4 +17,3 @@
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>
-
