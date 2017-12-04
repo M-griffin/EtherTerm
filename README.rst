@@ -32,7 +32,7 @@ acceleration.
 Project details
 ===============
 
-EtherTerm is Public Domain Software, (c) 2014-2015 Michael Griffin <mrmisticismo@hotmail.com>
+EtherTerm is Open Source Software, (c) 2014-2017 Michael Griffin <mrmisticismo@hotmail.com>
 
 Currently, no *auto-configure* environment is provided, and build targets are
 limited to Windows, Linux, and OSX.  EtherTerm is **Alpha** software.  Please
