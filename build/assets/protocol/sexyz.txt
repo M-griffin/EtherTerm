@@ -1,0 +1,455 @@
+Synchronet External X/Y/ZMODEM (SEXYZ) File Transfer Protocol Driver
+--------------------------------------------------------------------
+
+$Id: sexyz.txt,v 1.27 2013/05/15 23:57:35 rswindell Exp $
+
+The live version of this document is online at:
+http://wiki.synchro.net/util:sexyz
+
+Overview
+--------
+SEXYZ was developed as a native (32-bit) TCP/socket-based replacement for the
+16-bit DOS file transfer drivers (e.g. FDSZ, CE-XYZ, etc.) that we've been
+stuck with on 32-bit BBSes for FAR too long. While SEXYZ was designed with
+Synchronet BBSes in mind, it should also work with other 32-bit BBS packages
+that have the ability to pass socket descriptors to external file transfer
+protocol drivers.
+
+SEXYZ behaves much like DSZ/FDSZ and CE-XYZ:
+
+    o Familiar command-line syntax
+    o Supports the DSZLOG environment variable for result logging
+    o Supports batch transfer file lists
+
+SEXYZ has several advantages over legacy drivers like FDSZ and CE-XYZ:
+
+    o Faster (native, multi-threaded design)
+    o Socket-based (no need for FOSSIL drivers or virtual COM ports/UARTs)
+    o Multi-tasking friendly (does not needlessly consume CPU cycles)
+    o Supports long filenames (e.g. not just DOS "8.3" formatted names)
+    o Supports YMODEM-G and XMODEM-G (FDSZ does not)
+    o Handles Telnet IAC escaping and option negotiations (optionally)
+    o Transfers files over fast connections (e.g. 100KB/sec) without issue
+    o Actively developed and supported
+    o Open source (at cvs.synchro.net)!
+
+
+Distribution
+------------
+SEXYZ is freeware, licensed under the GNU General Public License (GPL)
+http://www.fsf.org/licensing/licenses/gpl.txt
+with portions licensed under the GNU Lesser General Public License (LGPL)
+http://www.fsf.org/licensing/licenses/lgpl.txt.
+
+You can find the current source code (in C) in the CVS repository at
+cvs.synchro.net.
+
+The latest and greatest build will be included in Synchronet-Win32 releases.
+You should be able to find/download the latest general release of SEXYZ-Win32
+(sexyzNNN.zip) at one or all of the following locations:
+
+http://www.synchro.net
+ftp://ftp.synchro.net
+ftp://vert.synchro.net
+telnet://vert.synchro.net
+
+SEXYZ can also be built from the C source code for use (natively) on Linux
+and other Unix variants (e.g. FreeBSD).
+
+For a client implementation of SEXYZ, use the SyncTerm Telnet/RLogin/SSH
+terminal program (http://syncterm.net/), available for many platforms,
+including Win32, *nix, and Mac OS-X.
+
+
+Command-line Syntax
+-------------------
+Just running "sexyz" by itself will display the supported command-line usage
+(options and commands):
+
+usage: sexyz <socket> [-opts] <cmd> [file | path | @list]
+
+socket = TCP socket descriptor (or leave blank for "stdio" mode on Unix)
+
+opts   = -y  allow overwriting of existing files when receiving
+         -o  disable ZMODEM CRC-32 mode (force CRC-16 mode instead)
+         -s  disable ZMODEM streaming (Slow ZMODEM)
+         -k  enable X/YMODEM-1K send mode
+         -c  enable XMODEM-CRC receive mode
+         -g  enable X/YMODEM-G receive mode (no error recovery)
+         -2  set maximum ZMODEM block size to 2K
+         -4  set maximum ZMODEM block size to 4K
+         -8  set maximum ZMODEM block size to 8K (ZedZap)
+         -!  to pause after abnormal exit (error)
+         -telnet to enable Telnet mode (the default)
+         -rlogin to enable RLogin (pass-through) mode
+
+cmd    = v  to display detailed version information
+         sx to send XMODEM     rx to receive XMODEM
+         sX to send XMODEM-1K  rc to receive XMODEM-CRC
+         sy to send YMODEM     ry to receive YMODEM
+         sY to send YMODEM-1K  rg to receive YMODEM-G
+         sz to send ZMODEM     rz to receive ZMODEM
+
+file   = filename to send or receive
+path   = directory to receive files into
+list   = name of text file with list of filenames to send or receive
+
+
+NOTE: SEXYZ actually supports either "+list" or "@list" syntax for specifying
+      a file list on the command-line. If the list file doesn't exist, it'll
+      treat the '+' or '@' as part of the filename to send or receive.
+
+NOTE: SEXYZ also supports "rz/sz style" command-line syntax for some commands.
+      Examples: "sexyz -c rx" to recv XMODEM-CRC (same as "sexyz rc")
+                "sexyz -k sx" to send XMODEM-1K  (same as "seyxz sX")
+                "sexyz rb"    to recv YMODEM     (same as "sexyz ry")
+                "sexyz -k sb" to send YMODEM-1K  (same as "sexyz sY")
+                "sexyz -g ry" to recv YMODEM-G   (same as "sexyz rg")
+                "sexyz -g rx" to recv XMODEM-G
+
+
+Installation for Synchronet v3.12-Win32
+---------------------------------------
+Copy sexyz.exe into your Synchronet "exec" directory.
+
+
+Example configuration for Synchronet v3.12-Win32
+------------------------------------------------
+
+SCFG:File Options->Transfer Protocols:
+
+[File Transfer Protocol]
+ 1: Mnemonic (Command Key)        X
+ 2: Protocol Name                 XMODEM (SEXYZ)
+ 3: Access Requirements           
+ 4: Upload Command Line           %!sexyz%. %h -%p rC %f
+ 5: Download Command Line         %!sexyz%. %h -%p sX %f
+ 6: Batch Upload Command Line
+ 7: Batch Download Command Line
+ 8: Bi-dir Command Line
+ 9: Native (32-bit) Executable    Yes
+10: Supports DSZLOG               Yes
+11: Socket I/O                    Yes
+
+[File Transfer Protocol]
+ 1: Mnemonic (Command Key)        Y
+ 2: Protocol Name                 YMODEM (SEXYZ)
+ 3: Access Requirements           
+ 4: Upload Command Line           %!sexyz%. %h -%p ry %f
+ 5: Download Command Line         %!sexyz%. %h -%p sY %f
+ 6: Batch Upload Command Line     %!sexyz%. %h -%p ry %g
+ 7: Batch Download Command Line   %!sexyz%. %h -%p sY @%f
+ 8: Bi-dir Command Line
+ 9: Native (32-bit) Executable    Yes
+10: Supports DSZLOG               Yes
+11: Socket I/O                    Yes
+
+[File Transfer Protocol]
+ 1: Mnemonic (Command Key)        G
+ 2: Protocol Name                 YMODEM-G (SEXYZ)
+ 3: Access Requirements           
+ 4: Upload Command Line           %!sexyz%. %h -%p rg %f
+ 5: Download Command Line         %!sexyz%. %h -%p sY %f
+ 6: Batch Upload Command Line     %!sexyz%. %h -%p rg %g
+ 7: Batch Download Command Line   %!sexyz%. %h -%p sY @%f
+ 8: Bi-dir Command Line
+ 9: Native (32-bit) Executable    Yes
+10: Supports DSZLOG               Yes
+11: Socket I/O                    Yes
+
+[File Transfer Protocol]
+ 1: Mnemonic (Command Key)        Z
+ 2: Protocol Name                 ZMODEM (SEXYZ)
+ 3: Access Requirements           
+ 4: Upload Command Line           %!sexyz%. %h -%p rz %f
+ 5: Download Command Line         %!sexyz%. %h -%p sz %f
+ 6: Batch Upload Command Line     %!sexyz%. %h -%p rz %g
+ 7: Batch Download Command Line   %!sexyz%. %h -%p sz @%f
+ 8: Bi-dir Command Line
+ 9: Native (32-bit) Executable    Yes
+10: Supports DSZLOG               Yes
+11: Socket I/O                    Yes
+
+Optional/Advanced:
+
+[File Transfer Protocol]
+ 1: Mnemonic (Command Key)        8
+ 2: Protocol Name                 ZMODEM-8K (SEXYZ)
+ 3: Access Requirements           
+ 4: Upload Command Line           %!sexyz%. %h -%p rz %f
+ 5: Download Command Line         %!sexyz%. %h -%p -8 sz %f
+ 6: Batch Upload Command Line     %!sexyz%. %h -%p rz %g
+ 7: Batch Download Command Line   %!sexyz%. %h -%p -8 sz @%f
+ 8: Bi-dir Command Line
+ 9: Native (32-bit) Executable    Yes
+10: Supports DSZLOG               Yes
+11: Socket I/O                    Yes
+
+NOTE: It is suggested you remove existing FDSZ, CE-XYZ, or sz/rz transfer
+      protocol entries as they are no longer needed.
+
+
+Example configuration for Mystic v1.08-Win32
+--------------------------------------------
+(provided by Dream Master and Jack Phlash)
+
+A. Active     : Yes
+B. HotKey     : Z
+C. Description: ZMODEM
+D. Batch      : No
+E. Send Cmd   : c:\mystic\prots\sexyz.exe %0 sz %3
+F. Receive Cmd: c:\mystic\prots\sexyz.exe %0 rz %3
+
+A. Active     : Yes
+B. HotKey     : Z
+C. Description: ZMODEM batch
+D. Batch      : Yes
+E. Send Cmd   : c:\mystic\prots\sexyz.exe %0 sz @%3
+F. Receive Cmd: c:\mystic\prots\sexyz.exe %0 rz %3
+
+
+Example configuration for EleBBS-Win32
+--------------------------------------
+(provided by Mike Ehlert, aka pcm)
+
+Name            ZMODEM (SEXYZ)
+Key             Z
+Ext ctl file    No
+Batch           Yes
+Status          Always available
+Log file        DSZ.LOG
+Control file    DSZ.CTL
+DL command line c:\bbs\sexyz.exe *W -quotes sz @DSZ.CTL
+UL command line c:\bbs\sexyz.exe *W -quotes rz
+DL ctl string   @
+UL ctl string   @
+DL log keyword  z
+UL log keyword  Z
+Log name word   10
+Log desc word   0
+
+You will need to have the environment variable DSZLOG set to DSZ.LOG.
+It should *not* have a path of course, so that it's created in the current
+node's directory.
+
+Once you define that under control panel > system > env variables > system
+variables, be sure to close the window running eleserv or telsrv and reopen
+it for the environment variable to become active.. Otherwise there will be
+no log of the transfer and EleBBS will assume it failed.
+
+Note: To support long filenames with EleBBS, you'll need Sexyz v1.74 or later
+and set "Quotes=true" in the [DSZLOG] section of your sexyz.ini file or use
+the secret "-quotes" command-line option.
+
+
+Note Regarding Synchronet for Unix
+----------------------------------
+Synchronet for Unix (prior to v3.14) did not support socket-based file
+transfer protocols, so SEXYZ is only currently supported on Synchronet for
+Unix (v3.13 and older) in "stdio" mode.
+
+You can use "stdio" mode in SEXYZ by removing '%h' (the socket descriptor)
+from the above command-lines. If you're using Synchronet for Unix v3.14 or
+later, socket I/O mode is preferred (do not use "stdio" mode).
+
+
+Optional Initialization File (sexyz.ini)
+----------------------------------------
+If the file sexyz.ini exists in the same directory as the sexyz executable
+(e.g. C:\sbbs\exec\sexyz.ini), it will be loaded and used to over-ride the
+default operating parameters shown below. Like all Synchronet .ini files,
+you can have a unique .ini file for different local systems by embedding
+the local hostname (sexyz[.host].ini) or platform (sexyz[.platform].ini)
+in the filename. The filenames are *not* case sensitive. Examples:
+
+    C:\sbbs\exec\sexyz.dadscomputer.ini
+    C:\sbbs\exec\sexyz.win32.ini
+    /sbbs/exec/sexyz.linux.ini
+
+Example .ini file (with default values given):
+
+    Telnet=TRUE                 ; set to FALSE to change the default mode
+    TCP_NoDelay=TRUE            ; disable the TCP Nagle algorithm
+    LogLevel=INFO               ; set display/log output level
+    Debug=FALSE                 ; enable debug logging (overrides LogLevel)
+    DebugTx=FALSE               ; debug transmitted characters
+    DebugRx=FALSE               ; debug received characters
+    DebugTelnet=FALSE           ; debug Telnet commands
+    PauseOnExit=FALSE           ; wait for key-press on exit
+    PauseOnAbend=FALSE          ; wait for key-press on abnormal exit
+    OutbufSize=16384            ; bytes (between 1024 and 65536)
+    OutbufHighwaterMark=1100    ; bytes before auto-flush
+    OutbufDrainTimeout=10       ; milliseconds before auto-flush
+    ProgressInterval=1          ; interval (in seconds) of progress display
+
+    [XMODEM]
+    SendTimeout=10      ; seconds
+    RecvTimeout=10      ; seconds
+    ByteTimeout=3       ; seconds
+    AckTimeout=10       ; seconds
+    BlockSize=1024      ; 128 or 1024
+    MaxBlockSize=1024   ; 128 or 1024   
+    MaxErrors=9
+    G_Delay=1           ; millisecond yield between sent X/YMODEM-G blocks
+    SendG=TRUE          ; Support G-mode for X/YMODEM sends
+    SendCRC=TRUE        ; Support CRC-16 error detection for X/YMODEM sends
+
+    [YMODEM]
+    FallbackToXMODEM=0  ; Failed send attempts before falling back to XMODEM
+
+    [ZMODEM]
+    InitTimeout=10      ; seconds
+    SendTimeout=15      ; seconds
+    RecvTimeout=20      ; seconds
+    CrcTimeout=60       ; seconds
+    BlockSize=1024      ; 1024 is usually best to start with
+    MaxBlockSize=1024   ; 1024 is "true" ZMODEM, 8192 for ZMODEM-8K (ZedZap)
+    MaxErrors=9         ; maximum number of consecutive errors
+    RecvBufSize=0       ; specify non-zero for partial streaming receives
+    Streaming=TRUE      ; set to FALSE to disable streaming (block-at-a-time)
+    CRC32=TRUE          ; set to FALSE to force CRC-16 instead
+    EscapeTelnetIAC=TRUE    ; send ZDLE/ZRUB1 instead of 0xff with -telnet
+    Escape8thBit=FALSE      ; ZDLE-escape all bytes with bit-7 set
+    EscapeCtrlChars=FALSE   ; ZDLE-escape all control characters (< 20h)
+
+    [DSZLOG]
+    Path=true           ; include full path to filename in log
+    Short=false         ; use Micros~1 short path/filename in log (Windows)
+    Quotes=false        ; enclose filename in "quotes" (for EleBBS)
+
+
+Compatibility
+-------------
+The XMODEM, YMODEM, and ZMODEM file transfers should be compatible with any
+terminal programs or remote protocol drivers that conform to the public
+specifications for these protocols written by Chuck Forsberg (XMODEM was
+actually written by Ward Christensen, but was extended by others and
+documented by our good friend, Chuck).
+
+SEXYZ supports the following protocols and their popular permutations:
+
+XMODEM:     128-byte blocks, 8-bit checksum error detection
+XMODEM-CRC: 128-byte blocks, 16-bit CRC error detection
+XMODEM-1K:  1024-byte blocks, 16-bit CRC error detection
+XMODEM-G:   1024-byte blocks, 16-bit CRC error detection, and streaming
+            (no acknowledgements or error recovery) (a.k.a. QMODEM-G)
+YMODEM:     128-byte blocks, 16-bit CRC error detection, batch file transfers
+YMODEM-1K:  1024-byte blocks, 16-bit CRC error detection, batch file transfers
+YMODEM-G:   1024-byte blocks, 16-bit CRC error detection, batch file transfers
+            and streaming (no acknowledgements or error recovery)
+ZMODEM:     1024-byte blocks, 16-bit or 32-bit CRC error detection, batch file
+            transfers, resume, auto-download, and more
+ZMODEM-8K:  8192-byte blocks, 16-bit or 32-bit CRC error detection, batch file
+            transfers, resume, auto-download, and more (a.k.a. ZedZap)
+
+SEXYZ will automatically fall back from 1024-byte block XMODEM/YMODEM send
+mode to 128-byte block XMODEM/YMODEM send mode if the receiver does not appear
+to support 1024-byte blocks.
+
+SEXYZ also supports automatically falling back from XMODEM/YMODEM-CRC to
+XMODEM/YMODEM-Checksum mode when sending to a receiver that does not support
+CRC-16 error detection.
+
+As of this writing, the current version of SEXYZ and the X/ZMODEM modules are:
+
+    sexyz.c  1.81
+    xmodem.c 1.36   <-- Includes YMODEM
+    zmodem.c 1.77
+
+SEXYZ for Win32 has been tested successfully with the following Telnet clients
+/terminal programs:
+
+[ztelnet]
+OS: Linux
+Version: 1.2.2
+URL: ftp://ibiblio.org/pub/Linux/system/network/telnet/
+Tested: ZMODEM uploads and downloads
+Failed: none
+
+[HyperTerminal Private Edition]
+By: Hilgraeve, Inc.
+OS: Win32
+Version: 6.3
+URL: http://www.hilgraeve.com/htpe/
+Tested: XMODEM (checksum and CRC), XMODEM-1K, YMODEM-1K, YMODEM-G and ZMODEM
+        both uploads and downloads
+Failed: ZMODEM uploads (CRC errors detected): appears to be the fault of
+        HyperTerminal and can be reproduced with any protocol driver on the 
+        BBS/server side (even FDSZ)
+
+[mTelnet]
+By: enigma
+OS: Win32
+Version: 1.0 (beta 12)/w32
+URL: http://ozone.eesc.com
+Tested: ZMODEM uploads and downloads
+Failed: none
+
+[NetRunner]
+By: Mystic Software Development (James Coyle/g00r00)
+OS: Win32
+Version: 0.09
+URL: www.mysticbbs.com
+Tested: ZMODEM uploads and downloads
+Failed: ZMODEM uploads (CRC errors detected): appears to be the fault of
+        NetRunner and can be reproduced with any protocol driver on the 
+        BBS/server side (FDSZ and CEXYZ both failed in the same manner)
+
+[ZOC]
+By: EmTec, Innovative Software, Markus Schmidt
+OS: Win32
+Version: 5.02
+URL: http://www.emtec.com
+Tested: XMODEM, YMODEM, ZMODEM uploads and downloads
+ZMODEM: CRC-32
+RZ-rx-frames: ZFILE, ZDATA, ZCRCG, ZCRCW, ZCRCE, ZEOF, ZFIN
+RZ-tx-frames: ZRINIT, ZRPOS, ZACK, ZFIN
+Failed: none
+
+
+Support
+-------
+For technical support (including bug reports), see 
+http://www.synchro.net/docs/support.html for details.
+
+When submitting problem/bug reports, please include the version output from
+the "sexyz v" command. We're also very interested in reports of compatibility
+(or incompatibility) with terminal programs or telnet clients.
+
+
+Credits
+-------
+The XMODEM (a.k.a. MODEM, MODEM2) protocol was originally created by Ward
+Christensen in 1977.
+
+The XMODEM-CRC protocol (XMODEM derivative using a 16-CRC for error detection
+rather than XMODEM's 8-bit checksum) was created by John Mahr.
+
+The YMODEM, YMODEM-G and ZMODEM protocols were created and documented by Chuck
+Forsberg; YMODEM being primarily a set of enhancements to Ward's XMODEM and
+Mahr's XMODEM-CRC protocols.
+
+The X/YMODEM code used in SEXYZ was written by Rob Swindell <rob [at] synchro
+[dot] net>, migrated from the Synchronet Transfer Protocols (STP) program
+circa 1997.
+
+The Unix "stdio" mode support in SEXYZ was written by Stephen Hurd (a.k.a.
+Deuce) of Synchronix/FreeBSD Synchronet stardom and "scary code" infamy.
+
+The ZMODEM code in SEXYZ is based on zmtx/zmrx v1.02 (C) Mattheij Computer
+Service 1994 by Jacques Mattheij <jacquesm [at] hacktic [dot] nl>. Although
+SEXYZ's ZMODEM code no longer resembles zmtx/zmrx much, it served as a good
+starting point, and Jacques' version of Chuck's ZMODEM.DOC was very helpful!
+
+The 16-bit CRC table and calculation macro was (unwittingly) contributed by
+Mark G. Mendel and Stephen Satchell.
+
+The 32-bit CRC table and calculation macro was (unwittingly) contributed by
+Gary S. Brown.
+
+SEXYZ includes portions of the Synchronet XPDEV and SMBLIB libraries which
+are licensed under the GNU Lesser General Public License (LGPL).
+http://www.fsf.org/licensing/licenses/lgpl.txt
+
+Synchronet BBS software is written by and copyright 2008 Rob Swindell.
+http://www.synchro.net/docs/copyright.html

@@ -1,0 +1,16 @@
+xterm
+
+<hellbeard>maze: ^[[0;237;124;48tn
+<hellbeard>is this how a linuxterminal rgb ansi code looks like?
+<hellbeard>in that case pablodraw does support rgb ansi \o/
+
+<maze>no
+<maze>                        case 't':   // "24 bit ANSI", custom hack by Curtis
+<maze>                                    // Wensley (eto):
+<maze>                                    // http://picoe.ca/2014/03/07/24-bit-ansi/
+<maze>                            if (piece_list_size(sequences) == 4) {
+<maze>                                uint8_t i = atoi(ANSI_SEQ_CC(sequences, 0)),
+<robotsex>Title: 24-bit Ansi « Blog « Picoe Software (at picoe.ca)
+<maze>                                        r = atoi(ANSI_SEQ_CC(sequences, 1)),
+<maze>                                        g = atoi(ANSI_SEQ_CC(sequences, 2)),
+<maze>                                        b = atoi(ANSI_SEQ_CC(sequences, 3));
