@@ -86,7 +86,6 @@
       <Linker Options="" Required="yes">
         <Library Value="SDL2main"/>
         <Library Value="SDL2"/>
-        <Library Value="SDL2_net"/>
         <Library Value="pthread"/>
         <Library Value="boost_system"/>
         <Library Value="boost_thread"/>

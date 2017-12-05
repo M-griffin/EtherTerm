@@ -39,8 +39,8 @@ LinkOptions            :=
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch).. 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)SDL2_net $(LibrarySwitch)pthread $(LibrarySwitch)boost_system $(LibrarySwitch)boost_thread $(LibrarySwitch)boost_chrono $(LibrarySwitch)boost_locale $(LibrarySwitch)boost_filesystem $(LibrarySwitch)boost_timer 
-ArLibs                 :=  "SDL2main" "SDL2" "SDL2_net" "pthread" "boost_system" "boost_thread" "boost_chrono" "boost_locale" "boost_filesystem" "boost_timer" 
+Libs                   := $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)pthread $(LibrarySwitch)boost_system $(LibrarySwitch)boost_thread $(LibrarySwitch)boost_chrono $(LibrarySwitch)boost_locale $(LibrarySwitch)boost_filesystem $(LibrarySwitch)boost_timer 
+ArLibs                 :=  "SDL2main" "SDL2" "pthread" "boost_system" "boost_thread" "boost_chrono" "boost_locale" "boost_filesystem" "boost_timer" 
 LibPath                := $(LibraryPathSwitch). 
 
 ##
