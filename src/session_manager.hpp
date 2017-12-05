@@ -84,6 +84,6 @@ public:
 };
 
 typedef boost::shared_ptr<SessionManager>  session_manager_ptr;
-typedef boost::weak_ptr<SessionManager>       session_manager_wptr;
+typedef boost::weak_ptr<SessionManager>    session_manager_wptr;
 
 #endif // BROAD_CASTER_HPP

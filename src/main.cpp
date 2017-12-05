@@ -16,12 +16,12 @@
 #define SDL_MAIN_HANDLED
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_Main.h>
 
 #ifdef TARGET_OS_MAC // OSX
 #include <mach-o/dyld.h>
 
 #elif _WIN32 // Windows
+#include <SDL2/SDL_Main.h>
 #include <winsock2.h>
 #include <windows.h>
 #endif

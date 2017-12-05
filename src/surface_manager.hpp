@@ -6,11 +6,12 @@
 
 #include <SDL2/SDL.h>
 
-#include <iostream>
-#include <cmath>
-#include <cstdio>
 #include <unordered_map>
-#include <assert.h>
+#include <iostream>
+#include <cstdio>
+#include <cassert>
+#include <vector>
+#include <cmath>
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>

@@ -205,7 +205,7 @@ public:
         connection_ptr new_connection(new tcp_connection(m_io_service));
 
         // Hard Coded for testing, move this to direcotry.ini!
-        int height = 50;
+        int height = 25;
         int width = 80;
 
         // Create the Session before passing to the Connection (Async Thread)
