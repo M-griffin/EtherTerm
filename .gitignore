@@ -28,3 +28,5 @@ Icon
 /Debug
 /EtherTerm
 /EtherTerm.txt
+*.d
+*.o
