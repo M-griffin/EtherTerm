@@ -10,7 +10,7 @@ InputHandler::InputHandler(surface_manager_ptr surface_manager, session_ptr sess
     : m_weak_surface_manager(surface_manager)
     , m_weak_session(session)
     , m_globalShutdown(false)
-    , m_isWindowMode(true)
+    , m_isWindowMode(false)
     , m_isMouseSelected(false)
     , m_mouseSourceXPosition(0)
     , m_mouseSourceYPosition(0)
@@ -55,20 +55,22 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
     switch(event.window.event)
     {
         case SDL_WINDOWEVENT_SIZE_CHANGED:
+            /*
             SDL_Log("Window %d size changed to %dx%d",
                     event.window.windowID, event.window.data1,
-                    event.window.data2);
+                    event.window.data2);*/
             break;
 
         case SDL_WINDOWEVENT_SHOWN:
-            SDL_Log("Window %d shown", event.window.windowID);
+            //SDL_Log("Window %d shown", event.window.windowID);
             break;
 
         case SDL_WINDOWEVENT_HIDDEN:
-            SDL_Log("Window %d hidden", event.window.windowID);
+            //SDL_Log("Window %d hidden", event.window.windowID);
             break;
 
         case SDL_WINDOWEVENT_EXPOSED:
+            /*
             {
                 SDL_Log("Window %d exposed", event.window.windowID);
                 session_ptr session = m_weak_session.lock();
@@ -79,6 +81,7 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
                 }
                 break;
             }
+            */
             break;
         case SDL_WINDOWEVENT_MOVED:
             /*
@@ -104,7 +107,7 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_MINIMIZED:
-            SDL_Log("Window %d minimized", event.window.windowID);
+            //SDL_Log("Window %d minimized", event.window.windowID);
             break;
 
         case SDL_WINDOWEVENT_MAXIMIZED:
@@ -162,16 +165,13 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
                         event.window.windowID);
 
                 if(!m_globalShutdown)
-                {
                     SDL_StartTextInput();
-                }
 
                 // Mark the current window as active.
                 session_ptr session = m_weak_session.lock();
                 if(session)
                 {
                     session->m_window_manager->setActiveWindow(true);
-                    session->m_window_manager->grabWindow();
                 }
                 break;
             }
@@ -181,10 +181,7 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
                         event.window.windowID);
 
                 if(!m_globalShutdown)
-                {
                     SDL_StopTextInput();
-                }
-
                 // Mark the current window as inactive.
                 session_ptr session = m_weak_session.lock();
                 if(session)
@@ -413,94 +410,101 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
     switch(event.key.keysym.sym)
     {
         case 'h': // ALT H - Hangup
-            if(!m_globalShutdown)
-            {
-                session_ptr session = m_weak_session.lock();
-                if(session && !session->m_is_dial_directory)
-                {
-                    m_globalShutdown = true;
-                    session->closeThisSession();
-                }
-            }
-            return false;
-
-        case 'd': // ALT D - Start Download
-            if(!m_globalShutdown)
-            {
-                session_ptr session = m_weak_session.lock();
-                if(session && !session->m_is_dial_directory)
-                {
-                    // Start External Protocol Session
-                    if (session->m_is_transfer) {
-                        std::cout << "ALT - D [End Download]" << std::endl;
-                        session->m_is_transfer = false;
-
-                        // Important need to reset the socket back to async to receive.
-                        session->waitForSocketData();
-
-                    }
-                    else
-                    {
-                        std::cout << "ALT - D [Start Download]" << std::endl;
-                        session->m_protocol->executeProtocols();
-                        session->m_is_transfer = true;
-                    }
-
-                }
-            }
+//            TheSocketHandler::Instance()->reset();
             return false;
 
         case SDLK_RETURN:
+            // If not Full Screen Then Toggle to Next Mode.
+            if(!m_isWindowMode)
             {
-                // Grab handle to Session
-                session_ptr session = m_weak_session.lock();
-                if(session)
-                {
-                    // If Window Mode, go Full Screen
-                    if(m_isWindowMode)
-                    {
-                        // Reset Window to FullScreen
-                        SDL_SetWindowFullscreen(
-                            session->m_window_manager->getWindow(),
-                            SDL_WINDOW_FULLSCREEN_DESKTOP
-                        );
+                //TheTerminal::Instance()->setWindowWidth(640);
+                //TheTerminal::Instance()->setWindowHeight(400);
 
-                        // Clear and redraw the screen (remove selection box).
-                        session->m_renderer->clearScreen();
-                        session->m_renderer->drawTextureScreen();
+                // Have to reset to 640 so when we come out of full screen,
+                // so it will display this rez properly! Otherwise it skips to last size.
+                //SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
 
-                        m_isWindowMode = false;
-                    }
-                    // Switch from Full Screen to Window Mode.
-                    else
-                    {
-
-                        // Add code here if were in 80x25,
-                        // then flipp through 640, 1200, then full screen.
-
-
-                        // Set Window Mode back to original size.
-                        SDL_SetWindowSize(
-                            session->m_window_manager->getWindow(),
-                            session->m_window_manager->getWindowWidth(),
-                            session->m_window_manager->getWindowHeight()
-                        );
-
-                        // Turn off Full Screen
-                        SDL_SetWindowFullscreen(
-                            session->m_window_manager->getWindow(),
-                            0
-                        );
-
-                        // Clear and redraw the screen (remove selection box).
-                        session->m_renderer->clearScreen();
-                        session->m_renderer->drawTextureScreen();
-
-                        m_isWindowMode = true;
-                    }
-                }
-                break;
+                // New work around of SDL issues, we now destroy the Window
+                // And Renderer and recreated them in our desired resolutions
+                // Due to SDL being retarded on different platforms.
+#ifndef _WIN32
+//                TheRenderer::Instance()->restartWindowSize(true);
+//                TheRenderer::Instance()->restartWindowRenderer("1");
+#else
+//                TheRenderer::Instance()->restartWindowRenderer("1");
+//                SDL_SetWindowFullscreen(TheRenderer::Instance()->getWindow(), SDL_WINDOW_FULLSCREEN_DESKTOP);
+#endif
+                SDL_Log("Setting window to FULLSCREEN.");
+                m_isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
+                m_fullScreenWindowSize = 0;
+//                TheRenderer::Instance()->clearScreen();
+//                SDL_RenderPresent(TheRenderer::Instance()->getRenderer());
+//                TheRenderer::Instance()->drawTextureScreen();
+                return false;
             }
+            else
+            {
+
+                // OSX Doesn't do full-screen properly!
+                // Reset Texture Filtering when in windowed mode.
+                // Set Window Mode
+                /*
+                                if(SDL_SetWindowFullscreen(TheRenderer::Instance()->getWindow(), 0) < 0)
+                                {
+                                    SDL_Log(
+                                        "Error setting window to Windowed Mode: %s", SDL_GetError());
+                                    return false;
+                                }
+                */
+                //Toggle Between Window Sizes.
+                switch(m_fullScreenWindowSize)
+                {
+                        // Texture Filtering OFF.
+                        // These (2) Resolutions work perfect for 8x16 fonts
+                        // When the screen is re-sized the pixels are doubled
+                        // without needing to do any fancy recalculations
+                        // WE use these multiple to keep shaded blocks with
+                        // Correct looking pixel size and layout.
+                    case 0:
+//                        TheRenderer::Instance()->setWindowWidth(640);
+//                        TheRenderer::Instance()->setWindowHeight(400);
+//                        SDL_SetWindowSize(TheRenderer::Instance()->getWindow(), 640, 400);
+
+#ifndef _WIN32
+//                        TheRenderer::Instance()->restartWindowSize(false);
+//                        TheRenderer::Instance()->restartWindowRenderer("0");
+#else
+//                        TheRenderer::Instance()->restartWindowRenderer("0");
+#endif
+//                        TheRenderer::Instance()->clearScreen();
+//                        SDL_RenderPresent(TheRenderer::Instance()->getRenderer());
+//                        TheRenderer::Instance()->drawTextureScreen();
+                        SDL_Log("Setting window size to 640 x 400.");
+                        ++m_fullScreenWindowSize;
+                        break;
+
+                    case 1:
+//                        TheRenderer::Instance()->setWindowWidth(1280);
+//                        TheRenderer::Instance()->setWindowHeight(800);
+//                        SDL_SetWindowSize(TheRenderer::Instance()->getWindow(), 1280, 800);
+#ifndef _WIN32
+//                        TheRenderer::Instance()->restartWindowSize(false);
+//                        TheRenderer::Instance()->restartWindowRenderer("0");
+#else
+//                        TheRenderer::Instance()->restartWindowRenderer("0");
+#endif
+//                        TheRenderer::Instance()->clearScreen();
+//                        SDL_RenderPresent(TheRenderer::Instance()->getRenderer());
+//                        TheRenderer::Instance()->drawTextureScreen();
+                        SDL_Log("Setting window size to 1280 x 800.");
+                        ++m_fullScreenWindowSize;
+                        m_isWindowMode = false;
+                        break;
+                }
+                return false;
+            }
+            break;
+
         default:
             break;
     }

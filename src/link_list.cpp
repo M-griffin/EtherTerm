@@ -100,3 +100,4 @@ std::string LinkList::drawVectorList(unsigned long page, unsigned long list)
     stringBuilder += capture;
     return stringBuilder;
 }
+

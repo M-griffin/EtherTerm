@@ -2,8 +2,72 @@
 <Session Name="C:\Users\Blue\Desktop\EtherTerm\win32\EtherTerm.workspace">
   <int Value="0" Name="m_selectedTab"/>
   <wxString Value="C:\Users\Blue\Desktop\EtherTerm\win32\EtherTerm.workspace" Name="m_workspaceName"/>
-  <TabInfoArray Name="TabInfoArray"/>
+  <TabInfoArray Name="TabInfoArray">
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\renderer.cpp" Name="FileName"/>
+      <int Value="1349" Name="FirstVisibleLine"/>
+      <int Value="1246" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks">
+        <wxString Value="1001:7"/>
+        <wxString Value="1244:7"/>
+      </wxArrayString>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\renderer.hpp" Name="FileName"/>
+      <int Value="226" Name="FirstVisibleLine"/>
+      <int Value="239" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\surface_manager.cpp" Name="FileName"/>
+      <int Value="736" Name="FirstVisibleLine"/>
+      <int Value="745" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\surface.hpp" Name="FileName"/>
+      <int Value="52" Name="FirstVisibleLine"/>
+      <int Value="49" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+  </TabInfoArray>
   <SerializedObject Name="m_breakpoints">
-    <long Value="0" Name="Count"/>
+    <long Value="2" Name="Count"/>
+    <SerializedObject Name="Breakpoint0">
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\renderer.cpp" Name="file"/>
+      <int Value="1051" Name="lineno"/>
+      <wxString Value="" Name="function_name"/>
+      <wxString Value="" Name="memory_address"/>
+      <int Value="1" Name="bp_type"/>
+      <int Value="0" Name="watchpoint_type"/>
+      <wxString Value="" Name="watchpt_data"/>
+      <CData Name="commandlist"/>
+      <bool Value="0" Name="regex"/>
+      <bool Value="0" Name="is_temp"/>
+      <bool Value="1" Name="is_enabled"/>
+      <int Value="0" Name="ignore_number"/>
+      <wxString Value="" Name="conditions"/>
+      <int Value="0" Name="origin"/>
+    </SerializedObject>
+    <SerializedObject Name="Breakpoint1">
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\renderer.cpp" Name="file"/>
+      <int Value="1245" Name="lineno"/>
+      <wxString Value="" Name="function_name"/>
+      <wxString Value="" Name="memory_address"/>
+      <int Value="1" Name="bp_type"/>
+      <int Value="0" Name="watchpoint_type"/>
+      <wxString Value="" Name="watchpt_data"/>
+      <CData Name="commandlist"/>
+      <bool Value="0" Name="regex"/>
+      <bool Value="0" Name="is_temp"/>
+      <bool Value="1" Name="is_enabled"/>
+      <int Value="0" Name="ignore_number"/>
+      <wxString Value="" Name="conditions"/>
+      <int Value="0" Name="origin"/>
+    </SerializedObject>
   </SerializedObject>
 </Session>

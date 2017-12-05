@@ -224,7 +224,8 @@ void Protocol::executeProcess(int socket_descriptor)
             if (session)
             {
                 // Reset the socket and read waiting data refresh.
-                session->m_is_transfer = false;
+// To Impliment
+//              session->m_is_transfer = false;
                 session->waitForSocketData();
             }
             break;

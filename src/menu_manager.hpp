@@ -31,12 +31,10 @@ typedef struct SystemConnection
     int         port;
     std::string protocol;
     std::string login;
-    std::string password;      // Make this encrypted with more time.
+    std::string password;  // Make this encrypted with more time.
     std::string font;
-    std::string keyMap;        // ANSI, VT100 etc..
-    std::string termType;      // ANSI, XTERM etc..
-    std::string termSize;      // 80x25, 80x50
-    int         textureFilter; // 0, 1, 2  None, Linear, Bilinear.
+    std::string keyMap;    // ANSI, VT100 etc..
+    std::string termType;  // ANSI, XTERM etc..
 
 } SystemConnection;
 
