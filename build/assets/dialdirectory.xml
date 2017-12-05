@@ -2,7 +2,7 @@
 <EtherTerm>
     <Phonebook version="1.0">
         <BBS name="hTc Enthral" ip="htc.zapto.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
-        <BBS name="Oddnetwork" ip="oddnetwork.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" termSize="80x25" textureFilter="0" />
+        <BBS name="79 Columns" ip="oddnetwork.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="Black Flag (Mystic)" ip="blackflag.acid.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="1" />
         <BBS name="Black Flag (PCBoard)" ip="blackflag.acid.org" port="2627" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="Pharcyde" ip="bbs.pharcyde.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
