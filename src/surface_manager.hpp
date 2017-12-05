@@ -10,7 +10,8 @@
 #include <cmath>
 #include <cstdio>
 #include <unordered_map>
-#include <assert.h>
+#include <cassert>
+#include <vector>
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>

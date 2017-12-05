@@ -70,10 +70,14 @@ std::string Protocol::getProtocolPath()
  */
 bool Protocol::isWinNT()
 {
+#ifdef _WIN32
     OSVERSIONINFO osv;
     osv.dwOSVersionInfoSize = sizeof(osv);
     GetVersionEx(&osv);
     return (osv.dwPlatformId == VER_PLATFORM_WIN32_NT);
+#else
+    return false;
+#endif
 }
 
 
@@ -109,8 +113,9 @@ void Protocol::executeProtocols()
 }
 
 
+#ifdef _WIN32
 /**
- * @brief Call an Extenral process
+ * @brief Call an Extenral process (Win32 Only)
  * @param socket_descriptor
  */
 void Protocol::executeProcess(int socket_descriptor)
@@ -271,3 +276,13 @@ void Protocol::executeProcess(int socket_descriptor)
 
     std::cout << "File Transfer Completed!" << std::endl;
 }
+#else
+/**
+ * @brief Call an Extenral process (Posix Only)
+ * @param socket_descriptor
+ */
+void Protocol::executeProcess(int socket_descriptor)
+{
+
+}
+#endif
