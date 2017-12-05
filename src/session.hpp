@@ -14,25 +14,22 @@
 #include "session_manager.hpp"
 #include "telnet_manager.hpp"
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
-#include <boost/make_shared.hpp>
+#include <memory>
 
+/*
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/io_service.hpp>
+*/
 
 // For IO service!
 #include <thread>
 #include <deque>
 #include <set>
 
-using boost::asio::ip::tcp;
-
 class Session;
-typedef boost::shared_ptr<Session> session_ptr;
-typedef boost::weak_ptr<Session> session_weak_ptr;
+typedef std::shared_ptr<Session> session_ptr;
+typedef std::weak_ptr<Session> session_weak_ptr;
 
 
 /**
@@ -43,7 +40,7 @@ typedef boost::weak_ptr<Session> session_weak_ptr;
  * @brief Sessions manage each instance of a window / renderer
  */
 class Session
-    : public boost::enable_shared_from_this<Session>
+    : public std::enable_shared_from_this<Session>
 {
 public:
 
@@ -168,6 +165,8 @@ public:
         m_raw_data_vector.reserve(8024);
         m_raw_data_vector.resize(8024);
 
+// TODO REWORK
+/*        
         if(m_connection->is_open())
         {
             m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data_vector),
@@ -179,6 +178,7 @@ public:
         {
             std::cout << "waitForSocketData: Lost Connection." << std::endl;
         }
+*/         
     }
 
     /**
@@ -187,7 +187,7 @@ public:
      * @param error
      * @param bytes_transferred
      */
-    void handleRead(const boost::system::error_code& error) //, size_t bytes_transferred)
+    void handleRead(const std::error_code& error) //, size_t bytes_transferred)
     {
         session_manager_ptr session_mgr = m_weak_session_manager.lock();
         if(session_mgr)
@@ -251,6 +251,8 @@ public:
                 // Restart Callback to wait for more data.
                 // If this step is skipped, then the node will exit
                 // since io_service will have no more work!
+// TODO REWORK                
+/*                
                 if(m_connection->is_open())
                 {
                     waitForSocketData();
@@ -259,6 +261,7 @@ public:
                 {
                     std::cout << "Error: Session Socket Closed!" << std::endl;
                 }
+*/
             }
             else
             {
@@ -302,6 +305,9 @@ public:
         std::vector<unsigned char> buffer;
         buffer.reserve(msg.size());
         buffer.resize(msg.size());
+
+// TODO REWORK        
+/*        
         boost::asio::buffer_copy(boost::asio::buffer(buffer), boost::asio::buffer(msg));
 
         if(m_connection->is_open())
@@ -314,13 +320,14 @@ public:
                                          boost::asio::placeholders::error
                                      ));
         }
+*/         
     }
 
     /**
      * @brief Callback after Writing Data, Check For Errors.
      * @param error
      */
-    void handleWrite(const boost::system::error_code& error)
+    void handleWrite(const std::error_code& error)
     {
         if(error)
         {
@@ -329,6 +336,8 @@ public:
 
             try
             {
+// TODO REWORK
+/*                
                 if(m_connection->is_open())
                 {
                     // Only Shutdown when Connected!
@@ -338,6 +347,7 @@ public:
                     }
                     m_connection->socket().close();
                 }
+*/
             }
             catch (std::exception ex)
             {

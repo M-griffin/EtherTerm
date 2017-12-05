@@ -30,3 +30,6 @@ Icon
 /EtherTerm.txt
 *.d
 *.o
+win32/.codelite/EtherTerm.tags
+win32/.codelite/cppcheck.list
+win32/.codelite/refactoring.db

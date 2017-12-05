@@ -1,9 +1,7 @@
 #ifndef TCP_CONNECTION_HPP
 #define TCP_CONNECTION_HPP
 
-#include <boost/asio.hpp>
-
-using boost::asio::ip::tcp;
+// #include <boost/asio.hpp>
 
 /**
  * @class tcp_connection
@@ -15,7 +13,7 @@ using boost::asio::ip::tcp;
 class tcp_connection
 {
 public:
-
+/*
     tcp_connection(boost::asio::io_service& io_service)
         : m_socket(io_service)
     {
@@ -26,27 +24,27 @@ public:
         std::cout << "~tcp_connection" << std::endl;
     }
 
-    /**
+    **
      * @brief Is the Socket Created and Open
      * @return
-     */
+     *
     bool is_open()
     {
         return m_socket.is_open();
     }
 
-    /**
+    **
      * @brief Handle to Socket
      * @return
-     */
+     *
     boost::asio::ip::tcp::socket& socket()
     {
         return m_socket;
     }
 
-    /**
+    **
      * @brief Shutdowns an Open Connection
-     */
+     *
     void shutdown()
     {
         try
@@ -62,9 +60,9 @@ public:
         }
     }
 
-    /**
+    **
      * @brief Closes an Open (Maybe Not Connected Socket)
-     */
+     *
     void close()
     {
         try
@@ -78,11 +76,11 @@ public:
         {
             std::cout << "tcp_connection close() - Caught exception: " << ex.what();
         }
-    }
+    }*/
 
-    boost::asio::ip::tcp::socket m_socket;
+   // boost::asio::ip::tcp::socket m_socket;
 };
 
-typedef boost::shared_ptr<tcp_connection> connection_ptr;
+typedef std::shared_ptr<tcp_connection> connection_ptr;
 
 #endif // TCP_CONNECTION_HPP

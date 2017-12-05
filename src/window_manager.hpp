@@ -2,8 +2,7 @@
 #define WINDOW_MANAGER_HPP
 
 #include <SDL2/SDL.h>
-
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 /**
  * @class WindowManager
@@ -172,6 +171,6 @@ private:
 
 };
 
-typedef boost::shared_ptr<WindowManager> window_manager_ptr;
+typedef std::shared_ptr<WindowManager> window_manager_ptr;
 
 #endif // WINDOW_MANAGER_HPP

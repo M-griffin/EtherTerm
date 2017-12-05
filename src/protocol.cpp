@@ -6,14 +6,13 @@
 #include "session.hpp"
 
 #ifdef _WIN32
+#include <winsock2.h>
 #include <windows.h>
 #endif
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
-
-#include <string>
 #include <iostream>
+#include <string>
+#include <memory>
 #include <chrono>
 #include <thread>
 
@@ -95,7 +94,9 @@ void Protocol::executeProtocols()
 
 #ifdef _WIN32
     WSAPROTOCOL_INFO pri;
-    WSADuplicateSocket(conn->socket().native(), GetCurrentProcessId(), &pri);
+    
+// TODO REWORK    
+//    WSADuplicateSocket(conn->socket().native(), GetCurrentProcessId(), &pri);
     m_socket_duplicate = WSASocket(pri.iAddressFamily, pri.iSocketType, pri.iProtocol, &pri, 0, 0);
 #else
     m_socket_duplicate = dup(conn->socket().native());

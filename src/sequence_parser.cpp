@@ -4,11 +4,11 @@
 #include "tcp_connection.hpp"
 #include "session.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/bind.hpp>
+//#include <boost/bind.hpp>
 
 #include <iostream>
 #include <sstream>
+#include <memory>
 
 
 SequenceParser::SequenceParser(renderer_ptr renderer, connection_ptr connection)
@@ -1699,6 +1699,8 @@ void SequenceParser::sequenceResetAndResponses()
                 session_ptr session = m_renderer->m_weak_session.lock();
                 if (session)
                 {
+// TODO REWORK
+/*                    
                     if(session->m_connection->is_open() && session->m_is_connected)
                     {
                         session->deliver(buf);
@@ -1707,6 +1709,7 @@ void SequenceParser::sequenceResetAndResponses()
                     {
                         std::cout << "Error: SequenceParser ESC[6n Reply()" << std::endl;
                     }
+*/
                 }
             }
             break;

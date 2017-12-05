@@ -5,17 +5,17 @@
 #include "link_list.hpp"
 #include "menu_config.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <string>
 #include <vector>
+#include <memory>
+
 
 // Forward Declarations.
 class SequenceDecoder;
-typedef boost::shared_ptr<SequenceDecoder> sequence_decoder_ptr;
+typedef std::shared_ptr<SequenceDecoder> sequence_decoder_ptr;
 
 class Renderer;
-typedef boost::shared_ptr<Renderer> renderer_ptr;
+typedef std::shared_ptr<Renderer> renderer_ptr;
 
 /**
  * @class SystemConnection
@@ -38,7 +38,7 @@ typedef struct SystemConnection
 
 } SystemConnection;
 
-typedef boost::shared_ptr<SystemConnection> system_connection_ptr;
+typedef std::shared_ptr<SystemConnection> system_connection_ptr;
 
 
 /**
@@ -126,6 +126,6 @@ public:
 };
 
 class MenuManager;
-typedef boost::shared_ptr<MenuManager> menu_manager_ptr;
+typedef std::shared_ptr<MenuManager> menu_manager_ptr;
 
 #endif // MENUSYSTEM_HPP

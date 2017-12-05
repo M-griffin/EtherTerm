@@ -3,19 +3,17 @@
 
 #include "safe_queue.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
-
 #include <iostream>
+#include <memory>
 #include <string>
 #include <set>
 
 // Forward Declarations
 class Session;
-typedef boost::shared_ptr<Session> session_ptr;
+typedef std::shared_ptr<Session> session_ptr;
 
 class SystemConnection;
-typedef boost::shared_ptr<SystemConnection> system_connection_ptr;
+typedef std::shared_ptr<SystemConnection> system_connection_ptr;
 
 /**
  * @class SessionManager
@@ -83,7 +81,7 @@ public:
     std::set<session_ptr> m_sessions;
 };
 
-typedef boost::shared_ptr<SessionManager>  session_manager_ptr;
-typedef boost::weak_ptr<SessionManager>    session_manager_wptr;
+typedef std::shared_ptr<SessionManager>  session_manager_ptr;
+typedef std::weak_ptr<SessionManager>    session_manager_wptr;
 
-#endif // BROAD_CASTER_HPP
+#endif // SESSION_MANAGER_HPP

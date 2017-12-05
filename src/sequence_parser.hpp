@@ -5,17 +5,16 @@
 
 #include <SDL2/SDL.h>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <memory>
 
 class Renderer;
-typedef boost::shared_ptr<Renderer> renderer_ptr;
+typedef std::shared_ptr<Renderer> renderer_ptr;
 
 class tcp_connection;
-typedef boost::shared_ptr<tcp_connection> connection_ptr;
+typedef std::shared_ptr<tcp_connection> connection_ptr;
 
 
 /**
@@ -187,6 +186,6 @@ private:
 
 };
 
-typedef boost::shared_ptr<SequenceParser> sequence_parser_ptr;
+typedef std::shared_ptr<SequenceParser> sequence_parser_ptr;
 
 #endif

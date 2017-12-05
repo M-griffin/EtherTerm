@@ -1,19 +1,17 @@
 #ifndef PROTOCOLS_HPP
 #define PROTOCOLS_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
-
 #include <iostream>
+#include <memory>
 #include <string>
 
 class Session;
-typedef boost::shared_ptr<Session> session_ptr;
-typedef boost::weak_ptr<Session> session_weak_ptr;
+typedef std::shared_ptr<Session> session_ptr;
+typedef std::weak_ptr<Session> session_weak_ptr;
 
 class tcp_connection;
-typedef boost::shared_ptr<tcp_connection> connection_ptr;
-typedef boost::weak_ptr<tcp_connection> connection_wptr;
+typedef std::shared_ptr<tcp_connection> connection_ptr;
+typedef std::weak_ptr<tcp_connection> connection_wptr;
 
 class Protocol
 {
@@ -74,6 +72,6 @@ public:
     int                  m_socket_duplicate;
 };
 
-typedef boost::shared_ptr<Protocol> protocol_ptr;
+typedef std::shared_ptr<Protocol> protocol_ptr;
 
 #endif // PROTOCOLS_HPP

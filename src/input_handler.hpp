@@ -5,19 +5,16 @@
 
 #include <iostream>
 #include <string>
-
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
+#include <memory>
 
 class SurfaceManager;
-typedef boost::shared_ptr<SurfaceManager> surface_manager_ptr;
-typedef boost::weak_ptr<SurfaceManager> surface_manager_weak_ptr;
+typedef std::shared_ptr<SurfaceManager> surface_manager_ptr;
+typedef std::weak_ptr<SurfaceManager> surface_manager_weak_ptr;
 
 
 class Session;
-typedef boost::shared_ptr<Session> session_ptr;
-typedef boost::weak_ptr<Session> session_weak_ptr;
+typedef std::shared_ptr<Session> session_ptr;
+typedef std::weak_ptr<Session> session_weak_ptr;
 
 /**
  * @class InputHandler
@@ -168,8 +165,8 @@ private:
     bool handleKeyDownEvents(SDL_Event &event);
 };
 
-typedef boost::shared_ptr<InputHandler> input_handler_ptr;
-typedef boost::weak_ptr<InputHandler> input_handler_weak_ptr;
+typedef std::shared_ptr<InputHandler> input_handler_ptr;
+typedef std::weak_ptr<InputHandler> input_handler_weak_ptr;
 
 
 #endif

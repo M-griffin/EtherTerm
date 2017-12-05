@@ -11,8 +11,7 @@
 
 #include <iostream>
 #include <string>
-
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 /**
  * @class Textures
@@ -62,5 +61,5 @@ private:
 
 };
 
-typedef boost::shared_ptr<Textures> texture_ptr;
+typedef std::shared_ptr<Textures> texture_ptr;
 #endif // TEXTURE_HPP

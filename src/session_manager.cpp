@@ -2,7 +2,7 @@
 #include "session.hpp"
 
 #include <algorithm>
-#include <boost/bind.hpp>
+//#include <std/bind.hpp>
 
 
 SessionManager::SessionManager()
@@ -41,6 +41,8 @@ void SessionManager::leave(session_ptr session)
         // If session is connected, we need to disconnect it first
         if(session->m_connection)
         {
+// TODO REWORK
+/*            
             if(session->m_is_connected)
             {
                 // Shutdown the Connection before closing
@@ -49,6 +51,7 @@ void SessionManager::leave(session_ptr session)
                 session->m_is_connected = false;
             }
             session->m_connection->close();
+*/
         }
 
         // Remove the Session

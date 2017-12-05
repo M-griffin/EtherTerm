@@ -4,16 +4,18 @@
 #include "session.hpp"
 #include "session_manager.hpp"
 
+/*
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/exception/all.hpp>
 #include <boost/asio/io_service.hpp>
+*/
+
 
 #include <iostream>
 #include <thread>
 #include <set>
 
-using boost::asio::ip::tcp;
 
 /**
  * @class Interface
@@ -36,14 +38,16 @@ public:
      */
     std::thread create_thread()
     {
-        return std::thread([&] { m_io_service.run(); });
+        // TODO REWORK
+        //return std::thread([&] { m_io_service.run(); });
+        return std::thread([&] { });
     }
 
     // Setup IO_Service polling for connections. Use Work to keep io_service active.
     // while waiting for new connections.  Only need single thread for all sockets.
     Interface(std::string program_path)
-        : m_work(m_io_service)
-        , m_program_path(program_path)
+        //: m_work(m_io_service)
+        : m_program_path(program_path)
         , m_session_manager(new SessionManager())
         , m_is_global_shutdown(false)
     {
@@ -56,8 +60,9 @@ public:
     ~Interface()
     {
         //std::cout << "~Interface" << std::endl;
-        m_io_service.stop();
-        m_thread.join();
+// TODO REWORK
+//        m_io_service.stop();
+        //m_thread.join();
     }
 
     /**
@@ -136,9 +141,9 @@ public:
                 SDL_Delay(10);
 
             }
-            catch(boost::exception &e)
+            catch(std::exception &e)
             {
-                std::cerr << boost::diagnostic_information(e);
+                std::cerr << e.what();
             }
         }
     }
@@ -195,6 +200,8 @@ public:
                   << system_connection->port
                   << std::endl;
 
+//TODO REWORK
+/*
         tcp::resolver resolver(m_io_service);
         tcp::resolver::query query(system_connection->ip, std::to_string(system_connection->port));
 
@@ -262,6 +269,7 @@ public:
                 m_session_manager->leave(new_session);
             }
         });
+*/        
     }
 
     /**
@@ -315,8 +323,8 @@ public:
     }
 
     // Client ASIO Service Specific
-    boost::asio::io_service        m_io_service;
-    boost::asio::io_service::work  m_work;
+    //boost::asio::io_service        m_io_service;
+    //boost::asio::io_service::work  m_work;
     std::string                    m_program_path;
 
     // Spawned Session List

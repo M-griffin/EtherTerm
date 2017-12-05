@@ -13,6 +13,7 @@
 #endif
 
 #include <iostream>
+#include <cassert>
 
 WindowManager::WindowManager(int window_height, int window_width)
     : m_window(nullptr)
