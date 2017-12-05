@@ -255,9 +255,9 @@ bool SurfaceManager::readFontSets()
 FontSet SurfaceManager::getFontFromSet(std::string value)
 {
     FontSet font_set;
-    for(FontSet f : m_fontSet)
+    for (FontSet f : m_fontSet)
     {
-        if(f.filename == value)
+        if (f.filename == value)
         {
             font_set = f;
         }
@@ -274,10 +274,10 @@ bool SurfaceManager::loadFont()
 {
     bool is_loaded = false;
 
-    if(m_fontSet.size() == 0)
+    if (m_fontSet.size() == 0)
     {
         is_loaded = readFontSets();
-        if(is_loaded)
+        if (is_loaded)
         {
             std::cout << "Error, Fontsets not loaded!" << std::endl;
             return false;
@@ -287,23 +287,23 @@ bool SurfaceManager::loadFont()
     }
 
     FontSet font(getFontFromSet(m_currentFont));
-    if(font.filename != m_currentFont)
+    if (font.filename != m_currentFont)
     {
         std::cout << "Error, unable to load front from set!" << std::endl;
         assert(false);
     }
 
     // If type = bmp or bitmap.
-    if(font.type == "bmp")
+    if (font.type == "bmp")
     {
         is_loaded = loadBitmapFontImage();
     }
     // True Type (WIP) for Unicode fonts.
-    else if(font.type == "ttf")
+    else if (font.type == "ttf")
     {  }
 
     // If font loaded, then read and set the properties.
-    if(is_loaded)
+    if (is_loaded)
     {
         /**
          * Important note, if these change, but there static right now
@@ -317,131 +317,6 @@ bool SurfaceManager::loadFont()
     return is_loaded;
 }
 
-
-/**
- * @brief Set a Specific Surface Pixel
- * @param surface
- * @param x
- * @param y
- * @return
- */
-Uint32 SurfaceManager::getPixel(SDL_Surface *surface, int x, int y)
-{
-    int bpp = surface->format->BytesPerPixel;
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x * bpp;
-
-    switch(bpp)
-    {
-        case 1:
-            //std::cout << "getPixel 1" << std::endl;
-            return *p;
-
-        case 2:
-            //std::cout << "getPixel 2" << std::endl;
-            return *(Uint16 *)p;
-
-        case 3:
-
-            //std::cout << "getPixel 3" << std::endl;
-            if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-                return p[0] << m_characterHeight | p[1] << m_characterHeight | p[2];
-            else
-                return p[0] | p[1] << m_characterWidth | p[2] << m_characterHeight;
-
-            break;
-
-        case 4:
-            //std::cout << "getPixel 4" << std::endl;
-            return *(Uint32 *)p;
-
-        default:
-            return 0;
-    }
-}
-
-/**
- * @brief Get a Specific Surface Pixel
- * @param surface
- * @param x
- * @param y
- * @param pixel
- */
-void SurfaceManager::putPixel(SDL_Surface *surface, int x, int y, Uint32 pixel)
-{
-    int bpp = surface->format->BytesPerPixel;
-    Uint8 *p = (Uint8 *)surface->pixels + y * surface->pitch + x*bpp;
-
-    switch(bpp)
-    {
-        case 1:
-            //std::cout << "putPixel 1" << std::endl;
-            *p = pixel;
-            break;
-
-        case 2:
-            //std::cout << "putPixel 2" << std::endl;
-            *(Uint16 *)p = pixel;
-            break;
-
-        case 3:
-            //std::cout << "putPixel 3" << std::endl;
-            if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-            {
-                p[0]=(pixel >> m_characterHeight) & 0xff;
-                p[1]=(pixel >> m_characterWidth) & 0xff;
-                p[2]=pixel & 0xff;
-            }
-            else
-            {
-                p[0]=pixel & 0xff;
-                p[1]=(pixel >> m_characterWidth) & 0xff;
-                p[2]=(pixel >> m_characterHeight) & 0xff;
-            }
-            break;
-
-        case 4:
-            //std::cout << "putPixel 4" << std::endl;
-            *(Uint32 *) p = pixel;
-            break;
-    }
-}
-
-
-/**
- * @brief Taken from SDL GFX to Scale Down a Surface.
- * @param target
- * @param factor
- */
-void SurfaceManager::scaleDownSurface(SDL_Surface *target, const uint32_t & factor)
-{
-    // downscaling directly to screen is not supported
-    if(!target) return;
-
-    if(target->w / factor > target->w ||
-            target->h / factor > target->h)
-        return;
-
-
-    SDL_LockSurface(target);
-
-    int32_t target_y = 0;
-    for(uint32_t src_y = factor/2; src_y < target->h; src_y += factor)
-    {
-        int32_t target_x = 0;
-        for(int32_t src_x = factor/2; src_x < target->w; src_x += factor)
-        {
-            Uint32 px = getPixel(target, src_x, src_y);
-            putPixel(target, target_x, target_y, px);
-            target_x++;
-        }
-        target_y++;
-    }
-
-    SDL_UnlockSurface(target);
-
-}
-
-
 /**
  * @brief Loads Bitmap Fonts Images from Files
  * @param fontName
@@ -450,166 +325,56 @@ void SurfaceManager::scaleDownSurface(SDL_Surface *target, const uint32_t & fact
 bool SurfaceManager::loadBitmapFontImage()
 {
     std::string path = getFontPath();
-
-    if(m_currentFont == "vga16x32.bmp")
-        m_currentFont = "vga8x16.bmp";
-
     path.append(m_currentFont);
 
     std::cout << "loading Font -> : " << path << std::endl;
 
-    // Scale testing!
-    if(m_currentFont == "vga16x32.bmp")
+    // Loading Bitmap first time, or reloading,  If already Exists remove it.
+    if(surfaceExists(SURFACE_FONT))
     {
-
-        std::cout << "*** scaled font loading!"  << std::endl;
-
-        /*
-        // Check for new scaled surface,, load it then convert it to font surface!
-        if(surfaceExists(SURFACE_FONT_SCALED))
-        {
-            delSurface(SURFACE_FONT_SCALED);
-        }
-
-        // Load the Font into the Surface.
-        surface_ptr fontSurfaceScaled(
-            new Surfaces(
-                SDL_LoadBMP(path.c_str())
-            )
-        );
-
-        if(!fontSurfaceScaled->exists())
-        {
-            SDL_Log("loadBitmapImage() fontSurfaceScaled font: %s", path.c_str());
-            SDL_Delay(1500);
-            assert(false);
-        }
-
-        // Convert and Add to Surface Manager.
-        if(!fontSurfaceScaled->convert())
-        {
-            SDL_Log("Error Converting fontSurfaceScaled!");
-            return false;
-        }
-
-
-        // Loading Bitmap first time, or reloading,  If already Exists remove it.
-        if(surfaceExists(SURFACE_FONT))
-        {
-            delSurface(SURFACE_FONT);
-        }
-
-        // Testing hard code original size.
-        path = getFontPath();
-        path.append("vga8x16.bmp");
-
-        // Load the Font into the Surface.
-        surface_ptr fontSurface(
-            new Surfaces(
-                SDL_LoadBMP(path.c_str())
-            )
-        );
-        */
-
-        if(surfaceExists(SURFACE_FONT))
-        {
-            delSurface(SURFACE_FONT);
-        }
-
-        surface_ptr fontSurface(
-            new Surfaces(
-                SDL_LoadBMP(path.c_str())
-            )
-        );
-
-
-        if(!fontSurface->exists())
-        {
-            SDL_Log("loadBitmapImage() fontSurface font: %s", path.c_str());
-            SDL_Delay(1500);
-            assert(false);
-        }
-
-        // Convert and Add to Surface Manager.
-        if(!fontSurface->convert())
-        {
-            SDL_Log("Error Converting fontSurface!");
-            return false;
-        }
-
-        /*
-                SDL_Rect src, dest;
-                src.h = fontSurfaceScaled->getSurface()->h;
-                src.w = fontSurfaceScaled->getSurface()->w;
-                src.x = 0;
-                src.y = 0;
-
-                dest.h = fontSurface->getSurface()->h;
-                dest.w = fontSurface->getSurface()->w;
-                dest.x = 0;
-                dest.y = 0;*/
-
-
-        // Clear for new copy.
-        //fontSurface->clear();
-
-        // SCale the surface down
-        //scaleDownSurface(fontSurfaceScaled->getSurface(), 1);
-
-
-        // not blit scale frontsurface scaled to useable font surface.
-        /*
-        SDL_BlitScaled(
-            fontSurfaceScaled->getSurface(),
-            nullptr,
-            fontSurface->getSurface(),
-            &dest
-        );*/
-
-        addSurface(SURFACE_FONT, fontSurface);
-
+        delSurface(SURFACE_FONT);
     }
-    else
+
+    // Load the Font into the Surface.
+    surface_ptr fontSurface(
+        new Surfaces(
+            SDL_LoadBMP(path.c_str())
+        )
+    );
+
+    if(!fontSurface->exists())
     {
-
-
-        // Loading Bitmap first time, or reloading,  If already Exists remove it.
-        if(surfaceExists(SURFACE_FONT))
-        {
-            delSurface(SURFACE_FONT);
-        }
-
-        // Load the Font into the Surface.
-        surface_ptr fontSurface(
-            new Surfaces(
-                SDL_LoadBMP(path.c_str())
-            )
-        );
-
-        if(!fontSurface->exists())
-        {
-            SDL_Log("loadBitmapImage() fontSurface font: %s", path.c_str());
-            SDL_Delay(1500);
-            assert(false);
-        }
-
-        // Convert and Add to Surface Manager.
-        if(!fontSurface->convert())
-        {
-            SDL_Log("Error Converting Font Surface!");
-            return false;
-        }
-
-        // Setup alpha Blending.
-        SDL_SetSurfaceBlendMode(fontSurface->getSurface(), SDL_BLENDMODE_BLEND);
-
-        // Enable RLE acceleration
-        SDL_SetSurfaceRLE(fontSurface->getSurface(), 1);
-
-        addSurface(SURFACE_FONT, fontSurface);
+        SDL_Log("loadBitmapImage() fontSurface font: %s", path.c_str());
+        SDL_Delay(1500);
+        assert(false);
     }
+
+    // Convert and Add to Surface Manager.
+    if(!fontSurface->convert())
+    {
+        SDL_Log("Error Converting Font Surface!");
+        return false;
+    }
+    addSurface(SURFACE_FONT, fontSurface);
 
     return true;
+    /*
+     * WIP, Implement this!
+     */
+    /*
+       // Redraw Cursor with new font!
+       // When no data received, this is when we want to show the cursor!
+       // Setup cursor in current x/y position Cursor.
+       if(TheSequenceParser::Instance()->isCursorActive())
+       {
+           setupCursorChar();
+           renderCursorOnScreen();
+           drawTextureScreen();
+       }
+
+       m_previousFont = m_currentFont; // Current to Previous
+       m_currentFont  = fontName;    // New to Current.
+       return m_cachedSurface != nullptr;*/
 }
 
 
@@ -622,7 +387,7 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
 {
     // Handle to Window Manager
     window_manager_ptr window = m_weak_window_manager.lock();
-    if(!window)
+    if (!window)
     {
         return;
     }
@@ -637,9 +402,9 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                     delTexture(textureType);
                 }
 
-                // Handle to Window Manager
+                 // Handle to Window Manager
                 window_manager_ptr window = m_weak_window_manager.lock();
-                if(!window)
+                if (!window)
                 {
                     return;
                 }
@@ -676,8 +441,6 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                 {
                     SDL_Log("%s: Error Setting Blend on Texture - %s", SDL_GetError());
                 }
-
-                //SDL_SetTextureAlphaMod( texture->getTexture(), 255 );
             }
             break;
 
@@ -788,12 +551,6 @@ void SurfaceManager::createSurface(int surfaceType)
                     )
                 );
 
-                // Setup alpha Blending.
-                SDL_SetSurfaceBlendMode(surface->getSurface(), SDL_BLENDMODE_BLEND);
-
-                // Enable RLE acceleration
-                SDL_SetSurfaceRLE(surface->getSurface(), 1);
-
                 convertAndAdd(surfaceType, surface);
             }
             break;
@@ -808,7 +565,7 @@ void SurfaceManager::createSurface(int surfaceType)
                 }
 
                 window_manager_ptr window = m_weak_window_manager.lock();
-                if(window)
+                if (window)
                 {
                     // Create Surface with Smart pointer
                     surface_ptr surface(
@@ -835,9 +592,9 @@ void SurfaceManager::createSurface(int surfaceType)
                     delSurface(surfaceType);
                 }
 
-                // Handle to Window Manager
+                 // Handle to Window Manager
                 window_manager_ptr window = m_weak_window_manager.lock();
-                if(!window)
+                if (!window)
                 {
                     return;
                 }
@@ -932,9 +689,6 @@ void SurfaceManager::unlockSurface(int surfaceType)
  */
 void SurfaceManager::fillSurfaceColor(int surfaceType, SDL_Rect *rect, SDL_Color *color)
 {
-
-    SDL_LockSurface(m_surfaceList[surfaceType]->getSurface());
-
     // Fill screen with current RGB Background colors.
     if(SDL_FillRect(
                 m_surfaceList[surfaceType]->getSurface(),
@@ -944,12 +698,11 @@ void SurfaceManager::fillSurfaceColor(int surfaceType, SDL_Rect *rect, SDL_Color
                     color->r,
                     color->g,
                     color->b,
-                    255
+                    color->a
                 )) < 0)
     {
         SDL_Log("fillSurfaceCurrentColor(): %s", SDL_GetError());
         assert(false);
     }
-
-    SDL_UnlockSurface(m_surfaceList[surfaceType]->getSurface());
 }
+

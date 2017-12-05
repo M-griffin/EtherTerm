@@ -6,11 +6,12 @@
 
 #include <SDL2/SDL.h>
 
-#include <iostream>
-#include <cmath>
-#include <cstdio>
 #include <unordered_map>
-#include <assert.h>
+#include <iostream>
+#include <cstdio>
+#include <cassert>
+#include <vector>
+#include <cmath>
 
 #include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/smart_ptr/weak_ptr.hpp>
@@ -70,7 +71,6 @@ public:
         SURFACE_MAIN_SCREEN = 0,
         SURFACE_MAIN_SCALED,
         SURFACE_FONT,
-        SURFACE_FONT_SCALED,
         SURFACE_CHARACTER,
         SURFACE_CURSOR_ON,
         SURFACE_CURSOR_OFF,
@@ -178,31 +178,6 @@ public:
      * @return
      */
     bool loadFont();
-
-    /**
-     * @brief Set a Specific Surface Pixel
-     * @param surface
-     * @param x
-     * @param y
-     * @return
-     */
-    Uint32 getPixel(SDL_Surface *surface, int x, int y);
-
-    /**
-     * @brief Get a Specific Surface Pixel
-     * @param surface
-     * @param x
-     * @param y
-     * @param pixel
-     */
-    void putPixel(SDL_Surface *surface, int x, int y, Uint32 pixel);
-
-    /**
-     * @brief Taken from SDL GFX to Scale Down a Surface.
-     * @param target
-     * @param factor
-     */
-    void scaleDownSurface(SDL_Surface *target, const uint32_t & factor);
 
     /**
      * @brief Loads Bitmap Fonts from Files

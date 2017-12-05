@@ -552,8 +552,8 @@ void SequenceParser::sequenceCursorAndDisplay()
                 ++m_screen_buffer.m_x_position;
                 if(m_screen_buffer.m_x_position > m_renderer->m_term_width)
                 {
-                    m_screen_buffer.m_x_position = m_renderer->m_term_width;
-                    //++m_screen_buffer.m_y_position;
+                    m_screen_buffer.m_x_position -= m_renderer->m_term_width;
+                    ++m_screen_buffer.m_y_position;
                 }
             }
             else
@@ -564,8 +564,8 @@ void SequenceParser::sequenceCursorAndDisplay()
                 // Down Automatically.
                 if(m_screen_buffer.m_x_position > m_renderer->m_term_width)
                 {
-                    m_screen_buffer.m_x_position = m_renderer->m_term_width;
-                    //++m_screen_buffer.m_y_position;
+                    m_screen_buffer.m_x_position -= m_renderer->m_term_width;
+                    ++m_screen_buffer.m_y_position;
                 }
             }
             break;
