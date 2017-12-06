@@ -67,6 +67,11 @@
     <File Name="../src/tinyxmlparser.cpp"/>
     <File Name="../src/window_manager.cpp"/>
     <File Name="../src/window_manager.hpp"/>
+    <File Name="../src/socket_handler.cpp"/>
+    <File Name="../src/socket_handler.hpp"/>
+    <File Name="../src/socket_ssh.cpp"/>
+    <File Name="../src/socket_state.hpp"/>
+    <File Name="../src/socket_telnet.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -81,24 +86,31 @@
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-deprecated -Wno-unused-local-typedefs" C_Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-deprecated -Wno-unused-local-typedefs" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
-        <IncludePath Value="C:/Users/Blue/Downloads/SDL2-devel-2.0.4-mingw/SDL2-2.0.4/include"/>
+        <IncludePath Value="C:/Users/Blue/Downloads/SDL2-2.0.4/i686-w64-mingw32/include/SDL2"/>
+        <IncludePath Value="C:/Users/Blue/Downloads/SDL2-2.0.4/i686-w64-mingw32/include"/>
+        <IncludePath Value="C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2"/>
         <IncludePath Value="C:/Users/Blue/Downloads/SDL2_ttf-2.0.12/i686-w64-mingw32/include/SDL2"/>
         <IncludePath Value="C:/OpenSSL-Win32/include"/>
+        <IncludePath Value="C:/Users/Blue/Downloads/libssh-0.7.2/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="C:/Users/Blue/Downloads/SDL2_ttf-2.0.12/i686-w64-mingw32/lib"/>
+        <LibraryPath Value="C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/lib"/>
         <LibraryPath Value="C:/libz-1.2.7-1-mingw32-dev/lib"/>
         <LibraryPath Value="C:/msys/1.0/icu/source/lib"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
+        <LibraryPath Value="C:/Users/Blue/Downloads/libssh-0.7.2\lib"/>
         <Library Value="mingw32"/>
         <Library Value="SDL2main"/>
         <Library Value="SDL2"/>
+        <Library Value="SDL2_net"/>
         <Library Value="libSDL2_ttf"/>
         <Library Value="libws2_32.a"/>
         <Library Value="libwsock32.a"/>
         <Library Value="ssleay32.a"/>
         <Library Value="libeay32.a"/>
+        <Library Value="libssh"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>

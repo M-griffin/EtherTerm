@@ -439,7 +439,7 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                             texture->getTexture(),
                             SDL_BLENDMODE_NONE) < 0)
                 {
-                    SDL_Log("%s: Error Setting Blend on Texture - %s", SDL_GetError());
+                    SDL_Log("Error Setting Blend on Texture - %s", SDL_GetError());
                 }
             }
             break;
@@ -472,7 +472,7 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
                             texture->getTexture(),
                             SDL_BLENDMODE_ADD) < 0)
                 {
-                    SDL_Log("%s: Error Setting Blend on Texture - %s", SDL_GetError());
+                    SDL_Log("Error Setting Blend on Texture - %s", SDL_GetError());
                 }
             }
             break;
