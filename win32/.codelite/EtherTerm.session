@@ -1,68 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Session Name="C:\Users\Blue\Desktop\EtherTerm\win32\EtherTerm.workspace">
-  <int Value="1" Name="m_selectedTab"/>
+  <int Value="4" Name="m_selectedTab"/>
   <wxString Value="C:\Users\Blue\Desktop\EtherTerm\win32\EtherTerm.workspace" Name="m_workspaceName"/>
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\socket_handler.cpp" Name="FileName"/>
+      <int Value="0" Name="FirstVisibleLine"/>
+      <int Value="22" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
       <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\socket_handler.hpp" Name="FileName"/>
-      <int Value="36" Name="FirstVisibleLine"/>
+      <int Value="0" Name="FirstVisibleLine"/>
       <int Value="51" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\socket_handler.cpp" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="9" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\socket_state.hpp" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="13" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
       <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\socket_telnet.cpp" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="67" Name="CurrentLine"/>
+      <int Value="24" Name="FirstVisibleLine"/>
+      <int Value="123" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\socket_ssh.cpp" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="9" Name="CurrentLine"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\interface.hpp" Name="FileName"/>
+      <int Value="252" Name="FirstVisibleLine"/>
+      <int Value="252" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Downloads\SDL2_net-devel-2.0.0-mingw\SDL2_net-2.0.0\i686-w64-mingw32\include\SDL2\SDL_net.h" Name="FileName"/>
-      <int Value="16" Name="FirstVisibleLine"/>
-      <int Value="41" Name="CurrentLine"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\io_service.hpp" Name="FileName"/>
+      <int Value="69" Name="FirstVisibleLine"/>
+      <int Value="34" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\io_service.cpp" Name="FileName"/>
+      <int Value="36" Name="FirstVisibleLine"/>
+      <int Value="47" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\session.hpp" Name="FileName"/>
+      <int Value="206" Name="FirstVisibleLine"/>
+      <int Value="171" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\tcp_connection.hpp" Name="FileName"/>
+      <int Value="76" Name="FirstVisibleLine"/>
+      <int Value="92" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\sequence_decoder.cpp" Name="FileName"/>
+      <int Value="1335" Name="FirstVisibleLine"/>
+      <int Value="1351" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\renderer.cpp" Name="FileName"/>
+      <int Value="1313" Name="FirstVisibleLine"/>
+      <int Value="1338" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\safe_queue.hpp" Name="FileName"/>
+      <int Value="81" Name="FirstVisibleLine"/>
+      <int Value="0" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\safe_vector.hpp" Name="FileName"/>
+      <int Value="90" Name="FirstVisibleLine"/>
+      <int Value="117" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\input_handler.cpp" Name="FileName"/>
+      <int Value="1226" Name="FirstVisibleLine"/>
+      <int Value="1242" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
   </TabInfoArray>
   <SerializedObject Name="m_breakpoints">
-    <long Value="1" Name="Count"/>
-    <SerializedObject Name="Breakpoint0">
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\renderer.cpp" Name="file"/>
-      <int Value="1051" Name="lineno"/>
-      <wxString Value="" Name="function_name"/>
-      <wxString Value="" Name="memory_address"/>
-      <int Value="1" Name="bp_type"/>
-      <int Value="0" Name="watchpoint_type"/>
-      <wxString Value="" Name="watchpt_data"/>
-      <CData Name="commandlist"/>
-      <bool Value="0" Name="regex"/>
-      <bool Value="0" Name="is_temp"/>
-      <bool Value="1" Name="is_enabled"/>
-      <int Value="0" Name="ignore_number"/>
-      <wxString Value="" Name="conditions"/>
-      <int Value="0" Name="origin"/>
-    </SerializedObject>
+    <long Value="0" Name="Count"/>
   </SerializedObject>
 </Session>
