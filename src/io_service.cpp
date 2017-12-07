@@ -25,10 +25,13 @@ void IOService::run()
     m_is_active = true;
     while(m_is_active)
     {
-        // std::cout << "IO_SERVICE RUNNING" << std::endl;
-        // std::cout << "Hello waiter" << std::endl;
+        std::cout << "IO_SERVICE RUNNING" << std::endl;
+        std::cout << "Hello waiter" << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
+        // This will wait for another job to be inserted on next call
+        // Do we want to insert the job back, if poll is empty or 
+        // move to vector then look polls..  i think #2.
         service_work_ptr job_work = m_queue.dequeue();
 
         // Test running job for reading..
