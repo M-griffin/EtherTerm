@@ -3,7 +3,8 @@
 
 #include "session.hpp"
 #include "session_manager.hpp"
-
+#include "socket_handler.hpp"
+#include "io_service.hpp"
 /*
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
@@ -38,15 +39,12 @@ public:
      */
     std::thread create_thread()
     {
-        // TODO REWORK
-        //return std::thread([&] { m_io_service.run(); });
-        return std::thread([&] { });
+        return std::thread([&] { m_io_service.run(); });
     }
 
     // Setup IO_Service polling for connections. Use Work to keep io_service active.
     // while waiting for new connections.  Only need single thread for all sockets.
     Interface(std::string program_path)
-        //: m_work(m_io_service)
         : m_program_path(program_path)
         , m_session_manager(new SessionManager())
         , m_is_global_shutdown(false)
@@ -201,13 +199,13 @@ public:
                   << std::endl;
 
 //TODO REWORK
-/*
-        tcp::resolver resolver(m_io_service);
-        tcp::resolver::query query(system_connection->ip, std::to_string(system_connection->port));
+        /*
+                tcp::resolver resolver(m_io_service);
+                tcp::resolver::query query(system_connection->ip, std::to_string(system_connection->port));
 
-        // Use all end pointer for IPV4 & IPV6 support
-        tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-
+                // Use all end pointer for IPV4 & IPV6 support
+                tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+        */
         // Connection handles TCP_Socket
         connection_ptr new_connection(new tcp_connection(m_io_service));
 
@@ -245,31 +243,57 @@ public:
         // Start Blinking Cursor for Active connection session.
         new_session->m_sequence_parser->setCursorActive(true);
 
-        // Start Async Connection
-        boost::asio::async_connect(new_connection->socket(),
-                                   endpoint_iterator,
-                                   [this, new_connection, system_connection, new_session]
-                                   (boost::system::error_code ec, tcp::resolver::iterator)
-        {
-            if(!ec)
-            {
-                // Mark Session Connected
-                new_session->m_is_connected = true;
-                new_session->waitForSocketData();
-            }
-            else
-            {
-                std::cout << "Unable to Connect, closing down session." << std::endl;
 
-                // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
-                if(new_connection->socket().is_open())
-                {
-                    new_connection->socket().close();
-                }
-                m_session_manager->leave(new_session);
+        if (new_connection->socket()->createTelnetSocket(
+                    system_connection->ip, system_connection->port
+                ))
+        {
+            // Connection Successful
+            new_session->m_is_connected = true;
+            new_session->waitForSocketData();
+        }
+        else
+        {
+            if(new_connection->socket()->isActive())
+            {
+                new_connection->socket()->close();
             }
-        });
-*/        
+            m_session_manager->leave(new_session);
+        }
+
+        //m_io_service.addAsyncConnect()
+
+        //auto func = std::bind(&Foo::bar, this, std::placeholders::_1);
+        //auto handle = std::async(std::launch::async, func, 0);
+
+
+        /*
+                // Start Async Connection
+                boost::asio::async_connect(new_connection->socket(),
+                                           endpoint_iterator,
+                                           [this, new_connection, system_connection, new_session]
+                                           (boost::system::error_code ec, tcp::resolver::iterator)
+
+                {
+                    if(!ec)
+                    {
+                        // Mark Session Connected
+                        new_session->m_is_connected = true;
+                        new_session->waitForSocketData();
+                    }
+                    else
+                    {
+                        std::cout << "Unable to Connect, closing down session." << std::endl;
+
+                        // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
+                        if(new_connection->socket().is_open())
+                        {
+                            new_connection->socket().close();
+                        }
+                        m_session_manager->leave(new_session);
+                    }
+                });
+        */
     }
 
     /**
@@ -325,6 +349,8 @@ public:
     // Client ASIO Service Specific
     //boost::asio::io_service        m_io_service;
     //boost::asio::io_service::work  m_work;
+
+    IOService                      m_io_service;
     std::string                    m_program_path;
 
     // Spawned Session List

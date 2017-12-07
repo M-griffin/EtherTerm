@@ -72,6 +72,8 @@
     <File Name="../src/socket_ssh.cpp"/>
     <File Name="../src/socket_state.hpp"/>
     <File Name="../src/socket_telnet.cpp"/>
+    <File Name="../src/io_service.hpp"/>
+    <File Name="../src/io_service.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

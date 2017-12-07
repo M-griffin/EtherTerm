@@ -60,11 +60,11 @@ public:
         , m_program_path(program_path)
         , m_weak_session_manager(session_manager)
         , m_window_manager(
-            new WindowManager(
-                (m_term_height * m_char_height),
-                (m_term_width * m_char_width)
-            )
-        )
+              new WindowManager(
+                  (m_term_height * m_char_height),
+                  (m_term_width * m_char_width)
+              )
+          )
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_connection(connection)
         , m_system_connection(system_connection)
@@ -165,20 +165,26 @@ public:
         m_raw_data_vector.reserve(8024);
         m_raw_data_vector.resize(8024);
 
+        if(m_connection->socket()->isActive())
+        {
+            m_connection->async_read(m_raw_data_vector,
+                                     std::bind(&Session::handleRead, shared_from_this(),
+                                                 std::placeholders::_1));
+        }
 // TODO REWORK
-/*        
-        if(m_connection->is_open())
-        {
-            m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data_vector),
-                                                   boost::bind(&Session::handleRead, shared_from_this(),
-                                                           boost::asio::placeholders::error)); //,
-            //boost::asio::placeholders::bytes_transferred));
-        }
-        else
-        {
-            std::cout << "waitForSocketData: Lost Connection." << std::endl;
-        }
-*/         
+        /*
+                if(m_connection->is_open())
+                {
+                    m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data_vector),
+                                                           boost::bind(&Session::handleRead, shared_from_this(),
+                                                                   boost::asio::placeholders::error)); //,
+                    //boost::asio::placeholders::bytes_transferred));
+                }
+                else
+                {
+                    std::cout << "waitForSocketData: Lost Connection." << std::endl;
+                }
+        */
     }
 
     /**
@@ -189,6 +195,9 @@ public:
      */
     void handleRead(const std::error_code& error) //, size_t bytes_transferred)
     {
+        
+        std::cout << "* handleRead: " << error << std::endl;
+        
         session_manager_ptr session_mgr = m_weak_session_manager.lock();
         if(session_mgr)
         {
@@ -251,17 +260,17 @@ public:
                 // Restart Callback to wait for more data.
                 // If this step is skipped, then the node will exit
                 // since io_service will have no more work!
-// TODO REWORK                
-/*                
-                if(m_connection->is_open())
+// TODO REWORK
+                
+                if(m_connection->socket()->isActive())
                 {
-                    waitForSocketData();
+ //                   waitForSocketData();
                 }
                 else
                 {
                     std::cout << "Error: Session Socket Closed!" << std::endl;
                 }
-*/
+                
             }
             else
             {
@@ -306,21 +315,21 @@ public:
         buffer.reserve(msg.size());
         buffer.resize(msg.size());
 
-// TODO REWORK        
-/*        
-        boost::asio::buffer_copy(boost::asio::buffer(buffer), boost::asio::buffer(msg));
+// TODO REWORK
+        /*
+                boost::asio::buffer_copy(boost::asio::buffer(buffer), boost::asio::buffer(msg));
 
-        if(m_connection->is_open())
-        {
-            boost::asio::async_write(m_connection->socket(),
-                                     boost::asio::buffer(buffer),
-                                     boost::bind(
-                                         &Session::handleWrite,
-                                         shared_from_this(),
-                                         boost::asio::placeholders::error
-                                     ));
-        }
-*/         
+                if(m_connection->is_open())
+                {
+                    boost::asio::async_write(m_connection->socket(),
+                                             boost::asio::buffer(buffer),
+                                             boost::bind(
+                                                 &Session::handleWrite,
+                                                 shared_from_this(),
+                                                 boost::asio::placeholders::error
+                                             ));
+                }
+        */
     }
 
     /**
@@ -337,17 +346,17 @@ public:
             try
             {
 // TODO REWORK
-/*                
-                if(m_connection->is_open())
-                {
-                    // Only Shutdown when Connected!
-                    if(m_is_connected)
-                    {
-                        m_connection->socket().shutdown(tcp::socket::shutdown_both);
-                    }
-                    m_connection->socket().close();
-                }
-*/
+                /*
+                                if(m_connection->is_open())
+                                {
+                                    // Only Shutdown when Connected!
+                                    if(m_is_connected)
+                                    {
+                                        m_connection->socket().shutdown(tcp::socket::shutdown_both);
+                                    }
+                                    m_connection->socket().close();
+                                }
+                */
             }
             catch (std::exception ex)
             {

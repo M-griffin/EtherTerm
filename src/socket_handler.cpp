@@ -20,7 +20,7 @@ int SocketHandler::recvSocket(char *message)
     return m_socket.back()->recvSocket(message);
 }
 
-int SocketHandler::update()
+int SocketHandler::poll()
 {    
     int ret;
     if(m_is_active)
@@ -74,13 +74,13 @@ bool SocketHandler::createTelnetSocket(std::string host, int port)
             else
             {                
                 SDL_Log("Unable to initialize Telnet Socket.");
-                reset();
+                close();
                 return false;
             }
         }
         catch(std::exception& e)
         {
-            reset();
+            close();
             std::cerr << "exception creating new SDL_Socket: "
                       << e.what() << std::endl;
             return false;
@@ -119,7 +119,7 @@ bool SocketHandler::createSshSocket(std::string host, int port,
             else
             {
                 SDL_Log("Unable to initialize SSH Socket.");
-                reset();
+                close();
                 return false;
             }
         }
@@ -129,7 +129,7 @@ bool SocketHandler::createSshSocket(std::string host, int port,
                       << e.what() << std::endl;
 
             m_is_active = false;
-            reset();
+            close();
             return false;
         }
     }
@@ -160,7 +160,7 @@ bool SocketHandler::isActive() const {
 /**
  * @brief Socket Reset 
  */
-void SocketHandler::reset()
+void SocketHandler::close()
 {
     try
     {

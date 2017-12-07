@@ -2,6 +2,7 @@
 #define __SocketHandler__
 
 #include "socket_state.hpp"
+#include "io_service.hpp"
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
@@ -21,8 +22,9 @@ class SocketHandler
 {
 public:
 
-    SocketHandler() 
-        : m_socket()    
+    SocketHandler(IOService& io_service) 
+        : m_io_service(io_service)
+        , m_socket()    
         , m_socket_type("")
         , m_is_active(false)
     {
@@ -40,17 +42,23 @@ public:
     // Socket Events, True if Data Available.
     int sendSocket(unsigned char *buf, Uint32 len);
     int recvSocket(char *message);
-    int update();
+    int poll();
 
     bool createTelnetSocket(std::string host, int port);
     bool createSshSocket(std::string host, int port, std::string username, std::string password);
 
     std::string getSocketType() const;
     bool isActive() const;
-    void reset();
+    void close();
 
+    IOService &getIOService() const 
+    {
+        return m_io_service;
+    }
+    
 private:
 
+    IOService                      &m_io_service;
     std::vector<socket_state_ptr>   m_socket;    
     std::string                     m_socket_type;
     bool                            m_is_active;

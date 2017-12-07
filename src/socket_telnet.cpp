@@ -96,7 +96,7 @@ bool SDL_Socket::onEnter()
 
     /* Resolve the argument into an IP address type */
     std::cout << "Connecting to " << m_host.c_str() << " on port " << m_port << std::endl;
-    if(SDLNet_ResolveHost(&ip, m_host.c_str(), m_port)==-1)
+    if(SDLNet_ResolveHost(&ip, m_host.c_str(), m_port) == -1)
     {
         std::cout << "SDLNet_ResolveHost: " << SDLNet_GetError() << std::endl;
         m_tcp_socket = nullptr;
@@ -121,6 +121,7 @@ bool SDL_Socket::onEnter()
     
     // Successful Startup
     m_is_socket_active = true;
+    std::cout << "Connection Successful" << std::endl;
     
     return true;
 }
