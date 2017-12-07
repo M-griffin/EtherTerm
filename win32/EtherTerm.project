@@ -74,6 +74,7 @@
     <File Name="../src/socket_telnet.cpp"/>
     <File Name="../src/io_service.hpp"/>
     <File Name="../src/io_service.cpp"/>
+    <File Name="../src/safe_vector.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

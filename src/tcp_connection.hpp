@@ -19,7 +19,7 @@ class tcp_connection
 public:
 
     tcp_connection(IOService& io_service)
-        : m_socket_handle(new SocketHandler(io_service))
+        : m_socket_handle(new SocketHandler())
         , m_io_service(io_service)
     {
         std::cout << "tcp_connection Created" << std::endl;
@@ -90,19 +90,7 @@ public:
     template <typename ConstBufferSequence, typename Callback>
     void async_read(ConstBufferSequence &buffer, const Callback &callback) 
     {
-        /*
-        // Handler format
-        std::error_code ec (0, std::generic_category());
-                
-        typedef std::function<void(const std::error_code& error)> function_handler;        
-        std::cout << "tcp_connection async_read " << std::endl;
-        
-        std::string str = "Test Data for you!";
-        std::copy(str.begin(), str.end(), std::back_inserter(buffer));
-        function_handler result(handle);
-        result(ec);
-        */
-        m_io_service.addAsyncRead(buffer, m_socket_handle, callback);
+        m_io_service.addAsyncRead(buffer, m_socket_handle, callback, SERVICE_TYPE_READ);
     }
 
     socket_handler_ptr m_socket_handle;

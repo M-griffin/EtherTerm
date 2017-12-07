@@ -22,9 +22,8 @@ class SocketHandler
 {
 public:
 
-    SocketHandler(IOService& io_service) 
-        : m_io_service(io_service)
-        , m_socket()    
+    SocketHandler() 
+        : m_socket()    
         , m_socket_type("")
         , m_is_active(false)
     {
@@ -50,15 +49,9 @@ public:
     std::string getSocketType() const;
     bool isActive() const;
     void close();
-
-    IOService &getIOService() const 
-    {
-        return m_io_service;
-    }
     
 private:
 
-    IOService                      &m_io_service;
     std::vector<socket_state_ptr>   m_socket;    
     std::string                     m_socket_type;
     bool                            m_is_active;
