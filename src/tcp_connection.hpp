@@ -24,7 +24,7 @@ public:
     {
         std::cout << "tcp_connection Created" << std::endl;
     }
-    
+
     ~tcp_connection()
     {
         std::cout << "~tcp_connection" << std::endl;
@@ -83,14 +83,23 @@ public:
             std::cout << "tcp_connection close() - Caught exception: " << ex.what();
         }
     }
-    
+
     /**
      * @brief Async Read Callback for IOService Work
      */
     template <typename ConstBufferSequence, typename Callback>
-    void async_read(ConstBufferSequence &buffer, const Callback &callback) 
+    void async_read(ConstBufferSequence &buffer, const Callback &callback)
     {
         m_io_service.addAsyncRead(buffer, m_socket_handle, callback, SERVICE_TYPE_READ);
+    }
+
+    /**
+     * @brief Async Write Callback for IOService Work
+     */
+    template <typename ConstBufferSequence, typename Callback>
+    void async_write(ConstBufferSequence &buffer, const Callback &callback)
+    {
+        m_io_service.addAsyncWrite(buffer, m_socket_handle, callback, SERVICE_TYPE_WRITE);
     }
 
     socket_handler_ptr m_socket_handle;

@@ -68,8 +68,8 @@ int SSH_Socket::recvSocket(char *message)
 
 int SSH_Socket::pollSocket()
 {
-    int num_ready = 0;    
-    if (m_is_socket_active) 
+    int num_ready = 0;
+    if (m_is_socket_active)
     {
         if(m_ssh_channel && ssh_channel_is_open(m_ssh_channel) && ssh_channel_poll(m_ssh_channel, 0) > 0)
         {
@@ -79,10 +79,10 @@ int SSH_Socket::pollSocket()
         {
             num_ready = 0;
         }
-        
+
         if(ssh_channel_poll(m_ssh_channel, 0) < 0)
         {
-            m_is_socket_active = false;        
+            m_is_socket_active = false;
         }
     }
     return num_ready;
@@ -99,7 +99,7 @@ bool SSH_Socket::onEnter()
     if(m_ssh_session == nullptr)
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-            "Closed Session", "User has closed the program.", nullptr);
+                                 "Closed Session", "User has closed the program.", nullptr);
 
         m_is_socket_active = false;
         return false;
@@ -132,10 +132,10 @@ bool SSH_Socket::onEnter()
     if(rc != SSH_OK)
     {
         std::cout << "Error: ssh_connect: " << m_host
-            << " " << ssh_get_error(m_ssh_session) << std::endl;
+                  << " " << ssh_get_error(m_ssh_session) << std::endl;
 
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-            "Closed Session", "Unable to Connect to Server!", nullptr);
+                                 "Closed Session", "Unable to Connect to Server!", nullptr);
 
         m_is_socket_active = false;
         return false;
@@ -146,10 +146,10 @@ bool SSH_Socket::onEnter()
     if(rc < 0)
     {
         std::cout << "Error: verify_knownhost: " << m_host
-            << " " << ssh_get_error(m_ssh_session) << " " << rc << std::endl;
+                  << " " << ssh_get_error(m_ssh_session) << " " << rc << std::endl;
 
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-            "Closed Session", "User has closed the program.", nullptr);
+                                 "Closed Session", "User has closed the program.", nullptr);
 
         m_is_socket_active = false;
         return false;
@@ -159,8 +159,8 @@ bool SSH_Socket::onEnter()
     rc = authenticate_console();
     if(rc != SSH_AUTH_SUCCESS)
     {
-         std::cout << "Error: authenticate: " << m_host
-            << " " << ssh_get_error(m_ssh_session) << " " << rc << std::endl;
+        std::cout << "Error: authenticate: " << m_host
+                  << " " << ssh_get_error(m_ssh_session) << " " << rc << std::endl;
 
         m_is_socket_active = false;
         return false;
@@ -171,7 +171,7 @@ bool SSH_Socket::onEnter()
     if(m_ssh_channel == nullptr)
     {
         std::cout << "Error: ssh_channel_new: " << m_host
-            << " " << ssh_get_error(m_ssh_session) << " " << rc << std::endl;
+                  << " " << ssh_get_error(m_ssh_session) << " " << rc << std::endl;
 
         m_is_socket_active = false;
         return false;
@@ -182,7 +182,7 @@ bool SSH_Socket::onEnter()
     if(rc != SSH_OK)
     {
         std::cout << "Error: ssh_channel_open_session: " << m_host
-            << " " << ssh_get_error(m_ssh_session) << " " << rc << std::endl;
+                  << " " << ssh_get_error(m_ssh_session) << " " << rc << std::endl;
 
         m_is_socket_active = false;
         return false;
@@ -206,7 +206,7 @@ bool SSH_Socket::onEnter()
     if(ssh_channel_request_pty_size(m_ssh_channel, "ansi", 80, 25))
     {
         std::cout << "Error: ssh_channel_request_pty_size: " << m_host
-            << " " << ssh_get_error(m_ssh_session) << " " << rc << std::endl;
+                  << " " << ssh_get_error(m_ssh_session) << " " << rc << std::endl;
         // Not an error to exit the connection on.
         //return 0;
     }
@@ -215,14 +215,14 @@ bool SSH_Socket::onEnter()
     if(ssh_channel_request_shell(m_ssh_channel))
     {
         std::cout << "Error: ssh_channel_request_shell: " << m_host
-            << " " << ssh_get_error(m_ssh_session) << " " << rc << std::endl;
+                  << " " << ssh_get_error(m_ssh_session) << " " << rc << std::endl;
 
         m_is_socket_active = false;
         return false;
     }
-    
+
     m_is_socket_active = true;
-    
+
     return true;
 }
 
@@ -234,7 +234,7 @@ bool SSH_Socket::onExit()
     {
         if (m_is_socket_active)
         {
-            ssh_channel_send_eof(m_ssh_channel);            
+            ssh_channel_send_eof(m_ssh_channel);
         }
         ssh_channel_close(m_ssh_channel);
         ssh_channel_free(m_ssh_channel);
@@ -300,7 +300,7 @@ int SSH_Socket::verify_knownhost()
             std::cout << "If you accept the host key here, the file will be"
                       << "automatically created." << std::endl;
 
-            /* fallback to SSH_SERVER_NOT_KNOWN behavior */
+        /* fallback to SSH_SERVER_NOT_KNOWN behavior */
         case SSH_SERVER_NOT_KNOWN:
             hexa = ssh_get_hexa(hash, hlen);
             //Do you trust the host key?\n");
@@ -429,17 +429,17 @@ int SSH_Socket::authenticate_console()
     method = ssh_auth_list(m_ssh_session);
     while(rc != SSH_AUTH_SUCCESS && failureCounter < 20)
     {
-/*
-    Retrieve the public key with ssh_import_pubkey_file().
-    Offer the public key to the SSH server using ssh_userauth_try_publickey().
-     * If the return value is SSH_AUTH_SUCCESS, the SSH server accepts
-     * to authenticate using the public key and you can go to the next step.
-    Retrieve the private key, using the ssh_pki_import_privkey_file() function.
-     * If a pass phrase is needed, either the pass phrase specified
-     * as argument or a callback will be used.
-    Authenticate using ssh_userauth_publickey() with your private key.
-    Do not forget cleaning up memory using ssh_key_free().
-*/
+        /*
+            Retrieve the public key with ssh_import_pubkey_file().
+            Offer the public key to the SSH server using ssh_userauth_try_publickey().
+             * If the return value is SSH_AUTH_SUCCESS, the SSH server accepts
+             * to authenticate using the public key and you can go to the next step.
+            Retrieve the private key, using the ssh_pki_import_privkey_file() function.
+             * If a pass phrase is needed, either the pass phrase specified
+             * as argument or a callback will be used.
+            Authenticate using ssh_userauth_publickey() with your private key.
+            Do not forget cleaning up memory using ssh_key_free().
+        */
         // The function ssh_userauth_autopubkey() does this using the
         // available keys in "~/.ssh/" or ssh-agent. The return values are the following:
         // ** Public Key Needs more testing.
@@ -468,7 +468,7 @@ int SSH_Socket::authenticate_console()
                 default:
                     break;
             }
-/*
+            /*
             // Validate with specific public key file
             rc = ssh_userauth_try_publickey(session, NULL, "pubkey.pub");
             switch (rc)
@@ -511,7 +511,7 @@ int SSH_Socket::authenticate_console()
                     std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_SUCCESS!" << std::endl;
                     break;
                 case SSH_AUTH_PARTIAL: //some key matched but you still have to
-                                       //provide an other mean of authentication (like a password).
+                    //provide an other mean of authentication (like a password).
                     std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_PARTIAL!" << std::endl;
                     ++failureCounter;
                     break;
@@ -545,7 +545,7 @@ int SSH_Socket::authenticate_console()
                         std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_SUCCESS!" << std::endl;
                         break;
                     case SSH_AUTH_PARTIAL: //some key matched but you still have to
-                                           // provide an other mean of authentication (like a password).
+                        // provide an other mean of authentication (like a password).
                         std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_PARTIAL!" << std::endl;
                         ++failureCounter;
                         break;

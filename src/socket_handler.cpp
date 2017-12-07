@@ -13,7 +13,7 @@ int SocketHandler::sendSocket(unsigned char *buffer, Uint32 length)
 /**
  * @brief Receive Waiting Data
  * @param message
- * @return 
+ * @return
  */
 int SocketHandler::recvSocket(char *message)
 {
@@ -21,7 +21,7 @@ int SocketHandler::recvSocket(char *message)
 }
 
 int SocketHandler::poll()
-{    
+{
     int ret;
     if(m_is_active)
     {
@@ -36,7 +36,7 @@ int SocketHandler::poll()
         }
         else if(ret == 0)  // No Data!
         {
-            
+
         }
         else
         {
@@ -55,7 +55,7 @@ int SocketHandler::poll()
  * @brief Create Telnet Socket
  * @param host
  * @param port
- * @return 
+ * @return
  */
 bool SocketHandler::createTelnetSocket(std::string host, int port)
 {
@@ -72,7 +72,7 @@ bool SocketHandler::createTelnetSocket(std::string host, int port)
                 m_is_active = true;
             }
             else
-            {                
+            {
                 SDL_Log("Unable to initialize Telnet Socket.");
                 close();
                 return false;
@@ -100,10 +100,10 @@ bool SocketHandler::createTelnetSocket(std::string host, int port)
  * @param port
  * @param username
  * @param password
- * @return 
+ * @return
  */
 bool SocketHandler::createSshSocket(std::string host, int port,
-                            std::string username, std::string password)
+                                    std::string username, std::string password)
 {
     if(!m_is_active)
     {
@@ -143,22 +143,33 @@ bool SocketHandler::createSshSocket(std::string host, int port,
 
 /**
  * @brief Type of Socket
- * @return 
+ * @return
  */
-std::string SocketHandler::getSocketType() const {
+std::string SocketHandler::getSocketType() const
+{
     return m_socket_type;
 }
 
 /**
  * @brief Check if Socket is Active
- * @return 
+ * @return
  */
-bool SocketHandler::isActive() const {
+bool SocketHandler::isActive() const
+{
     return m_is_active;
 }
 
 /**
- * @brief Socket Reset 
+ * @brief On Errors, set Inactive
+ */
+void SocketHandler::setInactive()
+{
+    m_is_active = false;
+}
+
+
+/**
+ * @brief Socket Reset
  */
 void SocketHandler::close()
 {

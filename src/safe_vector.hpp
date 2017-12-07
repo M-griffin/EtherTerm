@@ -83,12 +83,14 @@ public:
     // Check for Non-Blocking Wait.
     bool is_empty(void) const
     {
+        std::unique_lock<std::mutex> lock(m);
         return v.empty();
     }
 
     // Check for Non-Blocking Wait.
     unsigned long size(void) const
     {
+        std::unique_lock<std::mutex> lock(m);
         return v.size();
     }
 
@@ -99,13 +101,12 @@ public:
         if (v.size() > 0)
         {
             std::unique_lock<std::mutex> lock(m);
-            auto it = std::find(v.begin(), v.end(), index);
-            if (it != v.end())
+            if ((unsigned)index != v.size()-1)
             {
                 // swap the one to be removed with the last element
                 // and remove the item at the end of the container
                 // to prevent moving all items after '5' by one
-                std::swap(*it, v.back());
+                std::swap(v.at(index), v.back());
                 v.pop_back();
             }
             else 

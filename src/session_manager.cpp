@@ -41,17 +41,11 @@ void SessionManager::leave(session_ptr session)
         // If session is connected, we need to disconnect it first
         if(session->m_connection)
         {
-// TODO REWORK
-/*            
-            if(session->m_is_connected)
-            {
-                // Shutdown the Connection before closing
-                session->m_connection->shutdown();
-                // Force no longer being connected now.
-                session->m_is_connected = false;
-            }
+            // Shutdown the Connection before closing
+            session->m_connection->shutdown();
+            // Force no longer being connected now.
+            session->m_is_connected = false;
             session->m_connection->close();
-*/
         }
 
         // Remove the Session
@@ -112,9 +106,9 @@ void SessionManager::deliver(std::string msg)
     // This isn't used at this time!
     std::cout << "Deliver Global SessionManager notices: " << msg << std::endl;
     std::for_each(m_sessions.begin(), m_sessions.end(),
-                  boost::bind(&Session::deliver, _1, boost::ref(msg)));
-}
-*/
+                  std::bind(&Session::deliver, _1, std::ref(msg)));
+}*/
+
 
 /**
  * @brief Retrieve Number of users connected

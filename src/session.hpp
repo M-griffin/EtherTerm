@@ -168,23 +168,15 @@ public:
         if(m_connection->socket()->isActive())
         {
             m_connection->async_read(m_raw_data_vector,
-                                     std::bind(&Session::handleRead, shared_from_this(),
-                                                 std::placeholders::_1));
+                                     std::bind(
+                                         &Session::handleRead,
+                                         shared_from_this(),
+                                         std::placeholders::_1));
         }
-// TODO REWORK
-        /*
-                if(m_connection->is_open())
-                {
-                    m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data_vector),
-                                                           boost::bind(&Session::handleRead, shared_from_this(),
-                                                                   boost::asio::placeholders::error)); //,
-                    //boost::asio::placeholders::bytes_transferred));
-                }
-                else
-                {
-                    std::cout << "waitForSocketData: Lost Connection." << std::endl;
-                }
-        */
+        else
+        {
+            std::cout << "waitForSocketData: Lost Connection." << std::endl;
+        }
     }
 
     /**
@@ -195,9 +187,14 @@ public:
      */
     void handleRead(const std::error_code& error) //, size_t bytes_transferred)
     {
-        
+
         std::cout << "* handleRead: " << error << std::endl;
-        
+
+        if(error) 
+        {
+            std::cout << "* Async Read Error!" << error << std::endl;
+        }
+
         session_manager_ptr session_mgr = m_weak_session_manager.lock();
         if(session_mgr)
         {
@@ -260,17 +257,16 @@ public:
                 // Restart Callback to wait for more data.
                 // If this step is skipped, then the node will exit
                 // since io_service will have no more work!
-// TODO REWORK
-                
                 if(m_connection->socket()->isActive())
                 {
- //                   waitForSocketData();
+                    waitForSocketData();
                 }
                 else
                 {
+                    // TODO, new io service, might need extra shutdown on session here?
                     std::cout << "Error: Session Socket Closed!" << std::endl;
                 }
-                
+
             }
             else
             {
@@ -311,25 +307,20 @@ public:
 
         // Send all outgoing data as unsigned data, want to make sure when
         // Time comes we support UTF8 bytes properly.
-        std::vector<unsigned char> buffer;
-        buffer.reserve(msg.size());
-        buffer.resize(msg.size());
+        std::vector<unsigned char> raw_data_buffer;
+        raw_data_buffer.reserve(msg.size());
+        raw_data_buffer.resize(msg.size());
+        
+        std::copy(msg.begin(), msg.end(), std::back_inserter(raw_data_buffer));
 
-// TODO REWORK
-        /*
-                boost::asio::buffer_copy(boost::asio::buffer(buffer), boost::asio::buffer(msg));
-
-                if(m_connection->is_open())
-                {
-                    boost::asio::async_write(m_connection->socket(),
-                                             boost::asio::buffer(buffer),
-                                             boost::bind(
-                                                 &Session::handleWrite,
-                                                 shared_from_this(),
-                                                 boost::asio::placeholders::error
-                                             ));
-                }
-        */
+        if(m_connection->socket()->isActive())
+        {
+            m_connection->async_write(raw_data_buffer,
+                                      std::bind(
+                                          &Session::handleWrite,
+                                          shared_from_this(),
+                                          std::placeholders::_1));
+        }
     }
 
     /**
@@ -340,7 +331,7 @@ public:
     {
         if(error)
         {
-            std::cout << "async_write error: " << error.message() << std::endl;
+            std::cout << "Async_write Error: " << error.message() << std::endl;
             std::cout << "Session Closed()" << std::endl;
 
             try

@@ -22,7 +22,7 @@
 int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
 {
     int result = 0;
-    if (m_is_socket_active) 
+    if (m_is_socket_active)
     {
         result = SDLNet_TCP_Send(m_tcp_socket, buffer, length);
         if(result < (signed)strlen((char *)buffer))
@@ -41,8 +41,8 @@ int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
 /* handle Telnet better */
 int SDL_Socket::recvSocket(char *message)
 {
-    int result = -1;    
-    if (m_is_socket_active) 
+    int result = -1;
+    if (m_is_socket_active)
     {
         result = SDLNet_TCP_Recv(m_tcp_socket, message, 8192);
         if(result <= 0)
@@ -77,7 +77,7 @@ int SDL_Socket::pollSocket()
             numready = 0;
         }
     }
-    
+
     return numready;
 }
 
@@ -118,11 +118,11 @@ bool SDL_Socket::onEnter()
         onExit();
         return false;
     }
-    
+
     // Successful Startup
     m_is_socket_active = true;
     std::cout << "Connection Successful" << std::endl;
-    
+
     return true;
 }
 
@@ -132,19 +132,18 @@ bool SDL_Socket::onExit()
     /*  double check global shutdown?!?
     if(TheInputHandler::Instance()->isGlobalShutdown())
     {
-        if (m_tcp_socket) 
+        if (m_tcp_socket)
         {
             SDLNet_TCP_Close(m_tcp_socket);
         }
         m_tcp_socket = nullptr;
     }*/
 
-    if (m_socket_set) 
+    if (m_socket_set)
     {
         SDLNet_FreeSocketSet(m_socket_set);
-    }        
-    
+    }
+
     m_socket_set = nullptr;
     return true;
 }
-

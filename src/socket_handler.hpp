@@ -31,6 +31,7 @@ public:
     
     ~SocketHandler()
     {
+        std::cout << "~SocketHandler" << std::endl;
         std::vector<socket_state_ptr>().swap(m_socket);
     }
     
@@ -48,6 +49,8 @@ public:
 
     std::string getSocketType() const;
     bool isActive() const;
+    void setInactive();
+    
     void close();
     
 private:

@@ -30,7 +30,7 @@ public:
         , m_port(port)
         , m_is_socket_active(false)
     { }
-    
+
     virtual ~SocketState()
     {
         std::cout << "Shutting Down SocketState" << std::endl;
@@ -41,7 +41,7 @@ public:
     virtual int pollSocket() = 0;
     virtual bool onEnter() = 0;
     virtual bool onExit() = 0;
-    
+
     std::string m_host;
     int         m_port;
     bool        m_is_socket_active;
@@ -57,7 +57,7 @@ class SDL_Socket : public SocketState
 {
 public:
 
-    SDL_Socket(std::string host, int port) 
+    SDL_Socket(std::string host, int port)
         : SocketState(host, port)
         , m_tcp_socket(nullptr)
         , m_socket_set(nullptr)
@@ -75,7 +75,7 @@ public:
     virtual bool onExit();
 
 private:
-    
+
     TCPsocket        m_tcp_socket;
     SDLNet_SocketSet m_socket_set;
 
@@ -156,7 +156,7 @@ public:
     void error()
     {
         std::cout << "Authentication failed: "
-            << ssh_get_error(m_ssh_session) << std::endl;
+                  << ssh_get_error(m_ssh_session) << std::endl;
     }
 
 
