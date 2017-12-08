@@ -1,5 +1,5 @@
-#ifndef __SocketHandler__
-#define __SocketHandler__
+#ifndef __SOCKET_HANDLER__
+#define __SOCKET_HANDLER__
 
 #include "socket_state.hpp"
 #include "io_service.hpp"
@@ -63,4 +63,4 @@ private:
 
 typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
 
-#endif
+#endif // __SOCKET_HANDLER__

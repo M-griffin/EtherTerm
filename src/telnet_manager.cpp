@@ -194,8 +194,6 @@ void TelnetManager::telnetOptionNawsReply()
         stm << static_cast<char>(SE);
         buf = stm.str();
 
-// TODO REWORK
-/*
         if(session->m_connection->is_open())
         {
             session->deliver(buf);
@@ -205,7 +203,7 @@ void TelnetManager::telnetOptionNawsReply()
             std::cout << "Error: TelnetManager telnetOptionNawsReply()" << std::endl;
             m_isShutdown = true;
         }
-*/
+
     }
 }
 
@@ -235,8 +233,6 @@ void TelnetManager::telnetOptionTerminalTypeReply()
         stm << static_cast<char>(SE);
         buf = stm.str();
 
-// TODO REWORK
-/*
         if(session->m_connection->is_open())
         {
             session->deliver(buf);
@@ -246,7 +242,6 @@ void TelnetManager::telnetOptionTerminalTypeReply()
             std::cout << "Error: TelnetManager telnetOptionTerminalTypeReply()" << std::endl;
             m_isShutdown = true;
         }
-*/
     }
 }
 
@@ -268,8 +263,6 @@ void TelnetManager::telnetSendIAC(unsigned char command, unsigned char option)
         stm << static_cast<char>(option);
         buf = stm.str();
 
-// TODO REWORK
-/*
         if(session->m_connection->is_open())
         {
             session->deliver(buf);
@@ -279,7 +272,6 @@ void TelnetManager::telnetSendIAC(unsigned char command, unsigned char option)
             std::cout << "Error: TelnetManager telnetSendIAC()" << std::endl;
             m_isShutdown = true;
         }
-*/
     }
 }
 

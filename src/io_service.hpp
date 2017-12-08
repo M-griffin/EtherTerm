@@ -29,6 +29,7 @@ public:
     ~IOService();
 
     typedef std::function<void(const std::error_code& error)> callback_function_handler;
+    static const int MAX_BUFFER_SIZE = 8193;
 
     class service_base
     {
@@ -49,8 +50,14 @@ public:
         // Virtual Methods to pickup Data from Base Classes
         virtual void setBuffer(char *buffer) 
         {
-            std::vector<unsigned char> conversion(buffer, buffer+sizeof(buffer));
-            m_buffer.swap(conversion);
+            for(int i = 0; i < MAX_BUFFER_SIZE; i++)
+            {
+                
+                //std::string buff = static_cast<char *>(buffer);
+                //std::copy(buff.begin(), buff.end(), std::back_inserter(m_buffer));
+                if (buffer[i] != '\0')
+                    m_buffer.push_back(buffer[i]);
+            }
         }        
         virtual std::vector<unsigned char> &getBuffer()
         {
@@ -76,7 +83,7 @@ public:
             , m_callback(callback)
             , m_service_type(service_type)
         {
-            std::cout << " * addAsyncRead Job Created!" << std::endl;
+            std::cout << " * addAsync Job Created!" << std::endl;
         }
 
         ConstBufferSequence &m_buffer;
@@ -88,7 +95,7 @@ public:
     template <typename ConstBufferSequence, typename SocketHandle, typename Callback, typename ServiceType>
     void addAsyncRead(ConstBufferSequence &buffer, SocketHandle socket_handle, Callback &callback, ServiceType serviceType)
     {
-        std::cout << " * addAsyncRead" << std::endl;        
+        std::cout << " * addAsyncRead Job" << std::endl;        
         service_job<ConstBufferSequence, SocketHandle, Callback, ServiceType> *job
             = new service_job <ConstBufferSequence, SocketHandle, Callback, ServiceType>
         (buffer, socket_handle, callback, serviceType);
@@ -99,7 +106,7 @@ public:
     template <typename ConstBufferSequence, typename SocketHandle, typename Callback, typename ServiceType>
     void addAsyncWrite(ConstBufferSequence &buffer, SocketHandle socket_handle, Callback &callback, ServiceType serviceType)
     {
-        std::cout << " * addAsyncWrite" << std::endl;        
+        std::cout << " * addAsyncWrite Job" << std::endl;        
         service_job<ConstBufferSequence, SocketHandle, Callback, ServiceType> *job
             = new service_job <ConstBufferSequence, SocketHandle, Callback, ServiceType>
         (buffer, socket_handle, callback, serviceType);

@@ -15,14 +15,6 @@
 #include "telnet_manager.hpp"
 
 #include <memory>
-
-/*
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
-#include <boost/asio/io_service.hpp>
-*/
-
-// For IO service!
 #include <thread>
 #include <deque>
 #include <set>
@@ -187,7 +179,6 @@ public:
      */
     void handleRead(const std::error_code& error) //, size_t bytes_transferred)
     {
-
         std::cout << "* handleRead: " << error << std::endl;
 
         if(error) 
@@ -300,6 +291,9 @@ public:
      */
     void deliver(const std::string &msg)
     {
+        
+        std::cout << " * Deliver: " << msg.size() << " - " << msg << std::endl;
+        
         if(msg.size() == 0 || msg[0] == '\0')
         {
             return;
@@ -312,6 +306,7 @@ public:
         raw_data_buffer.resize(msg.size());
         
         std::copy(msg.begin(), msg.end(), std::back_inserter(raw_data_buffer));
+        raw_data_buffer.push_back('\0');
 
         if(m_connection->socket()->isActive())
         {
@@ -329,6 +324,9 @@ public:
      */
     void handleWrite(const std::error_code& error)
     {
+        
+        std::cout << "* handleWrite" << error << std::endl;
+        
         if(error)
         {
             std::cout << "Async_write Error: " << error.message() << std::endl;

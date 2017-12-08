@@ -265,8 +265,6 @@ public:
 
         //auto func = std::bind(&Foo::bar, this, std::placeholders::_1);
         //auto handle = std::async(std::launch::async, func, 0);
-
-
         /*
                 // Start Async Connection
                 boost::asio::async_connect(new_connection->socket(),

@@ -96,23 +96,24 @@ public:
 
     // Remove item quickly, swap with back, then pop back.
     // If only item in list, then pop it.
-    void remove(int index)
+    void remove(std::string::size_type index)
     {        
         if (v.size() > 0)
         {
             std::unique_lock<std::mutex> lock(m);
-            if ((unsigned)index != v.size()-1)
+            
+            // Create new Vector to hold all items.
+            std::vector<T> temp;
+            for (std::string::size_type i = 0; i < v.size(); i++) 
             {
-                // swap the one to be removed with the last element
-                // and remove the item at the end of the container
-                // to prevent moving all items after '5' by one
-                std::swap(v.at(index), v.back());
-                v.pop_back();
+                if (i != index)
+                {
+                    temp.push_back(v.at(i));                
+                }                
             }
-            else 
-            {
-                v.pop_back();
-            }
+            
+            v.swap(temp);
+            std::vector<T>().swap(temp);
         }
     }    
 

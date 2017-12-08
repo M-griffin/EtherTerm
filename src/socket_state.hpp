@@ -47,7 +47,6 @@ public:
     bool        m_is_socket_active;
 };
 
-
 typedef std::shared_ptr<SocketState> socket_state_ptr;
 
 /*
@@ -119,7 +118,6 @@ private:
     TCPsocket        m_listen_socket;
     TCPsocket        m_data_socket;
     SDLNet_SocketSet m_socket_set;
-
 };
 
 
@@ -158,7 +156,6 @@ public:
         std::cout << "Authentication failed: "
                   << ssh_get_error(m_ssh_session) << std::endl;
     }
-
 
 private:
 
