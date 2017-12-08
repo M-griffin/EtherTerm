@@ -69,8 +69,8 @@ public:
     {
         std::cout << "Session Created!" << std::endl;
 
-        m_in_data_vector.reserve(8024);
-        m_in_data_vector.resize(8024);
+        m_in_data_vector.reserve(0);
+        m_in_data_vector.resize(0);
 
         // NOTES Reallocate by using reset! When rending Term Height/Width Change, need to recreate.
         // m_sequence_parser.reset(new SequenceParser(m_renderer, connection));
@@ -82,7 +82,6 @@ public:
 
         // Clear any Data left over in the Buffer.
         std::vector<unsigned char>().swap(m_in_data_vector);
-        std::vector<unsigned char>().swap(m_out_data_vector);
     }
 
     /**
@@ -125,7 +124,7 @@ public:
      * @param connection
      * @return
      */
-    static session_ptr create(//boost::asio::io_service& io_service,
+    static session_ptr create(
         connection_ptr           connection,
         session_manager_ptr      session_manager,
         std::string              program_path,
@@ -154,10 +153,8 @@ public:
     void waitForSocketData()
     {
         // Important, clear out buffer before each read.
+        // A reference is passed by Session through the IO Service.
         std::vector<unsigned char>().swap(m_in_data_vector);
-        m_in_data_vector.reserve(8024);
-        m_in_data_vector.resize(8024);
-
         if(m_connection->socket()->isActive())
         {
             m_connection->async_read(m_in_data_vector,
@@ -180,8 +177,7 @@ public:
      */
     void handleRead(const std::error_code& error) //, size_t bytes_transferred)
     {
-        std::cout << "* handleRead: " << error << std::endl;
-
+        //std::cout << "* handleRead: " << error << std::endl;
         if(error) 
         {
             std::cout << "* Async Read Error!" << error << std::endl;
@@ -283,6 +279,11 @@ public:
         else
         {
             std::cout << "Error, Not connected to the SessionManager!" << std::endl;
+            if(m_connection->socket()->isActive()) 
+            {
+                // if the socket is still active, shut it down
+                m_connection->shutdown();
+            }
         }
     }
 
@@ -290,29 +291,17 @@ public:
      * @brief Callback from The SessionManager to write data to the active sessions.
      * @param msg
      */
-    void deliver(const std::string &msg)
-    {
-        
-        std::cout << " * Deliver: " << msg.size() << " - " << msg << std::endl;
-        
-        if(msg.size() == 0 || msg[0] == '\0')
+    void deliver(const std::string &string_msg)
+    {        
+        //std::cout << " * Deliver: " << string_msg.size() << " - " << string_msg << std::endl;        
+        if(string_msg.size() == 0 || string_msg[0] == '\0')
         {
             return;
         }
 
-        /*
-        // Send all outgoing data as unsigned data, want to make sure when
-        // Time comes we support UTF8 bytes properly.
-        while(m_out_data_vector.size() > 0) { m_out_data_vector.pop_back(); }
-        std::vector<unsigned char>().swap(m_out_data_vector);        
-        std::copy(msg.begin(), msg.end(), std::back_inserter(m_out_data_vector));
-        */
-        
-        std::cout << " * m_out_data_vector: " << m_out_data_vector.size() << std::endl;
-
         if(m_connection->socket()->isActive())
         {
-            m_connection->async_write(msg,
+            m_connection->async_write(string_msg,
                                       std::bind(
                                           &Session::handleWrite,
                                           shared_from_this(),
@@ -325,9 +314,8 @@ public:
      * @param error
      */
     void handleWrite(const std::error_code& error)
-    {
-        
-        std::cout << "* handleWrite" << error << std::endl;        
+    {        
+        //std::cout << "* handleWrite" << error << std::endl;        
         if(error)
         {
             std::cout << "Async_write Error: " << error.message() << std::endl;
@@ -335,18 +323,16 @@ public:
 
             try
             {
-// TODO REWORK
-                /*
-                                if(m_connection->is_open())
-                                {
-                                    // Only Shutdown when Connected!
-                                    if(m_is_connected)
-                                    {
-                                        m_connection->socket().shutdown(tcp::socket::shutdown_both);
-                                    }
-                                    m_connection->socket().close();
-                                }
-                */
+                if(m_connection->is_open())
+                {
+                    // Only Shutdown when Connected!
+                    if(m_is_connected)
+                    {
+                        m_connection->shutdown();
+                    }
+                    
+                }
+
             }
             catch (std::exception ex)
             {
@@ -361,7 +347,7 @@ public:
     void startMenuInstance()
     {
         // Allocate a new Dialing Directory Instance on existing placeholder.
-        std::cout << "Starting Menu Instatnce:" << std::endl;
+        std::cout << "Starting Menu Instance:" << std::endl;
         m_menu_manager.reset(
             new MenuManager(
                 m_program_path,
@@ -623,7 +609,6 @@ public:
 
     // Input Raw Data Buffer.
     std::vector<unsigned char> m_in_data_vector;
-    std::vector<unsigned char> m_out_data_vector;
 
 };
 

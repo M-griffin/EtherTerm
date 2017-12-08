@@ -88,7 +88,7 @@ public:
             , m_callback(callback)
             , m_service_type(service_type)
         {
-            std::cout << " * addAsync Job Created!" << std::endl;
+            //std::cout << " * addAsync Job Created!" << std::endl;
         }
 
         ConstBufferSequence &m_buffer;
@@ -101,7 +101,7 @@ public:
     template <typename ConstBufferSequence, typename StringSequence, typename SocketHandle, typename Callback, typename ServiceType>
     void addAsyncRead(ConstBufferSequence &buffer, StringSequence write_sequence, SocketHandle socket_handle, Callback &callback, ServiceType service_type)
     {
-        std::cout << " * addAsyncRead Job" << std::endl;        
+        //std::cout << " * addAsyncRead Job" << std::endl;        
         service_job<ConstBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
             = new service_job <ConstBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
         (buffer, write_sequence, socket_handle, callback, service_type);
@@ -112,7 +112,7 @@ public:
     template <typename ConstBufferSequence, typename StringSequence, typename SocketHandle, typename Callback, typename ServiceType>
     void addAsyncWrite(ConstBufferSequence &buffer, StringSequence write_sequence, SocketHandle socket_handle, Callback &callback, ServiceType service_type)
     {
-        std::cout << " * addAsyncWrite Job" << std::endl;        
+        //std::cout << " * addAsyncWrite Job" << std::endl;        
         service_job<ConstBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
             = new service_job <ConstBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
         (buffer, write_sequence, socket_handle, callback, service_type);

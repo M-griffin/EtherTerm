@@ -57,10 +57,9 @@ public:
 
     ~Interface()
     {
-        //std::cout << "~Interface" << std::endl;
-// TODO REWORK
-//        m_io_service.stop();
-        //m_thread.join();
+        std::cout << "~Interface" << std::endl;
+        m_io_service.stop();
+        m_thread.join();
     }
 
     /**
@@ -344,10 +343,7 @@ public:
         }
     }
 
-    // Client ASIO Service Specific
-    //boost::asio::io_service        m_io_service;
-    //boost::asio::io_service::work  m_work;
-
+    // Custom Async IO Service.
     IOService                      m_io_service;
     std::string                    m_program_path;
 

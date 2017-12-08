@@ -12,6 +12,7 @@ IOService::IOService()
 
 IOService::~IOService()
 {
+    std::cout << "~IOService" << std::endl;
 }
 
 

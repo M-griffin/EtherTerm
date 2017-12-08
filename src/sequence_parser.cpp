@@ -1698,9 +1698,7 @@ void SequenceParser::sequenceResetAndResponses()
                 // Grab an instance of the session and socket connection.
                 session_ptr session = m_renderer->m_weak_session.lock();
                 if (session)
-                {
-// TODO REWORK
-/*                    
+                {              
                     if(session->m_connection->is_open() && session->m_is_connected)
                     {
                         session->deliver(buf);
@@ -1709,7 +1707,6 @@ void SequenceParser::sequenceResetAndResponses()
                     {
                         std::cout << "Error: SequenceParser ESC[6n Reply()" << std::endl;
                     }
-*/
                 }
             }
             break;

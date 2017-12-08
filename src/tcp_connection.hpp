@@ -97,12 +97,13 @@ public:
      * @brief Async Write Callback for IOService Work
      */
     template <typename StringSequence, typename Callback>
-    void async_write(StringSequence string, const Callback &callback)
+    void async_write(StringSequence string_seq, const Callback &callback)
     {
-        // Place Holder is used for template parmeters, buffer is used in write
-        // Where the Place Holder in the above method is used for reads.
+        // Place Holder is used for template parmeters, string_seq is used in writes
+        // Where the Buffer Place Holder in the above method is used for reads.
+        // nullptr can't be passed as reference for vector
         std::vector<unsigned char> place_holder;
-        m_io_service.addAsyncWrite(place_holder, string, m_socket_handle, callback, SERVICE_TYPE_WRITE);
+        m_io_service.addAsyncWrite(place_holder, string_seq, m_socket_handle, callback, SERVICE_TYPE_WRITE);
     }
 
     socket_handler_ptr m_socket_handle;
