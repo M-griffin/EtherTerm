@@ -69,8 +69,8 @@ public:
     {
         std::cout << "Session Created!" << std::endl;
 
-        m_raw_data_vector.reserve(8024);
-        m_raw_data_vector.resize(8024);
+        m_in_data_vector.reserve(8024);
+        m_in_data_vector.resize(8024);
 
         // NOTES Reallocate by using reset! When rending Term Height/Width Change, need to recreate.
         // m_sequence_parser.reset(new SequenceParser(m_renderer, connection));
@@ -81,7 +81,8 @@ public:
         std::cout << "~Session" << std::endl;
 
         // Clear any Data left over in the Buffer.
-        std::vector<unsigned char>().swap(m_raw_data_vector);
+        std::vector<unsigned char>().swap(m_in_data_vector);
+        std::vector<unsigned char>().swap(m_out_data_vector);
     }
 
     /**
@@ -153,13 +154,13 @@ public:
     void waitForSocketData()
     {
         // Important, clear out buffer before each read.
-        std::vector<unsigned char>().swap(m_raw_data_vector);
-        m_raw_data_vector.reserve(8024);
-        m_raw_data_vector.resize(8024);
+        std::vector<unsigned char>().swap(m_in_data_vector);
+        m_in_data_vector.reserve(8024);
+        m_in_data_vector.resize(8024);
 
         if(m_connection->socket()->isActive())
         {
-            m_connection->async_read(m_raw_data_vector,
+            m_connection->async_read(m_in_data_vector,
                                      std::bind(
                                          &Session::handleRead,
                                          shared_from_this(),
@@ -201,7 +202,7 @@ public:
                     if(m_telnet_manager)
                     {
                         //std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data);
-                        std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data_vector);
+                        std::string parsed_data = m_telnet_manager->parseIncomingData(m_in_data_vector);
 
                         // Debugging on Raw data coming in Shows Screen with bad ANSI Sequences!
                         // Testing and Debugging to make sure were not going insane! :)
@@ -229,10 +230,10 @@ public:
                     /** Not in use yet, when time comes change to support m_raw_data_vector
                      *  as needed.  Still deciding best way to handle this.
                      */
-                    if(m_raw_data_vector.size() != 0)
+                    if(m_in_data_vector.size() != 0)
                     {
                         std::string incoming_data = "";
-                        for(auto c : m_raw_data_vector)
+                        for(auto c : m_in_data_vector)
                         {
                             // Ignore null's
                             if(c == '\0')
@@ -299,18 +300,19 @@ public:
             return;
         }
 
+        /*
         // Send all outgoing data as unsigned data, want to make sure when
         // Time comes we support UTF8 bytes properly.
-        std::vector<unsigned char> raw_data_buffer;
-        raw_data_buffer.reserve(msg.size());
-        raw_data_buffer.resize(msg.size());
+        while(m_out_data_vector.size() > 0) { m_out_data_vector.pop_back(); }
+        std::vector<unsigned char>().swap(m_out_data_vector);        
+        std::copy(msg.begin(), msg.end(), std::back_inserter(m_out_data_vector));
+        */
         
-        std::copy(msg.begin(), msg.end(), std::back_inserter(raw_data_buffer));
-        raw_data_buffer.push_back('\0');
+        std::cout << " * m_out_data_vector: " << m_out_data_vector.size() << std::endl;
 
         if(m_connection->socket()->isActive())
         {
-            m_connection->async_write(raw_data_buffer,
+            m_connection->async_write(msg,
                                       std::bind(
                                           &Session::handleWrite,
                                           shared_from_this(),
@@ -325,8 +327,7 @@ public:
     void handleWrite(const std::error_code& error)
     {
         
-        std::cout << "* handleWrite" << error << std::endl;
-        
+        std::cout << "* handleWrite" << error << std::endl;        
         if(error)
         {
             std::cout << "Async_write Error: " << error.message() << std::endl;
@@ -621,7 +622,8 @@ public:
     time_t                   m_ttime, m_ttime2;
 
     // Input Raw Data Buffer.
-    std::vector<unsigned char> m_raw_data_vector;
+    std::vector<unsigned char> m_in_data_vector;
+    std::vector<unsigned char> m_out_data_vector;
 
 };
 

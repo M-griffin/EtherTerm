@@ -87,19 +87,22 @@ public:
     /**
      * @brief Async Read Callback for IOService Work
      */
-    template <typename ConstBufferSequence, typename Callback>
-    void async_read(ConstBufferSequence &buffer, const Callback &callback)
+    template <typename BufferSequence, typename Callback>
+    void async_read(BufferSequence &buffer, const Callback &callback)
     {
-        m_io_service.addAsyncRead(buffer, m_socket_handle, callback, SERVICE_TYPE_READ);
+        m_io_service.addAsyncRead(buffer, nullptr, m_socket_handle, callback, SERVICE_TYPE_READ);
     }
 
     /**
      * @brief Async Write Callback for IOService Work
      */
-    template <typename ConstBufferSequence, typename Callback>
-    void async_write(ConstBufferSequence &buffer, const Callback &callback)
+    template <typename StringSequence, typename Callback>
+    void async_write(StringSequence string, const Callback &callback)
     {
-        m_io_service.addAsyncWrite(buffer, m_socket_handle, callback, SERVICE_TYPE_WRITE);
+        // Place Holder is used for template parmeters, buffer is used in write
+        // Where the Place Holder in the above method is used for reads.
+        std::vector<unsigned char> place_holder;
+        m_io_service.addAsyncWrite(place_holder, string, m_socket_handle, callback, SERVICE_TYPE_WRITE);
     }
 
     socket_handler_ptr m_socket_handle;

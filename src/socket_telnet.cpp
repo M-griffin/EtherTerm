@@ -22,20 +22,12 @@
 /* returns 0 on any errors, length sent on success */
 int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
 {
-    
-    std::cout << "SDL_Socket::sendSocket: " << m_is_socket_active << std::endl;
-    
     int result = 0;
     if (m_is_socket_active)
     {
-        
-        std::cout << "SDLNet_TCP_Send: " << buffer << std::endl;
         result = SDLNet_TCP_Send(m_tcp_socket, buffer, length);
         if(result < (signed)strlen((char *)buffer))
         {
-            
-             std::cout << "SDLNet_GetError()" << SDLNet_GetError() << std::endl;
-             
             if(SDLNet_GetError() && strlen(SDLNet_GetError()))
             {
                 std::cout << "SDLNet_TCP_Send: " << SDLNet_GetError() << std::endl;
@@ -50,19 +42,12 @@ int SDL_Socket::sendSocket(unsigned char *buffer, Uint32 length)
 /* handle Telnet better */
 int SDL_Socket::recvSocket(char *message)
 {
-    
-    std::cout << "SDL_Socket::recvSocket: " << m_is_socket_active << std::endl;
-    
     int result = -1;
     if (m_is_socket_active)
     {
-        std::cout << "SDLNet_TCP_Recv" << std::endl;
         result = SDLNet_TCP_Recv(m_tcp_socket, message, 8192);
         if(result <= 0)
         {
-            
-            std::cout << "SDLNet_TCP_Recv result: " << result << std::endl;
-            
             // -1 is Error 0 is Server Closed Connection
             return -1;
         }
@@ -74,22 +59,17 @@ int SDL_Socket::recvSocket(char *message)
 
 int SDL_Socket::pollSocket()
 {
-    
-    std::cout << "pollSocket: " << m_is_socket_active << std::endl;
-    
     int num_ready = -1;
     if (m_is_socket_active)
     {
         num_ready = SDLNet_CheckSockets(m_socket_set, 0);
         if(num_ready == -1)
         {
-            std::cout << "SDLNet_CheckSockets -1: " << SDLNet_GetError() << std::endl;
             m_is_socket_active = false;
             return num_ready;
         }
         if(num_ready && SDLNet_SocketReady(m_tcp_socket) > 0)
         {
-            std::cout << "pollSocket SDLNet_SocketReady! 1" << std::endl;
             num_ready = 1;
         }
         else
@@ -103,7 +83,6 @@ int SDL_Socket::pollSocket()
 
 bool SDL_Socket::onEnter()
 {
-    std::cout << "SDL_Socket::onEnter()" << std::endl;
     IPaddress ip;
 
     m_socket_set = SDLNet_AllocSocketSet(1);

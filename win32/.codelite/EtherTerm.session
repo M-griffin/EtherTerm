@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Session Name="C:\Users\Blue\Desktop\EtherTerm\win32\EtherTerm.workspace">
-  <int Value="2" Name="m_selectedTab"/>
+  <int Value="7" Name="m_selectedTab"/>
   <wxString Value="C:\Users\Blue\Desktop\EtherTerm\win32\EtherTerm.workspace" Name="m_workspaceName"/>
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
@@ -19,29 +19,50 @@
     </TabInfo>
     <TabInfo>
       <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\socket_telnet.cpp" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="77" Name="CurrentLine"/>
+      <int Value="39" Name="FirstVisibleLine"/>
+      <int Value="45" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
       <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\io_service.cpp" Name="FileName"/>
-      <int Value="38" Name="FirstVisibleLine"/>
-      <int Value="50" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="C:\MinGW-5.1.0\mingw32\i686-w64-mingw32\include\c++\bits\stl_algobase.h" Name="FileName"/>
-      <int Value="418" Name="FirstVisibleLine"/>
-      <int Value="435" Name="CurrentLine"/>
+      <int Value="22" Name="FirstVisibleLine"/>
+      <int Value="23" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
       <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\session.hpp" Name="FileName"/>
-      <int Value="153" Name="FirstVisibleLine"/>
-      <int Value="199" Name="CurrentLine"/>
+      <int Value="602" Name="FirstVisibleLine"/>
+      <int Value="234" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\io_service.hpp" Name="FileName"/>
+      <int Value="29" Name="FirstVisibleLine"/>
+      <int Value="31" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\input_handler.cpp" Name="FileName"/>
+      <int Value="1224" Name="FirstVisibleLine"/>
+      <int Value="1242" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\telnet_manager.cpp" Name="FileName"/>
+      <int Value="27" Name="FirstVisibleLine"/>
+      <int Value="41" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\telnet_manager.hpp" Name="FileName"/>
+      <int Value="9" Name="FirstVisibleLine"/>
+      <int Value="34" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>

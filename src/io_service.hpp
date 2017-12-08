@@ -34,34 +34,38 @@ public:
     class service_base
     {
     public:
-        virtual void setBuffer(char *buffer) = 0;
-        virtual std::vector<unsigned char> &getBuffer() = 0;        
+        virtual void setBuffer(unsigned char *buffer) = 0;
+        virtual std::vector<unsigned char> &getBuffer() = 0;  
+        virtual std::string getWriteSequence() = 0;
         virtual socket_handler_ptr getSocket() = 0;
         virtual callback_function_handler getCallback() = 0;
         virtual int getServiceType() = 0;
     };
     typedef std::shared_ptr<service_base> service_base_ptr;
 
-    template <class ConstBufferSequence, class  SocketHandle, class Callback, class ServiceType>
+    template <class ConstBufferSequence, class StringSequence, class SocketHandle, class Callback, class ServiceType>
     class service_job : public service_base
     {
     public:
     
         // Virtual Methods to pickup Data from Base Classes
-        virtual void setBuffer(char *buffer) 
+        virtual void setBuffer(unsigned char *buffer) 
         {
             for(int i = 0; i < MAX_BUFFER_SIZE; i++)
             {
                 
                 //std::string buff = static_cast<char *>(buffer);
                 //std::copy(buff.begin(), buff.end(), std::back_inserter(m_buffer));
-                if (buffer[i] != '\0')
-                    m_buffer.push_back(buffer[i]);
+                m_buffer.push_back(buffer[i]);
             }
         }        
         virtual std::vector<unsigned char> &getBuffer()
         {
             return m_buffer;
+        }
+        virtual std::string getWriteSequence()
+        {
+            return m_write_sequence;
         }
         virtual socket_handler_ptr getSocket()
         {
@@ -76,9 +80,10 @@ public:
             return m_service_type;
         }
 
-        service_job(ConstBufferSequence &buffer, SocketHandle socket_handle, Callback callback, 
+        service_job(ConstBufferSequence &buffer, StringSequence write_sequence, SocketHandle socket_handle, Callback callback, 
                 ServiceType service_type)
             : m_buffer(buffer)
+            , m_write_sequence(write_sequence)
             , m_socket_handle(socket_handle)
             , m_callback(callback)
             , m_service_type(service_type)
@@ -87,29 +92,30 @@ public:
         }
 
         ConstBufferSequence &m_buffer;
+        StringSequence       m_write_sequence;
         SocketHandle         m_socket_handle;
         Callback             m_callback;
         ServiceType          m_service_type;
     };
 
-    template <typename ConstBufferSequence, typename SocketHandle, typename Callback, typename ServiceType>
-    void addAsyncRead(ConstBufferSequence &buffer, SocketHandle socket_handle, Callback &callback, ServiceType serviceType)
+    template <typename ConstBufferSequence, typename StringSequence, typename SocketHandle, typename Callback, typename ServiceType>
+    void addAsyncRead(ConstBufferSequence &buffer, StringSequence write_sequence, SocketHandle socket_handle, Callback &callback, ServiceType service_type)
     {
         std::cout << " * addAsyncRead Job" << std::endl;        
-        service_job<ConstBufferSequence, SocketHandle, Callback, ServiceType> *job
-            = new service_job <ConstBufferSequence, SocketHandle, Callback, ServiceType>
-        (buffer, socket_handle, callback, serviceType);
+        service_job<ConstBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
+            = new service_job <ConstBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
+        (buffer, write_sequence, socket_handle, callback, service_type);
 
         m_service_list.push_back(std::shared_ptr<service_base>(job));
     }
 
-    template <typename ConstBufferSequence, typename SocketHandle, typename Callback, typename ServiceType>
-    void addAsyncWrite(ConstBufferSequence &buffer, SocketHandle socket_handle, Callback &callback, ServiceType serviceType)
+    template <typename ConstBufferSequence, typename StringSequence, typename SocketHandle, typename Callback, typename ServiceType>
+    void addAsyncWrite(ConstBufferSequence &buffer, StringSequence write_sequence, SocketHandle socket_handle, Callback &callback, ServiceType service_type)
     {
         std::cout << " * addAsyncWrite Job" << std::endl;        
-        service_job<ConstBufferSequence, SocketHandle, Callback, ServiceType> *job
-            = new service_job <ConstBufferSequence, SocketHandle, Callback, ServiceType>
-        (buffer, socket_handle, callback, serviceType);
+        service_job<ConstBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
+            = new service_job <ConstBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
+        (buffer, write_sequence, socket_handle, callback, service_type);
 
         m_service_list.push_back(std::shared_ptr<service_base>(job));
     }
