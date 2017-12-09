@@ -25,6 +25,8 @@
 #include <SDL_net.h>
 #include <winsock2.h>
 #include <windows.h>
+#else
+#include <SDL2/SDL_net.h>
 #endif
 
 #include <cstdio>
@@ -49,12 +51,12 @@ bool SDLStartUp()
         std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
         success = false;
     }
-    
+
     if(SDLNet_Init()==-1)
-	{
-		printf("SDLNet_Init: %s\n",SDLNet_GetError());
-		exit(2);
-	}
+    {
+        printf("SDLNet_Init: %s\n",SDLNet_GetError());
+        exit(2);
+    }
 
     // Turn off, might make a toggle for this later on.
     SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
