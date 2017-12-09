@@ -1,10 +1,13 @@
 
 4.0 Demo Branch is now the latest branch work in progress with a rewrite and reintegration of SSH.
 ===============
-The removal of Boost libs will be replaced with standard c++ functionaly instead.  The build and project files are currently in the process of rewritten and seperated in folders by environment/os. 
+You can follow the latest updates and work in the ``feature/0.4.0-alpha`` branch.  As updates and changes are made stable pull requests will merge the updates back to the master branch.
 
 
-The previous 3.0 Demo branch is a fork and rewrite of the internals for EtherTerm.  This version differs a bit as asynchronous sockets were added along with the ability to open several connections at the same each in their own window.  Other telnet option fixes and updated to the terminal have also been added along with some pre-testing of file upload/downloads.  Still very raw (Dialing Directory is still unfinished, and SSH support is disconnected at the moment).  This more of a POC (Proof of concept) rewrite to see what can be done differently.   Also some rendering changes were made and are in testing such as recolor blocks using alpha channels for a slight speed up.  Although some kinks need to be worked out on some background / foreground color swaps, this isn't 100% yet.  Blinking cursor code has also been improved however some issues the color of the cursor following the color of the current x/y position on the screen due to using Alpha channels for quick color changes.
+The removal of Boost libs will be replaced with standard c++11 functionaly instead.  The build and project files are currently in the process of being rewritten and seperated in folders by environment/os. 
+
+
+The previous 3.0 Demo branch is a fork and rewrite of the internals for EtherTerm.  This version differs a bit as asynchronous sockets were added along with the ability to open several connections at the same each in their own window.  Other telnet option fixes and updated to the terminal have also been added along with some pre-testing of file upload/downloads.  Still very raw (Dialing Directory is still unfinished, and SSH support is disconnected at the moment).  This more of a POC (Proof of concept) rewrite to see what can be done differently.   Also some rendering changes were made and are in testing such as recolor blocks using alpha channels for a slight speed up.  ``Note`` the 3.x branch had some experimental stuff I was testing,  right now I've had to roll back several commits and some things are disabled until I get time to fix and re-implement them.  **Just keep in mind this Alpha Software and is very much a work in progress.**
 
 
 .. contents:: Table of Contents
@@ -104,12 +107,13 @@ Generally, the following libraries must be installed:
 - libssh (Requires OpenSSL, Zlib)
 
 As well as a recent version of gnu/gcc providing g++, or clang.
+``GCC/G++ version 5.x and above are required along with -std=c++11``
 
 For Windows, mingw32 or 64 is required.
 
 - **NOTE**: EtherTerm will seek an ``./assets`` folder relative to the executable.  In this way,
-  it is not (yet) a very "portable" executable.  At this stage, please execute only from the
-  project folder.
+  it is not (yet) a very "portable" executable.  At this stage, a build folder has been created with quick scripts that will copy from the DEBUG folder to the build folder where the assets is now located by default.
+  
 
 
 TODO
