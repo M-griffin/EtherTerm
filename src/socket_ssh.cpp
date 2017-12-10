@@ -63,6 +63,9 @@ int SSH_Socket::recvSocket(char *message)
             return SSH_ERROR;
         }
     }
+    
+    std::cout << "recvSocket" << " message: " << message <<  std::endl;
+    
     return result;
 }
 
@@ -107,6 +110,7 @@ bool SSH_Socket::onEnter()
 
     std::cout << "Connecting to: " << m_host << ":" << m_port << std::endl;
     std::cout << "User: " << m_user_id << std::endl;
+    std::cout << "Password: " << m_password << std::endl;
 
     //SSH Set Connection Options
     ssh_options_set(m_ssh_session, SSH_OPTIONS_HOST, m_host.c_str());
@@ -222,7 +226,6 @@ bool SSH_Socket::onEnter()
     }
 
     m_is_socket_active = true;
-
     return true;
 }
 
@@ -530,7 +533,8 @@ int SSH_Socket::authenticate_console()
         {
             if (m_password != "")
             {
-                rc = ssh_userauth_password(m_ssh_session, nullptr, m_password.c_str());
+                std::cout << "*** manual login *** " << std::endl;
+                rc = ssh_userauth_password(m_ssh_session, m_user_id.c_str(), m_password.c_str());
                 switch(rc)
                 {
                     case SSH_AUTH_ERROR:   //some serious error happened during authentication

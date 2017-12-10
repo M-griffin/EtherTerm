@@ -2,7 +2,6 @@
 #include "session.hpp"
 
 #include <algorithm>
-//#include <std/bind.hpp>
 
 
 SessionManager::SessionManager()
@@ -93,22 +92,6 @@ void SessionManager::grabNewWindowFocus()
     // Reset for next system detected.
     m_is_system_disconnected = false;
 }
-
-/**
- * @brief Sends message to all users in the current room.
- * @param participant
- *
-void SessionManager::deliver(std::string msg)
-{
-    if(msg.size() == 0)
-        return;
-
-    // This isn't used at this time!
-    std::cout << "Deliver Global SessionManager notices: " << msg << std::endl;
-    std::for_each(m_sessions.begin(), m_sessions.end(),
-                  std::bind(&Session::deliver, _1, std::ref(msg)));
-}*/
-
 
 /**
  * @brief Retrieve Number of users connected

@@ -5,18 +5,10 @@
 #include "session_manager.hpp"
 #include "socket_handler.hpp"
 #include "io_service.hpp"
-/*
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
-#include <boost/exception/all.hpp>
-#include <boost/asio/io_service.hpp>
-*/
-
 
 #include <iostream>
 #include <thread>
 #include <set>
-
 
 /**
  * @class Interface
@@ -219,7 +211,8 @@ public:
         new_session->startup();
 
         // If Telnet Session spawn it, Add Other Instances later on, SSH, IRC, FTP etc..
-        if(system_connection->protocol == "TELNET")
+        // TODO, think this sets up the ansi parser might need to break this out.
+        if(system_connection->protocol == "TELNET" || system_connection->protocol == "SSH")
         {
             std::cout << "Starting TelnetManager in Interface" << std::endl;
             new_session->createTelnetManager();
@@ -238,61 +231,19 @@ public:
         std::string connection_string = system_connection->ip;
         connection_string.append(":");
         connection_string.append(std::to_string(system_connection->port));
+        
+        // TODO Change this to WriteSequence and use vector, incase passwords or others has colons
+        // That could casue issues on string split!
+        if(system_connection->protocol == "SSH")
+        {
+            connection_string.append(":");
+            connection_string.append(system_connection->login);
+            connection_string.append(":");
+            connection_string.append(system_connection->password);
+        }
 
         new_session->createConnection(connection_string, system_connection->protocol);
     }
-
-
-
-    /*
-    if (new_connection->socket()->createTelnetSocket(
-                system_connection->ip, system_connection->port
-            ))
-    {
-        // Connection Successful
-        new_session->m_is_connected = true;
-        new_session->waitForSocketData();
-    }
-    else
-    {
-        if(new_connection->socket()->isActive())
-        {
-            new_connection->socket()->close();
-        }
-        m_session_manager->leave(new_session);
-    }*/
-
-    //m_io_service.addAsyncConnect()
-
-    //auto func = std::bind(&Foo::bar, this, std::placeholders::_1);
-    //auto handle = std::async(std::launch::async, func, 0);
-    /*
-    // Start Async Connection
-    boost::asio::async_connect(new_connection->socket(),
-                               endpoint_iterator,
-                               [this, new_connection, system_connection, new_session]
-                               (boost::system::error_code ec, tcp::resolver::iterator)
-
-    {
-        if(!ec)
-        {
-            // Mark Session Connected
-            new_session->m_is_connected = true;
-            new_session->waitForSocketData();
-        }
-        else
-        {
-            std::cout << "Unable to Connect, closing down session." << std::endl;
-
-            // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
-            if(new_connection->socket().is_open())
-            {
-                new_connection->socket().close();
-            }
-            m_session_manager->leave(new_session);
-        }
-    });
-    }*/
 
     /**
      * @brief Process SDL_TextInput and SDL_Window Events per session

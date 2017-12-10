@@ -148,7 +148,45 @@ void IOService::run()
 
             else if (job_work->getServiceType() == SERVICE_TYPE_CONNECT_SSH)
             {
-                // m_system_connection->protocol == "TELNET"
+                // Get host and port from string.
+                // This would better as a vector<std::string> for the sequqnce,
+                // More versitile.!
+                std::vector<std::string> ip_address = split(job_work->getStringSequence(), ':');
+                std::cout << "ip_address: " << ip_address.size();
+                bool is_success = false;
+                if (ip_address.size() >= 4)
+                {
+                    
+                    std::cout << "1. " << ip_address.at(0) << std::endl;
+                    std::cout << "2. " << ip_address.at(1) << std::endl;
+                    std::cout << "3. " << ip_address.at(2) << std::endl;
+                    std::cout << "4. " << ip_address.at(3) << std::endl;
+                    
+                    is_success = job_work->getSocket()->connectSshSocket(
+                                     ip_address.at(0),
+                                     std::atoi(ip_address.at(1).c_str()),
+                                     ip_address.at(2),
+                                     ip_address.at(3)
+                                 );
+                }
+
+                if (is_success)
+                {
+                    callback_function_handler run_callback(job_work->getCallback());
+                    std::error_code success_code (0, std::generic_category());
+                    run_callback(success_code);
+                    m_service_list.remove(i);
+                }
+                else
+                {
+                    // Error - Unable to connect
+                    std::cout << "async_connection - unable to connect" << std::endl;
+                    job_work->getSocket()->setInactive();
+                    callback_function_handler run_callback(job_work->getCallback());
+                    std::error_code not_connected_error_code (1, std::system_category());
+                    run_callback(not_connected_error_code);
+                    m_service_list.remove(i);
+                }
 
             }
         }

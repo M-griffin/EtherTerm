@@ -169,6 +169,9 @@ public:
      */
     void handleConnection(const std::error_code& error)
     {
+        
+        std::cout << "*** handleConnection ***" << std::endl;
+        
         if (error)
         {
             std::cout << "Unable to Connect, closing down session." << std::endl;
