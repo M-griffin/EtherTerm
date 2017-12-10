@@ -27,7 +27,7 @@ void IOService::run()
 
     m_is_active = true;
     while(m_is_active)
-    {       
+    {
         // This will wait for another job to be inserted on next call
         // Do we want to insert the job back, if poll is empty or
         // move to vector then look polls..  i think #2.
@@ -39,7 +39,7 @@ void IOService::run()
              * Handle Read Service if Data is Available.
              */
             if (job_work->getServiceType() == SERVICE_TYPE_READ)
-            {                
+            {
                 // If Data Available, read, then ppulate buffer, and remove
                 // Otherwise keep polling till data is available.
                 int result = job_work->getSocket()->poll();
@@ -81,7 +81,7 @@ void IOService::run()
              */
             else if (job_work->getServiceType() == SERVICE_TYPE_WRITE)
             {
-                // std::cout << "* SERVICE_TYPE_WRITE" << std::endl;                
+                // std::cout << "* SERVICE_TYPE_WRITE" << std::endl;
                 int result = job_work->getSocket()->sendSocket(
                                  (unsigned char*)job_work->getWriteSequence().c_str(),
                                  job_work->getWriteSequence().size());
@@ -118,5 +118,6 @@ void IOService::run()
  */
 void IOService::stop()
 {
+    m_is_active = false;
     m_service_list.clear();
 }

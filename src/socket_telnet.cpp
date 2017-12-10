@@ -130,13 +130,14 @@ bool SDL_Socket::onExit()
     std::cout << "SDL_Socket::onExit()" << std::endl;
     /*  double check global shutdown?!?
     if(TheInputHandler::Instance()->isGlobalShutdown())
+     */
     {
         if (m_tcp_socket)
         {
             SDLNet_TCP_Close(m_tcp_socket);
         }
         m_tcp_socket = nullptr;
-    }*/
+    }
 
     if (m_socket_set)
     {
