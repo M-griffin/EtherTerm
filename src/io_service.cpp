@@ -140,8 +140,8 @@ void IOService::run()
                     std::cout << "async_connection - unable to connect" << std::endl;
                     job_work->getSocket()->setInactive();
                     callback_function_handler run_callback(job_work->getCallback());
-                    std::error_code lost_connect_error_code (1, std::system_category());
-                    run_callback(lost_connect_error_code);
+                    std::error_code not_connected_error_code (1, std::system_category());
+                    run_callback(not_connected_error_code);
                     m_service_list.remove(i);
                 }
             }
