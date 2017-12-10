@@ -54,7 +54,7 @@ void IOService::run()
                         job_work->getSocket()->setInactive();
                         callback_function_handler run_callback(job_work->getCallback());
                         std::error_code lost_connect_error_code (1, std::system_category());
-                        run_callback(lost_connect_error_code);
+                        run_callback(lost_connect_error_code, nullptr);
                         m_service_list.remove(i);
                     }
                     else
@@ -62,7 +62,7 @@ void IOService::run()
                         job_work->setBuffer((unsigned char *)msg_buffer);
                         callback_function_handler run_callback(job_work->getCallback());
                         std::error_code success_code (0, std::generic_category());
-                        run_callback(success_code);
+                        run_callback(success_code, nullptr);
                         m_service_list.remove(i);
                     }
                 }
@@ -71,7 +71,7 @@ void IOService::run()
                     std::cout << "SDL Poll Error!" << std::endl;
                     callback_function_handler run_callback(job_work->getCallback());
                     std::error_code lost_connect_error_code (1, std::system_category());
-                    run_callback(lost_connect_error_code);
+                    run_callback(lost_connect_error_code, nullptr);
                     m_service_list.remove(i);
                 }
             }
@@ -93,14 +93,14 @@ void IOService::run()
                     job_work->getSocket()->setInactive();
                     callback_function_handler run_callback(job_work->getCallback());
                     std::error_code lost_connect_error_code (1, std::system_category());
-                    run_callback(lost_connect_error_code);
+                    run_callback(lost_connect_error_code, nullptr);
                     m_service_list.remove(i);
                 }
                 else
                 {
                     callback_function_handler run_callback(job_work->getCallback());
                     std::error_code success_code (0, std::generic_category());
-                    run_callback(success_code);
+                    run_callback(success_code, nullptr);
                     m_service_list.remove(i);
                 }
             }

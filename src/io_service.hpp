@@ -10,6 +10,9 @@
 class SocketHandler;
 typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
 
+class Session;
+typedef std::shared_ptr<Session> session_ptr;
+
 const int SERVICE_TYPE_NONE    = 0;
 const int SERVICE_TYPE_READ    = 1;
 const int SERVICE_TYPE_WRITE   = 2;
@@ -29,7 +32,12 @@ public:
     IOService();
     ~IOService();
 
-    typedef std::function<void(const std::error_code& error)> callback_function_handler;
+    /**
+     * Handles Call Backs, Read/Write only pass error, and null for session since not needed
+     * Connection will use both
+     */
+    typedef std::function<void(const std::error_code& error, session_ptr session)> callback_function_handler;
+    
     static const int MAX_BUFFER_SIZE = 8193;
 
     class service_base
@@ -54,9 +62,6 @@ public:
         {
             for(int i = 0; i < MAX_BUFFER_SIZE; i++)
             {
-
-                //std::string buff = static_cast<char *>(buffer);
-                //std::copy(buff.begin(), buff.end(), std::back_inserter(m_buffer));
                 m_buffer.push_back(buffer[i]);
             }
         }
