@@ -54,7 +54,6 @@
     <File Name="../src/surface.hpp"/>
     <File Name="../src/surface_manager.cpp"/>
     <File Name="../src/surface_manager.hpp"/>
-    <File Name="../src/tcp_connection.hpp"/>
     <File Name="../src/telnet.hpp"/>
     <File Name="../src/telnet_manager.cpp"/>
     <File Name="../src/telnet_manager.hpp"/>
@@ -74,6 +73,7 @@
     <File Name="../src/socket_ssh.cpp"/>
     <File Name="../src/socket_state.hpp"/>
     <File Name="../src/socket_telnet.cpp"/>
+    <File Name="../src/async_connection.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>

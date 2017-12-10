@@ -7,7 +7,7 @@
 #include "sequence_decoder.hpp"
 #include "renderer.hpp"
 #include "input_handler.hpp"
-#include "tcp_connection.hpp"
+#include "async_connection.hpp"
 #include "safe_queue.hpp"
 #include "message_queue.hpp"
 #include "menu_manager.hpp"
@@ -52,11 +52,11 @@ public:
         , m_program_path(program_path)
         , m_weak_session_manager(session_manager)
         , m_window_manager(
-              new WindowManager(
-                  (m_term_height * m_char_height),
-                  (m_term_width * m_char_width)
-              )
-          )
+            new WindowManager(
+                (m_term_height * m_char_height),
+                (m_term_width * m_char_width)
+            )
+        )
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_connection(connection)
         , m_system_connection(system_connection)
@@ -178,7 +178,7 @@ public:
     void handleRead(const std::error_code& error) //, size_t bytes_transferred)
     {
         //std::cout << "* handleRead: " << error << std::endl;
-        if(error) 
+        if(error)
         {
             std::cout << "* Async Read Error!" << error << std::endl;
         }
@@ -279,7 +279,7 @@ public:
         else
         {
             std::cout << "Error, Not connected to the SessionManager!" << std::endl;
-            if(m_connection->socket()->isActive()) 
+            if(m_connection->socket()->isActive())
             {
                 // if the socket is still active, shut it down
                 m_connection->shutdown();
@@ -292,8 +292,8 @@ public:
      * @param msg
      */
     void deliver(const std::string &string_msg)
-    {        
-        //std::cout << " * Deliver: " << string_msg.size() << " - " << string_msg << std::endl;        
+    {
+        //std::cout << " * Deliver: " << string_msg.size() << " - " << string_msg << std::endl;
         if(string_msg.size() == 0 || string_msg[0] == '\0')
         {
             return;
@@ -314,8 +314,8 @@ public:
      * @param error
      */
     void handleWrite(const std::error_code& error)
-    {        
-        //std::cout << "* handleWrite" << error << std::endl;        
+    {
+        //std::cout << "* handleWrite" << error << std::endl;
         if(error)
         {
             std::cout << "Async_write Error: " << error.message() << std::endl;
@@ -330,7 +330,7 @@ public:
                     {
                         m_connection->shutdown();
                     }
-                    
+
                 }
 
             }

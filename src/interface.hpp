@@ -206,7 +206,7 @@ public:
                 tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
         */
         // Connection handles TCP_Socket
-        connection_ptr new_connection(new tcp_connection(m_io_service));
+        connection_ptr new_connection(new async_connection(m_io_service));
 
         // Hard Coded for testing, move this to direcotry.ini!
         int height = 25;

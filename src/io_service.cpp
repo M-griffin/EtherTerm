@@ -83,8 +83,8 @@ void IOService::run()
             {
                 // std::cout << "* SERVICE_TYPE_WRITE" << std::endl;
                 int result = job_work->getSocket()->sendSocket(
-                                 (unsigned char*)job_work->getWriteSequence().c_str(),
-                                 job_work->getWriteSequence().size());
+                                 (unsigned char*)job_work->getStringSequence().c_str(),
+                                 job_work->getStringSequence().size());
 
                 if (result <= 0)
                 {

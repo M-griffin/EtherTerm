@@ -9,9 +9,9 @@ class Session;
 typedef std::shared_ptr<Session> session_ptr;
 typedef std::weak_ptr<Session> session_weak_ptr;
 
-class tcp_connection;
-typedef std::shared_ptr<tcp_connection> connection_ptr;
-typedef std::weak_ptr<tcp_connection> connection_wptr;
+class async_connection;
+typedef std::shared_ptr<async_connection> connection_ptr;
+typedef std::weak_ptr<async_connection> connection_wptr;
 
 class Protocol
 {
