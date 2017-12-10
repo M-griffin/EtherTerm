@@ -148,6 +148,56 @@ public:
     }
 
     /**
+     * @brief Create Async Connection
+     * @param connection_string
+     * @param protocol
+     */
+    void createConnection(std::string connection_string, std::string protocol)
+    {
+        m_connection->async_connect(connection_string,
+                                    protocol,
+                                    std::bind(
+                                        &Session::handleConnection,
+                                        shared_from_this(),
+                                        std::placeholders::_1));
+    }
+
+    /**
+     * @brief Async Connection Handler
+     * @param error
+     * @param new_session
+     */
+    void handleConnection(const std::error_code& error)
+    {
+        if (error)
+        {
+            std::cout << "Unable to Connect, closing down session." << std::endl;
+            // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
+            if(m_connection->socket()->isActive())
+            {
+                m_connection->socket()->close();
+            }
+            m_is_leaving = true;
+            // Disconenct the session.
+            std::cout << "Connection Closed, Leaving Session! " << std::endl;
+
+            // Shutdown the Input handler.
+            if(!m_input_handler->isGlobalShutdown())
+            {
+                session_manager_ptr session_mgr = m_weak_session_manager.lock();
+                if(session_mgr)
+                {
+                    session_mgr->leave(shared_from_this());
+                }
+            }
+            return;
+        }
+
+        m_is_connected = true;
+        waitForSocketData();
+    }
+
+    /**
      * @brief Setup the initial Async Socket Data Calls for Managing the connection.
      */
     void waitForSocketData()
@@ -365,9 +415,9 @@ public:
     }
 
     /**
-     * @brief Startup for the Telnet Instatnces.
+     * @brief Startup Telnet Option/Sequence Parser
      */
-    void startTelnetManager()
+    void createTelnetManager()
     {
         // Setup and Load Font from Dialing Directory for Selected System
         if(m_system_connection->font != "")

@@ -52,12 +52,12 @@ int SocketHandler::poll()
 }
 
 /**
- * @brief Create Telnet Socket
+ * @brief Connect Telnet Socket
  * @param host
  * @param port
  * @return
  */
-bool SocketHandler::createTelnetSocket(std::string host, int port)
+bool SocketHandler::connectTelnetSocket(std::string host, int port)
 {
     std::cout << "SocketHandler::initTelnet" << std::endl;
     if(!m_is_active)
@@ -102,8 +102,8 @@ bool SocketHandler::createTelnetSocket(std::string host, int port)
  * @param password
  * @return
  */
-bool SocketHandler::createSshSocket(std::string host, int port,
-                                    std::string username, std::string password)
+bool SocketHandler::connectSshSocket(std::string host, int port,
+                                     std::string username, std::string password)
 {
     if(!m_is_active)
     {

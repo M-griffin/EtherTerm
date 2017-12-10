@@ -22,19 +22,19 @@ class SocketHandler
 {
 public:
 
-    SocketHandler() 
-        : m_socket()    
+    SocketHandler()
+        : m_socket()
         , m_socket_type("")
         , m_is_active(false)
     {
     }
-    
+
     ~SocketHandler()
     {
         std::cout << "~SocketHandler" << std::endl;
         std::vector<socket_state_ptr>().swap(m_socket);
     }
-    
+
     std::string const SOCKET_TYPE_TELNET = "TELNET";
     std::string const SOCKET_TYPE_SSH = "SSH";
     std::string const SOCKET_TYPE_FTP = "FTP";
@@ -44,18 +44,18 @@ public:
     int recvSocket(char *message);
     int poll();
 
-    bool createTelnetSocket(std::string host, int port);
-    bool createSshSocket(std::string host, int port, std::string username, std::string password);
+    bool connectTelnetSocket(std::string host, int port);
+    bool connectSshSocket(std::string host, int port, std::string username, std::string password);
 
     std::string getSocketType() const;
     bool isActive() const;
     void setInactive();
-    
+
     void close();
-    
+
 private:
 
-    std::vector<socket_state_ptr>   m_socket;    
+    std::vector<socket_state_ptr>   m_socket;
     std::string                     m_socket_type;
     bool                            m_is_active;
 

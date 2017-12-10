@@ -197,14 +197,6 @@ public:
                   << system_connection->port
                   << std::endl;
 
-//TODO REWORK
-        /*
-                tcp::resolver resolver(m_io_service);
-                tcp::resolver::query query(system_connection->ip, std::to_string(system_connection->port));
-
-                // Use all end pointer for IPV4 & IPV6 support
-                tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-        */
         // Connection handles TCP_Socket
         connection_ptr new_connection(new async_connection(m_io_service));
 
@@ -230,7 +222,7 @@ public:
         if(system_connection->protocol == "TELNET")
         {
             std::cout << "Starting TelnetManager in Interface" << std::endl;
-            new_session->startTelnetManager();
+            new_session->createTelnetManager();
         }
 
         // Start Async Read/Writes Loop for Session Socket Data.
@@ -242,56 +234,65 @@ public:
         // Start Blinking Cursor for Active connection session.
         new_session->m_sequence_parser->setCursorActive(true);
 
+        // Setup the Connection String
+        std::string connection_string = system_connection->ip;
+        connection_string.append(":");
+        connection_string.append(std::to_string(system_connection->port));
 
-        if (new_connection->socket()->createTelnetSocket(
-                    system_connection->ip, system_connection->port
-                ))
+        new_session->createConnection(connection_string, system_connection->protocol);
+    }
+
+
+
+    /*
+    if (new_connection->socket()->createTelnetSocket(
+                system_connection->ip, system_connection->port
+            ))
+    {
+        // Connection Successful
+        new_session->m_is_connected = true;
+        new_session->waitForSocketData();
+    }
+    else
+    {
+        if(new_connection->socket()->isActive())
         {
-            // Connection Successful
+            new_connection->socket()->close();
+        }
+        m_session_manager->leave(new_session);
+    }*/
+
+    //m_io_service.addAsyncConnect()
+
+    //auto func = std::bind(&Foo::bar, this, std::placeholders::_1);
+    //auto handle = std::async(std::launch::async, func, 0);
+    /*
+    // Start Async Connection
+    boost::asio::async_connect(new_connection->socket(),
+                               endpoint_iterator,
+                               [this, new_connection, system_connection, new_session]
+                               (boost::system::error_code ec, tcp::resolver::iterator)
+
+    {
+        if(!ec)
+        {
+            // Mark Session Connected
             new_session->m_is_connected = true;
             new_session->waitForSocketData();
         }
         else
         {
-            if(new_connection->socket()->isActive())
+            std::cout << "Unable to Connect, closing down session." << std::endl;
+
+            // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
+            if(new_connection->socket().is_open())
             {
-                new_connection->socket()->close();
+                new_connection->socket().close();
             }
             m_session_manager->leave(new_session);
         }
-
-        //m_io_service.addAsyncConnect()
-
-        //auto func = std::bind(&Foo::bar, this, std::placeholders::_1);
-        //auto handle = std::async(std::launch::async, func, 0);
-        /*
-                // Start Async Connection
-                boost::asio::async_connect(new_connection->socket(),
-                                           endpoint_iterator,
-                                           [this, new_connection, system_connection, new_session]
-                                           (boost::system::error_code ec, tcp::resolver::iterator)
-
-                {
-                    if(!ec)
-                    {
-                        // Mark Session Connected
-                        new_session->m_is_connected = true;
-                        new_session->waitForSocketData();
-                    }
-                    else
-                    {
-                        std::cout << "Unable to Connect, closing down session." << std::endl;
-
-                        // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
-                        if(new_connection->socket().is_open())
-                        {
-                            new_connection->socket().close();
-                        }
-                        m_session_manager->leave(new_session);
-                    }
-                });
-        */
-    }
+    });
+    }*/
 
     /**
      * @brief Process SDL_TextInput and SDL_Window Events per session

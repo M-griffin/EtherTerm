@@ -114,14 +114,25 @@ public:
      * @param StringSequence - Host:Port
      * @param Callback - return error code and handles to new session
      */
-    template <typename StringSequence, typename Callback>
-    void async_connect(StringSequence string_seq, const Callback &callback)
+    template <typename StringSequence, typename Protocol, typename Callback>
+    void async_connect(StringSequence string_seq, Protocol protocol, const Callback &callback)
     {
         // Place Holder is used for template parmeters, string_seq is used in writes
         // Where the Buffer Place Holder in the above method is used for reads.
         // nullptr can't be passed as reference for vector
         std::vector<unsigned char> place_holder;
-        m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handle, callback, SERVICE_TYPE_CONNECT);
+        int service_type = SERVICE_TYPE_NONE;
+
+        if(protocol == "TELNET")
+        {
+            service_type = SERVICE_TYPE_CONNECT_TELNET;
+        }
+        else if (protocol == "SSH")
+        {
+            service_type = SERVICE_TYPE_CONNECT_SSH;
+        }
+
+        m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handle, callback, service_type);
     }
 
     socket_handler_ptr m_socket_handle;

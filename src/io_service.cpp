@@ -50,11 +50,11 @@ void IOService::run()
                     if(length < 0)
                     {
                         // Error - Lost Connection
-                        std::cout << "tcp_connection async_read - lost connection!: " << length << std::endl;
+                        std::cout << "async_read - lost connection!: " << length << std::endl;
                         job_work->getSocket()->setInactive();
                         callback_function_handler run_callback(job_work->getCallback());
                         std::error_code lost_connect_error_code (1, std::system_category());
-                        run_callback(lost_connect_error_code, nullptr);
+                        run_callback(lost_connect_error_code);
                         m_service_list.remove(i);
                     }
                     else
@@ -62,16 +62,16 @@ void IOService::run()
                         job_work->setBuffer((unsigned char *)msg_buffer);
                         callback_function_handler run_callback(job_work->getCallback());
                         std::error_code success_code (0, std::generic_category());
-                        run_callback(success_code, nullptr);
+                        run_callback(success_code);
                         m_service_list.remove(i);
                     }
                 }
                 else if (result == -1)
                 {
-                    std::cout << "SDL Poll Error!" << std::endl;
+                    std::cout << "async_poll - lost connection" << std::endl;
                     callback_function_handler run_callback(job_work->getCallback());
                     std::error_code lost_connect_error_code (1, std::system_category());
-                    run_callback(lost_connect_error_code, nullptr);
+                    run_callback(lost_connect_error_code);
                     m_service_list.remove(i);
                 }
             }
@@ -89,20 +89,67 @@ void IOService::run()
                 if (result <= 0)
                 {
                     // Error - Lost Connection
-                    std::cout << "tcp_connection async_write - lost connection!" << std::endl;
+                    std::cout << "async_write - lost connection!" << std::endl;
                     job_work->getSocket()->setInactive();
                     callback_function_handler run_callback(job_work->getCallback());
                     std::error_code lost_connect_error_code (1, std::system_category());
-                    run_callback(lost_connect_error_code, nullptr);
+                    run_callback(lost_connect_error_code);
                     m_service_list.remove(i);
                 }
                 else
                 {
                     callback_function_handler run_callback(job_work->getCallback());
                     std::error_code success_code (0, std::generic_category());
-                    run_callback(success_code, nullptr);
+                    run_callback(success_code);
                     m_service_list.remove(i);
                 }
+            }
+
+            else if (job_work->getServiceType() == SERVICE_TYPE_CONNECT_TELNET)
+            {
+                // Get host and port from string.
+                // This would better as a vector<std::string> for the sequqnce,
+                // More versitile.!
+                std::vector<std::string> ip_address = split(job_work->getStringSequence(), ':');
+                bool is_success = false;
+                if (ip_address.size() > 1)
+                {
+                    is_success = job_work->getSocket()->connectTelnetSocket(
+                                     ip_address.at(0),
+                                     std::atoi(ip_address.at(1).c_str())
+                                 );
+                }
+                else
+                {
+                    is_success = job_work->getSocket()->connectTelnetSocket(
+                                     ip_address.at(0),
+                                     23
+                                 );
+                }
+
+                if (is_success)
+                {
+                    callback_function_handler run_callback(job_work->getCallback());
+                    std::error_code success_code (0, std::generic_category());
+                    run_callback(success_code);
+                    m_service_list.remove(i);
+                }
+                else
+                {
+                    // Error - Unable to connect
+                    std::cout << "async_connection - unable to connect" << std::endl;
+                    job_work->getSocket()->setInactive();
+                    callback_function_handler run_callback(job_work->getCallback());
+                    std::error_code lost_connect_error_code (1, std::system_category());
+                    run_callback(lost_connect_error_code);
+                    m_service_list.remove(i);
+                }
+            }
+
+            else if (job_work->getServiceType() == SERVICE_TYPE_CONNECT_SSH)
+            {
+                // m_system_connection->protocol == "TELNET"
+
             }
         }
 

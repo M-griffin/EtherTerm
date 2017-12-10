@@ -3,7 +3,8 @@
 
 #include "safe_vector.hpp"
 
-//#include <functional>
+#include <functional>
+#include <sstream>
 #include <vector>
 #include <memory>
 
@@ -13,10 +14,11 @@ typedef std::shared_ptr<SocketHandler> socket_handler_ptr;
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
 
-const int SERVICE_TYPE_NONE    = 0;
-const int SERVICE_TYPE_READ    = 1;
-const int SERVICE_TYPE_WRITE   = 2;
-const int SERVICE_TYPE_CONNECT = 3;
+const int SERVICE_TYPE_NONE           = 0;
+const int SERVICE_TYPE_READ           = 1;
+const int SERVICE_TYPE_WRITE          = 2;
+const int SERVICE_TYPE_CONNECT_TELNET = 3;
+const int SERVICE_TYPE_CONNECT_SSH    = 4;
 
 /**
  * @class IOService
@@ -36,8 +38,8 @@ public:
      * Handles Call Backs, Read/Write only pass error, and null for session since not needed
      * Connection will use both
      */
-    typedef std::function<void(const std::error_code& error, session_ptr session)> callback_function_handler;
-    
+    typedef std::function<void(const std::error_code& error)> callback_function_handler;
+
     static const int MAX_BUFFER_SIZE = 8193;
 
     class service_base
@@ -117,6 +119,24 @@ public:
 
     void run();
     void stop();
+
+    /**
+     * @brief String Split for Hostname : Port on Async Connects
+     * @param s
+     * @param delimiter
+     * @return
+     */
+    std::vector<std::string> split(const std::string& s, char delimiter)
+    {
+        std::vector<std::string> tokens;
+        std::string token;
+        std::istringstream tokenStream(s);
+        while (std::getline(tokenStream, token, delimiter))
+        {
+            tokens.push_back(token);
+        }
+        return tokens;
+    }
 
     SafeVector<service_base_ptr>  m_service_list;
 
