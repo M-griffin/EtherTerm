@@ -253,13 +253,13 @@ public:
                     {
                         std::string parsed_data = m_telnet_manager->parseIncomingData(m_in_data_vector);
 
-                        // Debugging on Raw data coming in Shows Screen with bad ANSI Sequences!
-                        // Testing and Debugging to make sure were not going insane! :)
+                        // Debugging ESC Sequences and data incoming from server.
+                        /*
                         std::ofstream ostrm("stream_output.txt", std::ios_base::app);
                         if (ostrm.is_open()) 
                         {
                             ostrm << parsed_data << std::flush;
-                        }
+                        }*/
 
                         // Process Only if data in the buffer.
                         if(parsed_data.size() > 0)
@@ -267,7 +267,7 @@ public:
                             m_sequence_decoder->decodeEscSequenceData(parsed_data);
                         }
                         
-                        ostrm.close();
+                        //ostrm.close();
                     }
                     else
                     {
