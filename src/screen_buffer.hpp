@@ -26,7 +26,7 @@ public:
     { }
 
     // Not used at this time!
-    ScreenPixel(std::string sequence, SDL_Color fg, SDL_Color bg)
+    ScreenPixel(const std::string &sequence, SDL_Color fg, SDL_Color bg)
         : m_character_sequence(sequence)
         , m_foreground(fg)
         , m_background(bg)

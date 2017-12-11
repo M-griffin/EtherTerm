@@ -23,6 +23,9 @@ public:
         , c() // Control
     {}
 
+    // Default copy Constructor.
+    SafeVector(const SafeVector&) = delete;
+
     // Copy Constructor (Overridden with MOVE)
     SafeVector& operator=(SafeVector& other)
     {

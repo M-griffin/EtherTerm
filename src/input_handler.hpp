@@ -27,7 +27,7 @@ class InputHandler
 {
 public:
 
-    InputHandler(surface_manager_ptr surface_manager, session_ptr session);
+    InputHandler(surface_manager_ptr &surface_manager, session_ptr session);
     ~InputHandler();
 
     /**
@@ -84,7 +84,7 @@ public:
 private:
 
     // Append Input Events until data is read to be pulled.
-    void setInputSequence(std::string sequence)
+    void setInputSequence(const std::string &sequence)
     {
         m_inputSequence += sequence;
     }

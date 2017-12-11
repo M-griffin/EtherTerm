@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <assert.h>
 
-SurfaceManager::SurfaceManager(window_manager_ptr window_manager, std::string program_path)
+SurfaceManager::SurfaceManager(window_manager_ptr &window_manager, const std::string &program_path)
     : m_weak_window_manager(window_manager)
     , m_programPath(program_path)
     , m_currentFont("vga8x16.bmp")
@@ -155,7 +155,7 @@ bool SurfaceManager::textureExists(int value)
  * @brief Set the Current Font name
  * @return
  */
-void SurfaceManager::setCurrentFont(std::string font)
+void SurfaceManager::setCurrentFont(const std::string &font)
 {
     m_previousFont = m_currentFont;
     m_currentFont = font;
@@ -252,7 +252,7 @@ bool SurfaceManager::readFontSets()
  * @param value
  * @return
  */
-FontSet SurfaceManager::getFontFromSet(std::string value)
+FontSet SurfaceManager::getFontFromSet(const std::string &value)
 {
     FontSet font_set;
     for (FontSet f : m_fontSet)

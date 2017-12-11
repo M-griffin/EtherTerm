@@ -193,7 +193,7 @@ bool MenuManager::changeTheme(int index)
  * @brief Helper Function to Handle left and right padding
  * @return
  */
-std::string MenuManager::padString(const std::string &value, const std::string justify, int padding)
+std::string MenuManager::padString(const std::string &value, const std::string &justify, int padding)
 {
     std::string stringReplace = value;
     if(justify == "LEFT")

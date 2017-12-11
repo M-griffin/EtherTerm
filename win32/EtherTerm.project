@@ -92,15 +92,12 @@
         <IncludePath Value="C:/Users/Blue/Downloads/SDL2-2.0.4/i686-w64-mingw32/include/SDL2"/>
         <IncludePath Value="C:/Users/Blue/Downloads/SDL2-2.0.4/i686-w64-mingw32/include"/>
         <IncludePath Value="C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/SDL2_ttf-2.0.12/i686-w64-mingw32/include/SDL2"/>
         <IncludePath Value="C:/OpenSSL-Win32/include"/>
         <IncludePath Value="C:/Users/Blue/Downloads/libssh-0.7.2/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
-        <LibraryPath Value="C:/Users/Blue/Downloads/SDL2_ttf-2.0.12/i686-w64-mingw32/lib"/>
         <LibraryPath Value="C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/lib"/>
         <LibraryPath Value="C:/libz-1.2.7-1-mingw32-dev/lib"/>
-        <LibraryPath Value="C:/msys/1.0/icu/source/lib"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
         <LibraryPath Value="C:/Users/Blue/Downloads/libssh-0.7.2\lib"/>
@@ -108,7 +105,6 @@
         <Library Value="SDL2main"/>
         <Library Value="SDL2"/>
         <Library Value="SDL2_net"/>
-        <Library Value="libSDL2_ttf"/>
         <Library Value="libws2_32.a"/>
         <Library Value="libwsock32.a"/>
         <Library Value="ssleay32.a"/>

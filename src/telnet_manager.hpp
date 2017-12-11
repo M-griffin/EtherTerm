@@ -21,7 +21,7 @@ class TelnetManager
 {
 public:
 
-    TelnetManager(session_ptr session);
+    explicit TelnetManager(session_ptr session);
     ~TelnetManager();
 
     // Handle To session for sending responses back to server.
@@ -76,7 +76,7 @@ public:
      */
     struct FindFirst
     {
-        FindFirst(unsigned char i) : to_find(i) { }
+        explicit FindFirst(unsigned char i) : to_find(i) { }
         unsigned char to_find;
         bool operator()
         (const unsigned char &p)

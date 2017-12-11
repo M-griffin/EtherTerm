@@ -25,7 +25,7 @@ class SocketState
 {
 public:
 
-    SocketState(std::string host, int port)
+    SocketState(const std::string &host, const int &port)
         : m_host(host)
         , m_port(port)
         , m_is_socket_active(false)
@@ -56,7 +56,7 @@ class SDL_Socket : public SocketState
 {
 public:
 
-    SDL_Socket(std::string host, int port)
+    SDL_Socket(const std::string &host, const int &port)
         : SocketState(host, port)
         , m_tcp_socket(nullptr)
         , m_socket_set(nullptr)
@@ -88,7 +88,8 @@ class FTP_Socket : public SocketState
 {
 public:
 
-    FTP_Socket(std::string host, int port, std::string user, std::string pass)
+    FTP_Socket(const std::string &host, const int &port,
+               const std::string &user, const std::string &pass)
         : SocketState(host, port)
         , m_user_id(user)
         , m_password(pass)
@@ -128,7 +129,8 @@ class SSH_Socket : public SocketState
 {
 public:
 
-    SSH_Socket(std::string host, int port, std::string user, std::string pass)
+    SSH_Socket(const std::string &host, const int &port,
+               const std::string &user, const std::string &pass)
         : SocketState(host, port)
         , m_user_id(user)
         , m_password(pass)
@@ -166,7 +168,6 @@ private:
     ssh_session m_ssh_session;
 
 };
-
 
 
 #endif

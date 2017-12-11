@@ -17,7 +17,7 @@ class async_connection
 {
 public:
 
-    async_connection(IOService& io_service)
+    explicit async_connection(IOService& io_service)
         : m_socket_handle(new SocketHandler())
         , m_io_service(io_service)
     {
@@ -59,7 +59,7 @@ public:
                 m_socket_handle->close();
             }
         }
-        catch (std::exception ex)
+        catch (std::exception &ex)
         {
             std::cout << "tcp_connection shutdown() - Caught exception: " << ex.what();
         }
@@ -77,7 +77,7 @@ public:
                 m_socket_handle->close();
             }
         }
-        catch (std::exception ex)
+        catch (std::exception &ex)
         {
             std::cout << "async_connection close() - Caught exception: " << ex.what();
         }

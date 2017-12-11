@@ -16,7 +16,7 @@ typedef std::weak_ptr<async_connection> connection_wptr;
 class Protocol
 {
 public:
-    Protocol(session_ptr session, connection_ptr connection, std::string program_path)
+    Protocol(session_ptr session, connection_ptr connection, const std::string &program_path)
         : m_weak_session(session)
         , m_weak_connection(connection)
         , m_program_path(program_path)

@@ -99,7 +99,7 @@ public:
      * @brief Helper Function to Handle left and right padding
      * @return
      */
-    std::string padString(const std::string &value, const std::string justify, int padding);
+    std::string padString(const std::string &value, const std::string &justify, int padding);
 
     std::vector<list_bar> buildDialList();
     void  readinAnsi(std::string FileName, std::string &buff);

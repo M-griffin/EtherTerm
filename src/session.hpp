@@ -37,12 +37,12 @@ class Session
 public:
 
     Session(
-        connection_ptr           connection,
-        std::string              program_path,
-        session_manager_ptr      session_manager,
-        system_connection_ptr    system_connection,
-        int                      term_height,
-        int                      term_width
+        connection_ptr           &connection,
+        std::string              &program_path,
+        session_manager_ptr      &session_manager,
+        system_connection_ptr    &system_connection,
+        int                      &term_height,
+        int                      &term_width
     )
         : m_is_dial_directory(false)
         , m_term_height(term_height)
@@ -126,11 +126,11 @@ public:
      */
     static session_ptr create(
         connection_ptr           connection,
-        session_manager_ptr      session_manager,
-        std::string              program_path,
+        session_manager_ptr      &session_manager,
+        std::string              &program_path,
         system_connection_ptr    system_connection,
-        int                      term_height,
-        int                      term_width)
+        int                      &term_height,
+        int                      &term_width)
 
     {
         // Create and Pass back the new Session Instance.
@@ -387,7 +387,7 @@ public:
                 }
 
             }
-            catch (std::exception ex)
+            catch (std::exception &ex)
             {
                 std::cout << "handleWrite() - Caught Exception on shutdown: " << ex.what();
             }

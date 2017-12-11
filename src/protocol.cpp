@@ -287,8 +287,8 @@ void Protocol::executeProcess(int socket_descriptor)
  * @brief Call an Extenral process (Posix Only)
  * @param socket_descriptor
  */
-void Protocol::executeProcess(int socket_descriptor)
+void Protocol::executeProcess(int)
 {
-
+    // WIP.
 }
 #endif

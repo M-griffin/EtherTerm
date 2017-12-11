@@ -47,7 +47,7 @@ typedef struct FontSet
 class SurfaceManager
 {
 public:
-    SurfaceManager(window_manager_ptr window_manager, std::string program_path);
+    SurfaceManager(window_manager_ptr &window_manager, const std::string &program_path);
     ~SurfaceManager();
 
     // Handle to Current Window
@@ -145,7 +145,7 @@ public:
      * @brief Set the Current Fontname
      * @return
      */
-    void setCurrentFont(std::string font);
+    void setCurrentFont(const std::string &font);
 
     /**
      * @brief Grab the Current Fontname
@@ -170,7 +170,7 @@ public:
      * @param value
      * @return
      */
-    FontSet getFontFromSet(std::string value);
+    FontSet getFontFromSet(const std::string &value);
 
     /**
      * @brief Loads Fonts

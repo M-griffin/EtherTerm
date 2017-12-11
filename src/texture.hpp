@@ -24,7 +24,7 @@ class Textures
 {
 
 public:
-    Textures(SDL_Texture *texture)
+    explicit Textures(SDL_Texture *texture)
         : m_texture(texture)
     {
         std::cout << "A Texture was Created!" << std::endl;

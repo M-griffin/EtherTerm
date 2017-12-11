@@ -18,7 +18,7 @@ class Surfaces
 {
 
 public:
-    Surfaces(SDL_Surface *surface)
+    explicit Surfaces(SDL_Surface *surface)
         : m_surface(surface)
         , m_is_converted(false)
     {

@@ -6,7 +6,7 @@
 #include <string>
 
 
-InputHandler::InputHandler(surface_manager_ptr surface_manager, session_ptr session)
+InputHandler::InputHandler(surface_manager_ptr &surface_manager, session_ptr session)
     : m_weak_surface_manager(surface_manager)
     , m_weak_session(session)
     , m_globalShutdown(false)

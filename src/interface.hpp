@@ -36,7 +36,7 @@ public:
 
     // Setup IO_Service polling for connections. Use Work to keep io_service active.
     // while waiting for new connections.  Only need single thread for all sockets.
-    Interface(std::string program_path)
+    explicit Interface(const std::string &program_path)
         : m_program_path(program_path)
         , m_session_manager(new SessionManager())
         , m_is_global_shutdown(false)

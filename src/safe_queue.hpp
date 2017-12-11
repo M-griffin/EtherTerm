@@ -22,6 +22,9 @@ public:
         , m() // Mutex
         , c() // Control
     {}
+    
+    // Default copy Constructor.
+    SafeQueue(const SafeQueue&) = delete;
 
     // Copy Constructor (Overridden with MOVE)
     SafeQueue& operator=(SafeQueue& other)

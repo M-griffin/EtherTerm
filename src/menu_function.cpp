@@ -11,7 +11,7 @@
 #include <string>
 #include <fstream>
 
-MenuFunction::MenuFunction(sequence_decoder_ptr decoder, std::string program_path)
+MenuFunction::MenuFunction(sequence_decoder_ptr &decoder, const std::string &program_path)
     : m_program_path(program_path)
     , m_sequence_decoder(decoder)
     , m_menu_io(decoder, program_path)

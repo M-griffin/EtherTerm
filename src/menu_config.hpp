@@ -14,7 +14,7 @@ class MenuConfig
 {
 public:
 
-    MenuConfig(std::string program_path);
+    explicit MenuConfig(const std::string &program_path);
     ~MenuConfig();
 
     std::string m_program_path;

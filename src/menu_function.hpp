@@ -58,7 +58,7 @@ class MenuFunction
 public:
 
     // This needs access from ie Title Scan Class.
-    MenuFunction(sequence_decoder_ptr decoder, std::string program_path);
+    MenuFunction(sequence_decoder_ptr &decoder, const std::string &program_path);
     ~MenuFunction();
 
     std::string          m_program_path;

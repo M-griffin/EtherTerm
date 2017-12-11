@@ -24,7 +24,7 @@ class SequenceDecoder
 {
 public:
 
-    SequenceDecoder(session_ptr session);
+    explicit SequenceDecoder(session_ptr session);
     ~SequenceDecoder();
 
     /**
