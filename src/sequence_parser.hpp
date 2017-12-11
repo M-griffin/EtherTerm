@@ -169,7 +169,7 @@ private:
     std::string      m_current_color;
     std::string      m_text_buffer;
 
-    int m_max_x_position;
+    //int m_max_x_position;
     int m_saved_cursor_x;
     int m_saved_cursor_y;
     int m_saved_attribute;

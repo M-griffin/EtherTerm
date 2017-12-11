@@ -59,7 +59,7 @@ private:
     unsigned char m_sequence;
     int           m_parameter;
     bool          m_is_sequence;
-    bool          m_is_parameter;
+    //bool          m_is_parameter;
     bool          m_is_invalid_sequence;
     bool          m_is_sequence_completed;
     int           m_sequence_level;

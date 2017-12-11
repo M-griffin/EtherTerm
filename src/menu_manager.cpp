@@ -353,14 +353,12 @@ std::vector<list_bar> MenuManager::buildDialList()
                             sprintf(temp2,"%lu", currentSystem+1);
                             if(isLeftPadding)
                             {
-                                std::string stringReplace = std::move(padString(temp2, "LEFT", padding));
-                                stringBuilder += stringReplace;
+                                stringBuilder += padString(temp2, "LEFT", padding);
                                 isLeftPadding = false;
                             }
                             else if(isRightPadding)
                             {
-                                std::string stringReplace = std::move(padString(temp2, "RIGHT", padding));
-                                stringBuilder += stringReplace;
+                                stringBuilder += padString(temp2, "RIGHT", padding);
                                 isRightPadding = false;
                             }
                         }
@@ -672,7 +670,7 @@ void MenuManager::setupDialDirectory()
     /*
      * Build And populate the dialing directory into a list.
      */
-    m_result = std::move(buildDialList());
+    m_result = buildDialList();
     m_link_list.getVectorList(m_result);
 
     // Loop Light bar Interface.

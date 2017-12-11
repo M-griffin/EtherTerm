@@ -1,4 +1,10 @@
 
+Change Log 0.4.2 - 2017-12-11
+- Created FreeBsd Project.
+  Tested on FreeBSD 11 using clang LLVM
+- Updated files and project for clean compile on FreeBsd and clang
+- Cleaned up Linux Project files and removed left over boost references.
+
 Change Log 0.4.1 - 2017-12-11
 - Fixed Version Numbering, 0.4 prefix is more appropriate.
 - Ripped out Boost Libs

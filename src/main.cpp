@@ -132,7 +132,11 @@ int main(int argc, char* argv[])
 #else
 
     char exePath[PATH_MAX] = {0};
+ #ifdef __FreeBSD__
+    ssize_t result = readlink("/proc/curproc/file", exePath, PATH_MAX);
+ #else
     ssize_t result = readlink("/proc/self/exe", exePath, PATH_MAX);
+ #endif
     if(result < 0)
     {
         std::cout << "Unable to get Program Path!" << std::endl;

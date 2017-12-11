@@ -119,7 +119,7 @@ public:
                     while(!m_session_manager->m_new_connections.is_empty())
                     {
                         system_connection_ptr new_system;
-                        new_system = std::move(m_session_manager->m_new_connections.dequeue());
+                        new_system = m_session_manager->m_new_connections.dequeue();
 
                         std::cout << "Swaping a new system connection from Interface!" << std::endl;
                         spawnConnectionSession(new_system);

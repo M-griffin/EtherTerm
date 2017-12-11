@@ -2,6 +2,7 @@
 #define __TELNET_MANAGER_H_
 
 #include <algorithm>
+#include <string>
 #include <memory>
 #include <vector>
 
