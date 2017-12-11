@@ -14,6 +14,7 @@
 #include "session_manager.hpp"
 #include "telnet_manager.hpp"
 
+#include <fstream>
 #include <memory>
 #include <thread>
 #include <deque>
@@ -250,24 +251,23 @@ public:
                     // Returns Test and ESC Sequence, All Options are Responsed to in the Manager.
                     if(m_telnet_manager)
                     {
-                        //std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data);
                         std::string parsed_data = m_telnet_manager->parseIncomingData(m_in_data_vector);
 
                         // Debugging on Raw data coming in Shows Screen with bad ANSI Sequences!
                         // Testing and Debugging to make sure were not going insane! :)
-                        /*
-                        std::string parsed_data = ""; //m_telnet_manager->parseIncomingData(m_raw_data_vector);
-                        for (auto c : m_raw_data_vector)
+                        std::ofstream ostrm("stream_output.txt", std::ios_base::app);
+                        if (ostrm.is_open()) 
                         {
-                            if ((int)c != 255 && c != '\0')
-                            parsed_data += c;
-                        }*/
+                            ostrm << parsed_data << std::flush;
+                        }
 
                         // Process Only if data in the buffer.
                         if(parsed_data.size() > 0)
                         {
                             m_sequence_decoder->decodeEscSequenceData(parsed_data);
                         }
+                        
+                        ostrm.close();
                     }
                     else
                     {

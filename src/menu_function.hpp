@@ -105,21 +105,21 @@ public:
     void dataParseHelper(std::string &temp);
 
     // Command Data Functions
-    void commandsParse(std::string cfgdata,
-                       int idx,
+    void commandsParse(std::string &cfgdata,
+                       const int &idx,
                        CommandRecord *cmdRecord);
-    int  commandsExist(std::string MenuName, int idx);
-    int  commandsCount(std::string MenuName);
-    int  commandsReadData(std::string MenuName, int idx);
+    int  commandsExist(const std::string &MenuName, const int &idx);
+    int  commandsCount(const std::string &MenuName);
+    int  commandsReadData(const std::string &MenuName, const int &idx);
 
     // Menu Data Functions
-    int  menuParseData(std::string cfgdata);
-    int  menuReadData(std::string MenuName);
+    int  menuParseData(std::string &cfgdata);
+    int  menuReadData(const std::string &MenuName);
 
     // Read in / Load Menu and Commands
     void menuReadCommands();
     void menuReload();
-    void menuStart(std::string curentMenu);
+    void menuStart(const std::string &curentMenu);
     void menuClearObjects();
 
     void menuLightBars(char *returnParameters,

@@ -9,7 +9,7 @@
 #include <string>
 #include <cstring>
 
-MenuIO::MenuIO(sequence_decoder_ptr decoder, std::string program_path)
+MenuIO::MenuIO(sequence_decoder_ptr &decoder, const std::string &program_path)
     : m_sequence_decoder(decoder)
     , m_program_path(program_path)
 
@@ -28,7 +28,7 @@ MenuIO::~MenuIO()
  * @param str
  * @param space
  */
-void MenuIO::rightSpacing(std::string &str, int space)   // Pad Right
+void MenuIO::rightSpacing(std::string &str, const int &space)   // Pad Right
 {
     if(space == 0) return;
 
@@ -48,7 +48,7 @@ void MenuIO::rightSpacing(std::string &str, int space)   // Pad Right
  * @param str
  * @param space
  */
-void MenuIO::leftSpacing(std::string &str, int space)   // Pad Left
+void MenuIO::leftSpacing(std::string &str, const int &space)   // Pad Left
 {
     if(space == 0) return;
 

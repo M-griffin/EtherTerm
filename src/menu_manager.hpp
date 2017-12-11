@@ -53,9 +53,9 @@ class MenuManager
 
 public:
     MenuManager(
-        std::string          program_path,
-        renderer_ptr         renderer,
-        sequence_decoder_ptr decoder
+        const std::string    &program_path,
+        renderer_ptr         &renderer,
+        sequence_decoder_ptr &decoder
     );
 
     ~MenuManager();

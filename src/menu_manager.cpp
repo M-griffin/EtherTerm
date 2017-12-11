@@ -16,9 +16,9 @@
 #include <vector>
 
 MenuManager::MenuManager(
-    std::string          program_path,
-    renderer_ptr         renderer,
-    sequence_decoder_ptr decoder
+    const std::string    &program_path,
+    renderer_ptr         &renderer,
+    sequence_decoder_ptr &decoder
 )
     : m_program_path(program_path)
     , m_menu_config(program_path)
