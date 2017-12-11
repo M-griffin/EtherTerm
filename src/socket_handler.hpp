@@ -18,6 +18,13 @@
 #include <vector>
 #include <memory>
 
+/**
+ * @class SocketHandler
+ * @author Michael Griffin
+ * @date 11/12/2017
+ * @file socket_handler.hpp
+ * @brief Handles Socket Calls per individual Session
+ */
 class SocketHandler
 {
 public:

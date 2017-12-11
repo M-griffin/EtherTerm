@@ -9,7 +9,7 @@
  * @author Michael Griffin
  * @date 11/16/2015
  * @file window_manager.hpp
- * @brief Manages Individual Window Interfaces with Renderers
+ * @brief Manages Individual SDL2 Window Interfaces with Renderers
  */
 class WindowManager
 {

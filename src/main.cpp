@@ -1,6 +1,6 @@
 
 /*
- *  EtherTerm (c) 2014-2016 Michael Griffin <mrmisticismo@hotmail.com>
+ *  EtherTerm (c) 2014-2017 Michael Griffin <mrmisticismo@hotmail.com>
  *  An Emulated Client Terminal in SDL 2.0
  *  With CP437 Character and ANSI Graphics Support.
  *

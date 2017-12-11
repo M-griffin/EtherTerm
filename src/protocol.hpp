@@ -13,6 +13,13 @@ class async_connection;
 typedef std::shared_ptr<async_connection> connection_ptr;
 typedef std::weak_ptr<async_connection> connection_wptr;
 
+/**
+ * @class Protocol
+ * @author Michael Griffin
+ * @date 11/12/2017
+ * @file protocol.hpp
+ * @brief Initial Implementation of Extrenal Transfer Protocols.
+ */
 class Protocol
 {
 public:

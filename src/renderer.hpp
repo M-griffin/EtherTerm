@@ -30,7 +30,7 @@ typedef std::shared_ptr<InputHandler> input_handler_ptr;
  * @author Michael Griffin
  * @date 12/12/2015
  * @file renderer.hpp
- * @brief Handles Rendering and Building Surface/Texture Data
+ * @brief Handles SDL2 Rendering and Building Surface/Texture Data
  */
 class Renderer
 {

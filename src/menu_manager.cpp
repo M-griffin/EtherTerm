@@ -5,7 +5,6 @@
 #include "session.hpp"
 #include "session_manager.hpp"
 
-// Temp, replace with boost later on.
 #include "tinyxml.hpp"
 
 #include <algorithm>

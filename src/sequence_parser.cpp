@@ -4,8 +4,6 @@
 #include "async_connection.hpp"
 #include "session.hpp"
 
-//#include <boost/bind.hpp>
-
 #include <iostream>
 #include <sstream>
 #include <memory>

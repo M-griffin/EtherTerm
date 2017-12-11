@@ -17,9 +17,12 @@
 #include <memory>
 #include <string>
 
-/*
- * Virtual Class Container for Common access to different
- * Socket And connection types.
+/**
+ * @class SocketState
+ * @author Michael Griffin
+ * @date 11/12/2017
+ * @file socket_state.hpp
+ * @brief Base Socket State Template
  */
 class SocketState
 {
@@ -49,8 +52,12 @@ public:
 
 typedef std::shared_ptr<SocketState> socket_state_ptr;
 
-/*
- * Class for TCP Telnet Sockets
+/**
+ * @class SDL_Socket
+ * @author Blue
+ * @date 11/12/2017
+ * @file socket_state.hpp
+ * @brief SDL / TCP Telnet Socket Template
  */
 class SDL_Socket : public SocketState
 {
@@ -81,8 +88,12 @@ private:
 };
 
 
-/*
- * Class for TCP FTP Sockets
+/**
+ * @class FTP_Socket
+ * @author Michael Griffin
+ * @date 11/12/2017
+ * @file socket_state.hpp
+ * @brief FTP Socket Template
  */
 class FTP_Socket : public SocketState
 {
@@ -122,9 +133,13 @@ private:
 };
 
 
-/*
- * Class for TCP SSH Connections
- */
+ /**
+  * @class SSH_Socket
+  * @author Michael Griffin
+  * @date 11/12/2017
+  * @file socket_state.hpp
+  * @brief SSH Socket Template
+  */
 class SSH_Socket : public SocketState
 {
 public:
