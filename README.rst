@@ -15,7 +15,7 @@ The previous 3.0 Demo branch is a fork and rewrite of the internals for EtherTer
 
 Introduction
 ============
-
+   
 .. image:: http://i.imgur.com/0BaGSSq.png
    :alt: Screenshot
 
@@ -36,6 +36,12 @@ Project details
 ===============
 
 EtherTerm is Open Source Software, (c) 2014-2017 Michael Griffin <mrmisticismo@hotmail.com>
+
+.. image:: https://imgur.com/H3auoEE.png
+   :alt: Screenshot
+
+The 4.x branch now supports multiple asynchronous connections which were added in the 3.x branch which was re-written to support SSH again from 2.x branch.
+
 
 Currently, no *auto-configure* environment is provided, and build targets are
 limited to Windows, Linux, and OSX.  EtherTerm is **Alpha** software.  Please
