@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Project Name="EtherTerm" InternalType="Console" Version="10.0.0">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00010001N0005Debug000000000000]]>
+    </Plugin>
+    <Plugin Name="CMakePlugin">
+      <![CDATA[[{
+  "name": "Debug",
+  "enabled": false,
+  "buildDirectory": "build",
+  "sourceDirectory": "$(ProjectPath)",
+  "generator": "",
+  "buildType": "",
+  "arguments": [],
+  "parentProject": ""
+ }]]]>
+    </Plugin>
+  </Plugins>
+  <Description/>
+  <Dependencies/>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
+  <VirtualDirectory Name="src">
+    <File Name="../src/input_handler.cpp"/>
+    <File Name="../src/input_handler.hpp"/>
+    <File Name="../src/interface.hpp"/>
+    <File Name="../src/link_list.cpp"/>
+    <File Name="../src/link_list.hpp"/>
+    <File Name="../src/main.cpp"/>
+    <File Name="../src/menu_config.cpp"/>
+    <File Name="../src/menu_config.hpp"/>
+    <File Name="../src/menu_function.cpp"/>
+    <File Name="../src/menu_function.hpp"/>
+    <File Name="../src/menu_io.cpp"/>
+    <File Name="../src/menu_io.hpp"/>
+    <File Name="../src/menu_manager.cpp"/>
+    <File Name="../src/menu_manager.hpp"/>
+    <File Name="../src/message_queue.hpp"/>
+    <File Name="../src/protocol.cpp"/>
+    <File Name="../src/protocol.hpp"/>
+    <File Name="../src/renderer.cpp"/>
+    <File Name="../src/renderer.hpp"/>
+    <File Name="../src/safe_queue.hpp"/>
+    <File Name="../src/screen_buffer.cpp"/>
+    <File Name="../src/screen_buffer.hpp"/>
+    <File Name="../src/sequence_decoder.cpp"/>
+    <File Name="../src/sequence_decoder.hpp"/>
+    <File Name="../src/sequence_parser.cpp"/>
+    <File Name="../src/sequence_parser.hpp"/>
+    <File Name="../src/session.hpp"/>
+    <File Name="../src/session_manager.cpp"/>
+    <File Name="../src/session_manager.hpp"/>
+    <File Name="../src/surface.hpp"/>
+    <File Name="../src/surface_manager.cpp"/>
+    <File Name="../src/surface_manager.hpp"/>
+    <File Name="../src/telnet.hpp"/>
+    <File Name="../src/telnet_manager.cpp"/>
+    <File Name="../src/telnet_manager.hpp"/>
+    <File Name="../src/texture.hpp"/>
+    <File Name="../src/tinystr.cpp"/>
+    <File Name="../src/tinystr.hpp"/>
+    <File Name="../src/tinyxml.cpp"/>
+    <File Name="../src/tinyxml.hpp"/>
+    <File Name="../src/tinyxmlerror.cpp"/>
+    <File Name="../src/tinyxmlparser.cpp"/>
+    <File Name="../src/window_manager.cpp"/>
+    <File Name="../src/window_manager.hpp"/>
+    <File Name="../src/io_service.cpp"/>
+    <File Name="../src/io_service.hpp"/>
+    <File Name="../src/socket_handler.cpp"/>
+    <File Name="../src/socket_handler.hpp"/>
+    <File Name="../src/socket_ssh.cpp"/>
+    <File Name="../src/socket_state.hpp"/>
+    <File Name="../src/socket_telnet.cpp"/>
+    <File Name="../src/async_connection.hpp"/>
+  </VirtualDirectory>
+  <Settings Type="Executable">
+    <GlobalSettings>
+      <Compiler Options="" C_Options="" Assembler="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
+    <Configuration Name="Debug" CompilerType="clang++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" C_Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+        <IncludePath Value=".."/>
+        <IncludePath Value="/usr/local/include"/>
+      </Compiler>
+      <Linker Options="" Required="yes">
+        <LibraryPath Value="."/>
+        <LibraryPath Value=".."/>
+        <LibraryPath Value="/usr/local/lib"/>
+        <Library Value="SDL2main"/>
+        <Library Value="SDL2"/>
+        <Library Value="SDL2_net"/>
+        <Library Value="pthread"/>
+        <Library Value="libssh"/>
+      </Linker>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="Default" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2;-Wall" C_Options="-O2;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+        <Preprocessor Value="NDEBUG"/>
+      </Compiler>
+      <Linker Options="" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+  </Settings>
+</CodeLite_Project>

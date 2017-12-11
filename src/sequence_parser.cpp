@@ -18,7 +18,7 @@ SequenceParser::SequenceParser(renderer_ptr renderer, connection_ptr connection)
         m_renderer->m_term_height
     )
     , m_preceeding_sequence('\0')
-    , m_max_x_position(0)
+    //, m_max_x_position(0)
     , m_saved_cursor_x(1)
     , m_saved_cursor_y(1)
     , m_saved_attribute(0)

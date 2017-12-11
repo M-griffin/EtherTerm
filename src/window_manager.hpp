@@ -2,6 +2,7 @@
 #define WINDOW_MANAGER_HPP
 
 #include <SDL2/SDL.h>
+#include <string>
 #include <memory>
 
 /**

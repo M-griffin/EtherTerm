@@ -114,91 +114,76 @@ void MenuConfig::ddirectory_check(std::string &cfgdata)
 {
     //std::cout << "ddirectory_check()" << std::endl;
     std::string::size_type id1 = 0;
-    std::string result;
 
     if(cfgdata[0] == '#') { }
     else if(cfgdata.find("set MID_ANSI_1 ", 0) != std::string::npos)
-    {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_mid_ansi_1 = std::move(result);
+    {        
+        m_mid_ansi_1 = ddirectory_chkpar(cfgdata);
     }
     else if(cfgdata.find("set MID_ANSI_2 ", 0) != std::string::npos)
-    {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_mid_ansi_2 = std::move(result);
+    {        
+        m_mid_ansi_2 = ddirectory_chkpar(cfgdata);
     }
     else if(cfgdata.find("set TOP ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
+        std::string result = ddirectory_chkpar(cfgdata);
         id1 = atoi(result.c_str());
         m_top_margin = id1;
     }
     else if(cfgdata.find("set BOT ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
+        std::string result = ddirectory_chkpar(cfgdata);
         id1 = atoi(result.c_str());
         m_bottom_margin = id1;
     }
     else if(cfgdata.find("set THEME_NAME ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_theme_name = std::move(result);
+        m_theme_name = ddirectory_chkpar(cfgdata);
     }
     else if(cfgdata.find("set FONT_SET ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_font_set = std::move(result);
+        m_font_set = ddirectory_chkpar(cfgdata);
         std::cout << " $$$ FONT_SET " << m_font_set << std::endl;
     }
     else if(cfgdata.find("set ANSI_FILE ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_ansi_filename = std::move(result);
+        m_ansi_filename = ddirectory_chkpar(cfgdata);
     }
     else if(cfgdata.find("set MENU_PROMPT ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_menu_prompt_text = std::move(result);
+        m_menu_prompt_text = ddirectory_chkpar(cfgdata);
     }
     else if(cfgdata.find("set PAGENUM ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_page_number = std::move(result);
+        m_page_number = ddirectory_chkpar(cfgdata);
     }
     else if(cfgdata.find("set PAGETOTAL ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_page_total = std::move(result);
+        m_page_total = ddirectory_chkpar(cfgdata);
     }
     else if(cfgdata.find("set MOREMSG_ON ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_more_active = std::move(result);
+        m_more_active = ddirectory_chkpar(cfgdata);
     }
     else if(cfgdata.find("set MOREMSG_WORD_ON ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_more_active_text = std::move(result);
+        m_more_active_text = ddirectory_chkpar(cfgdata);
     }
     else if(cfgdata.find("set MOREMSG_OFF ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_more_inactive = std::move(result);
+        m_more_inactive = ddirectory_chkpar(cfgdata);
     }
     else if(cfgdata.find("set MOREMSG_WORD_OFF ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_more_inactive_text = std::move(result);
+        m_more_inactive_text = ddirectory_chkpar(cfgdata);
     }
     else if(cfgdata.find("set TEXT_COLOR ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_text_color_normal = std::move(result);
+        m_text_color_normal = ddirectory_chkpar(cfgdata);
     }
     else if(cfgdata.find("set MAX_AREAS ", 0) != std::string::npos)
     {
-        result = std::move(ddirectory_chkpar(cfgdata));
-        m_max_systems = std::move(result);
+        m_max_systems = ddirectory_chkpar(cfgdata);
     }
     cfgdata.erase();
 }

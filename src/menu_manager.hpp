@@ -24,8 +24,9 @@ typedef std::shared_ptr<Renderer> renderer_ptr;
  * @file menu_manager.hpp
  * @brief Connection data pulled from XML
  */
-typedef struct SystemConnection
+class SystemConnection
 {
+public:
     std::string name;
     std::string ip;
     int         port;
@@ -36,7 +37,7 @@ typedef struct SystemConnection
     std::string keyMap;    // ANSI, VT100 etc..
     std::string termType;  // ANSI, XTERM etc..
 
-} SystemConnection;
+};
 
 typedef std::shared_ptr<SystemConnection> system_connection_ptr;
 
