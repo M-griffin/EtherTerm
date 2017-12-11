@@ -86,7 +86,7 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-deprecated -Wno-unused-local-typedefs" C_Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;-Wno-deprecated -Wno-unused-local-typedefs" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" C_Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value=".."/>
       </Compiler>
@@ -95,12 +95,6 @@
         <Library Value="SDL2"/>
         <Library Value="SDL2_net"/>
         <Library Value="pthread"/>
-        <Library Value="boost_system"/>
-        <Library Value="boost_thread"/>
-        <Library Value="boost_chrono"/>
-        <Library Value="boost_locale"/>
-        <Library Value="boost_filesystem"/>
-        <Library Value="boost_timer"/>
         <Library Value="libssh"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
