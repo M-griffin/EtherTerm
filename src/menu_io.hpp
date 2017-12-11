@@ -15,7 +15,7 @@
 class MenuIO
 {
 public:
-    MenuIO(sequence_decoder_ptr decoder, std::string program_path);
+    MenuIO(sequence_decoder_ptr &decoder, const std::string &program_path);
     ~MenuIO();
 
     sequence_decoder_ptr m_sequence_decoder;
@@ -26,14 +26,14 @@ public:
      * @param str
      * @param space
      */
-    void rightSpacing(std::string &str, int space);
+    void rightSpacing(std::string &str, const int &space);
 
     /**
      * @brief Left String Padding.
      * @param str
      * @param space
      */
-    void leftSpacing(std::string &str, int space);
+    void leftSpacing(std::string &str, const int &space);
 
     /**
      * @brief Setup Text Input Fields

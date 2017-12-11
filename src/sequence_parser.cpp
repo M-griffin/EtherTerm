@@ -1,14 +1,12 @@
 #include "sequence_parser.hpp"
 #include "renderer.hpp"
 #include "screen_buffer.hpp"
-#include "tcp_connection.hpp"
+#include "async_connection.hpp"
 #include "session.hpp"
-
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/bind.hpp>
 
 #include <iostream>
 #include <sstream>
+#include <memory>
 
 
 SequenceParser::SequenceParser(renderer_ptr renderer, connection_ptr connection)
@@ -286,8 +284,8 @@ void SequenceParser::textInput(const std::string &buffer)
         // This last check is for normal text being pushed to the screen,
         // NO CR/LR so check if we gone past the bottom margin of the screen.
         if(m_screen_buffer.m_y_position > m_renderer->m_term_height || (m_renderer->m_is_scroll_region_active &&
-                                      m_screen_buffer.m_y_position >= m_renderer->m_bottom_margin &&
-                                      m_screen_buffer.m_x_position > m_renderer->m_term_width))
+                m_screen_buffer.m_y_position >= m_renderer->m_bottom_margin &&
+                m_screen_buffer.m_x_position > m_renderer->m_term_width))
         {
             // If we cleared the screen and hit bottom row, then
             // The very first time we want to spit out the entire screen
@@ -304,7 +302,7 @@ void SequenceParser::textInput(const std::string &buffer)
                     m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
                     // Reset to beginning of line.
                     if(m_screen_buffer.m_x_position > m_renderer->m_term_width)
-                       {
+                    {
                         m_screen_buffer.m_x_position = 1;
                     }
                 }
@@ -329,7 +327,7 @@ void SequenceParser::textInput(const std::string &buffer)
 
                     // Reset to beginning of line.
                     if(m_screen_buffer.m_x_position > m_renderer->m_term_width)
-                       {
+                    {
                         m_screen_buffer.m_x_position = 1;
                     }
                     m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
@@ -608,8 +606,7 @@ void SequenceParser::sequenceCursorAndDisplay()
                 }
                 //37 - P0T NOoDLE (Amiga)
                 // "\x1b[0;37 D"
-                else
-                if (m_parameters[1] == 0 && m_parameters[2] == 37)
+                else if (m_parameters[1] == 0 && m_parameters[2] == 37)
                 {
                     std::cout << std::endl << "Switched to Pot-Noodle Font" << std::endl;
                     m_renderer->m_surface_manager->setCurrentFont("potNoodle-8x16.bmp");
@@ -620,8 +617,7 @@ void SequenceParser::sequenceCursorAndDisplay()
                 }
                 //38 - mO'sOul (Amiga)
                 // "\x1b[0;38 D"
-                else
-                if (m_parameters[1] == 0 && m_parameters[2] == 38)
+                else if (m_parameters[1] == 0 && m_parameters[2] == 38)
                 {
                     std::cout << std::endl << "Switched to mO'sOul Font" << std::endl;
                     m_renderer->m_surface_manager->setCurrentFont("mo'soul-8x16.bmp");
@@ -632,8 +628,7 @@ void SequenceParser::sequenceCursorAndDisplay()
                 }
                 //39 - MicroKnight (Amiga)
                 //"\x1b[0;39 D"
-                else
-                if (m_parameters[1] == 0 && m_parameters[2] == 39)
+                else if (m_parameters[1] == 0 && m_parameters[2] == 39)
                 {
                     std::cout << std::endl << "Switched to Micro-Knight+ Font" << std::endl;
                     m_renderer->m_surface_manager->setCurrentFont("microKnightPlus-8x16.bmp");
@@ -644,8 +639,7 @@ void SequenceParser::sequenceCursorAndDisplay()
                 }
                 //40 - Topaz (Amiga)
                 // \x1b[0;40 D
-                else
-                if (m_parameters[1] == 0 && m_parameters[2] == 40)
+                else if (m_parameters[1] == 0 && m_parameters[2] == 40)
                 {
                     std::cout << std::endl << "Switched to Topaz+ Font" << std::endl;
                     m_renderer->m_surface_manager->setCurrentFont("topazPlus-8x16.bmp");

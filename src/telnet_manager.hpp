@@ -1,14 +1,14 @@
 #ifndef __TELNET_MANAGER_H_
 #define __TELNET_MANAGER_H_
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
+#include <algorithm>
+#include <memory>
 #include <vector>
 
 // Forward Declaration
 class Session;
-typedef boost::shared_ptr<Session> session_ptr;
-typedef boost::weak_ptr<Session> session_weak_ptr;
+typedef std::shared_ptr<Session> session_ptr;
+typedef std::weak_ptr<Session> session_weak_ptr;
 
 /**
  * @class TelnetManager
@@ -21,7 +21,7 @@ class TelnetManager
 {
 public:
 
-    TelnetManager(session_ptr session);
+    explicit TelnetManager(session_ptr session);
     ~TelnetManager();
 
     // Handle To session for sending responses back to server.
@@ -76,7 +76,7 @@ public:
      */
     struct FindFirst
     {
-        FindFirst(unsigned char i) : to_find(i) { }
+        explicit FindFirst(unsigned char i) : to_find(i) { }
         unsigned char to_find;
         bool operator()
         (const unsigned char &p)
@@ -194,6 +194,6 @@ private:
 
 };
 
-typedef boost::shared_ptr<TelnetManager> telnet_manager_ptr;
+typedef std::shared_ptr<TelnetManager> telnet_manager_ptr;
 
 #endif

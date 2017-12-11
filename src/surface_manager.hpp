@@ -13,12 +13,11 @@
 #include <vector>
 #include <cmath>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
+#include <memory>
 
 class WindowManager;
-typedef boost::shared_ptr<WindowManager> window_manager_ptr;
-typedef boost::weak_ptr<WindowManager> window_manager_weak_ptr;
+typedef std::shared_ptr<WindowManager> window_manager_ptr;
+typedef std::weak_ptr<WindowManager> window_manager_weak_ptr;
 
 /**
  * @class FontSet
@@ -48,7 +47,7 @@ typedef struct FontSet
 class SurfaceManager
 {
 public:
-    SurfaceManager(window_manager_ptr window_manager, std::string program_path);
+    SurfaceManager(window_manager_ptr &window_manager, const std::string &program_path);
     ~SurfaceManager();
 
     // Handle to Current Window
@@ -146,7 +145,7 @@ public:
      * @brief Set the Current Fontname
      * @return
      */
-    void setCurrentFont(std::string font);
+    void setCurrentFont(const std::string &font);
 
     /**
      * @brief Grab the Current Fontname
@@ -171,7 +170,7 @@ public:
      * @param value
      * @return
      */
-    FontSet getFontFromSet(std::string value);
+    FontSet getFontFromSet(const std::string &value);
 
     /**
      * @brief Loads Fonts
@@ -228,6 +227,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<SurfaceManager> surface_manager_ptr;
+typedef std::shared_ptr<SurfaceManager> surface_manager_ptr;
 
 #endif // SURFACE_MANAGER_HPP

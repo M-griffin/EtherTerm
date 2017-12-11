@@ -9,8 +9,10 @@
 #include <cstring>
 
 
-MenuConfig::MenuConfig(std::string program_path)
+MenuConfig::MenuConfig(const std::string &program_path)
     : m_program_path(program_path)
+    , m_top_margin(0)
+    , m_bottom_margin(0)
 {
     std::cout << "MenuConfig Created!" << std::endl;
 }
@@ -100,7 +102,7 @@ std::string MenuConfig::ddirectory_chkpar(const std::string &data)
     temp1 = data.substr(st1,st2);
     ct = st2 - st1;
     if(temp1.length() > ct)
-        temp1.erase(ct,temp1.length());
+        temp1.erase(ct, temp1.length());
 
     return temp1;
 }

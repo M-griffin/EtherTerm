@@ -54,7 +54,6 @@
     <File Name="../src/surface.hpp"/>
     <File Name="../src/surface_manager.cpp"/>
     <File Name="../src/surface_manager.hpp"/>
-    <File Name="../src/tcp_connection.hpp"/>
     <File Name="../src/telnet.hpp"/>
     <File Name="../src/telnet_manager.cpp"/>
     <File Name="../src/telnet_manager.hpp"/>
@@ -67,6 +66,14 @@
     <File Name="../src/tinyxmlparser.cpp"/>
     <File Name="../src/window_manager.cpp"/>
     <File Name="../src/window_manager.hpp"/>
+    <File Name="../src/io_service.cpp"/>
+    <File Name="../src/io_service.hpp"/>
+    <File Name="../src/socket_handler.cpp"/>
+    <File Name="../src/socket_handler.hpp"/>
+    <File Name="../src/socket_ssh.cpp"/>
+    <File Name="../src/socket_state.hpp"/>
+    <File Name="../src/socket_telnet.cpp"/>
+    <File Name="../src/async_connection.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -86,6 +93,7 @@
       <Linker Options="" Required="yes">
         <Library Value="SDL2main"/>
         <Library Value="SDL2"/>
+        <Library Value="SDL2_net"/>
         <Library Value="pthread"/>
         <Library Value="boost_system"/>
         <Library Value="boost_thread"/>
@@ -93,6 +101,7 @@
         <Library Value="boost_locale"/>
         <Library Value="boost_filesystem"/>
         <Library Value="boost_timer"/>
+        <Library Value="libssh"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>

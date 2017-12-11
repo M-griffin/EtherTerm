@@ -5,8 +5,7 @@
 
 #include <iostream>
 #include <string>
-
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 /**
  * @class Surfaces
@@ -19,7 +18,7 @@ class Surfaces
 {
 
 public:
-    Surfaces(SDL_Surface *surface)
+    explicit Surfaces(SDL_Surface *surface)
         : m_surface(surface)
         , m_is_converted(false)
     {
@@ -86,7 +85,7 @@ private:
 
 };
 
-typedef boost::shared_ptr<Surfaces> surface_ptr;
+typedef std::shared_ptr<Surfaces> surface_ptr;
 
 
 #endif // SURFACE_HPP

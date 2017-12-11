@@ -11,7 +11,7 @@
 #include <string>
 #include <fstream>
 
-MenuFunction::MenuFunction(sequence_decoder_ptr decoder, std::string program_path)
+MenuFunction::MenuFunction(sequence_decoder_ptr &decoder, const std::string &program_path)
     : m_program_path(program_path)
     , m_sequence_decoder(decoder)
     , m_menu_io(decoder, program_path)
@@ -103,7 +103,7 @@ void MenuFunction::dataParseHelper(std::string &temp)
 /*
  * Parse Menu.TXT Files
  */
-int MenuFunction::menuParseData(std::string cfgdata)
+int MenuFunction::menuParseData(std::string &cfgdata)
 {
     std::string::size_type id1 = 0;
 
@@ -150,7 +150,7 @@ int MenuFunction::menuParseData(std::string cfgdata)
 /*
  * Loop for Reading reading a menu
  */
-int MenuFunction::menuReadData(std::string MenuName)
+int MenuFunction::menuReadData(const std::string &MenuName)
 {
     std::string path = getDirectoryPath();
     path.append(MenuName);
@@ -179,8 +179,8 @@ int MenuFunction::menuReadData(std::string MenuName)
 /*
  * Parse Commands Reads from a Menu File
  */
-void MenuFunction::commandsParse(std::string cfgdata,
-                                 int idx,
+void MenuFunction::commandsParse(std::string &cfgdata,
+                                 const int &idx,
                                  CommandRecord *cmdRecord)
 {
     std::string::size_type id1 = 0;
@@ -287,7 +287,7 @@ void MenuFunction::commandsParse(std::string cfgdata,
 /*
  * Check if Command Exists (Used for Counting Commands)
  */
-int MenuFunction::commandsExist(std::string MenuName, int idx)
+int MenuFunction::commandsExist(const std::string &MenuName, const int &idx)
 {
     //std::cout << "MenuFunction::cmdexist" << std::endl;
     std::string path = getDirectoryPath();
@@ -326,7 +326,7 @@ int MenuFunction::commandsExist(std::string MenuName, int idx)
  * Make it parse once for the max command rec found, save cpu! :)
  * Files are small, so no rush! :)
  */
-int MenuFunction::commandsCount(std::string MenuName)
+int MenuFunction::commandsCount(const std::string &MenuName)
 {
     int  cnt = 0;
     while(commandsExist(MenuName, cnt))
@@ -339,7 +339,7 @@ int MenuFunction::commandsCount(std::string MenuName)
 /**
  * Loop to Read commands in a Menu File.
  */
-int MenuFunction::commandsReadData(std::string MenuName, int idx)
+int MenuFunction::commandsReadData(const std::string &MenuName, const int &idx)
 {
     std::string path = getDirectoryPath();
     path.append(MenuName);
@@ -415,7 +415,7 @@ void MenuFunction::menuReload()
 /**
  * Function to Read in a Menu set in the class
  */
-void MenuFunction::menuStart(std::string currentMenu)
+void MenuFunction::menuStart(const std::string &currentMenu)
 {
     if(m_previous_menu == currentMenu)
     {

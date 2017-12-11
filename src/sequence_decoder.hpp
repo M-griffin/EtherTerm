@@ -4,16 +4,14 @@
 #include "safe_queue.hpp"
 #include "message_queue.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
-
+#include <memory>
 #include <string>
 #include <vector>
 
 // Forward Deceleration
 class Session;
-typedef boost::shared_ptr<Session> session_ptr;
-typedef boost::weak_ptr<Session> session_weak_ptr;
+typedef std::shared_ptr<Session> session_ptr;
+typedef std::weak_ptr<Session> session_weak_ptr;
 
 /**
  * @class SequenceDecoder
@@ -26,7 +24,7 @@ class SequenceDecoder
 {
 public:
 
-    SequenceDecoder(session_ptr session);
+    explicit SequenceDecoder(session_ptr session);
     ~SequenceDecoder();
 
     /**
@@ -127,6 +125,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<SequenceDecoder> sequence_decoder_ptr;
+typedef std::shared_ptr<SequenceDecoder> sequence_decoder_ptr;
 
 #endif

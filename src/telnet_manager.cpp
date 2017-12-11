@@ -2,12 +2,11 @@
 #include "telnet_manager.hpp"
 #include "session.hpp"
 
-#include <boost/algorithm/string.hpp>
-
-#include <cstdio>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cstdio>
 #include <vector>
 
 TelnetManager::TelnetManager(session_ptr session)
@@ -204,6 +203,7 @@ void TelnetManager::telnetOptionNawsReply()
             std::cout << "Error: TelnetManager telnetOptionNawsReply()" << std::endl;
             m_isShutdown = true;
         }
+
     }
 }
 
@@ -217,7 +217,7 @@ void TelnetManager::telnetOptionTerminalTypeReply()
     {
         // Grab the Terminal Type, make sure we send lowercase.
         std::string terminal = session->m_system_connection->termType;
-        boost::algorithm::to_lower(terminal);
+        std::transform(terminal.begin(), terminal.end(), terminal.begin(), ::tolower);
 
         std::cout << "TermType: " << terminal << std::endl;
 

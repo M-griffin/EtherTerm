@@ -1,24 +1,29 @@
 #ifndef PROTOCOLS_HPP
 #define PROTOCOLS_HPP
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
-
 #include <iostream>
+#include <memory>
 #include <string>
 
 class Session;
-typedef boost::shared_ptr<Session> session_ptr;
-typedef boost::weak_ptr<Session> session_weak_ptr;
+typedef std::shared_ptr<Session> session_ptr;
+typedef std::weak_ptr<Session> session_weak_ptr;
 
-class tcp_connection;
-typedef boost::shared_ptr<tcp_connection> connection_ptr;
-typedef boost::weak_ptr<tcp_connection> connection_wptr;
+class async_connection;
+typedef std::shared_ptr<async_connection> connection_ptr;
+typedef std::weak_ptr<async_connection> connection_wptr;
 
+/**
+ * @class Protocol
+ * @author Michael Griffin
+ * @date 11/12/2017
+ * @file protocol.hpp
+ * @brief Initial Implementation of Extrenal Transfer Protocols.
+ */
 class Protocol
 {
 public:
-    Protocol(session_ptr session, connection_ptr connection, std::string program_path)
+    Protocol(session_ptr session, connection_ptr connection, const std::string &program_path)
         : m_weak_session(session)
         , m_weak_connection(connection)
         , m_program_path(program_path)
@@ -74,6 +79,6 @@ public:
     int                  m_socket_duplicate;
 };
 
-typedef boost::shared_ptr<Protocol> protocol_ptr;
+typedef std::shared_ptr<Protocol> protocol_ptr;
 
 #endif // PROTOCOLS_HPP

@@ -5,17 +5,17 @@
 #include "link_list.hpp"
 #include "menu_config.hpp"
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <string>
 #include <vector>
+#include <memory>
+
 
 // Forward Declarations.
 class SequenceDecoder;
-typedef boost::shared_ptr<SequenceDecoder> sequence_decoder_ptr;
+typedef std::shared_ptr<SequenceDecoder> sequence_decoder_ptr;
 
 class Renderer;
-typedef boost::shared_ptr<Renderer> renderer_ptr;
+typedef std::shared_ptr<Renderer> renderer_ptr;
 
 /**
  * @class SystemConnection
@@ -38,7 +38,7 @@ typedef struct SystemConnection
 
 } SystemConnection;
 
-typedef boost::shared_ptr<SystemConnection> system_connection_ptr;
+typedef std::shared_ptr<SystemConnection> system_connection_ptr;
 
 
 /**
@@ -53,9 +53,9 @@ class MenuManager
 
 public:
     MenuManager(
-        std::string          program_path,
-        renderer_ptr         renderer,
-        sequence_decoder_ptr decoder
+        const std::string    &program_path,
+        renderer_ptr         &renderer,
+        sequence_decoder_ptr &decoder
     );
 
     ~MenuManager();
@@ -99,7 +99,7 @@ public:
      * @brief Helper Function to Handle left and right padding
      * @return
      */
-    std::string padString(const std::string &value, const std::string justify, int padding);
+    std::string padString(const std::string &value, const std::string &justify, int padding);
 
     std::vector<list_bar> buildDialList();
     void  readinAnsi(std::string FileName, std::string &buff);
@@ -126,6 +126,6 @@ public:
 };
 
 class MenuManager;
-typedef boost::shared_ptr<MenuManager> menu_manager_ptr;
+typedef std::shared_ptr<MenuManager> menu_manager_ptr;
 
 #endif // MENUSYSTEM_HPP

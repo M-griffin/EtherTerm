@@ -7,32 +7,22 @@
 #include "sequence_decoder.hpp"
 #include "renderer.hpp"
 #include "input_handler.hpp"
-#include "tcp_connection.hpp"
+#include "async_connection.hpp"
 #include "safe_queue.hpp"
 #include "message_queue.hpp"
 #include "menu_manager.hpp"
 #include "session_manager.hpp"
 #include "telnet_manager.hpp"
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
-#include <boost/make_shared.hpp>
-
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
-#include <boost/asio/io_service.hpp>
-
-// For IO service!
+#include <fstream>
+#include <memory>
 #include <thread>
 #include <deque>
 #include <set>
 
-using boost::asio::ip::tcp;
-
 class Session;
-typedef boost::shared_ptr<Session> session_ptr;
-typedef boost::weak_ptr<Session> session_weak_ptr;
+typedef std::shared_ptr<Session> session_ptr;
+typedef std::weak_ptr<Session> session_weak_ptr;
 
 
 /**
@@ -43,17 +33,17 @@ typedef boost::weak_ptr<Session> session_weak_ptr;
  * @brief Sessions manage each instance of a window / renderer
  */
 class Session
-    : public boost::enable_shared_from_this<Session>
+    : public std::enable_shared_from_this<Session>
 {
 public:
 
     Session(
-        connection_ptr           connection,
-        std::string              program_path,
-        session_manager_ptr      session_manager,
-        system_connection_ptr    system_connection,
-        int                      term_height,
-        int                      term_width
+        connection_ptr           &connection,
+        std::string              &program_path,
+        session_manager_ptr      &session_manager,
+        system_connection_ptr    &system_connection,
+        int                      &term_height,
+        int                      &term_width
     )
         : m_is_dial_directory(false)
         , m_term_height(term_height)
@@ -80,8 +70,8 @@ public:
     {
         std::cout << "Session Created!" << std::endl;
 
-        m_raw_data_vector.reserve(8024);
-        m_raw_data_vector.resize(8024);
+        m_in_data_vector.reserve(0);
+        m_in_data_vector.resize(0);
 
         // NOTES Reallocate by using reset! When rending Term Height/Width Change, need to recreate.
         // m_sequence_parser.reset(new SequenceParser(m_renderer, connection));
@@ -92,7 +82,7 @@ public:
         std::cout << "~Session" << std::endl;
 
         // Clear any Data left over in the Buffer.
-        std::vector<unsigned char>().swap(m_raw_data_vector);
+        std::vector<unsigned char>().swap(m_in_data_vector);
     }
 
     /**
@@ -135,13 +125,13 @@ public:
      * @param connection
      * @return
      */
-    static session_ptr create(//boost::asio::io_service& io_service,
+    static session_ptr create(
         connection_ptr           connection,
-        session_manager_ptr      session_manager,
-        std::string              program_path,
+        session_manager_ptr      &session_manager,
+        std::string              &program_path,
         system_connection_ptr    system_connection,
-        int                      term_height,
-        int                      term_width)
+        int                      &term_height,
+        int                      &term_width)
 
     {
         // Create and Pass back the new Session Instance.
@@ -159,21 +149,73 @@ public:
     }
 
     /**
+     * @brief Create Async Connection
+     * @param connection_string
+     * @param protocol
+     */
+    void createConnection(std::string connection_string, std::string protocol)
+    {
+        m_connection->async_connect(connection_string,
+                                    protocol,
+                                    std::bind(
+                                        &Session::handleConnection,
+                                        shared_from_this(),
+                                        std::placeholders::_1));
+    }
+
+    /**
+     * @brief Async Connection Handler
+     * @param error
+     * @param new_session
+     */
+    void handleConnection(const std::error_code& error)
+    {
+        
+        std::cout << "*** handleConnection ***" << std::endl;
+        
+        if (error)
+        {
+            std::cout << "Unable to Connect, closing down session." << std::endl;
+            // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
+            if(m_connection->socket()->isActive())
+            {
+                m_connection->socket()->close();
+            }
+            m_is_leaving = true;
+            // Disconenct the session.
+            std::cout << "Connection Closed, Leaving Session! " << std::endl;
+
+            // Shutdown the Input handler.
+            if(!m_input_handler->isGlobalShutdown())
+            {
+                session_manager_ptr session_mgr = m_weak_session_manager.lock();
+                if(session_mgr)
+                {
+                    session_mgr->leave(shared_from_this());
+                }
+            }
+            return;
+        }
+
+        m_is_connected = true;
+        waitForSocketData();
+    }
+
+    /**
      * @brief Setup the initial Async Socket Data Calls for Managing the connection.
      */
     void waitForSocketData()
     {
         // Important, clear out buffer before each read.
-        std::vector<unsigned char>().swap(m_raw_data_vector);
-        m_raw_data_vector.reserve(8024);
-        m_raw_data_vector.resize(8024);
-
-        if(m_connection->is_open())
+        // A reference is passed by Session through the IO Service.
+        std::vector<unsigned char>().swap(m_in_data_vector);
+        if(m_connection->socket()->isActive())
         {
-            m_connection->socket().async_read_some(boost::asio::buffer(m_raw_data_vector),
-                                                   boost::bind(&Session::handleRead, shared_from_this(),
-                                                           boost::asio::placeholders::error)); //,
-            //boost::asio::placeholders::bytes_transferred));
+            m_connection->async_read(m_in_data_vector,
+                                     std::bind(
+                                         &Session::handleRead,
+                                         shared_from_this(),
+                                         std::placeholders::_1));
         }
         else
         {
@@ -187,8 +229,14 @@ public:
      * @param error
      * @param bytes_transferred
      */
-    void handleRead(const boost::system::error_code& error) //, size_t bytes_transferred)
+    void handleRead(const std::error_code& error) //, size_t bytes_transferred)
     {
+        //std::cout << "* handleRead: " << error << std::endl;
+        if(error)
+        {
+            std::cout << "* Async Read Error!" << error << std::endl;
+        }
+
         session_manager_ptr session_mgr = m_weak_session_manager.lock();
         if(session_mgr)
         {
@@ -203,17 +251,14 @@ public:
                     // Returns Test and ESC Sequence, All Options are Responsed to in the Manager.
                     if(m_telnet_manager)
                     {
-                        //std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data);
-                        std::string parsed_data = m_telnet_manager->parseIncomingData(m_raw_data_vector);
+                        std::string parsed_data = m_telnet_manager->parseIncomingData(m_in_data_vector);
 
-                        // Debugging on Raw data coming in Shows Screen with bad ANSI Sequences!
-                        // Testing and Debugging to make sure were not going insane! :)
+                        // Debugging ESC Sequences and data incoming from server.
                         /*
-                        std::string parsed_data = ""; //m_telnet_manager->parseIncomingData(m_raw_data_vector);
-                        for (auto c : m_raw_data_vector)
+                        std::ofstream ostrm("stream_output.txt", std::ios_base::app);
+                        if (ostrm.is_open()) 
                         {
-                            if ((int)c != 255 && c != '\0')
-                            parsed_data += c;
+                            ostrm << parsed_data << std::flush;
                         }*/
 
                         // Process Only if data in the buffer.
@@ -221,6 +266,8 @@ public:
                         {
                             m_sequence_decoder->decodeEscSequenceData(parsed_data);
                         }
+                        
+                        //ostrm.close();
                     }
                     else
                     {
@@ -232,10 +279,10 @@ public:
                     /** Not in use yet, when time comes change to support m_raw_data_vector
                      *  as needed.  Still deciding best way to handle this.
                      */
-                    if(m_raw_data_vector.size() != 0)
+                    if(m_in_data_vector.size() != 0)
                     {
                         std::string incoming_data = "";
-                        for(auto c : m_raw_data_vector)
+                        for(auto c : m_in_data_vector)
                         {
                             // Ignore null's
                             if(c == '\0')
@@ -251,14 +298,16 @@ public:
                 // Restart Callback to wait for more data.
                 // If this step is skipped, then the node will exit
                 // since io_service will have no more work!
-                if(m_connection->is_open())
+                if(m_connection->socket()->isActive())
                 {
                     waitForSocketData();
                 }
                 else
                 {
+                    // TODO, new io service, might need extra shutdown on session here?
                     std::cout << "Error: Session Socket Closed!" << std::endl;
                 }
+
             }
             else
             {
@@ -283,6 +332,11 @@ public:
         else
         {
             std::cout << "Error, Not connected to the SessionManager!" << std::endl;
+            if(m_connection->socket()->isActive())
+            {
+                // if the socket is still active, shut it down
+                m_connection->shutdown();
+            }
         }
     }
 
@@ -290,29 +344,21 @@ public:
      * @brief Callback from The SessionManager to write data to the active sessions.
      * @param msg
      */
-    void deliver(const std::string &msg)
+    void deliver(const std::string &string_msg)
     {
-        if(msg.size() == 0 || msg[0] == '\0')
+        //std::cout << " * Deliver: " << string_msg.size() << " - " << string_msg << std::endl;
+        if(string_msg.size() == 0 || string_msg[0] == '\0')
         {
             return;
         }
 
-        // Send all outgoing data as unsigned data, want to make sure when
-        // Time comes we support UTF8 bytes properly.
-        std::vector<unsigned char> buffer;
-        buffer.reserve(msg.size());
-        buffer.resize(msg.size());
-        boost::asio::buffer_copy(boost::asio::buffer(buffer), boost::asio::buffer(msg));
-
-        if(m_connection->is_open())
+        if(m_connection->socket()->isActive())
         {
-            boost::asio::async_write(m_connection->socket(),
-                                     boost::asio::buffer(buffer),
-                                     boost::bind(
-                                         &Session::handleWrite,
-                                         shared_from_this(),
-                                         boost::asio::placeholders::error
-                                     ));
+            m_connection->async_write(string_msg,
+                                      std::bind(
+                                          &Session::handleWrite,
+                                          shared_from_this(),
+                                          std::placeholders::_1));
         }
     }
 
@@ -320,11 +366,12 @@ public:
      * @brief Callback after Writing Data, Check For Errors.
      * @param error
      */
-    void handleWrite(const boost::system::error_code& error)
+    void handleWrite(const std::error_code& error)
     {
+        //std::cout << "* handleWrite" << error << std::endl;
         if(error)
         {
-            std::cout << "async_write error: " << error.message() << std::endl;
+            std::cout << "Async_write Error: " << error.message() << std::endl;
             std::cout << "Session Closed()" << std::endl;
 
             try
@@ -334,12 +381,13 @@ public:
                     // Only Shutdown when Connected!
                     if(m_is_connected)
                     {
-                        m_connection->socket().shutdown(tcp::socket::shutdown_both);
+                        m_connection->shutdown();
                     }
-                    m_connection->socket().close();
+
                 }
+
             }
-            catch (std::exception ex)
+            catch (std::exception &ex)
             {
                 std::cout << "handleWrite() - Caught Exception on shutdown: " << ex.what();
             }
@@ -352,7 +400,7 @@ public:
     void startMenuInstance()
     {
         // Allocate a new Dialing Directory Instance on existing placeholder.
-        std::cout << "Starting Menu Instatnce:" << std::endl;
+        std::cout << "Starting Menu Instance:" << std::endl;
         m_menu_manager.reset(
             new MenuManager(
                 m_program_path,
@@ -370,9 +418,9 @@ public:
     }
 
     /**
-     * @brief Startup for the Telnet Instatnces.
+     * @brief Startup Telnet Option/Sequence Parser
      */
-    void startTelnetManager()
+    void createTelnetManager()
     {
         // Setup and Load Font from Dialing Directory for Selected System
         if(m_system_connection->font != "")
@@ -613,7 +661,7 @@ public:
     time_t                   m_ttime, m_ttime2;
 
     // Input Raw Data Buffer.
-    std::vector<unsigned char> m_raw_data_vector;
+    std::vector<unsigned char> m_in_data_vector;
 
 };
 

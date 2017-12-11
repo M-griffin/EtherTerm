@@ -1,6 +1,6 @@
 
 /*
- *  EtherTerm (c) 2014-2016 Michael Griffin <mrmisticismo@hotmail.com>
+ *  EtherTerm (c) 2014-2017 Michael Griffin <mrmisticismo@hotmail.com>
  *  An Emulated Client Terminal in SDL 2.0
  *  With CP437 Character and ANSI Graphics Support.
  *
@@ -22,8 +22,11 @@
 
 #elif _WIN32 // Windows
 #include <SDL2/SDL_Main.h>
+#include <SDL_net.h>
 #include <winsock2.h>
 #include <windows.h>
+#else
+#include <SDL2/SDL_net.h>
 #endif
 
 #include <cstdio>
@@ -47,6 +50,12 @@ bool SDLStartUp()
     {
         std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << std::endl;
         success = false;
+    }
+
+    if(SDLNet_Init()==-1)
+    {
+        printf("SDLNet_Init: %s\n",SDLNet_GetError());
+        exit(2);
     }
 
     // Turn off, might make a toggle for this later on.

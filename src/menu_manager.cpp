@@ -5,7 +5,6 @@
 #include "session.hpp"
 #include "session_manager.hpp"
 
-// Temp, replace with boost later on.
 #include "tinyxml.hpp"
 
 #include <algorithm>
@@ -16,9 +15,9 @@
 #include <vector>
 
 MenuManager::MenuManager(
-    std::string          program_path,
-    renderer_ptr         renderer,
-    sequence_decoder_ptr decoder
+    const std::string    &program_path,
+    renderer_ptr         &renderer,
+    sequence_decoder_ptr &decoder
 )
     : m_program_path(program_path)
     , m_menu_config(program_path)
@@ -193,7 +192,7 @@ bool MenuManager::changeTheme(int index)
  * @brief Helper Function to Handle left and right padding
  * @return
  */
-std::string MenuManager::padString(const std::string &value, const std::string justify, int padding)
+std::string MenuManager::padString(const std::string &value, const std::string &justify, int padding)
 {
     std::string stringReplace = value;
     if(justify == "LEFT")

@@ -3,10 +3,9 @@
 
 #include <SDL2/SDL.h>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <string>
 #include <vector>
+#include <memory>
 
 /**
  * @class ScreenPixel
@@ -27,7 +26,7 @@ public:
     { }
 
     // Not used at this time!
-    ScreenPixel(std::string sequence, SDL_Color fg, SDL_Color bg)
+    ScreenPixel(const std::string &sequence, SDL_Color fg, SDL_Color bg)
         : m_character_sequence(sequence)
         , m_foreground(fg)
         , m_background(bg)
@@ -116,6 +115,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<ScreenBuffer> screen_buffer_ptr;
+typedef std::shared_ptr<ScreenBuffer> screen_buffer_ptr;
 
 #endif // SCREENBUFFER_HPP

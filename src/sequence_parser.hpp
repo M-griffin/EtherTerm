@@ -5,17 +5,16 @@
 
 #include <SDL2/SDL.h>
 
-#include <boost/smart_ptr/shared_ptr.hpp>
-
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <memory>
 
 class Renderer;
-typedef boost::shared_ptr<Renderer> renderer_ptr;
+typedef std::shared_ptr<Renderer> renderer_ptr;
 
-class tcp_connection;
-typedef boost::shared_ptr<tcp_connection> connection_ptr;
+class async_connection;
+typedef std::shared_ptr<async_connection> connection_ptr;
 
 
 /**
@@ -29,7 +28,7 @@ class SequenceParser
 {
 public:
 
-     SequenceParser(renderer_ptr renderer, connection_ptr connection);
+    SequenceParser(renderer_ptr renderer, connection_ptr connection);
     ~SequenceParser();
 
     // Handle to Screen Buffer
@@ -38,33 +37,33 @@ public:
     ScreenBuffer   m_screen_buffer;
 
     const  char ESC   = '\x1b';
-    #define MAX_PARAMS  10
+#define MAX_PARAMS  10
 
-        // Control Sequence Terminators
-    #define CURSOR_UP             'A'
-    #define CURSOR_DOWN           'B'
-    #define CURSOR_FORWARD        'C'
-    #define CURSOR_BACKWARD       'D'
-    #define CURSOR_NEXT_LINE      'E'   // XTERM
-    #define CURSOR_PREV_LIVE      'F'   // XTERM
-    #define CURSOR_X_POSITION     'G'   // XTERM
-    #define CURSOR_POSITION       'H'
+    // Control Sequence Terminators
+#define CURSOR_UP             'A'
+#define CURSOR_DOWN           'B'
+#define CURSOR_FORWARD        'C'
+#define CURSOR_BACKWARD       'D'
+#define CURSOR_NEXT_LINE      'E'   // XTERM
+#define CURSOR_PREV_LIVE      'F'   // XTERM
+#define CURSOR_X_POSITION     'G'   // XTERM
+#define CURSOR_POSITION       'H'
 
-    #define ERASE_DISPLAY         'J'   // 2J
-    #define ERASE_TO_EOL          'K'
-    #define DELETE_CHARACTER      'P'   // Erase Character(2)
+#define ERASE_DISPLAY         'J'   // 2J
+#define ERASE_TO_EOL          'K'
+#define DELETE_CHARACTER      'P'   // Erase Character(2)
 
-    #define REPEAT_CHARACTER      'b'   // Repeat preceding character
-    #define LINE_POS_ABSOLUTE     'd'   // Line Position Absolute [row] (default = [1,column]) (VPA).
-    #define CURSOR_POSITION_ALT   'f'   // equivalent to 'H'
-    #define SET_MODE              'h'   // Line Wraparound ?7h
-    #define SCROLL_REGION         'r'   // ESC[#;#r
-    #define SAVE_CURSOR_POS       's'
-    #define RESTORE_CURSOR_POS    'u'
-    #define RESET_MODE            'l'
-    #define SET_GRAPHICS_MODE     'm'
-    #define ANSI_DETECTION        'n'   // ESC[6n
-    #define SET_KEYBOARD_STRINGS  'p'
+#define REPEAT_CHARACTER      'b'   // Repeat preceding character
+#define LINE_POS_ABSOLUTE     'd'   // Line Position Absolute [row] (default = [1,column]) (VPA).
+#define CURSOR_POSITION_ALT   'f'   // equivalent to 'H'
+#define SET_MODE              'h'   // Line Wraparound ?7h
+#define SCROLL_REGION         'r'   // ESC[#;#r
+#define SAVE_CURSOR_POS       's'
+#define RESTORE_CURSOR_POS    'u'
+#define RESET_MODE            'l'
+#define SET_GRAPHICS_MODE     'm'
+#define ANSI_DETECTION        'n'   // ESC[6n
+#define SET_KEYBOARD_STRINGS  'p'
 
     /* Extra Notes.
     ESC [ 7 ; col h Enables line wrapping at column position. If col (1-based)
@@ -187,6 +186,6 @@ private:
 
 };
 
-typedef boost::shared_ptr<SequenceParser> sequence_parser_ptr;
+typedef std::shared_ptr<SequenceParser> sequence_parser_ptr;
 
 #endif

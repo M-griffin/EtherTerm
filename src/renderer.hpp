@@ -13,18 +13,16 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <boost/smart_ptr/weak_ptr.hpp>
+#include <memory>
 
 // Forward Deceleration
 class Session;
-typedef boost::shared_ptr<Session> session_ptr;
-typedef boost::weak_ptr<Session> session_weak_ptr;
+typedef std::shared_ptr<Session> session_ptr;
+typedef std::weak_ptr<Session> session_weak_ptr;
 
 
 class InputHandler;
-typedef boost::shared_ptr<InputHandler> input_handler_ptr;
+typedef std::shared_ptr<InputHandler> input_handler_ptr;
 
 
 /**
@@ -32,7 +30,7 @@ typedef boost::shared_ptr<InputHandler> input_handler_ptr;
  * @author Michael Griffin
  * @date 12/12/2015
  * @file renderer.hpp
- * @brief Handles Rendering and Building Surface/Texture Data
+ * @brief Handles SDL2 Rendering and Building Surface/Texture Data
  */
 class Renderer
 {
@@ -260,6 +258,6 @@ public:
 
 };
 
-typedef boost::shared_ptr<Renderer> renderer_ptr;
+typedef std::shared_ptr<Renderer> renderer_ptr;
 
 #endif

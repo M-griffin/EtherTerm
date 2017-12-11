@@ -2,7 +2,6 @@
 #include "session.hpp"
 
 #include <algorithm>
-#include <boost/bind.hpp>
 
 
 SessionManager::SessionManager()
@@ -41,13 +40,10 @@ void SessionManager::leave(session_ptr session)
         // If session is connected, we need to disconnect it first
         if(session->m_connection)
         {
-            if(session->m_is_connected)
-            {
-                // Shutdown the Connection before closing
-                session->m_connection->shutdown();
-                // Force no longer being connected now.
-                session->m_is_connected = false;
-            }
+            // Shutdown the Connection before closing
+            session->m_connection->shutdown();
+            // Force no longer being connected now.
+            session->m_is_connected = false;
             session->m_connection->close();
         }
 
@@ -96,22 +92,6 @@ void SessionManager::grabNewWindowFocus()
     // Reset for next system detected.
     m_is_system_disconnected = false;
 }
-
-/**
- * @brief Sends message to all users in the current room.
- * @param participant
- *
-void SessionManager::deliver(std::string msg)
-{
-    if(msg.size() == 0)
-        return;
-
-    // This isn't used at this time!
-    std::cout << "Deliver Global SessionManager notices: " << msg << std::endl;
-    std::for_each(m_sessions.begin(), m_sessions.end(),
-                  boost::bind(&Session::deliver, _1, boost::ref(msg)));
-}
-*/
 
 /**
  * @brief Retrieve Number of users connected

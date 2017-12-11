@@ -3,17 +3,12 @@
 
 #include "session.hpp"
 #include "session_manager.hpp"
-
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
-#include <boost/exception/all.hpp>
-#include <boost/asio/io_service.hpp>
+#include "socket_handler.hpp"
+#include "io_service.hpp"
 
 #include <iostream>
 #include <thread>
 #include <set>
-
-using boost::asio::ip::tcp;
 
 /**
  * @class Interface
@@ -41,9 +36,8 @@ public:
 
     // Setup IO_Service polling for connections. Use Work to keep io_service active.
     // while waiting for new connections.  Only need single thread for all sockets.
-    Interface(std::string program_path)
-        : m_work(m_io_service)
-        , m_program_path(program_path)
+    explicit Interface(const std::string &program_path)
+        : m_program_path(program_path)
         , m_session_manager(new SessionManager())
         , m_is_global_shutdown(false)
     {
@@ -55,7 +49,7 @@ public:
 
     ~Interface()
     {
-        //std::cout << "~Interface" << std::endl;
+        std::cout << "~Interface" << std::endl;
         m_io_service.stop();
         m_thread.join();
     }
@@ -136,9 +130,9 @@ public:
                 SDL_Delay(10);
 
             }
-            catch(boost::exception &e)
+            catch(std::exception &e)
             {
-                std::cerr << boost::diagnostic_information(e);
+                std::cerr << e.what();
             }
         }
     }
@@ -195,14 +189,8 @@ public:
                   << system_connection->port
                   << std::endl;
 
-        tcp::resolver resolver(m_io_service);
-        tcp::resolver::query query(system_connection->ip, std::to_string(system_connection->port));
-
-        // Use all end pointer for IPV4 & IPV6 support
-        tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-
         // Connection handles TCP_Socket
-        connection_ptr new_connection(new tcp_connection(m_io_service));
+        connection_ptr new_connection(new async_connection(m_io_service));
 
         // Hard Coded for testing, move this to direcotry.ini!
         int height = 25;
@@ -223,10 +211,11 @@ public:
         new_session->startup();
 
         // If Telnet Session spawn it, Add Other Instances later on, SSH, IRC, FTP etc..
-        if(system_connection->protocol == "TELNET")
+        // TODO, think this sets up the ansi parser might need to break this out.
+        if(system_connection->protocol == "TELNET" || system_connection->protocol == "SSH")
         {
             std::cout << "Starting TelnetManager in Interface" << std::endl;
-            new_session->startTelnetManager();
+            new_session->createTelnetManager();
         }
 
         // Start Async Read/Writes Loop for Session Socket Data.
@@ -238,30 +227,22 @@ public:
         // Start Blinking Cursor for Active connection session.
         new_session->m_sequence_parser->setCursorActive(true);
 
-        // Start Async Connection
-        boost::asio::async_connect(new_connection->socket(),
-                                   endpoint_iterator,
-                                   [this, new_connection, system_connection, new_session]
-                                   (boost::system::error_code ec, tcp::resolver::iterator)
+        // Setup the Connection String
+        std::string connection_string = system_connection->ip;
+        connection_string.append(":");
+        connection_string.append(std::to_string(system_connection->port));
+        
+        // TODO Change this to WriteSequence and use vector, incase passwords or others has colons
+        // That could casue issues on string split!
+        if(system_connection->protocol == "SSH")
         {
-            if(!ec)
-            {
-                // Mark Session Connected
-                new_session->m_is_connected = true;
-                new_session->waitForSocketData();
-            }
-            else
-            {
-                std::cout << "Unable to Connect, closing down session." << std::endl;
+            connection_string.append(":");
+            connection_string.append(system_connection->login);
+            connection_string.append(":");
+            connection_string.append(system_connection->password);
+        }
 
-                // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
-                if(new_connection->socket().is_open())
-                {
-                    new_connection->socket().close();
-                }
-                m_session_manager->leave(new_session);
-            }
-        });
+        new_session->createConnection(connection_string, system_connection->protocol);
     }
 
     /**
@@ -314,9 +295,8 @@ public:
         }
     }
 
-    // Client ASIO Service Specific
-    boost::asio::io_service        m_io_service;
-    boost::asio::io_service::work  m_work;
+    // Custom Async IO Service.
+    IOService                      m_io_service;
     std::string                    m_program_path;
 
     // Spawned Session List

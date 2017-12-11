@@ -11,8 +11,7 @@
 
 #include <iostream>
 #include <string>
-
-#include <boost/smart_ptr/shared_ptr.hpp>
+#include <memory>
 
 /**
  * @class Textures
@@ -25,7 +24,7 @@ class Textures
 {
 
 public:
-    Textures(SDL_Texture *texture)
+    explicit Textures(SDL_Texture *texture)
         : m_texture(texture)
     {
         std::cout << "A Texture was Created!" << std::endl;
@@ -62,5 +61,5 @@ private:
 
 };
 
-typedef boost::shared_ptr<Textures> texture_ptr;
+typedef std::shared_ptr<Textures> texture_ptr;
 #endif // TEXTURE_HPP
