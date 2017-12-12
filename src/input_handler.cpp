@@ -10,7 +10,7 @@ InputHandler::InputHandler(surface_manager_ptr &surface_manager, session_ptr ses
     : m_weak_surface_manager(surface_manager)
     , m_weak_session(session)
     , m_globalShutdown(false)
-    , m_isWindowMode(false)
+    , m_isWindowMode(true)
     , m_isMouseSelected(false)
     , m_mouseSourceXPosition(0)
     , m_mouseSourceYPosition(0)
@@ -70,7 +70,6 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_EXPOSED:
-            /*
             {
                 SDL_Log("Window %d exposed", event.window.windowID);
                 session_ptr session = m_weak_session.lock();
@@ -81,7 +80,6 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
                 }
                 break;
             }
-            */
             break;
         case SDL_WINDOWEVENT_MOVED:
             /*
@@ -410,99 +408,214 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
     switch(event.key.keysym.sym)
     {
         case 'h': // ALT H - Hangup
-//            TheSocketHandler::Instance()->reset();
-            return false;
-
-        case SDLK_RETURN:
-            // If not Full Screen Then Toggle to Next Mode.
-            if(!m_isWindowMode)
             {
-                //TheTerminal::Instance()->setWindowWidth(640);
-                //TheTerminal::Instance()->setWindowHeight(400);
-
-                // Have to reset to 640 so when we come out of full screen,
-                // so it will display this rez properly! Otherwise it skips to last size.
-                //SDL_SetWindowSize(TheTerminal::Instance()->getWindow(), 640, 400);
-
-                // New work around of SDL issues, we now destroy the Window
-                // And Renderer and recreated them in our desired resolutions
-                // Due to SDL being retarded on different platforms.
-#ifndef _WIN32
-//                TheRenderer::Instance()->restartWindowSize(true);
-//                TheRenderer::Instance()->restartWindowRenderer("1");
-#else
-//                TheRenderer::Instance()->restartWindowRenderer("1");
-//                SDL_SetWindowFullscreen(TheRenderer::Instance()->getWindow(), SDL_WINDOW_FULLSCREEN_DESKTOP);
-#endif
-                SDL_Log("Setting window to FULLSCREEN.");
-                m_isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
-                m_fullScreenWindowSize = 0;
-//                TheRenderer::Instance()->clearScreen();
-//                SDL_RenderPresent(TheRenderer::Instance()->getRenderer());
-//                TheRenderer::Instance()->drawTextureScreen();
+                session_ptr session = m_weak_session.lock();
+                if(session)
+                {
+                    // Clear and redraw the screen (remove selection box).
+                    session->m_connection->close();
+                }
                 return false;
             }
-            else
-            {
 
-                // OSX Doesn't do full-screen properly!
-                // Reset Texture Filtering when in windowed mode.
-                // Set Window Mode
-                /*
-                                if(SDL_SetWindowFullscreen(TheRenderer::Instance()->getWindow(), 0) < 0)
+        case SDLK_RETURN:
+            {
+                session_ptr session = m_weak_session.lock();
+                if(session)
+                {
+                    // Ignore full screen on dialing directory
+                    // Allow other window resizing, Full screen
+                    // Should be limited to connection windows.
+                    if (session->m_window_manager->getWindowId() == 1 ||
+                        session->m_is_dial_directory)
+                    {
+
+                        if (m_fullScreenWindowSize == 0)
+                        {
+                            SDL_Log("1280x800");
+                            session->m_window_manager->setWindowWidth(1280);
+                            session->m_window_manager->setWindowHeight(800);
+                            SDL_SetWindowSize(session->m_window_manager->getWindow(), 1280, 800);
+                            m_fullScreenWindowSize = 1;
+                        }
+                        else if (m_fullScreenWindowSize == 1)
+                        {
+                            SDL_Log("640x400");
+                            session->m_window_manager->setWindowWidth(640);
+                            session->m_window_manager->setWindowHeight(400);
+                            SDL_SetWindowSize(session->m_window_manager->getWindow(), 640, 400);
+                            session->m_renderer->clearScreen();
+                            session->m_renderer->drawTextureScreen();
+                            m_fullScreenWindowSize = 0;
+                        }
+                        // Just some Testing, only avilable SDL2.0.5+
+                        else if (m_fullScreenWindowSize == 2)
+                        {
+                            SDL_Log("Full Window");
+                            /*
+                            int display_index = SDL_GetWindowDisplayIndex(
+                                                    session->m_window_manager->getWindow()
+                                                );
+                            if (display_index < 0)
+                            {
+                                SDL_Log("error getting window display");
+                                break;
+                            }
+                               
+                            SDL_Rect usable_bounds;
+                            if (0 != SDL_GetDisplayUsableBounds(
+                                        display_index,
+                                        &usable_bounds))
+                            {
+                                SDL_Log("error getting usable bounds");
+                                break;
+                            }
+
+                            SDL_SetWindowPosition(
+                                session->m_window_manager->getWindow(),
+                                usable_bounds.x,
+                                usable_bounds.y);
+
+                            SDL_SetWindowSize(
+                                session->m_window_manager->getWindow(),
+                                usable_bounds.w,
+                                usable_bounds.h);
+                            */
+                            session->m_renderer->clearScreen();
+                            session->m_renderer->drawTextureScreen();
+                            m_fullScreenWindowSize = 0;
+                        }
+
+
+                        break;
+                    }
+
+                    // Else all Connection Windows.
+                    if (m_isWindowMode)
+                    {
+                        m_isWindowMode = false;
+                        SDL_SetWindowFullscreen(
+                            session->m_window_manager->getWindow(),
+                            SDL_WINDOW_FULLSCREEN_DESKTOP
+                        );
+
+                        session->m_renderer->clearScreen();
+                        session->m_renderer->drawTextureScreen();
+                    }
+                    else
+                    {
+                        m_isWindowMode = true;
+                        SDL_SetWindowFullscreen(
+                            session->m_window_manager->getWindow(),
+                            0
+                        );
+
+                        session->m_renderer->clearScreen();
+                        session->m_renderer->drawTextureScreen();
+                    }
+
+                }
+            }
+
+            /*
+                        // If not Full Screen Then Toggle to Next Mode.
+                        if(!m_isWindowMode)
+                        {
+                            session_ptr session = m_weak_session.lock();
+                            if(session)
+                            {
+                                session->m_window_manager->setWindowWidth(640);
+                                session->m_window_manager->setWindowHeight(400);
+
+                                // Have to reset to 640 so when we come out of full screen,
+                                // so it will display this rez properly! Otherwise it skips to last size.
+                                SDL_SetWindowSize(session->m_window_manager->getWindow(), 640, 400);
+
+                                // New work around of SDL issues, we now destroy the Window
+                                // And Renderer and recreated them in our desired resolutions
+                                // Due to SDL being retarded on different platforms.
+            #ifndef _WIN32
+                                session->m_window_manager->restartWindowSize(true);
+            //                    session->m_window_manager->restartWindowRenderer("1");
+            #else
+            //                    session->m_window_manager->restartWindowRenderer("1");
+                                SDL_SetWindowFullscreen(session->m_window_manager->getWindow(), SDL_WINDOW_FULLSCREEN_DESKTOP);
+            #endif
+                                SDL_Log("Setting window to FULLSCREEN.");
+                                m_isWindowMode = true; // Reset so next ALT+ENTER we switch to windowed mode.
+                                m_fullScreenWindowSize = 0;
+                                session->m_renderer->clearScreen();
+            //                    SDL_RenderPresent(session->m_renderer->getRenderer());
+                                session->m_renderer->drawTextureScreen();
+                            }
+                            return false;
+                        }
+                        else
+                        {
+                            session_ptr session = m_weak_session.lock();
+                            if(session)
+                            {
+                                // OSX Doesn't do full-screen properly!
+                                // Reset Texture Filtering when in windowed mode.
+                                // Set Window Mode
+
+                                if(SDL_SetWindowFullscreen(session->m_window_manager->getWindow(), 0) < 0)
                                 {
                                     SDL_Log(
                                         "Error setting window to Windowed Mode: %s", SDL_GetError());
                                     return false;
                                 }
-                */
-                //Toggle Between Window Sizes.
-                switch(m_fullScreenWindowSize)
-                {
-                        // Texture Filtering OFF.
-                        // These (2) Resolutions work perfect for 8x16 fonts
-                        // When the screen is re-sized the pixels are doubled
-                        // without needing to do any fancy recalculations
-                        // WE use these multiple to keep shaded blocks with
-                        // Correct looking pixel size and layout.
-                    case 0:
-//                        TheRenderer::Instance()->setWindowWidth(640);
-//                        TheRenderer::Instance()->setWindowHeight(400);
-//                        SDL_SetWindowSize(TheRenderer::Instance()->getWindow(), 640, 400);
 
-#ifndef _WIN32
-//                        TheRenderer::Instance()->restartWindowSize(false);
-//                        TheRenderer::Instance()->restartWindowRenderer("0");
-#else
-//                        TheRenderer::Instance()->restartWindowRenderer("0");
-#endif
-//                        TheRenderer::Instance()->clearScreen();
-//                        SDL_RenderPresent(TheRenderer::Instance()->getRenderer());
-//                        TheRenderer::Instance()->drawTextureScreen();
-                        SDL_Log("Setting window size to 640 x 400.");
-                        ++m_fullScreenWindowSize;
-                        break;
+                                //Toggle Between Window Sizes.
+                                switch(m_fullScreenWindowSize)
+                                {
+                                        // Texture Filtering OFF.
+                                        // These (2) Resolutions work perfect for 8x16 fonts
+                                        // When the screen is re-sized the pixels are doubled
+                                        // without needing to do any fancy recalculations
+                                        // WE use these multiple to keep shaded blocks with
+                                        // Correct looking pixel size and layout.
+                                    case 0:
+                                        session->m_window_manager->setWindowWidth(640);
+                                        session->m_window_manager->setWindowHeight(400);
+                                        SDL_SetWindowSize(session->m_window_manager->getWindow(), 640, 400);
 
-                    case 1:
-//                        TheRenderer::Instance()->setWindowWidth(1280);
-//                        TheRenderer::Instance()->setWindowHeight(800);
-//                        SDL_SetWindowSize(TheRenderer::Instance()->getWindow(), 1280, 800);
-#ifndef _WIN32
-//                        TheRenderer::Instance()->restartWindowSize(false);
-//                        TheRenderer::Instance()->restartWindowRenderer("0");
-#else
-//                        TheRenderer::Instance()->restartWindowRenderer("0");
-#endif
-//                        TheRenderer::Instance()->clearScreen();
-//                        SDL_RenderPresent(TheRenderer::Instance()->getRenderer());
-//                        TheRenderer::Instance()->drawTextureScreen();
-                        SDL_Log("Setting window size to 1280 x 800.");
-                        ++m_fullScreenWindowSize;
-                        m_isWindowMode = false;
-                        break;
-                }
-                return false;
-            }
+            #ifndef _WIN32
+                                        session->m_window_manager->restartWindowSize(false);
+            //                            TheRenderer::Instance()->restartWindowRenderer("0");
+            #else
+            //                            TheRenderer::Instance()->restartWindowRenderer("0");
+            #endif
+                                        session->m_renderer->clearScreen();
+                                        //SDL_RenderPresent(TheRenderer::Instance()->getRenderer());
+                                        session->m_renderer->drawTextureScreen();
+                                        SDL_Log("Setting window size to 640 x 400.");
+                                        ++m_fullScreenWindowSize;
+                                    break;
+
+
+                                    case 1:
+                                        session->m_window_manager->setWindowWidth(1280);
+                                        session->m_window_manager->setWindowHeight(800);
+                                        SDL_SetWindowSize(session->m_window_manager->getWindow(), 1280, 800);
+            #ifndef _WIN32
+                                        session->m_window_manager->restartWindowSize(false);
+            //                            TheRenderer::Instance()->restartWindowRenderer("0");
+            #else
+            //                            TheRenderer::Instance()->restartWindowRenderer("0");
+            #endif
+                                        session->m_renderer->clearScreen();
+            //                            SDL_RenderPresent(TheRenderer::Instance()->getRenderer());
+                                        session->m_renderer->drawTextureScreen();
+                                        SDL_Log("Setting window size to 1280 x 800.");
+                                        ++m_fullScreenWindowSize;
+                                        m_isWindowMode = false;
+                                        break;
+                                }
+
+                            }
+                            return false;
+                        }*/
             break;
 
         default:
@@ -520,16 +633,16 @@ bool InputHandler::handleKeyPadAndFunctionKeys(SDL_Event &event)
 {
     switch(event.key.keysym.sym)
     {
-            // Handle KeyPad Keys without numlock
-            // Numlock Numbers are read by Text Input already.
-            /* Caught by TextInput()
-            case SDLK_KP_PERIOD:
-                if (event.key.keysym.mod & KMOD_NUM)
-                {
-                    setInputSequence(".");
-                    return true;
-                }
-                break;*/
+        // Handle KeyPad Keys without numlock
+        // Numlock Numbers are read by Text Input already.
+        /* Caught by TextInput()
+        case SDLK_KP_PERIOD:
+            if (event.key.keysym.mod & KMOD_NUM)
+            {
+                setInputSequence(".");
+                return true;
+            }
+            break;*/
         case SDLK_KP_8: // UP
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
@@ -563,7 +676,7 @@ bool InputHandler::handleKeyPadAndFunctionKeys(SDL_Event &event)
             setInputSequence("\x1b");
             return true;
 
-            // Add Toggle for Hardware Keys ESC0A etc..
+        // Add Toggle for Hardware Keys ESC0A etc..
         case SDLK_UP:
             if(event.key.keysym.mod & KMOD_SHIFT)
                 setInputSequence("\x1b[1;2A");
@@ -593,7 +706,7 @@ bool InputHandler::handleKeyPadAndFunctionKeys(SDL_Event &event)
             setInputSequence("\r");
             return true;
 
-            // Add Swap for BS and DEL (Win vs Nix Terms)
+        // Add Swap for BS and DEL (Win vs Nix Terms)
         case SDLK_TAB:
             if(event.key.keysym.mod & KMOD_SHIFT)
                 setInputSequence("\x1b[Z");
@@ -642,8 +755,8 @@ bool InputHandler::handleANSIKeyMapFunctionKeys(SDL_Event &event)
             setInputSequence("\x1b[U");
             return true;
 
-            // Handle KeyPad Keys without Numlock
-            // Numlock Numbers are read by Text Input already.
+        // Handle KeyPad Keys without Numlock
+        // Numlock Numbers are read by Text Input already.
         case SDLK_KP_PERIOD: // Delete
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
@@ -693,7 +806,7 @@ bool InputHandler::handleANSIKeyMapFunctionKeys(SDL_Event &event)
             }
             break;
 
-            // Function Keys
+        // Function Keys
         case SDLK_F1:
             setInputSequence("\x1b[OP");
             return true;
@@ -748,7 +861,7 @@ bool InputHandler::handleVT100KeyMapFunctionKeys(SDL_Event &event)
     // VT-100 Putty
     switch(event.key.keysym.sym)
     {
-            // \x7f = ^?  // 0x08 = ^H
+        // \x7f = ^?  // 0x08 = ^H
         case SDLK_KP_BACKSPACE:
         case SDLK_BACKSPACE:
             setInputSequence("\x7f");
@@ -773,8 +886,8 @@ bool InputHandler::handleVT100KeyMapFunctionKeys(SDL_Event &event)
             setInputSequence("\x1b[6~");
             return true;
 
-            // Handle KeyPad Keys without NumLock
-            // NumLock Numbers are read by Text Input already.
+        // Handle KeyPad Keys without NumLock
+        // NumLock Numbers are read by Text Input already.
         case SDLK_KP_PERIOD: // Delete
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
@@ -824,7 +937,7 @@ bool InputHandler::handleVT100KeyMapFunctionKeys(SDL_Event &event)
             }
             break;
 
-            // Function Keys
+        // Function Keys
         case SDLK_F1:
             setInputSequence("\x1b[OP");
             return true;
@@ -878,7 +991,7 @@ bool InputHandler::handleLINUXKeyMapFunctionKeys(SDL_Event &event)
     // Linux Terminal Putty
     switch(event.key.keysym.sym)
     {
-            // \x7f = ^?  // 0x08 = ^H
+        // \x7f = ^?  // 0x08 = ^H
         case SDLK_KP_BACKSPACE:
         case SDLK_BACKSPACE:
             setInputSequence("\x7f");
@@ -903,8 +1016,8 @@ bool InputHandler::handleLINUXKeyMapFunctionKeys(SDL_Event &event)
             setInputSequence("\x1b[6~");
             return true;
 
-            // Handle KeyPad Keys without NumLock
-            // NumLock Numbers are read by Text Input already.
+        // Handle KeyPad Keys without NumLock
+        // NumLock Numbers are read by Text Input already.
         case SDLK_KP_PERIOD: // Delete
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
@@ -954,7 +1067,7 @@ bool InputHandler::handleLINUXKeyMapFunctionKeys(SDL_Event &event)
             }
             break;
 
-            // Function Keys
+        // Function Keys
         case SDLK_F1:
             setInputSequence("\x1b[[A");
             return true;
@@ -1008,7 +1121,7 @@ bool InputHandler::handleSCOKeyMapFunctionKeys(SDL_Event &event)
     // SCO Putty
     switch(event.key.keysym.sym)
     {
-            // \x7f = ^?  // 0x08 = ^H
+        // \x7f = ^?  // 0x08 = ^H
         case SDLK_KP_BACKSPACE:
         case SDLK_BACKSPACE:
             setInputSequence("\x7f");
@@ -1032,8 +1145,8 @@ bool InputHandler::handleSCOKeyMapFunctionKeys(SDL_Event &event)
             setInputSequence("\x1b[G");
             return true;
 
-            // Handle KeyPad Keys without NumLock
-            // NumLock Numbers are read by Text Input already.
+        // Handle KeyPad Keys without NumLock
+        // NumLock Numbers are read by Text Input already.
         case SDLK_KP_PERIOD: // Delete
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
@@ -1083,7 +1196,7 @@ bool InputHandler::handleSCOKeyMapFunctionKeys(SDL_Event &event)
             }
             break;
 
-            // Function Keys
+        // Function Keys
         case SDLK_F1:
             setInputSequence("\x1b[[M");
             return true;
@@ -1199,8 +1312,8 @@ bool InputHandler::update(SDL_Event &event)
 
     switch(event.type)
     {
-            //case SDL_QUIT:
-            //    return false;
+        //case SDL_QUIT:
+        //    return false;
 
         case SDL_WINDOWEVENT:
             handleWindowEvents(event);

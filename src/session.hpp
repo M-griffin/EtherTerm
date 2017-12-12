@@ -14,6 +14,7 @@
 #include "session_manager.hpp"
 #include "telnet_manager.hpp"
 
+#include <chrono>
 #include <fstream>
 #include <memory>
 #include <thread>
@@ -461,9 +462,16 @@ public:
         {
             std::string input_sequence;
             m_input_handler->getInputSequence(input_sequence);
+                        
             if(input_sequence.size() > 0)
-            {
-                m_menu_manager->handleMenuUpdates(input_sequence);
+            {                
+                // Menu Key returned EOF for System Exit.
+                // Handle Closing Windows and Program.
+                if (m_menu_manager->handleMenuUpdates(input_sequence) == EOF)
+                {
+                    closeThisSession();
+                    return;
+                }
                 m_menu_manager->updateDialDirectory();
             }
         }
