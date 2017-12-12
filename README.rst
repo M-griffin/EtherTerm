@@ -19,14 +19,14 @@ Introduction
 .. image:: http://i.imgur.com/0BaGSSq.png
    :alt: Screenshot
 
-EtherTerm is a portable terminal emulator and telnet/ssh client for Windows
+**EtherTerm** is a portable terminal emulator and telnet/ssh client for Windows
 and Unix.  It differs from standard terminal emulators such as xterm and PuTTY
 by providing a common telnet and ssh protocol across platforms, with particular
 focus on font sets appropriate for connecting to BBS servers using cp437, and
 amiga art.
 
 EtherTerm is comparable to programs such as syncterm_ and netrunner_.  Notably:
-It is an **SDL graphics program** and makes use of full OpenGL/DirectX graphics
+It is an **SDL2 graphics program** and makes use of full OpenGL/DirectX graphics
 acceleration.
 
 .. _syncterm: http://syncterm.bbsdev.net/
@@ -44,8 +44,10 @@ The 4.x branch now supports multiple asynchronous connections which were added i
 
 
 Currently, no *auto-configure* environment is provided, and build targets are
-limited to Windows, Linux, and OSX.  EtherTerm is **Alpha** software.  Please
-report any issues or feature requests as a `github issue`_.  Pull requests welcome.
+limited to **Windows**, **Linux**, **ARM**, **FreeBSD** and **OSX**.  
+
+EtherTerm is **Alpha** software.  Please
+report any issues or feature requests as a `github issue`_.  Pull requests and contributions are always welcome.
 
 .. _github issue: https://github.com/M-griffin/EtherTerm/issues
 
@@ -116,6 +118,8 @@ Generally, the following libraries must be installed:
 
 As well as a recent version of gnu/gcc providing g++, or clang.
 ``GCC/G++ version 5.x and above are required along with -std=c++11``
+
+**FreeBSD 11 and OSX Sierra have been tested with latest version of clang LLVM**
 
 For Windows, mingw32 or 64 is required.
 
