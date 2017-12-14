@@ -1,4 +1,13 @@
 
+Change Log 0.4.3 - 2017-12-13
+- Re-Implemented ESC and menu options (Q) and Lightbar Enter for exiting program
+- Re-Implemented ALT + H to hang up on connections
+- Re-Implemented ALT + ETNER to toggle window sizes on connections includes full screen 
+- Re-Implemented ALT + ENTER to toggle window sizes on Dialing directory minus full screen
+  Full screen removed from dialing directory becasue it spawn each connection in it's own
+  separate window, if the dialing directory is full screen it doesn't transfer focus properly.
+  some more tweaks to follow.
+
 Change Log 0.4.2 - 2017-12-11
 - Created FreeBsd Project.
   Tested on FreeBSD 11 using clang LLVM
