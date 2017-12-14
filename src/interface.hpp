@@ -301,10 +301,11 @@ public:
 
     // Spawned Session List
     session_manager_ptr            m_session_manager;
-
     std::thread                    m_thread;
     bool                           m_is_global_shutdown;
 
 };
+
+typedef std::unique_ptr<Interface> interface_ptr;
 
 #endif // INTERFACE_HPP

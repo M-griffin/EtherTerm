@@ -14,6 +14,7 @@
 #include "session_manager.hpp"
 #include "telnet_manager.hpp"
 
+#include <chrono>
 #include <fstream>
 #include <memory>
 #include <thread>
@@ -53,11 +54,11 @@ public:
         , m_program_path(program_path)
         , m_weak_session_manager(session_manager)
         , m_window_manager(
-            new WindowManager(
-                (m_term_height * m_char_height),
-                (m_term_width * m_char_width)
-            )
-        )
+              new WindowManager(
+                  (m_term_height * m_char_height),
+                  (m_term_width * m_char_width)
+              )
+          )
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_connection(connection)
         , m_system_connection(system_connection)
@@ -170,9 +171,9 @@ public:
      */
     void handleConnection(const std::error_code& error)
     {
-        
+
         std::cout << "*** handleConnection ***" << std::endl;
-        
+
         if (error)
         {
             std::cout << "Unable to Connect, closing down session." << std::endl;
@@ -256,7 +257,7 @@ public:
                         // Debugging ESC Sequences and data incoming from server.
                         /*
                         std::ofstream ostrm("stream_output.txt", std::ios_base::app);
-                        if (ostrm.is_open()) 
+                        if (ostrm.is_open())
                         {
                             ostrm << parsed_data << std::flush;
                         }*/
@@ -266,7 +267,7 @@ public:
                         {
                             m_sequence_decoder->decodeEscSequenceData(parsed_data);
                         }
-                        
+
                         //ostrm.close();
                     }
                     else
@@ -461,9 +462,22 @@ public:
         {
             std::string input_sequence;
             m_input_handler->getInputSequence(input_sequence);
+
             if(input_sequence.size() > 0)
             {
-                m_menu_manager->handleMenuUpdates(input_sequence);
+                // Menu Key returned EOF for System Exit.
+                // Handle Closing Windows and Program.
+                if (m_menu_manager->handleMenuUpdates(input_sequence) == EOF)
+                {
+                    // This is mirror clicking X on the Window and proceed with
+                    // Proper shutdown and de-allocation.
+                    SDL_Event event;
+                    event.type = SDL_WINDOWEVENT;
+                    event.window.event = SDL_WINDOWEVENT_CLOSE;
+                    event.window.windowID = m_window_manager->getWindowId();
+                    SDL_PushEvent(&event);
+                    return;
+                }
                 m_menu_manager->updateDialDirectory();
             }
         }
