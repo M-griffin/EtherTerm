@@ -51,15 +51,18 @@ WindowManager::~WindowManager()
 
     if(m_renderer)
     {
+		std::cout << "m_renderer" << std::endl;
         SDL_DestroyRenderer(m_renderer);
         m_renderer = nullptr;
     }
 
     if(m_window)
     {
+		std::cout << "m_window" << std::endl;
         SDL_DestroyWindow(m_window);
         m_window = nullptr;
     }
+	std::cout << "done" << std::endl;
 }
 
 /**

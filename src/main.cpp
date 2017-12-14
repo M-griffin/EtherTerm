@@ -36,6 +36,7 @@
 
 #include <string>
 #include <iostream>
+#include <memory>
 
 /**
  * @brief Initial Startup for SDL with Video
@@ -54,7 +55,7 @@ bool SDLStartUp()
 
     if(SDLNet_Init()==-1)
     {
-        printf("SDLNet_Init: %s\n",SDLNet_GetError());
+        std::cout << "SDL_Net could not initialize! SDL Error: " << SDL_GetError() << std::endl;
         exit(2);
     }
 
@@ -122,7 +123,7 @@ int main(int argc, char* argv[])
     if(result == 0)
     {
         std::cout << "Unable to get Program Path!" << std::endl;
-        return 1;
+        exit(1);
     }
 
     realPath = currentPath;
@@ -140,7 +141,7 @@ int main(int argc, char* argv[])
     if(result < 0)
     {
         std::cout << "Unable to get Program Path!" << std::endl;
-        return 1;
+        exit(1);
     }
 
     const char* t = " \t\n\r\f\v";
@@ -162,36 +163,39 @@ int main(int argc, char* argv[])
      * For automation and testing
      */
 
-    // Setup the interface for spawning session windows.
-    Interface interface_spawn(realPath);
+    // Setup the interface for spawning session windows.	
+	// Using Smart Pointer will clear final allocation prior to full exit of system.
+	{
+		interface_ptr interface_spawn(new Interface(realPath));
 
-    // Don't loaded menu system waiting for user input, just handle
-    // Scripts and connections or parsing functions for testing.
-    if(is_headless)
-    {
-        // Execute scripts / connections via command line
-        // Don't startup SDL since were not using the video
-        // or Waiting for Keyboard input from the window events.
+		// Don't loaded menu system waiting for user input, just handle
+		// Scripts and connections or parsing functions for testing.
+		if(is_headless)
+		{
+			// Execute scripts / connections via command line
+			// Don't startup SDL since were not using the video
+			// or Waiting for Keyboard input from the window events.
 
-        // Nothing to do right now.
-        return 0;
-    }
-    else
-    {
-        // Startup the Window System and load initial menu
-        // Window with Initialization with window event processing.
-        if(!SDLStartUp())
-        {
-            return -1;
-        }
+			// Nothing to do right now.
+			exit(0);
+		}
+		else
+		{
+			// Startup the Window System and load initial menu
+			// Window with Initialization with window event processing.
+			if(!SDLStartUp())
+			{
+				exit(-1);
+			}
 
-        // Lead into Interface spawn for session startup and management.
-        interface_spawn.startup();
-
-        // SDL is done.
-        std::cout << "EtherTerm Shutdown completed." << std::endl;
-        SDL_Quit();
-    }
+			// Lead into Interface spawn for session startup and management.
+			interface_spawn->startup();
+		}
+	}
+	
+	// SDL is done.
+	std::cout << "EtherTerm Shutdown completed." << std::endl;
+	SDL_Quit();
 
     // Closing Message Box.
     SDL_ShowSimpleMessageBox(
@@ -201,5 +205,5 @@ int main(int argc, char* argv[])
         nullptr
     );
 
-    return 0;
+    exit(0);
 }

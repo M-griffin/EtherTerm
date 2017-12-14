@@ -468,9 +468,15 @@ public:
                 // Menu Key returned EOF for System Exit.
                 // Handle Closing Windows and Program.
                 if (m_menu_manager->handleMenuUpdates(input_sequence) == EOF)
-                {
-                    closeThisSession();
-                    return;
+                {                    
+					// This is mirror clicking X on the Window and proceed with
+					// Proper shutdown and de-allocation.
+					SDL_Event event;
+					event.type = SDL_WINDOWEVENT;
+					event.window.event = SDL_WINDOWEVENT_CLOSE;
+					event.window.windowID = m_window_manager->getWindowId();
+					SDL_PushEvent(&event);
+                    	return;
                 }
                 m_menu_manager->updateDialDirectory();
             }
