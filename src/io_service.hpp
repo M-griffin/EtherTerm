@@ -54,7 +54,7 @@ public:
     };
     typedef std::shared_ptr<service_base> service_base_ptr;
 
-    template <class ConstBufferSequence, class StringSequence, class SocketHandle, class Callback, class ServiceType>
+    template <class MutableBufferSequence, class StringSequence, class SocketHandle, class Callback, class ServiceType>
     class service_job : public service_base
     {
     public:
@@ -88,7 +88,7 @@ public:
             return m_service_type;
         }
 
-        service_job(ConstBufferSequence &buffer, StringSequence string_sequence, SocketHandle socket_handle, Callback callback,
+        service_job(MutableBufferSequence &buffer, StringSequence string_sequence, SocketHandle socket_handle, Callback callback,
                     ServiceType service_type)
             : m_buffer(buffer)
             , m_string_sequence(string_sequence)
@@ -99,19 +99,19 @@ public:
             //std::cout << " * addAsync Job Created!" << std::endl;
         }
 
-        ConstBufferSequence &m_buffer;
-        StringSequence       m_string_sequence;
-        SocketHandle         m_socket_handle;
-        Callback             m_callback;
-        ServiceType          m_service_type;
+        MutableBufferSequence &m_buffer;
+        StringSequence         m_string_sequence;
+        SocketHandle           m_socket_handle;
+        Callback               m_callback;
+        ServiceType            m_service_type;
     };
 
-    template <typename ConstBufferSequence, typename StringSequence, typename SocketHandle, typename Callback, typename ServiceType>
-    void addAsyncJob(ConstBufferSequence &buffer, StringSequence write_sequence, SocketHandle socket_handle, Callback &callback, ServiceType service_type)
+    template <typename MutableBufferSequence, typename StringSequence, typename SocketHandle, typename Callback, typename ServiceType>
+    void addAsyncJob(MutableBufferSequence &buffer, StringSequence write_sequence, SocketHandle socket_handle, Callback &callback, ServiceType service_type)
     {
         //std::cout << " * addAsyncJob To Queue" << std::endl;
-        service_job<ConstBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
-            = new service_job <ConstBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
+        service_job<MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
+            = new service_job <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
         (buffer, write_sequence, socket_handle, callback, service_type);
 
         m_service_list.push_back(std::shared_ptr<service_base>(job));

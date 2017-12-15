@@ -81,19 +81,18 @@ public:
             v.pop_back();
         }        
         std::vector<T>().swap(v);
+        c.notify_one();
     }
 
     // Check for Non-Blocking Wait.
     bool is_empty(void) const
     {
-        std::unique_lock<std::mutex> lock(m);
         return v.empty();
     }
 
     // Check for Non-Blocking Wait.
     unsigned long size(void) const
     {
-        std::unique_lock<std::mutex> lock(m);
         return v.size();
     }
 

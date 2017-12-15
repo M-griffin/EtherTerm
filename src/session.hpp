@@ -235,7 +235,7 @@ public:
         //std::cout << "* handleRead: " << error << std::endl;
         if(error)
         {
-            std::cout << "* Async Read Error!" << error << std::endl;
+            std::cout << "* Async Read Error!" << error << std::endl;            
         }
 
         session_manager_ptr session_mgr = m_weak_session_manager.lock();
