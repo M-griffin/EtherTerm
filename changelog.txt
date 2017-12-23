@@ -1,10 +1,16 @@
 
+Change Log 0.4.4 - 2017-12-23
+- Added ESC[6n Response Queue.  Systems like Enigma BBS query 6+ ESC[6n
+  sequences and without response directly to all 6, fields appears out of order.
+  to correct this, a queue was setup when parsing so that all write sequences
+  are compiled and sent as a single response.
+
 Change Log 0.4.3 - 2017-12-13
 - Re-Implemented ESC and menu options (Q) and Lightbar Enter for exiting program
 - Re-Implemented ALT + H to hang up on connections
 - Re-Implemented ALT + ETNER to toggle window sizes on connections includes full screen 
 - Re-Implemented ALT + ENTER to toggle window sizes on Dialing directory minus full screen
-  Full screen removed from dialing directory becasue it spawn each connection in it's own
+  Full screen removed from dialing directory because it spawn each connection in it's own
   separate window, if the dialing directory is full screen it doesn't transfer focus properly.
   some more tweaks to follow.
 

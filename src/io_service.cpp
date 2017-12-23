@@ -193,7 +193,7 @@ void IOService::run()
 
         // Temp timer, change to 10/20 miliseconds for cpu useage
         // possiably as lock wait() check for jobs added to vector queue.
-        std::this_thread::sleep_for(std::chrono::milliseconds(40));
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
 
 }

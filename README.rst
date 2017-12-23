@@ -4,7 +4,7 @@
 You can follow the latest updates and work in the ``feature/0.4.0-alpha`` branch.  As updates and changes are made stable pull requests will merge the updates back to the master branch.
 
 
-The removal of Boost libs will be replaced with standard c++11 functionaly instead.  The build and project files are currently in the process of being rewritten and seperated in folders by environment/os. 
+The removal of Boost libs will be replaced with standard c++11 functionaly instead.  The build and project files are currently in the process of being rewritten and seperated in folders by environment/os.
 
 
 The previous 3.0 Demo branch is a fork and rewrite of the internals for EtherTerm.  This version differs a bit as asynchronous sockets were added along with the ability to open several connections at the same each in their own window.  Other telnet option fixes and updated to the terminal have also been added along with some pre-testing of file upload/downloads.  Still very raw (Dialing Directory is still unfinished, and SSH support is disconnected at the moment).  This more of a POC (Proof of concept) rewrite to see what can be done differently.   Also some rendering changes were made and are in testing such as recolor blocks using alpha channels for a slight speed up.  ``Note`` the 3.x branch had some experimental stuff I was testing,  right now I've had to roll back several commits and some things are disabled until I get time to fix and re-implement them.  **Please keep in mind this is Alpha Software and is very much a work in progress.**
@@ -15,7 +15,7 @@ The previous 3.0 Demo branch is a fork and rewrite of the internals for EtherTer
 
 Introduction
 ============
-   
+
 .. image:: http://i.imgur.com/0BaGSSq.png
    :alt: Screenshot
 
@@ -44,7 +44,7 @@ The 4.x branch now supports multiple asynchronous connections which were added i
 
 
 Currently, no *auto-configure* environment is provided, and build targets are
-limited to **Windows**, **Linux**, **ARM**, **FreeBSD** and **OSX**.  
+limited to **Windows**, **Linux**, **ARM**, **FreeBSD** and **OSX**.
 
 EtherTerm is **Alpha** software.  Please
 report any issues or feature requests as a `github issue`_.  Pull requests and contributions are always welcome.
@@ -98,7 +98,7 @@ To add new systems or remove, you must edit the ``assets/dialdirectory.xml`` fil
 Downloads (Demo Previews)
 =========
 
-- `Windows 0.4.1 Preview <https://drive.google.com/file/d/1eIGr55WwIrWjmcQjgzWEPrpMxCdBOya3/view?usp=sharing>`_
+- `Windows 0.4.4 (Latest) Preview <https://drive.google.com/file/d/1aJsqVn2haKmmbEnrMSx5ubYjDstnnlh0/view?usp=sharing>`_
 
 - `Windows 0.3.1 Preview <https://drive.google.com/file/d/0ByPPRlSSb7N-dGpGXzV0a3VIN2c/view?usp=sharing>`_
 
@@ -125,7 +125,7 @@ For Windows, mingw32 or 64 is required.
 
 - **NOTE**: EtherTerm will seek an ``./assets`` folder relative to the executable.  In this way,
   it is not (yet) a very "portable" executable.  At this stage, a build folder has been created with quick scripts that will copy from the DEBUG folder to the build folder where the assets is now located by default.
-  
+
 
 
 TODO

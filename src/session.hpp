@@ -13,6 +13,7 @@
 #include "menu_manager.hpp"
 #include "session_manager.hpp"
 #include "telnet_manager.hpp"
+#include "safe_queue.hpp"
 
 #include <chrono>
 #include <fstream>
@@ -171,9 +172,6 @@ public:
      */
     void handleConnection(const std::error_code& error)
     {
-
-        std::cout << "*** handleConnection ***" << std::endl;
-
         if (error)
         {
             std::cout << "Unable to Connect, closing down session." << std::endl;
@@ -235,7 +233,7 @@ public:
         //std::cout << "* handleRead: " << error << std::endl;
         if(error)
         {
-            std::cout << "* Async Read Error!" << error << std::endl;
+            std::cout << "* Async Read Error!" << error << std::endl;            
         }
 
         session_manager_ptr session_mgr = m_weak_session_manager.lock();
@@ -338,7 +336,7 @@ public:
                 // if the socket is still active, shut it down
                 m_connection->shutdown();
             }
-        }
+        }        
     }
 
     /**
@@ -347,7 +345,6 @@ public:
      */
     void deliver(const std::string &string_msg)
     {
-        //std::cout << " * Deliver: " << string_msg.size() << " - " << string_msg << std::endl;
         if(string_msg.size() == 0 || string_msg[0] == '\0')
         {
             return;
@@ -361,6 +358,15 @@ public:
                                           shared_from_this(),
                                           std::placeholders::_1));
         }
+    }
+    
+    /**
+     * @brief Queues ESC[6n Response Sequences
+     * @param string_msg
+     */
+    void deliverEscResponseSequence(const std::string &string_msg)
+    {
+        m_write_queue.enqueue(string_msg);
     }
 
     /**
@@ -401,7 +407,6 @@ public:
     void startMenuInstance()
     {
         // Allocate a new Dialing Directory Instance on existing placeholder.
-        std::cout << "Starting Menu Instance:" << std::endl;
         m_menu_manager.reset(
             new MenuManager(
                 m_program_path,
@@ -530,6 +535,19 @@ public:
                 m_sequence_parser->textInput(msgQueue.m_text);
             }
             msgQueue.clear();
+        }
+        
+        // Handle Immediate ESC Position Response Sequences
+        // Queue all responses and write out as single output.
+        std::string esc_response_sequence = "";
+        while (m_write_queue.size() > 0)
+        {
+            esc_response_sequence += m_write_queue.dequeue();
+        }
+
+        if (esc_response_sequence.size() > 0)
+        {
+            deliver(esc_response_sequence);
         }
 
         // Render Changes on updates only, save CPU usage!
@@ -675,8 +693,9 @@ public:
     time_t                   m_ttime, m_ttime2;
 
     // Input Raw Data Buffer.
-    std::vector<unsigned char> m_in_data_vector;
-
+    std::vector<unsigned char> m_in_data_vector;    
+    SafeQueue<std::string>     m_write_queue;
+        
 };
 
 #endif // SESSION_BASE_HPP

@@ -1695,7 +1695,7 @@ void SequenceParser::sequenceResetAndResponses()
                 {
                     if(session->m_connection->is_open() && session->m_is_connected)
                     {
-                        session->deliver(buf);
+                        session->deliverEscResponseSequence(buf);
                     }
                     else
                     {

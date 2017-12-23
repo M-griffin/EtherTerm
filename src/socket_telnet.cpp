@@ -53,8 +53,8 @@ int SDL_Socket::recvSocket(char *message)
         }
         message[result] = 0;
     }
+    
     return result;
-
 }
 
 int SDL_Socket::pollSocket()

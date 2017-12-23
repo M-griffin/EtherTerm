@@ -90,6 +90,7 @@ public:
     {
         std::lock_guard<std::mutex> lock(m);
         std::queue<T>().swap(q);
+        c.notify_one();
     }
 
     // Check for Non-Blocking Wait.
