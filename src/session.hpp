@@ -172,8 +172,6 @@ public:
      */
     void handleConnection(const std::error_code& error)
     {
-        std::cout << "*** handleConnection ***" << std::endl;
-
         if (error)
         {
             std::cout << "Unable to Connect, closing down session." << std::endl;
@@ -338,9 +336,7 @@ public:
                 // if the socket is still active, shut it down
                 m_connection->shutdown();
             }
-        }
-        
-        std::cout << "handleRead End" << std::endl;
+        }        
     }
 
     /**
@@ -349,7 +345,6 @@ public:
      */
     void deliver(const std::string &string_msg)
     {
-        //std::cout << " * Deliver: " << string_msg.size() << " - " << string_msg << std::endl;
         if(string_msg.size() == 0 || string_msg[0] == '\0')
         {
             return;
@@ -357,7 +352,6 @@ public:
 
         if(m_connection->socket()->isActive())
         {
-            std::cout << "ASYNC WRITE: " << string_msg << std::endl;
             m_connection->async_write(string_msg,
                                       std::bind(
                                           &Session::handleWrite,
@@ -405,7 +399,6 @@ public:
                 std::cout << "handleWrite() - Caught Exception on shutdown: " << ex.what();
             }
         }
-        std::cout << "handleWrite End" << std::endl;
     }
 
     /**
@@ -414,7 +407,6 @@ public:
     void startMenuInstance()
     {
         // Allocate a new Dialing Directory Instance on existing placeholder.
-        std::cout << "Starting Menu Instance:" << std::endl;
         m_menu_manager.reset(
             new MenuManager(
                 m_program_path,

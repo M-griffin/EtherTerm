@@ -109,7 +109,6 @@ public:
     template <typename MutableBufferSequence, typename StringSequence, typename SocketHandle, typename Callback, typename ServiceType>
     void addAsyncJob(MutableBufferSequence &buffer, StringSequence write_sequence, SocketHandle socket_handle, Callback &callback, ServiceType service_type)
     {
-        //std::cout << " * addAsyncJob To Queue" << std::endl;
         service_job<MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
             = new service_job <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
         (buffer, write_sequence, socket_handle, callback, service_type);
@@ -139,8 +138,7 @@ public:
     }
 
     SafeVector<service_base_ptr>  m_service_list;
-
-    bool m_is_active;
+    bool                          m_is_active;
 
 };
 
