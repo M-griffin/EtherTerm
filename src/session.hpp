@@ -13,6 +13,7 @@
 #include "menu_manager.hpp"
 #include "session_manager.hpp"
 #include "telnet_manager.hpp"
+#include "safe_queue.hpp"
 
 #include <chrono>
 #include <fstream>
@@ -171,7 +172,6 @@ public:
      */
     void handleConnection(const std::error_code& error)
     {
-
         std::cout << "*** handleConnection ***" << std::endl;
 
         if (error)
@@ -339,6 +339,8 @@ public:
                 m_connection->shutdown();
             }
         }
+        
+        std::cout << "handleRead End" << std::endl;
     }
 
     /**
@@ -355,12 +357,22 @@ public:
 
         if(m_connection->socket()->isActive())
         {
+            std::cout << "ASYNC WRITE: " << string_msg << std::endl;
             m_connection->async_write(string_msg,
                                       std::bind(
                                           &Session::handleWrite,
                                           shared_from_this(),
                                           std::placeholders::_1));
         }
+    }
+    
+    /**
+     * @brief Queues ESC[6n Response Sequences
+     * @param string_msg
+     */
+    void deliverEscResponseSequence(const std::string &string_msg)
+    {
+        m_write_queue.enqueue(string_msg);
     }
 
     /**
@@ -393,6 +405,7 @@ public:
                 std::cout << "handleWrite() - Caught Exception on shutdown: " << ex.what();
             }
         }
+        std::cout << "handleWrite End" << std::endl;
     }
 
     /**
@@ -530,6 +543,19 @@ public:
                 m_sequence_parser->textInput(msgQueue.m_text);
             }
             msgQueue.clear();
+        }
+        
+        // Handle Immediate ESC Position Response Sequences
+        // Queue all responses and write out as single output.
+        std::string esc_response_sequence = "";
+        while (m_write_queue.size() > 0)
+        {
+            esc_response_sequence += m_write_queue.dequeue();
+        }
+
+        if (esc_response_sequence.size() > 0)
+        {
+            deliver(esc_response_sequence);
         }
 
         // Render Changes on updates only, save CPU usage!
@@ -675,8 +701,9 @@ public:
     time_t                   m_ttime, m_ttime2;
 
     // Input Raw Data Buffer.
-    std::vector<unsigned char> m_in_data_vector;
-
+    std::vector<unsigned char> m_in_data_vector;    
+    SafeQueue<std::string>     m_write_queue;
+        
 };
 
 #endif // SESSION_BASE_HPP
