@@ -35,14 +35,19 @@ public:
     ~IOService();
 
     /**
-     * Handles Call Backs, Read/Write only pass error, and null for session since not needed
-     * Connection will use both
+     * Handles Call Back Functions, execute at the end of Asyn Job.
      */
     typedef std::function<void(const std::error_code& error)> callback_function_handler;
-
     static const int MAX_BUFFER_SIZE = 8193;
 
-    class service_base
+    /**
+     * @class ServiceBase
+     * @author Michael Griffin
+     * @date 06/12/2017
+     * @file io_service.hpp
+     * @brief IO Service Job Base Template, needed to access virtual methods on ServiceJob
+     */
+    class ServiceBase
     {
     public:
         virtual void setBuffer(unsigned char *buffer) = 0;
@@ -52,14 +57,19 @@ public:
         virtual callback_function_handler getCallback() = 0;
         virtual int getServiceType() = 0;
     };
-    typedef std::shared_ptr<service_base> service_base_ptr;
+    typedef std::shared_ptr<ServiceBase> service_base_ptr;
 
+    /**
+     * @class ServiceJob
+     * @author Michael Griffin
+     * @date 06/12/2017
+     * @file io_service.hpp
+     * @brief IO Service Job Template
+     */
     template <class MutableBufferSequence, class StringSequence, class SocketHandle, class Callback, class ServiceType>
-    class service_job : public service_base
+    class ServiceJob : public ServiceBase
     {
     public:
-
-        // Virtual Methods to pickup Data from Base Classes
         virtual void setBuffer(unsigned char *buffer)
         {
             for(int i = 0; i < MAX_BUFFER_SIZE; i++)
@@ -88,16 +98,14 @@ public:
             return m_service_type;
         }
 
-        service_job(MutableBufferSequence &buffer, StringSequence string_sequence, SocketHandle socket_handle, Callback callback,
-                    ServiceType service_type)
+        ServiceJob(MutableBufferSequence &buffer, StringSequence string_sequence, SocketHandle socket_handle, Callback callback,
+                   ServiceType service_type)
             : m_buffer(buffer)
             , m_string_sequence(string_sequence)
             , m_socket_handle(socket_handle)
             , m_callback(callback)
             , m_service_type(service_type)
-        {
-            //std::cout << " * addAsync Job Created!" << std::endl;
-        }
+        { }
 
         MutableBufferSequence &m_buffer;
         StringSequence         m_string_sequence;
@@ -106,14 +114,23 @@ public:
         ServiceType            m_service_type;
     };
 
+    /**
+     * @brief Add Async Jobs to the Vector Queue
+     * @param buffer
+     * @param write_sequence
+     * @param socket_handle
+     * @param callback
+     * @param service_type
+     */
     template <typename MutableBufferSequence, typename StringSequence, typename SocketHandle, typename Callback, typename ServiceType>
-    void addAsyncJob(MutableBufferSequence &buffer, StringSequence write_sequence, SocketHandle socket_handle, Callback &callback, ServiceType service_type)
+    void addAsyncJob(MutableBufferSequence &buffer, StringSequence write_sequence, SocketHandle socket_handle,
+                     Callback &callback, ServiceType service_type)
     {
-        service_job<MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
-            = new service_job <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
+        ServiceJob<MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType> *job
+            = new ServiceJob <MutableBufferSequence, StringSequence, SocketHandle, Callback, ServiceType>
         (buffer, write_sequence, socket_handle, callback, service_type);
 
-        m_service_list.push_back(std::shared_ptr<service_base>(job));
+        m_service_list.push_back(std::shared_ptr<ServiceBase>(job));
     }
 
     void run();

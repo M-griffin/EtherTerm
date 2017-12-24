@@ -40,7 +40,7 @@ void IOService::run()
              */
             if (job_work->getServiceType() == SERVICE_TYPE_READ)
             {
-                // If Data Available, read, then ppulate buffer, and remove
+                // If Data Available, read, then populate buffer
                 // Otherwise keep polling till data is available.
                 int result = job_work->getSocket()->poll();
                 if (result > 0)
@@ -192,7 +192,6 @@ void IOService::run()
         }
 
         // Temp timer, change to 10/20 miliseconds for cpu useage
-        // possiably as lock wait() check for jobs added to vector queue.
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
 

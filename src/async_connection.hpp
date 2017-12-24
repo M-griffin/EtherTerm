@@ -135,7 +135,7 @@ public:
         m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handle, callback, service_type);
     }
 
-    socket_handler_ptr m_socket_handle;
+    socket_handler_ptr  m_socket_handle;
     IOService          &m_io_service;
 };
 
