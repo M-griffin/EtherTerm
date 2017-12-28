@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
 <EtherTerm>
     <Phonebook version="1.0">
-        <BBS name="hTc IRC Test" ip="localhost" port="6667" protocol="IRC" login="" password="" font="topazPlus-8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="hTc Enthral" ip="htc.zapto.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="79 Columns" ip="oddnetwork.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="Black Flag (Mystic)" ip="blackflag.acid.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="1" />
