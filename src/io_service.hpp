@@ -19,6 +19,7 @@ const int SERVICE_TYPE_READ           = 1;
 const int SERVICE_TYPE_WRITE          = 2;
 const int SERVICE_TYPE_CONNECT_TELNET = 3;
 const int SERVICE_TYPE_CONNECT_SSH    = 4;
+const int SERVICE_TYPE_CONNECT_IRC    = 5;
 
 /**
  * @class IOService

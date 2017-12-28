@@ -142,6 +142,50 @@ bool SocketHandler::connectSshSocket(std::string host, int port,
 }
 
 /**
+ * @brief Connect IRC Socket
+ * @param host
+ * @param port
+ * @return
+ */
+ // TODO, this will need nick etc.. 
+bool SocketHandler::connectIrcSocket(std::string host, int port)
+{
+    std::cout << "SocketHandler::initIRC" << std::endl;
+    if(!m_is_active)
+    {
+        try
+        {
+            m_socket_type = SOCKET_TYPE_TELNET;
+            socket_state_ptr sdl_socket(new IRC_Socket(host, port));
+            m_socket.push_back(sdl_socket);
+            if(m_socket.back()->onEnter())
+            {
+                m_is_active = true;
+            }
+            else
+            {
+                SDL_Log("Unable to initialize IRC Socket.");
+                close();
+                return false;
+            }
+        }
+        catch(std::exception& e)
+        {
+            close();
+            std::cerr << "exception creating new IRC_Socket: "
+                      << e.what() << std::endl;
+            return false;
+        }
+    }
+    else
+    {
+        SDL_Log("IRC Socket already Active!");
+        return false;
+    }
+    return true;
+}
+
+/**
  * @brief Type of Socket
  * @return
  */

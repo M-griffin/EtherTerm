@@ -131,6 +131,11 @@ public:
         {
             service_type = SERVICE_TYPE_CONNECT_SSH;
         }
+        else if (protocol == "IRC")
+        {
+            service_type = SERVICE_TYPE_CONNECT_IRC;
+        }
+
 
         m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handle, callback, service_type);
     }

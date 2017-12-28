@@ -187,8 +187,63 @@ void IOService::run()
                     run_callback(not_connected_error_code);
                     m_service_list.remove(i);
                 }
-
             }
+            
+            // SERVICE_TYPE_CONNECT_IRC
+            else if (job_work->getServiceType() == SERVICE_TYPE_CONNECT_IRC)
+            {
+                // Get host and port from string.
+                // This would better as a vector<std::string> for the sequqnce,
+                // More versitile.!
+                std::vector<std::string> ip_address = split(job_work->getStringSequence(), ':');
+                bool is_success = false;
+                if (ip_address.size() > 1)
+                {
+                    is_success = job_work->getSocket()->connectIrcSocket(
+                                     ip_address.at(0),
+                                     std::atoi(ip_address.at(1).c_str())
+                                 );
+                }
+                else
+                {
+                    is_success = job_work->getSocket()->connectIrcSocket(
+                                     ip_address.at(0),
+                                     6667
+                                 );
+                }
+
+                if (is_success)
+                {                    
+                    // Send Initial Connection Information
+                    std::string nick = "mercyful1";
+                    std::string ident = "mercyful1";
+                    std::string read_name = "michael";
+                    std::string host = "localhost";
+                    
+                    std::stringstream ss;
+                    ss  << "NICK " << nick << "\r\n" 
+                        << "USER " << ident << " " << host << " bla : " << read_name << "\r\n";
+                    
+                    std::string output = ss.str();
+                    job_work->getSocket()->sendSocket((unsigned char *)output.c_str(), output.size());
+                                        
+                    callback_function_handler run_callback(job_work->getCallback());
+                    std::error_code success_code (0, std::generic_category());
+                    run_callback(success_code);
+                    m_service_list.remove(i);
+                }
+                else
+                {
+                    // Error - Unable to connect
+                    std::cout << "async_connection - unable to connect" << std::endl;
+                    job_work->getSocket()->setInactive();
+                    callback_function_handler run_callback(job_work->getCallback());
+                    std::error_code not_connected_error_code (1, std::system_category());
+                    run_callback(not_connected_error_code);
+                    m_service_list.remove(i);
+                }
+            }
+            
         }
 
         // Temp timer, change to 10/20 miliseconds for cpu useage

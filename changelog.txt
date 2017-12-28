@@ -1,4 +1,12 @@
 
+Change Log 0.4.5 - 2017-12-28
+- ESC[C Cursor forward will no longer move to next line
+- Added extra shutdown management to session manager so give sessions some time
+  to finish their last updates on disconnects to avoid any exception errors.
+- WIP, Started IRC Session Socket Connections and added initial irc_manager class.
+  Initial connections are working, now need to parse responses and setup client
+  command parsing.
+
 Change Log 0.4.4 - 2017-12-23
 - Added ESC[6n Response Queue.  Systems like Enigma BBS query 6+ ESC[6n
   sequences and without response directly to all 6, fields appears out of order.
