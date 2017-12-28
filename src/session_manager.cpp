@@ -2,7 +2,7 @@
 #include "session.hpp"
 
 #include <algorithm>
-
+#include <chrono>
 
 SessionManager::SessionManager()
     : m_is_system_disconnected(false)
@@ -37,6 +37,10 @@ void SessionManager::leave(session_ptr session)
 
     try
     {
+        // Start Session Shutdown Sequence, give time for sync and clean exit.
+        session->m_is_shutdown = true;
+        std::this_thread::sleep_for(std::chrono::milliseconds(40));
+        
         // If session is connected, we need to disconnect it first
         if(session->m_connection)
         {
@@ -115,7 +119,7 @@ void SessionManager::update()
     for(auto it = m_sessions.begin(); it != m_sessions.end(); ++it)
     {
         // Make sure handle is valid once we call it.
-        if (num_sessions != m_sessions.size())
+        if (num_sessions != m_sessions.size() || (*it)->m_is_shutdown)
         {
             return;
         }

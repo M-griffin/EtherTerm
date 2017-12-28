@@ -46,9 +46,8 @@ std::string TelnetManager::parseIncomingData(const std::vector<unsigned char> &m
 
 // Debugging, write all data received to file
 //    std::fstream sout;
-//    sout.open( "screen.ans", ios::out | ios::app );
-//    sout << msgBuffer << std::flush;
-//    sout.close();
+//    sout.open( "stream_output.txt", std::ios_base::out | std::ios_base::app );
+    
 
     // Make sure buffer isn't empty
     if (msg_buffer.size() == 0)
@@ -75,6 +74,9 @@ std::string TelnetManager::parseIncomingData(const std::vector<unsigned char> &m
             std::cout << c << std::flush;
 #endif
 
+//        sout << c << std::flush;
+        
+
         try
         {
             // Run the Telnet Options Parser
@@ -100,6 +102,8 @@ std::string TelnetManager::parseIncomingData(const std::vector<unsigned char> &m
         output += ch;
     }
 
+//    sout.close();
+    
     // If available, push Data through ANSI Passer then Screen.
     if(output.size() > 0)
     {

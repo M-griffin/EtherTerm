@@ -51,6 +51,7 @@ public:
     int recvSocket(char *message);
     int poll();
 
+    bool connectIrcSocket(std::string host, int port);
     bool connectTelnetSocket(std::string host, int port);
     bool connectSshSocket(std::string host, int port, std::string username, std::string password);
 

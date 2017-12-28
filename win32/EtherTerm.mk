@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=23/12/2017
+Date                   :=28/12/2017
 CodeLitePath           :="C:/Program Files (x86)/CodeLite"
 LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
@@ -62,9 +62,9 @@ AS       := C:/MinGW-5.1.0/mingw32/bin/as.exe
 ## User defined environment variables
 ##
 CodeLiteDir:=C:\Program Files (x86)\CodeLite
-Objects0=$(IntermediateDirectory)/up_src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_window_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinyxmlparser.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinyxml.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinystr.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_main.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_menu_function.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_screen_buffer.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_protocol.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_link_list.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_surface_manager.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/up_src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_window_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinyxmlparser.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinyxml.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinystr.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_function.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/up_src_menu_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_irc_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_screen_buffer.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_io.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_protocol.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_link_list.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_surface_manager.cpp$(ObjectSuffix) 
 
 
 
@@ -102,14 +102,6 @@ $(IntermediateDirectory)/up_src_io_service.cpp$(DependSuffix): ../src/io_service
 
 $(IntermediateDirectory)/up_src_io_service.cpp$(PreprocessSuffix): ../src/io_service.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_io_service.cpp$(PreprocessSuffix) ../src/io_service.cpp
-
-$(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix): ../src/socket_telnet.cpp $(IntermediateDirectory)/up_src_socket_telnet.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/socket_telnet.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_socket_telnet.cpp$(DependSuffix): ../src/socket_telnet.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_socket_telnet.cpp$(DependSuffix) -MM ../src/socket_telnet.cpp
-
-$(IntermediateDirectory)/up_src_socket_telnet.cpp$(PreprocessSuffix): ../src/socket_telnet.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_socket_telnet.cpp$(PreprocessSuffix) ../src/socket_telnet.cpp
 
 $(IntermediateDirectory)/up_src_socket_handler.cpp$(ObjectSuffix): ../src/socket_handler.cpp $(IntermediateDirectory)/up_src_socket_handler.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/socket_handler.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_socket_handler.cpp$(ObjectSuffix) $(IncludePath)
@@ -151,21 +143,13 @@ $(IntermediateDirectory)/up_src_tinystr.cpp$(DependSuffix): ../src/tinystr.cpp
 $(IntermediateDirectory)/up_src_tinystr.cpp$(PreprocessSuffix): ../src/tinystr.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_tinystr.cpp$(PreprocessSuffix) ../src/tinystr.cpp
 
-$(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix): ../src/socket_ssh.cpp $(IntermediateDirectory)/up_src_socket_ssh.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/socket_ssh.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_socket_ssh.cpp$(DependSuffix): ../src/socket_ssh.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_socket_ssh.cpp$(DependSuffix) -MM ../src/socket_ssh.cpp
+$(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix): ../src/telnet_manager.cpp $(IntermediateDirectory)/up_src_telnet_manager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/telnet_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_telnet_manager.cpp$(DependSuffix): ../src/telnet_manager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_telnet_manager.cpp$(DependSuffix) -MM ../src/telnet_manager.cpp
 
-$(IntermediateDirectory)/up_src_socket_ssh.cpp$(PreprocessSuffix): ../src/socket_ssh.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(PreprocessSuffix) ../src/socket_ssh.cpp
-
-$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(ObjectSuffix): ../src/tinyxmlerror.cpp $(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/tinyxmlerror.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(DependSuffix): ../src/tinyxmlerror.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(DependSuffix) -MM ../src/tinyxmlerror.cpp
-
-$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(PreprocessSuffix): ../src/tinyxmlerror.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(PreprocessSuffix) ../src/tinyxmlerror.cpp
+$(IntermediateDirectory)/up_src_telnet_manager.cpp$(PreprocessSuffix): ../src/telnet_manager.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_telnet_manager.cpp$(PreprocessSuffix) ../src/telnet_manager.cpp
 
 $(IntermediateDirectory)/up_src_main.cpp$(ObjectSuffix): ../src/main.cpp $(IntermediateDirectory)/up_src_main.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_main.cpp$(ObjectSuffix) $(IncludePath)
@@ -174,6 +158,14 @@ $(IntermediateDirectory)/up_src_main.cpp$(DependSuffix): ../src/main.cpp
 
 $(IntermediateDirectory)/up_src_main.cpp$(PreprocessSuffix): ../src/main.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_main.cpp$(PreprocessSuffix) ../src/main.cpp
+
+$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(ObjectSuffix): ../src/tinyxmlerror.cpp $(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/tinyxmlerror.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(DependSuffix): ../src/tinyxmlerror.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(DependSuffix) -MM ../src/tinyxmlerror.cpp
+
+$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(PreprocessSuffix): ../src/tinyxmlerror.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(PreprocessSuffix) ../src/tinyxmlerror.cpp
 
 $(IntermediateDirectory)/up_src_menu_function.cpp$(ObjectSuffix): ../src/menu_function.cpp $(IntermediateDirectory)/up_src_menu_function.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/menu_function.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_menu_function.cpp$(ObjectSuffix) $(IncludePath)
@@ -191,6 +183,30 @@ $(IntermediateDirectory)/up_src_menu_config.cpp$(DependSuffix): ../src/menu_conf
 $(IntermediateDirectory)/up_src_menu_config.cpp$(PreprocessSuffix): ../src/menu_config.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_menu_config.cpp$(PreprocessSuffix) ../src/menu_config.cpp
 
+$(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix): ../src/socket_telnet.cpp $(IntermediateDirectory)/up_src_socket_telnet.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/socket_telnet.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_socket_telnet.cpp$(DependSuffix): ../src/socket_telnet.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_socket_telnet.cpp$(DependSuffix) -MM ../src/socket_telnet.cpp
+
+$(IntermediateDirectory)/up_src_socket_telnet.cpp$(PreprocessSuffix): ../src/socket_telnet.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_socket_telnet.cpp$(PreprocessSuffix) ../src/socket_telnet.cpp
+
+$(IntermediateDirectory)/up_src_irc_manager.cpp$(ObjectSuffix): ../src/irc_manager.cpp $(IntermediateDirectory)/up_src_irc_manager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/irc_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_irc_manager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_irc_manager.cpp$(DependSuffix): ../src/irc_manager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_irc_manager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_irc_manager.cpp$(DependSuffix) -MM ../src/irc_manager.cpp
+
+$(IntermediateDirectory)/up_src_irc_manager.cpp$(PreprocessSuffix): ../src/irc_manager.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_irc_manager.cpp$(PreprocessSuffix) ../src/irc_manager.cpp
+
+$(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix): ../src/socket_irc.cpp $(IntermediateDirectory)/up_src_socket_irc.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/socket_irc.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_socket_irc.cpp$(DependSuffix): ../src/socket_irc.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_socket_irc.cpp$(DependSuffix) -MM ../src/socket_irc.cpp
+
+$(IntermediateDirectory)/up_src_socket_irc.cpp$(PreprocessSuffix): ../src/socket_irc.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_socket_irc.cpp$(PreprocessSuffix) ../src/socket_irc.cpp
+
 $(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix): ../src/input_handler.cpp $(IntermediateDirectory)/up_src_input_handler.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/input_handler.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_src_input_handler.cpp$(DependSuffix): ../src/input_handler.cpp
@@ -207,14 +223,6 @@ $(IntermediateDirectory)/up_src_screen_buffer.cpp$(DependSuffix): ../src/screen_
 $(IntermediateDirectory)/up_src_screen_buffer.cpp$(PreprocessSuffix): ../src/screen_buffer.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_screen_buffer.cpp$(PreprocessSuffix) ../src/screen_buffer.cpp
 
-$(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix): ../src/telnet_manager.cpp $(IntermediateDirectory)/up_src_telnet_manager.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/telnet_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_telnet_manager.cpp$(DependSuffix): ../src/telnet_manager.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_telnet_manager.cpp$(DependSuffix) -MM ../src/telnet_manager.cpp
-
-$(IntermediateDirectory)/up_src_telnet_manager.cpp$(PreprocessSuffix): ../src/telnet_manager.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_telnet_manager.cpp$(PreprocessSuffix) ../src/telnet_manager.cpp
-
 $(IntermediateDirectory)/up_src_menu_manager.cpp$(ObjectSuffix): ../src/menu_manager.cpp $(IntermediateDirectory)/up_src_menu_manager.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/menu_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_menu_manager.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_src_menu_manager.cpp$(DependSuffix): ../src/menu_manager.cpp
@@ -222,6 +230,14 @@ $(IntermediateDirectory)/up_src_menu_manager.cpp$(DependSuffix): ../src/menu_man
 
 $(IntermediateDirectory)/up_src_menu_manager.cpp$(PreprocessSuffix): ../src/menu_manager.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_menu_manager.cpp$(PreprocessSuffix) ../src/menu_manager.cpp
+
+$(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix): ../src/socket_ssh.cpp $(IntermediateDirectory)/up_src_socket_ssh.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/socket_ssh.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_socket_ssh.cpp$(DependSuffix): ../src/socket_ssh.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_socket_ssh.cpp$(DependSuffix) -MM ../src/socket_ssh.cpp
+
+$(IntermediateDirectory)/up_src_socket_ssh.cpp$(PreprocessSuffix): ../src/socket_ssh.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(PreprocessSuffix) ../src/socket_ssh.cpp
 
 $(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix): ../src/renderer.cpp $(IntermediateDirectory)/up_src_renderer.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/Blue/Desktop/EtherTerm/src/renderer.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix) $(IncludePath)

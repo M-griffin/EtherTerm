@@ -65,6 +65,7 @@ public:
         , m_system_connection(system_connection)
         , m_is_connected(false)
         , m_is_leaving(false)
+        , m_is_shutdown(false)
         , m_cursor_blink(2)
         , m_start_blinking(false)
         , m_ttime(0)
@@ -237,7 +238,7 @@ public:
         }
 
         session_manager_ptr session_mgr = m_weak_session_manager.lock();
-        if(session_mgr)
+        if(session_mgr && !m_is_shutdown)
         {
             if(!error)
             {
@@ -273,6 +274,32 @@ public:
                         std::cout << "Error: m_telnet_manager inaccessable!" << std::endl;
                     }
                 }
+                else if(m_system_connection->protocol == "IRC")
+                {
+                    std::string incoming_data = "";
+                    for(auto c : m_in_data_vector)
+                    {
+                        // Ignore null's
+                        if(c == '\0')
+                        {
+                            break;
+                        }
+                        incoming_data += c;
+                    }
+                    
+                    // TODO Initial Testing, to be moved to irc manager/decoder 
+                    std::cout << "irc: " << incoming_data << std::endl;
+                    m_sequence_decoder->decodeEscSequenceData(incoming_data);   
+
+                    std::string::size_type index = 0;
+                    index = incoming_data.find("PING", 0);
+                    if (index != std::string::npos) {
+                        std::string key = incoming_data.substr(6);
+                        std::cout << "key: " << key << std::endl;
+                        std::string ping_reponse = "PONG :" + key + "\r\n";
+                        deliver(ping_reponse);
+                    }                    
+                }                    
                 else
                 {
                     /** Not in use yet, when time comes change to support m_raw_data_vector
@@ -495,6 +522,13 @@ public:
             {
                 // Pass to the Socket once we have that setup,
                 deliver(input_sequence);
+                
+                if(m_system_connection->protocol == "IRC") 
+                {
+                   // Echo Input, Server doesn't echo input typed by user.
+                   std::cout << "\n *** input: " << input_sequence << std::endl;
+                   m_sequence_decoder->decodeEscSequenceData(input_sequence);
+                }
             }
         }
 
@@ -519,7 +553,7 @@ public:
             toggleBlinkingCursor(false);
         }
 
-        while(!m_data_queue.is_empty())
+        while(!m_data_queue.is_empty() && !m_is_shutdown)
         {
             msgQueue = std::move(m_data_queue.dequeue());
             if(msgQueue.m_text.empty())
@@ -540,7 +574,7 @@ public:
         // Handle Immediate ESC Position Response Sequences
         // Queue all responses and write out as single output.
         std::string esc_response_sequence = "";
-        while (m_write_queue.size() > 0)
+        while (m_write_queue.size() > 0 && !m_is_shutdown)
         {
             esc_response_sequence += m_write_queue.dequeue();
         }
@@ -686,6 +720,7 @@ public:
 
     bool                     m_is_connected;
     bool                     m_is_leaving;
+    bool                     m_is_shutdown;
 
     // Handle Blinking cursor
     int                      m_cursor_blink;

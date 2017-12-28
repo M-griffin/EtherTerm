@@ -22,6 +22,9 @@
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <VirtualDirectory Name="src">
+    <File Name="../src/irc_manager.cpp"/>
+    <File Name="../src/irc_manager.hpp"/>
+    <File Name="../src/socket_irc.cpp"/>
     <File Name="../src/input_handler.cpp"/>
     <File Name="../src/input_handler.hpp"/>
     <File Name="../src/interface.hpp"/>

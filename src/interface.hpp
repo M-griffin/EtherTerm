@@ -212,11 +212,13 @@ public:
 
         // If Telnet Session spawn it, Add Other Instances later on, SSH, IRC, FTP etc..
         // TODO, think this sets up the ansi parser might need to break this out.
-        if(system_connection->protocol == "TELNET" || system_connection->protocol == "SSH")
-        {
+        //if(system_connection->protocol == "TELNET" || system_connection->protocol == "SSH")
+        //{
+            
+            // TODO, right now everything passes through TelnetManager
             std::cout << "Starting TelnetManager in Interface" << std::endl;
             new_session->createTelnetManager();
-        }
+        //}
 
         // Start Async Read/Writes Loop for Session Socket Data.
         // Required only for Sessions that make connections, Local sessions do not use this.

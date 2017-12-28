@@ -61,6 +61,7 @@ bool SDLStartUp()
 
     // Turn off, might make a toggle for this later on.
     SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+    
     return success;
 }
 
