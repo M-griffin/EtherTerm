@@ -98,7 +98,7 @@ To add new systems or remove, you must edit the ``assets/dialdirectory.xml`` fil
 Downloads (Demo Previews)
 =========
 
-- `Windows 0.4.5 (Latest) Preview <https://drive.google.com/file/d/1BP99odKKvjDss2nUJTki3u1I0fRVWf4V/view?usp=sharing>`_
+- `Windows 0.4.6 (Latest) Preview <https://drive.google.com/file/d/1FT94kn7UY1EZ_qy5ICbTqCj2-Dwm290N/view?usp=sharing>`_
 
 - `Windows 0.3.1 Preview <https://drive.google.com/file/d/0ByPPRlSSb7N-dGpGXzV0a3VIN2c/view?usp=sharing>`_
 
