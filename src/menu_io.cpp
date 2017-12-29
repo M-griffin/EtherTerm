@@ -1,5 +1,3 @@
-#include <SDL2/SDL.h>
-
 #include "menu_io.hpp"
 #include "sequence_decoder.hpp"
 

@@ -11,14 +11,13 @@
 
 #ifdef TARGET_OS_MAC
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_net.h>
 #elif _WIN32
 #include <SDL.h>
-#include <SDL_net.h>
 #else
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_net.h>
 #endif
+
+#include <SDL2_net/SDL_net.hpp>
 
 #include <libssh/libssh.h>
 

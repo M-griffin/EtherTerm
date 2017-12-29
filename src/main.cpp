@@ -22,12 +22,12 @@
 
 #elif _WIN32 // Windows
 #include <SDL2/SDL_Main.h>
-#include <SDL_net.h>
 #include <winsock2.h>
 #include <windows.h>
 #else
-#include <SDL2/SDL_net.h>
 #endif
+
+#include <SDL2_net/SDL_net.hpp>
 
 #include <cstdio>
 #include <cstring>

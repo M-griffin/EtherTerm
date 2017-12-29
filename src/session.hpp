@@ -209,7 +209,7 @@ public:
         // Important, clear out buffer before each read.
         // A reference is passed by Session through the IO Service.
         std::vector<unsigned char>().swap(m_in_data_vector);
-        if(m_connection->socket()->isActive())
+        if(m_connection->socket()->isActive() && !m_is_shutdown)
         {
             m_connection->async_read(m_in_data_vector,
                                      std::bind(
@@ -377,7 +377,7 @@ public:
             return;
         }
 
-        if(m_connection->socket()->isActive())
+        if(m_connection->socket()->isActive() && !m_is_shutdown)
         {
             m_connection->async_write(string_msg,
                                       std::bind(
