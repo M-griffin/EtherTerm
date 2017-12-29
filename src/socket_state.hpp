@@ -2,13 +2,10 @@
 #ifndef __MY_SOCKET__H
 #define __MY_SOCKET__H
 
-#ifdef TARGET_OS_MAC
-#include <SDL2/SDL_net.h>
-#elif _WIN32
-#include <SDL_net.h>
+#include <SDL2_net/SDL_net.hpp>
+
+#ifdef _WIN32
 #include <winsock2.h>
-#else
-#include <SDL2/SDL_net.h>
 #endif
 
 #include <libssh/libssh.h>

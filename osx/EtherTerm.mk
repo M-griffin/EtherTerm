@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Admin
-Date                   :=14/12/2017
+Date                   :=29/12/2017
 CodeLitePath           :="/Users/admin/Library/Application Support/codelite"
 LinkerName             :=clang++
 SharedObjectLinkerName :=clang++ -shared -fPIC
@@ -36,12 +36,12 @@ ObjectsFileList        :="EtherTerm.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            :=  
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch).. $(IncludeSwitch)/usr/local/Cellar/sdl2/2.0.7/include $(IncludeSwitch)/usr/local/Cellar/sdl2/2.0.7/include/SDL2 $(IncludeSwitch)/usr/local/Cellar/sdl2_net/2.0.1/include $(IncludeSwitch)/usr/local/Cellar/libssh/0.7.5/include 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch).. $(IncludeSwitch)../src $(IncludeSwitch)/usr/local/Cellar/sdl2/2.0.7/include $(IncludeSwitch)/usr/local/Cellar/sdl2/2.0.7/include/SDL2 $(IncludeSwitch)/usr/local/Cellar/libssh/0.7.5/include 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)SDL2_net $(LibrarySwitch)pthread $(LibrarySwitch)ssh 
-ArLibs                 :=  "SDL2main" "SDL2" "SDL2_net" "pthread" "libssh" 
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch).. $(LibraryPathSwitch)/usr/local/Cellar/sdl2/2.0.7/lib $(LibraryPathSwitch)/usr/local/Cellar/sdl2_net/2.0.1/lib $(LibraryPathSwitch)/usr/local/Cellar/libssh/0.7.5/lib 
+Libs                   := $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)pthread $(LibrarySwitch)ssh 
+ArLibs                 :=  "SDL2main" "SDL2" "pthread" "libssh" 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch). $(LibraryPathSwitch).. $(LibraryPathSwitch)/usr/local/Cellar/sdl2/2.0.7/lib $(LibraryPathSwitch)/usr/local/Cellar/libssh/0.7.5/lib 
 
 ##
 ## Common variables
@@ -62,7 +62,8 @@ AS       := llvm-as
 CodeLiteDir:=/Applications/codelite.app/Contents/SharedSupport/
 Objects0=$(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_link_list.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_function.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_protocol.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_screen_buffer.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinystr.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinyxml.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinyxmlparser.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_window_manager.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) 
+	$(IntermediateDirectory)/up_src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_irc_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetselect.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(ObjectSuffix) \
+	
 
 
 
@@ -212,6 +213,36 @@ $(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix): ../src/socket_
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/socket_telnet.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_src_socket_telnet.cpp$(PreprocessSuffix): ../src/socket_telnet.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_socket_telnet.cpp$(PreprocessSuffix) ../src/socket_telnet.cpp
+
+$(IntermediateDirectory)/up_src_irc_manager.cpp$(ObjectSuffix): ../src/irc_manager.cpp 
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/irc_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_irc_manager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_irc_manager.cpp$(PreprocessSuffix): ../src/irc_manager.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_irc_manager.cpp$(PreprocessSuffix) ../src/irc_manager.cpp
+
+$(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix): ../src/socket_irc.cpp 
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/socket_irc.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_socket_irc.cpp$(PreprocessSuffix): ../src/socket_irc.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_socket_irc.cpp$(PreprocessSuffix) ../src/socket_irc.cpp
+
+$(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(ObjectSuffix): ../src/SDL2_net/SDLnet.cpp 
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/SDL2_net/SDLnet.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(PreprocessSuffix): ../src/SDL2_net/SDLnet.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(PreprocessSuffix) ../src/SDL2_net/SDLnet.cpp
+
+$(IntermediateDirectory)/up_src_SDL2_net_SDLnetselect.cpp$(ObjectSuffix): ../src/SDL2_net/SDLnetselect.cpp 
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/SDL2_net/SDLnetselect.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_SDL2_net_SDLnetselect.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_SDL2_net_SDLnetselect.cpp$(PreprocessSuffix): ../src/SDL2_net/SDLnetselect.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetselect.cpp$(PreprocessSuffix) ../src/SDL2_net/SDLnetselect.cpp
+
+$(IntermediateDirectory)/up_src_SDL2_net_SDLnetTCP.cpp$(ObjectSuffix): ../src/SDL2_net/SDLnetTCP.cpp 
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/SDL2_net/SDLnetTCP.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_SDL2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_SDL2_net_SDLnetTCP.cpp$(PreprocessSuffix): ../src/SDL2_net/SDLnetTCP.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetTCP.cpp$(PreprocessSuffix) ../src/SDL2_net/SDLnetTCP.cpp
+
+$(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(ObjectSuffix): ../src/SDL2_net/SDLnetUDP.cpp 
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/SDL2_net/SDLnetUDP.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(PreprocessSuffix): ../src/SDL2_net/SDLnetUDP.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(PreprocessSuffix) ../src/SDL2_net/SDLnetUDP.cpp
 
 ##
 ## Clean

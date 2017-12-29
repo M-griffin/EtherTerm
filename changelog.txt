@@ -1,4 +1,11 @@
 
+Change Log 0.4.6 - 2017-12-29
+- Include SDL2_net into project, added custom fix for SO_KEEPALIVE so idle
+  chat connections would not lose passed socket handles.  (fe.. MRC Chat on BBSes)
+- Tested new compiles and updated all platform project files, Win32, FreeBSD, Linux, OSX,
+  and ARM which uses the same Linux project but gcc7.x with Arch.
+  Also include new IRC include files while the implementation is a WIP.
+
 Change Log 0.4.5 - 2017-12-28
 - ESC[C Cursor forward will no longer move to next line
 - Added extra shutdown management to session manager so give sessions some time
