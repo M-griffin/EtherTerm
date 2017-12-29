@@ -74,6 +74,17 @@
     <File Name="../src/socket_state.hpp"/>
     <File Name="../src/socket_telnet.cpp"/>
     <File Name="../src/async_connection.hpp"/>
+    <File Name="../src/irc_manager.cpp"/>
+    <File Name="../src/irc_manager.hpp"/>
+    <File Name="../src/socket_irc.cpp"/>
+    <VirtualDirectory Name="SDL2_net">
+      <File Name="../src/SDL2_net/SDL_net.hpp"/>
+      <File Name="../src/SDL2_net/SDLnet.cpp"/>
+      <File Name="../src/SDL2_net/SDLnetselect.cpp"/>
+      <File Name="../src/SDL2_net/SDLnetsys.hpp"/>
+      <File Name="../src/SDL2_net/SDLnetTCP.cpp"/>
+      <File Name="../src/SDL2_net/SDLnetUDP.cpp"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -89,20 +100,18 @@
       <Compiler Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" C_Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value=".."/>
+        <IncludePath Value="../src"/>
         <IncludePath Value="/usr/local/Cellar/sdl2/2.0.7/include"/>
         <IncludePath Value="/usr/local/Cellar/sdl2/2.0.7/include/SDL2"/>
-        <IncludePath Value="/usr/local/Cellar/sdl2_net/2.0.1/include"/>
         <IncludePath Value="/usr/local/Cellar/libssh/0.7.5/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
         <LibraryPath Value=".."/>
         <LibraryPath Value="/usr/local/Cellar/sdl2/2.0.7/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/sdl2_net/2.0.1/lib"/>
         <LibraryPath Value="/usr/local/Cellar/libssh/0.7.5/lib"/>
         <Library Value="SDL2main"/>
         <Library Value="SDL2"/>
-        <Library Value="SDL2_net"/>
         <Library Value="pthread"/>
         <Library Value="libssh"/>
       </Linker>

@@ -1,51 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Session Name="/Users/admin/code/EtherTerm/osx/EtherTerm.workspace">
-  <int Value="1" Name="m_selectedTab"/>
+  <int Value="0" Name="m_selectedTab"/>
   <wxString Value="/Users/admin/code/EtherTerm/osx/EtherTerm.workspace" Name="m_workspaceName"/>
-  <TabInfoArray Name="TabInfoArray">
-    <TabInfo>
-      <wxString Value="/Users/admin/code/EtherTerm/src/interface.hpp" Name="FileName"/>
-      <int Value="98" Name="FirstVisibleLine"/>
-      <int Value="109" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/Users/admin/code/EtherTerm/src/session_manager.cpp" Name="FileName"/>
-      <int Value="120" Name="FirstVisibleLine"/>
-      <int Value="114" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/Users/admin/code/EtherTerm/src/main.cpp" Name="FileName"/>
-      <int Value="74" Name="FirstVisibleLine"/>
-      <int Value="64" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/Users/admin/code/EtherTerm/src/session.hpp" Name="FileName"/>
-      <int Value="595" Name="FirstVisibleLine"/>
-      <int Value="611" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/Users/admin/code/EtherTerm/src/input_handler.hpp" Name="FileName"/>
-      <int Value="28" Name="FirstVisibleLine"/>
-      <int Value="38" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="/Users/admin/code/EtherTerm/src/input_handler.cpp" Name="FileName"/>
-      <int Value="1338" Name="FirstVisibleLine"/>
-      <int Value="1309" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-  </TabInfoArray>
+  <TabInfoArray Name="TabInfoArray"/>
   <SerializedObject Name="m_breakpoints">
     <long Value="0" Name="Count"/>
   </SerializedObject>
