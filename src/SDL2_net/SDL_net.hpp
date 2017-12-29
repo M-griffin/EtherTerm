@@ -31,7 +31,8 @@ typedef uint8_t Uint8;
 typedef uint16_t Uint16;
 typedef uint32_t Uint32;
 
-typedef struct SDLNet_version {
+typedef struct SDLNet_version
+{
     Uint8 major;
     Uint8 minor;
     Uint8 patch;
@@ -64,11 +65,11 @@ extern "C" {
  * version of the SDL_net library.
  */
 #define SDL_NET_VERSION(X)                          \
-{                                                   \
-    (X)->major = SDL_NET_MAJOR_VERSION;             \
-    (X)->minor = SDL_NET_MINOR_VERSION;             \
-    (X)->patch = SDL_NET_PATCHLEVEL;                \
-}
+    {                                                   \
+        (X)->major = SDL_NET_MAJOR_VERSION;             \
+        (X)->minor = SDL_NET_MINOR_VERSION;             \
+        (X)->patch = SDL_NET_PATCHLEVEL;                \
+    }
 
 /**
  *  This is the version number macro for the current SDL_net version.
@@ -99,7 +100,8 @@ void SDLCALL SDLNet_Quit(void);
 /* IPv4 hostname resolution API                                        */
 /***********************************************************************/
 
-typedef struct {
+typedef struct
+{
     Uint32 host;            /* 32-bit IPv4 host address */
     Uint16 port;            /* 16-bit protocol port */
 } IPaddress;
@@ -191,7 +193,8 @@ void SDLCALL SDLNet_TCP_Close(TCPsocket sock);
 #define SDLNET_MAX_UDPADDRESSES 4
 
 typedef struct _UDPsocket *UDPsocket;
-typedef struct {
+typedef struct
+{
     int channel;        /* The src/dst channel of the packet */
     Uint8 *data;        /* The packet data */
     int len;            /* The length of the packet data */
@@ -309,7 +312,8 @@ void SDLCALL SDLNet_UDP_Close(UDPsocket sock);
 typedef struct _SDLNet_SocketSet *SDLNet_SocketSet;
 
 /* Any network socket can be safely cast to this socket type */
-typedef struct _SDLNet_GenericSocket {
+typedef struct _SDLNet_GenericSocket
+{
     int ready;
 } *SDLNet_GenericSocket;
 
@@ -449,6 +453,6 @@ SDL_FORCE_INLINE Uint32 _SDLNet_Read32(const void *areap)
 #ifdef __cplusplus
 }
 #endif
-#include "close_code.h"
+//#include "close_code.h"
 
 #endif /* SDL_NET_H_ */
