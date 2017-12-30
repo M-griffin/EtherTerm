@@ -301,6 +301,7 @@ int SSH_Socket::verify_knownhost()
             std::cout << "Could not find known host file." << std::endl;
             std::cout << "If you accept the host key here, the file will be"
                       << "automatically created." << std::endl;
+            [[gnu::fallthrough]]; // c++11 and c++14
 
         /* fallback to SSH_SERVER_NOT_KNOWN behavior */
         case SSH_SERVER_NOT_KNOWN:
