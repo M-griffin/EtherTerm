@@ -3,6 +3,8 @@
 .. image:: http://htc.zapto.org:1024/jenkins/job/EtherTerm/badge/icon?png
     :target: https://htc.zapto.org/jenkins/job/EtherTerm/
     
+    Testing web hook.
+    
 4.0 Demo Branch is now the latest branch work in progress with a rewrite and reintegration of SSH.
 ===============
 You can follow the latest updates and work in the ``feature/0.4.0-alpha`` branch.  As updates and changes are made stable pull requests will merge the updates back to the master branch.
