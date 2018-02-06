@@ -12,7 +12,7 @@ pipeline {
 	stages {
 		stage('\u2776 Checkout') {
 			 steps {
-				echo "\u2600 BUILD_URL=${env.BUILD_URL}"
+				//echo "\u2600 BUILD_URL=${env.BUILD_URL}"
 
 				//def workspace = pwd()
 				//echo "\u2600 workspace=${workspace}"
@@ -22,10 +22,10 @@ pipeline {
 
 		stage('\u2777 MakeFile') {
 			 steps {
-				echo 'Update Makefile..'
+				//echo 'Update Makefile..'
 				dir 'linux'
-				sh 'ls -alh'
-				sh 'pwd'
+				//sh 'ls -alh'
+				//sh 'pwd'
 				sh '''sed -i 's+/home/blue/code/EtherTerm/src/+../src/+' EtherTerm.mk'''
 				sh '''sed -i 's+/home/merc/code/EtherTerm/src/+../src/+' EtherTerm.mk'''
 			 }
@@ -33,7 +33,8 @@ pipeline {
 
 		stage('\u2777 Build') {
 			 steps {
-				echo 'Building..'
+				//echo 'Building..'
+				dir 'linux'
 				sh 'make clean'
 				sh 'make -j3'
 			 }
