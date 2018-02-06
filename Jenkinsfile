@@ -20,18 +20,21 @@ try {
 
 		}
 
-		stage('\u2777 Build') {
+		stage('\u2777 MakeFile') {
 
 				echo 'Update Makefile..'
 				dir "linux"
-				sh "ls -alh"
-				sh "pwd"
-				sh "sed -i 's+/home/blue/code/EtherTerm/src/+../src/+' EtherTerm.mk"
-				sh "sed -i 's+/home/merc/code/EtherTerm/src/+../src/+' EtherTerm.mk"
-				sh "make clean"
+				run "ls -alh"
+				run "pwd"
+				run "sed -i 's+/home/blue/code/EtherTerm/src/+../src/+' EtherTerm.mk"
+				run "sed -i 's+/home/merc/code/EtherTerm/src/+../src/+' EtherTerm.mk"
+				run "make clean"
+		}
+		
+		stage('\u2777 Build') {
 
 				echo 'Building..'
-				sh "make -j3"
+				run "make -j3"
 		}
 
 		echo "done!"				
