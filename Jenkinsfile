@@ -17,13 +17,13 @@ pipeline {
 	        }
 		
 		stage('\u2776 Build') {
-			 steps {
-								
+			 steps {								
 				sh '''sed -i 's+/home/blue/code/EtherTerm/src/+../src/+' linux/EtherTerm.mk'''
 				sh '''sed -i 's+/home/merc/code/EtherTerm/src/+../src/+' linux/EtherTerm.mk'''
-				dir 'linux'
-				sh 'make -f linux/Makefile clean'
-				sh 'make -f linux/Makefile -j3'
+				dir ('linux') {
+					sh 'make -f linux/Makefile clean'
+					sh 'make -f linux/Makefile -j3'
+				}
 			 }
 		}
 	}
