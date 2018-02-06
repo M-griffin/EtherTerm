@@ -1,4 +1,7 @@
-node {
+import jenkins.model.*
+jenkins = Jenkins.instance
+
+node('EtherTerm') {
 	agent any	
 	echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
 	
