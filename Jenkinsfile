@@ -1,25 +1,17 @@
-import jenkins.model.*
-jenkins = Jenkins.instance
+#!/usr/bin/env groovy
 
-node('EtherTerm') {
-	agent any	
-	echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL}"
-	
-	stages {	
-		stage('Build') {
-			steps {
-				echo 'Running Checkout..'
-				checkout scm
-				
-				echo 'Update Makefile..'
-				sh "cd linux"
-				sh "sed -i 's+/home/blue/code/EtherTerm/src/+../src/+ EtherTerm.mk'"
-				sh "sed -i 's+/home/merc/code/EtherTerm/src/+../src/+ EtherTerm.mk'"
-				sh "make clean"
-				
-				echo 'Building..'
-				sh "make -j3"
-			}
+pipeline {
+	agent any
+	stages {
+		stage('\u2776 Build') {
+			 steps {								
+				sh '''sed -i 's+/home/blue/code/EtherTerm/src/+../src/+' linux/EtherTerm.mk'''
+				sh '''sed -i 's+/home/merc/code/EtherTerm/src/+../src/+' linux/EtherTerm.mk'''
+				dir ('linux') {
+					sh 'make -f Makefile clean'
+					sh 'make -f Makefile -j3'
+				}
+			 }
 		}
 	}
 }
