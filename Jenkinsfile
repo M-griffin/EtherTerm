@@ -16,7 +16,7 @@ pipeline {
 
 				//def workspace = pwd()
 				//echo "\u2600 workspace=${workspace}"
-				checkout scm
+				//checkout scm
 			 }
 		}
 
