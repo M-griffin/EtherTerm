@@ -14,14 +14,15 @@ try {
  
 		def workspace = pwd()
 		echo "\u2600 workspace=${workspace}"
- 
-		stage '\u2777 Stage 2'
 		checkout scm
-		
+ 
+		stage '\u2777 Stage 2'				
 		echo 'Update Makefile..'
 		sh "cd linux"
-		sh "sed -i 's+/home/blue/code/EtherTerm/src/+../src/+ EtherTerm.mk'"
-		sh "sed -i 's+/home/merc/code/EtherTerm/src/+../src/+ EtherTerm.mk'"
+		sh "ls -alh"
+		sh "pwd"
+		sh "sed -i 's+/home/blue/code/EtherTerm/src/+../src/+' EtherTerm.mk"
+		sh "sed -i 's+/home/merc/code/EtherTerm/src/+../src/+' EtherTerm.mk"
 		sh "make clean"
 
 		echo 'Building..'
