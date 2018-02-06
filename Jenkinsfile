@@ -10,7 +10,7 @@ import java.net.URL
 try {
 	node {
 		stage '\u2776 Stage 1'
-		steps {
+		step {
 			echo "\u2600 BUILD_URL=${env.BUILD_URL}"
 
 			def workspace = pwd()
@@ -19,7 +19,7 @@ try {
 		}
  
 		stage '\u2777 Stage 2'				
-		steps {
+		step {
 			echo 'Update Makefile..'
 			dir "linux"
 			sh "ls -alh"
