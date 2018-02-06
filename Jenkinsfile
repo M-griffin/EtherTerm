@@ -10,35 +10,31 @@ import java.net.URL
 try {
 	node {
 		
-			stage('\u2776 Stage 1') {
-		
-					echo "\u2600 BUILD_URL=${env.BUILD_URL}"
+		stage('\u2776 Checkout') {
 
-					def workspace = pwd()
-					echo "\u2600 workspace=${workspace}"
-					checkout scm
-		
-			}
+				echo "\u2600 BUILD_URL=${env.BUILD_URL}"
 
-			stage('\u2777 Stage 2') {
-		
-					echo 'Update Makefile..'
-					dir "linux"
-					sh "ls -alh"
-					sh "pwd"
-					sh "sed -i 's+/home/blue/code/EtherTerm/src/+../src/+' EtherTerm.mk"
-					sh "sed -i 's+/home/merc/code/EtherTerm/src/+../src/+' EtherTerm.mk"
-					sh "make clean"
+				def workspace = pwd()
+				echo "\u2600 workspace=${workspace}"
+				checkout scm
 
-					echo 'Building..'
-					sh "make -j3"
-		
-			}
-		
-			echo "done!"
 		}
-		
-		
+
+		stage('\u2777 Build') {
+
+				echo 'Update Makefile..'
+				dir "linux"
+				sh "ls -alh"
+				sh "pwd"
+				sh "sed -i 's+/home/blue/code/EtherTerm/src/+../src/+' EtherTerm.mk"
+				sh "sed -i 's+/home/merc/code/EtherTerm/src/+../src/+' EtherTerm.mk"
+				sh "make clean"
+
+				echo 'Building..'
+				sh "make -j3"
+		}
+
+		echo "done!"				
 		
 	} // node
 } // try end
