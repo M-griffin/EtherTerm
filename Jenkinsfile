@@ -18,7 +18,7 @@ try {
  
 		stage '\u2777 Stage 2'				
 		echo 'Update Makefile..'
-		sh "cd linux"
+		dir "linux"
 		sh "ls -alh"
 		sh "pwd"
 		sh "sed -i 's+/home/blue/code/EtherTerm/src/+../src/+' EtherTerm.mk"
