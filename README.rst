@@ -158,6 +158,7 @@ Acknowledgments and Thanks
 - `haliphax <https://github.com/haliphax>`_: Testing and bug reports.
 - `hellbeard <https://github.com/ericolito>`_: Testing and bug reports.
 
+License
 =======
 
 EtherTerm is available under the zlib license :
