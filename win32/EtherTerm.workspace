@@ -6,14 +6,19 @@
   </Environment>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Environment/>
       <Project Name="EtherTerm" ConfigName="Debug"/>
       <Project Name="UnitTests" ConfigName="Debug"/>
       <Project Name="InputTest" ConfigName="Debug"/>
+      <Project Name="unittest" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Environment/>
       <Project Name="EtherTerm" ConfigName="Release"/>
       <Project Name="UnitTests" ConfigName="Release"/>
       <Project Name="InputTest" ConfigName="Release"/>
+      <Project Name="unittest" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
+  <Project Name="unittest" Path="../unittest/unittest.project" Active="No"/>
 </CodeLite_Workspace>

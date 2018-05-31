@@ -163,7 +163,9 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
                         event.window.windowID);
 
                 if(!m_globalShutdown)
+                {
                     SDL_StartTextInput();
+                }
 
                 // Mark the current window as active.
                 session_ptr session = m_weak_session.lock();
@@ -179,7 +181,10 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
                         event.window.windowID);
 
                 if(!m_globalShutdown)
+                {
                     SDL_StopTextInput();
+                }
+
                 // Mark the current window as inactive.
                 session_ptr session = m_weak_session.lock();
                 if(session)
@@ -408,16 +413,41 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
     switch(event.key.keysym.sym)
     {
         case 'h': // ALT H - Hangup
+            if(!m_globalShutdown)
             {
                 session_ptr session = m_weak_session.lock();
-                if(session)
+                if(session && !session->m_is_dial_directory)
                 {
-                    // Clear and redraw the screen (remove selection box).
-                    session->m_connection->close();
+                    m_globalShutdown = true;
+                    session->closeThisSession();
                 }
-                return false;
             }
+            return false;
 
+		case 'd': // ALT D - Start Download
+            if(!m_globalShutdown)
+            {
+                session_ptr session = m_weak_session.lock();
+                if(session && !session->m_is_dial_directory)
+                {
+                    // Start External Protocol Session
+                    if (session->m_is_transfer) {
+                        std::cout << "ALT - D [End Download]" << std::endl;
+                        session->m_is_transfer = false;
+
+                        // Important need to reset the socket back to async to receive.
+                        session->waitForSocketData();
+                    }
+                    else
+                    {
+                        std::cout << "ALT - D [Start Download]" << std::endl;
+                        session->m_protocol->executeProtocols();
+                        session->m_is_transfer = true;
+                    }
+                }
+            }
+            return false;
+			
         case SDLK_RETURN:
             {
                 session_ptr session = m_weak_session.lock();

@@ -1,4 +1,8 @@
 
+Change Log 0.4.7 - 2018-04-07
+- Re-Added Back Protocol for testing downloads. WIP.
+- Added back pulling screen size 80x25, 80x50 etc.. from Dialing Directory.
+
 Change Log 0.4.6 - 2017-12-29
 - Include SDL2_net into project, added custom fix for SO_KEEPALIVE so idle
   chat connections would not lose passed socket handles.  (fe.. MRC Chat on BBSes)

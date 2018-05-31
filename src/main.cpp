@@ -1,27 +1,10 @@
 
-/**
- * EtherTerm (c) 2014-2018 Michael Griffin <mrmisticismo@hotmail.com>
- * An Emulated Client Terminal in SDL 2.0 supporting Telnet and SSH and more.
- * With CP437 Character and ANSI Graphics Support.
+/*
+ *  EtherTerm (c) 2014-2018 Michael Griffin <mrmisticismo@hotmail.com>
+ *  An Emulated Client Terminal in SDL 2.0
+ *  With CP437 Character and ANSI Graphics Support.
  *
- * Linker Options: -mwindows to remove Console Debug Window (WIN32)
- *
- * EtherTerm is available under the zlib license :
- * This software is provided 'as-is', without any express or implied
- * warranty.  In no event will the authors be held liable for any damages
- * arising from the use of this software.
- *
- * Permission is granted to anyone to use this software for any purpose,
- * including commercial applications, and to alter it and redistribute it
- * freely, subject to the following restrictions:
- *
- * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software. If you use this software
- *    in a product, an acknowledgment in the product documentation would be
- *    appreciated but is not required.
- * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.
- * 3. This notice may not be removed or altered from any source distribution.
+ *  Linker Options: -mwindows to remove Console Debug Window (WIN32)
  *
  */
 
@@ -78,7 +61,7 @@ bool SDLStartUp()
 
     // Turn off, might make a toggle for this later on.
     SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
-
+    
     return success;
 }
 
@@ -181,7 +164,7 @@ int main(int argc, char* argv[])
      * For automation and testing
      */
 
-    // Setup the interface for spawning session windows.
+    // Setup the interface for spawning session windows.	
 	// Using Smart Pointer will clear final allocation prior to full exit of system.
 	{
 		interface_ptr interface_spawn(new Interface(realPath));
@@ -210,7 +193,7 @@ int main(int argc, char* argv[])
 			interface_spawn->startup();
 		}
 	}
-
+	
 	// SDL is done.
 	std::cout << "EtherTerm Shutdown completed." << std::endl;
 	SDL_Quit();

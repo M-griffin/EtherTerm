@@ -8,7 +8,11 @@
 #include <sstream>
 #include <memory>
 
-
+/**
+ * TODO
+ * @brief Notes m_term_width needs to replace checks for 80, and m_term_width+1 for 81.
+ * When the time is available to do testing on forced and default screen wrapping.
+ */
 SequenceParser::SequenceParser(renderer_ptr renderer, connection_ptr connection)
     : m_renderer(renderer)
     , m_connection(connection)
@@ -123,9 +127,20 @@ void SequenceParser::textInput(const std::string &buffer)
         // Debugging!
         //std::cout << "sequence: " << sequence << " "
         //  << static_cast<int>(sequence) << std::endl;
+        
+        // Char 12 is the same as Clear Screen. lets handle it.
+        if(static_cast<int>(sequence) == 12)
+        {
+            m_renderer->clearScreenSurface();
+            m_screen_buffer.clearScreenBuffer();
+            m_is_cleared_the_screen = true;
+            m_screen_buffer.m_x_position = 1;
+            m_screen_buffer.m_y_position = 1;
+            continue;
+        }
 
         // Back Space
-        if(sequence == '\b')
+        if(sequence == '\b' || sequence == '\x08')
         {
             //std::cout << "backspace: " << std::endl;
             if(m_screen_buffer.m_x_position > 1)
@@ -157,7 +172,6 @@ void SequenceParser::textInput(const std::string &buffer)
                 //screen_buff.color_sequence += "\x1b[40m";
                 //screenbuffer('\r');
             }
-
 
             // Check here if we need to scroll the screen up 1 row.
             if(m_screen_buffer.m_y_position > m_renderer->m_term_height ||
@@ -198,6 +212,7 @@ void SequenceParser::textInput(const std::string &buffer)
             // But also move down a second line!
             if(m_screen_buffer.m_x_position == 81)
             {
+                // NOTE Shouldn't get here anymore!
                 ++m_screen_buffer.m_y_position;
             }
 
@@ -217,6 +232,7 @@ void SequenceParser::textInput(const std::string &buffer)
             // But also move down a second line!
             if(m_screen_buffer.m_x_position == 81)
             {
+                // NOTE Shouldn't get here anymore.
                 ++m_screen_buffer.m_y_position;
             }
 
@@ -359,13 +375,77 @@ void SequenceParser::textInput(const std::string &buffer)
             m_renderer->m_current_bg_color
         );
 
-        // After drawing character send Cursor to Next Position forward.
+        // Update 4/8/2018
+        // If the current char has been writen to the last column
+        // and now were at the one position after, then we need to move
+        // down and left so the next sequence is ready .. and ESC[C to push forward
+        // will be set.
         ++m_screen_buffer.m_x_position;
+        
+        // TODO,  VT100 / Posix leaves cursor on col 81 till next text char comes in to wrap!
+        // Otherwise, telnet ANSI, when hitting the 81, will move down and 1st position for next char to start
+        // Which is AUTO ESC[?7h, grrr
+        // Posix will continure to allow ESC sequence(s) for moving the cusor back to do more stuff after writing
+        // to the 80th column, this would be different of ESC[?7h or not!  check into this more.
+        
+        // This is a mix, some ANSI screen are not setting the code for this properly!
+        if (m_screen_buffer.m_x_position == 81 && m_is_line_wrapped) 
+        {
+            m_screen_buffer.m_x_position = 1;
+            ++m_screen_buffer.m_y_position;
+        }
     }
 }
 
 /**
- * @brief Handle Screen Position and Display Erase
+ * @brief Handle Screen Position and Display Erase 7/8 Bit Control Sequences.
+ */
+void SequenceParser::sequenceControlCursorAndDisplay()
+{
+    switch(m_parameters[0])
+    {
+        case CTRL_DOWN:        //       'D'   // Control
+            // This should also scroll down the screen keeping same X position
+            if(m_screen_buffer.m_y_position < m_renderer->m_term_height)
+            {                    
+                ++m_screen_buffer.m_y_position;
+            }
+            break;
+        
+        case CTRL_NEWLINE:     //       'E'   // Control
+            // Scroll screen up and make new lines This is more a Form Feed.
+            // Test input should handle scrolling the screen on the next input.
+            //++m_screen_buffer.m_y_position;
+            //m_screen_buffer.m_x_position = 1;
+            
+            // Use Text parse casue it has scrolling all setup.
+            textInput("\r\n");
+            break;
+        
+        case CTRL_PREV_LINE:   //       'M'   // Control
+            // Up, this should scroll the screen up, NOT YET IMPLIMENTED, stop at top!
+            // Keeping same X position
+            if(m_screen_buffer.m_y_position > 1)
+            {
+                --m_screen_buffer.m_y_position;
+            }
+            break;
+        
+        case CTRL_G2_CHAR_SET: //       'N'   // G2 Character Set
+            // not supported yet, but pass through
+            break;
+        
+        case CTRL_G3_CHAR_SET: //       'O'   // G3 Character Set
+            // not supported yet, but pass through
+            break;
+            
+        default:
+            break;
+    }
+}
+
+/**
+ * @brief Handle Screen Position and Display Erase '[' Sequences
  */
 void SequenceParser::sequenceCursorAndDisplay()
 {
@@ -388,6 +468,7 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             if(m_parameters.size() == 2)  // Erase current position, move left x
             {
+                if (m_parameters[1] == 0) m_parameters[1] = 1;
                 m_renderer->renderDeleteCharScreen(
                     m_screen_buffer.m_x_position -1,
                     m_screen_buffer.m_y_position -1,
@@ -407,6 +488,7 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             if(m_parameters.size() == 2)
             {
+                if (m_parameters[1] == 0) m_parameters[1] = 1;
                 std::string string_builder(m_parameters[1], (char)m_preceeding_sequence);
                 textInput(string_builder);
                 break;
@@ -423,6 +505,7 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             if(m_parameters.size() == 2)
             {
+                if (m_parameters[1] == 0) m_parameters[1] = 1;
                 m_screen_buffer.m_x_position = 1;
                 m_screen_buffer.m_y_position = m_parameters[1];
                 break;
@@ -439,6 +522,7 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else if(m_parameters.size() == 2)
             {
+                if (m_parameters[1] == 0) m_parameters[1] = 1;
                 m_screen_buffer.m_y_position = m_parameters[1];
                 m_screen_buffer.m_x_position = 1;
                 if(m_screen_buffer.m_y_position > m_renderer->m_term_height)
@@ -454,6 +538,7 @@ void SequenceParser::sequenceCursorAndDisplay()
             // Empty is sent as -1
             else if(m_parameters.size() == 3 && m_parameters[1] == -1)
             {
+                if (m_parameters[2] == 0) m_parameters[2] = 1;
                 m_screen_buffer.m_x_position = m_parameters[2];
                 if(m_screen_buffer.m_x_position > m_renderer->m_term_width)
                 {
@@ -462,6 +547,9 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else
             {
+                if (m_parameters[1] == 0) m_parameters[1] = 1;
+                if (m_parameters[2] == 0) m_parameters[2] = 1;
+                
                 m_screen_buffer.m_y_position = m_parameters[1];
                 m_screen_buffer.m_x_position = m_parameters[2];
 
@@ -493,6 +581,9 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             if(m_parameters.size() == 3)
             {
+                if (m_parameters[1] == 0) m_parameters[1] = 1;
+                if (m_parameters[2] == 0) m_parameters[2] = 1;
+                
                 // Enable scrolling from row1 to row2
                 // Move the cursor to the home position
                 m_renderer->setScrollRegion(
@@ -505,7 +596,27 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             break;
 
-        case CURSOR_PREV_LIVE:
+        // Cursor up an begging of previous line.
+        case CURSOR_PREV_LINE:
+            if(m_parameters.size() == 1)
+            {
+                if(m_screen_buffer.m_y_position > 1)
+                {
+                    --m_screen_buffer.m_y_position;
+                }
+                m_screen_buffer.m_x_position = 1;
+            }
+            else
+            {
+                m_screen_buffer.m_y_position -= m_parameters[1];
+                if(m_screen_buffer.m_y_position < 1)
+                {
+                    m_screen_buffer.m_y_position = 1;
+                }
+                m_screen_buffer.m_x_position = 1;
+            }
+            break;
+        
         case CURSOR_UP:
             if(m_parameters.size() == 1)
             {
@@ -516,6 +627,7 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else
             {
+                if (m_parameters[1] == 0) m_parameters[1] = 1;
                 m_screen_buffer.m_y_position -= m_parameters[1];
                 if(m_screen_buffer.m_y_position < 1)
                 {
@@ -524,7 +636,28 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             break;
 
+        // Next Lile is like CRLF down then beggining.
         case CURSOR_NEXT_LINE:
+            if(m_parameters.size() == 1)
+            {
+                if(m_screen_buffer.m_y_position < m_renderer->m_term_height)
+                {
+                    ++m_screen_buffer.m_y_position;
+                    m_screen_buffer.m_x_position = 1;
+                }
+            }
+            else
+            {
+                if (m_parameters[1] == 0) m_parameters[1] = 1;
+                m_screen_buffer.m_y_position += m_parameters[1];
+                if(m_screen_buffer.m_y_position > m_renderer->m_term_height)
+                {
+                    m_screen_buffer.m_y_position = m_renderer->m_term_height;
+                }
+                m_screen_buffer.m_x_position = 1;
+            }
+            break;
+            
         case CURSOR_DOWN:
             if(m_parameters.size() == 1)
             {
@@ -535,6 +668,7 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else
             {
+                if (m_parameters[1] == 0) m_parameters[1] = 1;
                 m_screen_buffer.m_y_position += m_parameters[1];
                 if(m_screen_buffer.m_y_position > m_renderer->m_term_height)
                 {
@@ -557,6 +691,7 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else
             {
+                if (m_parameters[1] == 0) m_parameters[1] = 1; 
                 m_screen_buffer.m_x_position += m_parameters[1];
                 // Some programs push ESC[C past the end
                 // of the line and expect us to loop and move
@@ -580,6 +715,7 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else if(m_parameters.size() == 2)
             {
+                if (m_parameters[1] == 0) m_parameters[1] = 1; 
                 m_screen_buffer.m_x_position -= m_parameters[1];
                 if(m_screen_buffer.m_x_position < 1)
                 {
@@ -676,6 +812,7 @@ void SequenceParser::sequenceCursorAndDisplay()
                 m_screen_buffer.m_x_position = 1;
             else
             {
+                if (m_parameters[1] == 0) m_parameters[1] = 1; 
                 m_screen_buffer.m_x_position = m_parameters[1];
                 if(m_screen_buffer.m_x_position < 1)
                 {
@@ -1616,7 +1753,36 @@ void SequenceParser::sequenceGraphicsModeDisplay()
 void SequenceParser::sequenceResetAndResponses()
 {
     switch(m_parameters[0])
-    {
+    {        
+        case TERMINAL_ATTRIBUTES: // ESC[0c
+            std::cout << "TERMINAL_ATTRIBUTES 1: " <<  m_parameters.size() << std::endl;
+            std::cout << "TERMINAL_ATTRIBUTES 2 : " <<  m_parameters[0] << " " << m_parameters[1] << std::endl;
+            if (m_parameters.size() == 2 && m_parameters[0] == 'c' && m_parameters[1] == 0)
+            {
+                std::cout << "TERMINAL_IDENTITY 3: " <<  m_parameters[2] << std::endl;                
+                std::stringstream stm;
+                std::string       buf;
+
+                // \x1b[?1;0c  // Putty does \e1b[?6c
+                stm << "\x1b[?1;0c";
+                buf = stm.str();
+
+                // Grab an instance of the session and socket connection.
+                session_ptr session = m_renderer->m_weak_session.lock();
+                if (session)
+                {
+                    if(session->m_connection->is_open() && session->m_is_connected)
+                    {
+                        session->deliverEscResponseSequence(buf);
+                    }
+                    else
+                    {
+                        std::cout << "Error: TERMINAL_IDENTITY ESC[?1;0c Reply()" << std::endl;
+                    }
+                }
+            }
+            break;
+        
         case SET_MODE: // [?h
             if(m_parameters.size() == 3 && m_parameters[1] == '?')
             {
@@ -1731,73 +1897,105 @@ void SequenceParser::sequenceInput(std::vector<int> &sequenceParameters)
                   << e.what() << std::endl;
     }
 
-    // Handle Character set conversions
+    // Top Level Control Char after ESC ie.. '[' and 7/8 Bit Control Chars.
     switch(m_parameters[0])
     {
-            // Catch Character Set Switching that is not supported
-            // just yet, pass through these sequences.
-        case '%':
-        case '(':
-        case ')':
-            std::cout << "CharSet Change: "
-                      << m_parameters[0] << std::endl;
-            return;
+        case CTRL_SEQUENCE: // '['
+            // Handle Character set conversions
+            m_parameters.erase(m_parameters.begin());
+            
+            switch(m_parameters[0])
+            {
+                    // Catch Character Set Switching that is not supported
+                    // just yet, pass through these sequences.
+                case '%':
+                case '(':
+                case ')':
+                    std::cout << "CharSet Change: "
+                              << m_parameters[1] << std::endl;
+                    return;
+                    
+                default:
+                    break;
+            }
+
+
+            // First Handle Any Cursor Movement and Re-display Attributes
+            switch(m_parameters[0])
+            {
+                case DELETE_CHARACTER:
+                case LINE_POS_ABSOLUTE:
+                case REPEAT_CHARACTER:
+                case CURSOR_POSITION:
+                case CURSOR_POSITION_ALT:
+                case SCROLL_REGION:
+                case CURSOR_PREV_LINE:
+                case CURSOR_UP:
+                case CURSOR_NEXT_LINE:
+                case CURSOR_DOWN:
+                case CURSOR_FORWARD:
+                case CURSOR_BACKWARD:
+                case SAVE_CURSOR_POS:
+                case RESTORE_CURSOR_POS:
+                case CURSOR_X_POSITION:
+                case ERASE_DISPLAY:
+                case ERASE_TO_EOL:
+                    sequenceCursorAndDisplay();
+                    std::vector<int>().swap(m_parameters);
+                    return;
+                    
+                default :
+                    break;
+            }
+
+            // Next Handle Graphic Mode Changes
+            // Switch on Sequence Terminator
+            switch(m_parameters[0])
+            {
+                case SET_GRAPHICS_MODE:
+                    sequenceGraphicsModeDisplay();
+                    std::vector<int>().swap(m_parameters);
+                    return;
+                    
+                default:
+                    break;
+            }
+
+            // Catch Mode Reset and Responses back to Server
+            switch(m_parameters[0])
+            {
+                case TERMINAL_ATTRIBUTES:
+                case RESET_MODE:
+                case SET_MODE:
+                case SET_KEYBOARD_STRINGS:
+                case ANSI_DETECTION:
+                    sequenceResetAndResponses();
+                    std::vector<int>().swap(m_parameters);
+                    return;
+                    
+                default:
+                    break;
+            }
+            break;
+
+        // Else Handle Control Sequences
         default:
-            break;
-    }
-
-
-    // First Handle Any Cursor Movement and Re-display Attributes
-    switch(m_parameters[0])
-    {
-        case DELETE_CHARACTER:
-        case LINE_POS_ABSOLUTE:
-        case REPEAT_CHARACTER:
-        case CURSOR_POSITION:
-        case CURSOR_POSITION_ALT:
-        case SCROLL_REGION:
-        case CURSOR_PREV_LIVE:
-        case CURSOR_UP:
-        case CURSOR_NEXT_LINE:
-        case CURSOR_DOWN:
-        case CURSOR_FORWARD:
-        case CURSOR_BACKWARD:
-        case SAVE_CURSOR_POS:
-        case RESTORE_CURSOR_POS:
-        case CURSOR_X_POSITION:
-        case ERASE_DISPLAY:
-        case ERASE_TO_EOL:
-            sequenceCursorAndDisplay();
-            std::vector<int>().swap(m_parameters);
-            return;
-        default :
-            break;
-    }
-
-    // Next Handle Graphic Mode Changes
-    // Switch on Sequence Terminator
-    switch(m_parameters[0])
-    {
-        case SET_GRAPHICS_MODE:
-            sequenceGraphicsModeDisplay();
-            std::vector<int>().swap(m_parameters);
-            return;
-        default:
-            break;
-    }
-
-    // Catch Mode Reset and Responses back to Server
-    switch(m_parameters[0])
-    {
-        case RESET_MODE:
-        case SET_MODE:
-        case SET_KEYBOARD_STRINGS:
-        case ANSI_DETECTION:
-            sequenceResetAndResponses();
-            std::vector<int>().swap(m_parameters);
-            return;
-        default:
-            break;
+            switch(m_parameters[0]) 
+            {
+                case CTRL_DOWN:        //       'D'   // Control
+                case CTRL_NEWLINE:     //       'E'   // Control
+                case CTRL_PREV_LINE:   //       'M'   // Control
+                case CTRL_G2_CHAR_SET: //       'N'   // G2 Character Set
+                case CTRL_G3_CHAR_SET: //       'O'   // G3 Character Set
+                    sequenceControlCursorAndDisplay();
+                    std::vector<int>().swap(m_parameters);
+                    return;                
+                    
+                default: 
+                    break;
+            }
+            break;        
+        
     }
 
     // Free and Clear!

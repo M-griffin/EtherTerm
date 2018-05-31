@@ -2,7 +2,7 @@
 
 .. image:: http://htc.zapto.org:1024/jenkins/job/EtherTerm/badge/icon?png
     :target: https://htc.zapto.org/jenkins/job/EtherTerm/
-
+    
 4.0 Demo Branch is now the latest branch work in progress with a rewrite and reintegration of SSH.
 ===============
 You can follow the latest updates and work in the ``feature/0.4.0-alpha`` branch.  As updates and changes are made stable pull requests will merge the updates back to the master branch.
@@ -11,7 +11,7 @@ You can follow the latest updates and work in the ``feature/0.4.0-alpha`` branch
 The removal of Boost libs will be replaced with standard **C++11** functionally instead.  The build and project files are currently in the process of being rewritten and separated in folders by environment/os.
 
 
-The previous 3.0 Demo branch is a fork and rewrite of the internals for EtherTerm.  This version differs a bit as asynchronous sockets were added along with the ability to open several connections in their own windows.  Other telnet option fixes and updates to the terminal have also been added along with some pre-testing of file upload/downloads.  Still very raw (Dialing Directory is still unfinished.  This more of a POC (Proof of concept) rewrite to see what can be done differently.   Also some rendering changes were made and are in testing such as recolor blocks using alpha channels for a slight speed up.  ``Note`` the 3.x branch had some experimental stuff I was testing,  right now I've had to roll back several commits and some things are disabled until I get time to fix and re-implement them.  Mainly input fields for SSH Connections.
+The previous 3.0 Demo branch is a fork and rewrite of the internals for EtherTerm.  This version differs a bit as asynchronous sockets were added along with the ability to open several connections in their own windows.  Other telnet option fixes and updates to the terminal have also been added along with some pre-testing of file upload/downloads.  Still very raw (Dialing Directory is still unfinished.  This more of a POC (Proof of concept) rewrite to see what can be done differently.   Also some rendering changes were made and are in testing such as recolor blocks using alpha channels for a slight speed up.  ``Note`` the 3.x branch had some experimental stuff I was testing,  right now I've had to roll back several commits and some things are disabled until I get time to fix and re-implement them.  Mainly input fields for SSH Connections.  
 
 **Please keep in mind this is Alpha Software and is very much a work in progress.**
 
@@ -157,23 +157,3 @@ Acknowledgments and Thanks
 - IceDevil: Testing and bug reports.
 - `haliphax <https://github.com/haliphax>`_: Testing and bug reports.
 - `hellbeard <https://github.com/ericolito>`_: Testing and bug reports.
-
-License
-=======
-
-EtherTerm is available under the zlib license :
-This software is provided 'as-is', without any express or implied
-warranty.  In no event will the authors be held liable for any damages
-arising from the use of this software.
-
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not
-   claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
-3. This notice may not be removed or altered from any source distribution.

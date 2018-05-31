@@ -58,12 +58,6 @@
     <File Name="../src/telnet_manager.cpp"/>
     <File Name="../src/telnet_manager.hpp"/>
     <File Name="../src/texture.hpp"/>
-    <File Name="../src/tinystr.cpp"/>
-    <File Name="../src/tinystr.hpp"/>
-    <File Name="../src/tinyxml.cpp"/>
-    <File Name="../src/tinyxml.hpp"/>
-    <File Name="../src/tinyxmlerror.cpp"/>
-    <File Name="../src/tinyxmlparser.cpp"/>
     <File Name="../src/window_manager.cpp"/>
     <File Name="../src/window_manager.hpp"/>
     <File Name="../src/io_service.cpp"/>
@@ -85,6 +79,26 @@
       <File Name="../src/SDL2_net/SDLnetUDP.cpp"/>
     </VirtualDirectory>
     <File Name="../src/socket_irc.cpp"/>
+    <VirtualDirectory Name="TinyXml">
+      <File Name="../src/TinyXml/tinystr.cpp"/>
+      <File Name="../src/TinyXml/tinystr.hpp"/>
+      <File Name="../src/TinyXml/tinyxml.cpp"/>
+      <File Name="../src/TinyXml/tinyxml.hpp"/>
+      <File Name="../src/TinyXml/tinyxmlerror.cpp"/>
+      <File Name="../src/TinyXml/tinyxmlparser.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="UtfCpp">
+      <File Name="../src/UtfCpp/utf8.h"/>
+      <VirtualDirectory Name="utf8">
+        <File Name="../src/UtfCpp/utf8/checked.h"/>
+        <File Name="../src/UtfCpp/utf8/core.h"/>
+        <File Name="../src/UtfCpp/utf8/unchecked.h"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+    <File Name="../src/session_io.cpp"/>
+    <File Name="../src/session_io.hpp"/>
+    <File Name="../src/common_io.cpp"/>
+    <File Name="../src/common_io.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -97,7 +111,7 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" C_Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall" C_Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value=".."/>
         <IncludePath Value="../src"/>
@@ -110,7 +124,6 @@
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
-      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="Default" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -150,7 +163,6 @@
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
-      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>

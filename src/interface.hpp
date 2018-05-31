@@ -2,10 +2,12 @@
 #define INTERFACE_HPP
 
 #include "session.hpp"
+#include "session_io.hpp"
 #include "session_manager.hpp"
 #include "socket_handler.hpp"
 #include "io_service.hpp"
 
+#include <sstream>
 #include <iostream>
 #include <thread>
 #include <set>
@@ -127,7 +129,7 @@ public:
                 }
 
                 // Delay for CPU Usage, 10 ms is pretty good.
-                SDL_Delay(10);
+                SDL_Delay(15);
 
             }
             catch(std::exception &e)
@@ -166,6 +168,41 @@ public:
         // Start the Dialing Directory on the local instance
         new_session->startMenuInstance();
     }
+    /**
+     * @brief Template for String to Integer.
+     * @param Text
+     * @return
+     */
+    template <typename T>
+    T stringToNumber ( const std::string &Text )
+    {
+        std::istringstream ss(Text);
+        T result;
+        return ss >> result ? result : 0;
+    }
+
+
+    /**
+     * @brief Parses the SystemConnection and Sets Hight and Width
+     * @param height
+     * @param width
+     */
+    void parseTermSize(std::string termSize, int &height, int &width)
+    {
+        std::string::size_type index = termSize.find("x", 0);
+
+        if (index != std::string::npos)
+        {
+            std::string str_width = termSize.substr(0, index);
+            std::cout << "termSize Width: " << str_width << std::endl;
+            width = stringToNumber<int>(str_width);
+
+
+            std::string str_height = termSize.substr(index+1);
+            std::cout << "termSize Height: " << str_height << std::endl;
+            height = stringToNumber<int>(str_height);
+        }
+    }
 
     /**
      * @brief Spawn Connection Sessions
@@ -195,6 +232,8 @@ public:
         // Hard Coded for testing, move this to direcotry.ini!
         int height = 25;
         int width = 80;
+
+        parseTermSize(system_connection->termSize, height, width);
 
         // Create the Session before passing to the Connection (Async Thread)
         session_ptr new_session = Session::create(
@@ -228,6 +267,13 @@ public:
 
         // Start Blinking Cursor for Active connection session.
         new_session->m_sequence_parser->setCursorActive(true);
+        
+        // IRC setup scrolling region
+        if(system_connection->protocol == "IRC")
+        {
+            new_session->createIrcManager();
+            new_session->m_irc_manager->startUp();
+        }
 
         // Setup the Connection String
         std::string connection_string = system_connection->ip;

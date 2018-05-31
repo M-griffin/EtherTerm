@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Admin
-Date                   :=29/12/2017
+Date                   :=08/02/2018
 CodeLitePath           :="/Users/admin/Library/Application Support/codelite"
 LinkerName             :=clang++
 SharedObjectLinkerName :=clang++ -shared -fPIC
@@ -61,9 +61,9 @@ AS       := llvm-as
 ##
 CodeLiteDir:=/Applications/codelite.app/Contents/SharedSupport/
 Objects0=$(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_link_list.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_function.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_protocol.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_screen_buffer.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinystr.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinyxml.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_tinyxmlparser.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_window_manager.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_irc_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetselect.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(ObjectSuffix) \
-	
+	$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_window_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/up_src_irc_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetselect.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_TinyXml_tinystr.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_TinyXml_tinyxml.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/up_src_TinyXml_tinyxmlerror.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_TinyXml_tinyxmlparser.cpp$(ObjectSuffix) 
 
 
 
@@ -169,26 +169,6 @@ $(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix): ../src/telnet
 $(IntermediateDirectory)/up_src_telnet_manager.cpp$(PreprocessSuffix): ../src/telnet_manager.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_telnet_manager.cpp$(PreprocessSuffix) ../src/telnet_manager.cpp
 
-$(IntermediateDirectory)/up_src_tinystr.cpp$(ObjectSuffix): ../src/tinystr.cpp 
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/tinystr.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_tinystr.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_tinystr.cpp$(PreprocessSuffix): ../src/tinystr.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_tinystr.cpp$(PreprocessSuffix) ../src/tinystr.cpp
-
-$(IntermediateDirectory)/up_src_tinyxml.cpp$(ObjectSuffix): ../src/tinyxml.cpp 
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/tinyxml.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_tinyxml.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_tinyxml.cpp$(PreprocessSuffix): ../src/tinyxml.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_tinyxml.cpp$(PreprocessSuffix) ../src/tinyxml.cpp
-
-$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(ObjectSuffix): ../src/tinyxmlerror.cpp 
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/tinyxmlerror.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(PreprocessSuffix): ../src/tinyxmlerror.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_tinyxmlerror.cpp$(PreprocessSuffix) ../src/tinyxmlerror.cpp
-
-$(IntermediateDirectory)/up_src_tinyxmlparser.cpp$(ObjectSuffix): ../src/tinyxmlparser.cpp 
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/tinyxmlparser.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_tinyxmlparser.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_tinyxmlparser.cpp$(PreprocessSuffix): ../src/tinyxmlparser.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_tinyxmlparser.cpp$(PreprocessSuffix) ../src/tinyxmlparser.cpp
-
 $(IntermediateDirectory)/up_src_window_manager.cpp$(ObjectSuffix): ../src/window_manager.cpp 
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/window_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_window_manager.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_src_window_manager.cpp$(PreprocessSuffix): ../src/window_manager.cpp
@@ -224,6 +204,16 @@ $(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix): ../src/socket_irc
 $(IntermediateDirectory)/up_src_socket_irc.cpp$(PreprocessSuffix): ../src/socket_irc.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_socket_irc.cpp$(PreprocessSuffix) ../src/socket_irc.cpp
 
+$(IntermediateDirectory)/up_src_common_io.cpp$(ObjectSuffix): ../src/common_io.cpp 
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/common_io.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_common_io.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_common_io.cpp$(PreprocessSuffix): ../src/common_io.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_common_io.cpp$(PreprocessSuffix) ../src/common_io.cpp
+
+$(IntermediateDirectory)/up_src_session_io.cpp$(ObjectSuffix): ../src/session_io.cpp 
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/session_io.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_session_io.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_session_io.cpp$(PreprocessSuffix): ../src/session_io.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_session_io.cpp$(PreprocessSuffix) ../src/session_io.cpp
+
 $(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(ObjectSuffix): ../src/SDL2_net/SDLnet.cpp 
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/SDL2_net/SDLnet.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(PreprocessSuffix): ../src/SDL2_net/SDLnet.cpp
@@ -243,6 +233,26 @@ $(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(ObjectSuffix): ../src/SD
 	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/SDL2_net/SDLnetUDP.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(PreprocessSuffix): ../src/SDL2_net/SDLnetUDP.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(PreprocessSuffix) ../src/SDL2_net/SDLnetUDP.cpp
+
+$(IntermediateDirectory)/up_src_TinyXml_tinystr.cpp$(ObjectSuffix): ../src/TinyXml/tinystr.cpp 
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/TinyXml/tinystr.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_TinyXml_tinystr.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_TinyXml_tinystr.cpp$(PreprocessSuffix): ../src/TinyXml/tinystr.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_TinyXml_tinystr.cpp$(PreprocessSuffix) ../src/TinyXml/tinystr.cpp
+
+$(IntermediateDirectory)/up_src_TinyXml_tinyxml.cpp$(ObjectSuffix): ../src/TinyXml/tinyxml.cpp 
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/TinyXml/tinyxml.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_TinyXml_tinyxml.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_TinyXml_tinyxml.cpp$(PreprocessSuffix): ../src/TinyXml/tinyxml.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_TinyXml_tinyxml.cpp$(PreprocessSuffix) ../src/TinyXml/tinyxml.cpp
+
+$(IntermediateDirectory)/up_src_TinyXml_tinyxmlerror.cpp$(ObjectSuffix): ../src/TinyXml/tinyxmlerror.cpp 
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/TinyXml/tinyxmlerror.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_TinyXml_tinyxmlerror.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_TinyXml_tinyxmlerror.cpp$(PreprocessSuffix): ../src/TinyXml/tinyxmlerror.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_TinyXml_tinyxmlerror.cpp$(PreprocessSuffix) ../src/TinyXml/tinyxmlerror.cpp
+
+$(IntermediateDirectory)/up_src_TinyXml_tinyxmlparser.cpp$(ObjectSuffix): ../src/TinyXml/tinyxmlparser.cpp 
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/Users/admin/code/EtherTerm/src/TinyXml/tinyxmlparser.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_TinyXml_tinyxmlparser.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_TinyXml_tinyxmlparser.cpp$(PreprocessSuffix): ../src/TinyXml/tinyxmlparser.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_TinyXml_tinyxmlparser.cpp$(PreprocessSuffix) ../src/TinyXml/tinyxmlparser.cpp
 
 ##
 ## Clean

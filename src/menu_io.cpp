@@ -556,8 +556,8 @@ void MenuIO::sequenceToAnsi(const std::string &sequence)
             memset(&esc_sequence,0,sizeof(esc_sequence));
             pipe_sequence[0] = data_string[id1+1];  // Get First # after Pipe
             pipe_sequence[1] = data_string[id1+2];  // Get Second Number After Pipe
-            if(pipe_sequence[0] == '\0' || pipe_sequence[0] == '\r') break;
-            if(pipe_sequence[1] == '\0' || pipe_sequence[1] == '\r') break;
+            if(pipe_sequence[0] == '\0' || pipe_sequence[0] == '\r' || pipe_sequence[0] == EOF) break;
+            if(pipe_sequence[1] == '\0' || pipe_sequence[1] == '\r' || pipe_sequence[0] == EOF) break;
 
             //std::cout << "\r\n*** pipe_sequence: " << pipe_sequence << std::endl;
             if(isdigit(pipe_sequence[0]) && isdigit(pipe_sequence[1]))
@@ -684,11 +684,6 @@ void MenuIO::displayMenuAnsi(const std::string &file_name)
         sequence = getc(fp);
         if(sequence != EOF)
             buff += sequence;
-        else
-        {
-            buff += '\0';
-            break;
-        }
     }
     while(sequence != EOF);
     fclose(fp);

@@ -5,7 +5,7 @@
 #include "session.hpp"
 #include "session_manager.hpp"
 
-#include "tinyxml.hpp"
+#include <TinyXml/tinyxml.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -142,7 +142,10 @@ void MenuManager::parseHeader(std::string FileName)
             return;
         }
     }
-    m_sequence_decoder->resetParser();
+    
+    // This needs the session! or not needed here.
+    // m_sequence_decoder->resetParser();
+    
     m_menu_function.m_menu_io.displayMenuAnsi(FileName);
 }
 
@@ -551,6 +554,7 @@ bool MenuManager::readDialDirectory()
             sysconn.font = pElem->Attribute("font");
             sysconn.keyMap = pElem->Attribute("keyMap");
             sysconn.termType = pElem->Attribute("termType");
+            sysconn.termSize = pElem->Attribute("termSize");
             // Add to Vector so we can parse in building the dialing directory.
             m_systemConnection.push_back(sysconn);
         }
@@ -577,7 +581,7 @@ void MenuManager::createDialDirectory()
 
     TiXmlElement * element2 = new TiXmlElement("Phonebook");
     element->LinkEndChild(element2);
-    element2->SetAttribute("version", "1.0");
+    element2->SetAttribute("version", "1.1");
 
     TiXmlElement * element3 = new TiXmlElement("BBS");
     element2->LinkEndChild(element3);
@@ -591,6 +595,7 @@ void MenuManager::createDialDirectory()
     element3->SetAttribute("font", "vga8x16.bmp");
     element3->SetAttribute("keyMap", "ANSI");
     element3->SetAttribute("termType", "ANSI");
+    element3->SetAttribute("termSize", "80x25");
 
     TiXmlElement *element4 = new TiXmlElement("BBS");
     element2->LinkEndChild(element4);
@@ -604,6 +609,7 @@ void MenuManager::createDialDirectory()
     element4->SetAttribute("font", "vga8x16.bmp");
     element4->SetAttribute("keyMap", "VT100");
     element4->SetAttribute("termType", "ANSI");
+    element4->SetAttribute("termSize", "80x25");
     doc.SaveFile(path.c_str());
 }
 
@@ -625,7 +631,7 @@ void MenuManager::writeDialDirectory()
 
     TiXmlElement *phonebook = new TiXmlElement("Phonebook");
     root->LinkEndChild(phonebook);
-    phonebook->SetAttribute("version", "1.0");
+    phonebook->SetAttribute("version", "1.1");
 
     // Loop and write out all System Connections
     for(auto &it : m_systemConnection)
@@ -642,6 +648,7 @@ void MenuManager::writeDialDirectory()
         system->SetAttribute("font", it.font);
         system->SetAttribute("keyMap", it.keyMap);
         system->SetAttribute("termType", it.termType);
+        system->SetAttribute("termSize", it.termSize);
     }
     doc.SaveFile(path.c_str());
 }

@@ -6,6 +6,8 @@
 #include <vector>
 #include <sstream>
 
+//#define _DEBUG
+
 // Initialize Class Variables
 SequenceDecoder::SequenceDecoder(session_ptr session)
     : m_weak_session(session)
@@ -13,7 +15,6 @@ SequenceDecoder::SequenceDecoder(session_ptr session)
     , m_sequence(0)
     , m_parameter(0)
     , m_is_sequence(false)
-    //, m_is_parameter(false)
     , m_is_invalid_sequence(false)
     , m_is_sequence_completed(false)
     , m_sequence_level(0)
@@ -36,9 +37,9 @@ void SequenceDecoder::processSequenceLevel0()
     switch(m_sequence)
     {
         case '[': // Control Sequence Introduction ( CSI is 0x9b).
-            break;
-
-            // Xterm Sequences Not implemented, pass through
+            break;       
+       
+        // Valid Squences,  7/8 Bit Control Codes, need to translate        
         case ' ':
             //ESC SP F 7-bit controls (S7C1T).
             //ESC SP G 8-bit controls (S8C1T).
@@ -82,12 +83,14 @@ void SequenceDecoder::processSequenceLevel0()
             // Invalid, should have CSI = ESC[ preceding ?
 
             // Xterm C1 (8-Bit) Control Characters
-        case 'D':  // Index ( IND is 0x84).
+
+        case 'D':  // Index ( IND is 0x84).               
+        case 'H':  // Tab Set ( HTS is 0x88).        
         case 'E':  // Next Line ( NEL is 0x85).
-        case 'H':  // Tab Set ( HTS is 0x88).
-        case 'M':  // Reverse Index ( RI is 0x8d).
+        case 'M':  // Reverse Index ( RI is 0x8d).        
         case 'N':  // Single Shift Select of G2 Character Set ( SS2 is 0x8e). This affects next character only.
-        case 'O':  // Single Shift Select of G3 Character Set ( SS3 is 0x8f). This affects next character only.
+        case 'O':  // Single Shift Select of G3 Character Set ( SS3 is 0x8f). This affects next character only.   
+
         case 'P':  // Device Control String ( DCS is 0x90).
         case 'V':  // Start of Guarded Area ( SPA is 0x96).
         case 'W':  // End of Guarded Area ( EPA is 0x97).
@@ -128,6 +131,10 @@ void SequenceDecoder::processSequenceLevel0()
         case '|':  // ESC | Invoke the G3 Character Set as GR (LS3R).
         case '}':  // ESC } Invoke the G2 Character Set as GR (LS2R).
         case '~':  // ESC ~ Invoke the G1 Character Set as GR (LS1R).
+            m_is_sequence_completed = true;
+            break;
+        
+        
         case '\0':   // Catch any NULL characters after ESC
         case '\x1b': // catch any double ESC's from bad servers
             m_is_invalid_sequence = true;
@@ -202,8 +209,10 @@ void SequenceDecoder::processSequenceLevel1()
         case 'L': // Insert P s Line(s) (default = 1) (IL).
         case 'M': // Delete P s Line(s) (default = 1) (DL).
         case 'P': // Delete P s Character(s) (default = 1) (DCH).
+        
         case 'S': // Scroll up P s lines (default = 1) (SU).
         case 'T': // Scroll down P s lines (default = 1) (SD).
+        
         case 'X': // Erase P s Character(s) (default = 1) (ECH).
         case 'Z': // Cursor Backward Tabulation P s tab stops (default = 1) (CBT).
 
@@ -770,83 +779,6 @@ void SequenceDecoder::processSequenceLevel2()
 }
 
 /**
- * @brief Handle SyncTerm Font Change Sequences
- */
-void SequenceDecoder::handleFontChangeSequences()
-{
-    /* Actual Font Switching should not be done in the Decoder!
-       We need to previous sequences to process before switching font!
-
-    if (m_sequence_builder == "\x1b[0;0 D")
-    {
-        std::cout << std::endl << "Switched to CP437 Font" << std::endl;
-        TheRenderer::Instance()->setCurrentFont("vga8x16.bmp");
-        if (TheRenderer::Instance()->didFontChange())
-            TheRenderer::Instance()->loadBitmapImage(
-                TheRenderer::Instance()->getCurrentFont());
-
-    //std::cout << "sequenceBuilder.erase();" << std::endl;
-    //    sequenceBuilder.erase();
-    //    sequenceState = SEQ_NORMAL; // Reset to pass-through
-    //    return;
-    }
-    //37 - P0T NOoDLE (Amiga)
-    else
-    if (m_sequence_builder == "\x1b[0;37 D")
-    {
-        std::cout << std::endl << "Switched to Pot-Noodle Font" << std::endl;
-        TheRenderer::Instance()->setCurrentFont("potNoodle-8x16.bmp");
-        if (TheRenderer::Instance()->didFontChange())
-            TheRenderer::Instance()->loadBitmapImage(
-                TheRenderer::Instance()->getCurrentFont());
-    //    sequenceBuilder.erase();
-    //    sequenceState = SEQ_NORMAL; // Reset to pass-through
-    //    return;
-    }
-    //38 - mO'sOul (Amiga)
-    else
-    if (m_sequence_builder == "\x1b[0;38 D")
-    {
-        std::cout << std::endl << "Switched to mO'sOul Font" << std::endl;
-        TheRenderer::Instance()->setCurrentFont("mo'soul-8x16.bmp");
-        if (TheRenderer::Instance()->didFontChange())
-            TheRenderer::Instance()->loadBitmapImage(
-                TheRenderer::Instance()->getCurrentFont());
-    //    sequenceBuilder.erase();
-    //    sequenceState = SEQ_NORMAL; // Reset to pass-through
-    //    return;
-    }
-    //39 - MicroKnight (Amiga)
-    else
-    if (m_sequence_builder == "\x1b[0;39 D")
-    {
-        std::cout << std::endl << "Switched to Micro-Knight+ Font" << std::endl;
-        TheRenderer::Instance()->setCurrentFont("microKnightPlus-8x16.bmp");
-        if (TheRenderer::Instance()->didFontChange())
-            TheRenderer::Instance()->loadBitmapImage(
-                TheRenderer::Instance()->getCurrentFont());
-    //    sequenceBuilder.erase();
-    //    sequenceState = SEQ_NORMAL; // Reset to pass-through
-    //    return;
-    }
-    //40 - Topaz (Amiga)
-    else
-    if (m_sequence_builder == "\x1b[0;40 D")
-    {
-        std::cout << std::endl << "Switched to Topaz+ Font" << std::endl;
-        TheRenderer::Instance()->setCurrentFont("topazPlus-8x16.bmp");
-        if (TheRenderer::Instance()->didFontChange())
-            TheRenderer::Instance()->loadBitmapImage(
-                TheRenderer::Instance()->getCurrentFont());
-    //    sequenceBuilder.erase();
-    //    sequenceState = SEQ_NORMAL; // Reset to pass-through
-    //    return;
-    }
-     */
-
-}
-
-/**
  * @brief Decode and Validate Escapce Sequences.
  */
 void SequenceDecoder::validateSequence()
@@ -854,6 +786,7 @@ void SequenceDecoder::validateSequence()
 #ifdef _DEBUG
     std::cout << "Validate Sequence: " << m_sequence_builder << std::endl;
 #endif
+    //system("pause");
 
     // Check and clear vector for fresh sequence
     // We only Validate on complete sequences, so we can clear here
@@ -872,16 +805,32 @@ void SequenceDecoder::validateSequence()
     // If we get there, we have full CSI with possible ; ; separators.
     try
     {
-        // Remove ESC [ then get Terminator
-        m_sequence_builder.erase(0,2);
-        int sequenceTerminator =
-            m_sequence_builder[m_sequence_builder.size()-1];
+        std::cout << "*** validate - m_sequence_builder: " << m_sequence_builder << std::endl;               
+        int control_char = m_sequence_builder[1];        
+        
+        // Check if Control Sequence,  then we need take as is, only remove ESC
+        if (control_char != '[' && m_sequence_builder.size() == 2)
+        {
+            m_sequence_builder.erase(0,2);
+            m_sequence_params.push_back(control_char);
+            return;
+        }
+        else 
+        {
+            // Remove ESC [ then get Terminator
+            m_sequence_builder.erase(0,2);  // We need [ or 7/8 Bit Control Char
+            int sequenceTerminator =
+                m_sequence_builder[m_sequence_builder.size()-1];
 
-        // First Parameter is always the Sequence Terminator.
-        m_sequence_params.push_back(sequenceTerminator);
+            // First Param is always control Char.  "[" or letter, digit that starts 7/8 bit control sequence.
+            m_sequence_params.push_back(control_char);
 
-        // Remove Sequence Terminator from string to text for parameters.
-        m_sequence_builder.erase(m_sequence_builder.size()-1,1);
+            // Second Parameter is always the Sequence Terminator.
+            m_sequence_params.push_back(sequenceTerminator);         
+
+            // Remove Sequence Terminator from string to parse text for parameters.
+            m_sequence_builder.erase(m_sequence_builder.size()-1,1);   
+        }
     }
     catch(std::exception &e)
     {
@@ -945,6 +894,8 @@ void SequenceDecoder::validateSequence()
     }
     else
     {
+        
+        // These handles ESC [ ? 7h  etc. 
         // First check for ? DEC Sequence Starter
         if(m_sequence_builder[0] == '?')
         {
@@ -954,7 +905,7 @@ void SequenceDecoder::validateSequence()
             try
             {
                 m_sequence_params.push_back('?');  // Add to Parameters Vector.
-                m_sequence_builder.erase(0,1);     // Remove ?
+                m_sequence_builder.erase(0,1);     // Remove
             }
             catch(std::exception &e)
             {
@@ -962,7 +913,8 @@ void SequenceDecoder::validateSequence()
                           << e.what() << std::endl;
             }
         }
-        // No separator, translate the 1-3 digit code that should be present.
+        
+        // No separator, translate the 1-3 digit code that should be present.            
         std::istringstream tokenStream;
         tokenStream.str(m_sequence_builder);        // String to Stream
         if((tokenStream >> m_parameter).fail())     // String to Int
@@ -1156,7 +1108,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
         {
             switch(m_sequence_level)
             {
-                case 0: // Process first char after ESC '['
+                case 0: // Process first char after ESC 
 #ifdef _DEBUG
                     std::cout << "sequenceLevel: " << m_sequence_level << " : "
                               << m_sequence << std::endl;
@@ -1165,8 +1117,19 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                     // Move to next Level if valid.
                     if(!m_is_invalid_sequence)
                     {
+                        // Check for 7/8Bit Control Sequences here.
+                        if (m_sequence != '[')
+                        {
+                            // Then we have 7/8 Bit Control Sequence and need to handle accordingly.
+                            if (m_is_sequence_completed)
+                                break;
+                            
+                            // Else goto sequence level 3 for next parameters.
+                            m_sequence_level = 3;
+                            break;
+                        }                        
                         ++m_sequence_level;
-                    }
+                    }                    
                     break;
 
                 case 1: // Process second char after ESC [ 'c'
@@ -1214,9 +1177,9 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
             // If the sequence is completed, The Parse the parameters and
             // Setup for ANSI Parser and Drawing to Screen.
             m_is_sequence_completed = false;
-            m_is_sequence     = false;
+            m_is_sequence           = false;
             m_is_invalid_sequence   = false;
-            m_sequence_level     = 0;
+            m_sequence_level        = 0;
         }
         // Invalid Sequences, Replace ESC with ^ characters for display
         // Then move on.
@@ -1237,22 +1200,22 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
 
             // Handle Invalid Sequences by removing the ESC character, then
             // Continue on to the next sequence.
-            /*
+            
             try
             {
-                // Turn off for pass through on shell.
-                //sequenceBuilder.replace(0,1,"^");
+                // Turn off for pass through on shell. remove ESC [
+                m_sequence_builder.replace(0,3,"");
             }
             catch (std::exception e)
             {
                 std::cout << "Exception replace escapePosition: "
                     << e.what() << std::endl;
-                sequenceState = SEQ_ERROR; // Reset The State
-            }*/
+                m_sequence_state = SEQ_ERROR; // Reset The State
+            }
 
-            m_is_sequence   = false;
+            m_is_sequence         = false;
             m_is_invalid_sequence = false;
-            m_sequence_level   = 0;
+            m_sequence_level      = 0;
 
             // First grab the entire sequence parsed so far, from ESC position
             // Place it into validOutputData to display on the screen,
@@ -1338,15 +1301,3 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
     }
 }
 
-/**
- * @brief Reset the Sequence Parser to refresh the screen
- */
-void SequenceDecoder::resetParser()
-{
-    // Handle to Session Instatnce
-    session_ptr session = m_weak_session.lock();
-    if(session)
-    {
-        session->m_sequence_parser->reset();
-    }
-}

@@ -60,7 +60,12 @@ public:
     void setInactive();
 
     void close();
-
+    
+    int getSocketHandle() 
+    {
+        return m_socket.back()->getSocketInstance();
+    }
+        
 private:
 
     std::vector<socket_state_ptr>   m_socket;

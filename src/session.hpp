@@ -13,9 +13,11 @@
 #include "menu_manager.hpp"
 #include "session_manager.hpp"
 #include "telnet_manager.hpp"
+#include "irc_manager.hpp"
 #include "safe_queue.hpp"
+#include "protocol.hpp"
 
-#include <chrono>
+//#include <chrono>
 #include <fstream>
 #include <memory>
 #include <thread>
@@ -39,6 +41,9 @@ class Session
 {
 public:
 
+    // Used for Unit Testing.
+    explicit Session() { }
+
     Session(
         connection_ptr           &connection,
         std::string              &program_path,
@@ -47,7 +52,8 @@ public:
         int                      &term_height,
         int                      &term_width
     )
-        : m_is_dial_directory(false)
+        : m_is_transfer(false)
+        , m_is_dial_directory(false)
         , m_term_height(term_height)
         , m_term_width(term_width)
         , m_char_height(16)
@@ -109,6 +115,7 @@ public:
         m_sequence_parser.reset(new SequenceParser(m_renderer, m_connection));
         m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));
 
+        m_protocol.reset(new Protocol(shared_from_this(), m_connection, m_program_path));
         // On creation, load a list of Available Font Sets XML
         bool is_loaded = m_surface_manager->readFontSets();
         if(!is_loaded)
@@ -181,8 +188,8 @@ public:
             {
                 m_connection->socket()->close();
             }
+            
             m_is_leaving = true;
-            // Disconenct the session.
             std::cout << "Connection Closed, Leaving Session! " << std::endl;
 
             // Shutdown the Input handler.
@@ -234,7 +241,7 @@ public:
         //std::cout << "* handleRead: " << error << std::endl;
         if(error)
         {
-            std::cout << "* Async Read Error!" << error << std::endl;            
+            std::cout << "* Async Read Error!" << error << std::endl;
         }
 
         session_manager_ptr session_mgr = m_weak_session_manager.lock();
@@ -251,15 +258,27 @@ public:
                     // Returns Test and ESC Sequence, All Options are Responsed to in the Manager.
                     if(m_telnet_manager)
                     {
-                        std::string parsed_data = m_telnet_manager->parseIncomingData(m_in_data_vector);
+                        std::string parsed_data = "";
+                        if(!m_is_transfer)
+                        {
+                        	parsed_data = m_telnet_manager->parseIncomingData(m_in_data_vector);
+                        }
+                        else
+                        {
+                            // Were in a file transfer, forward
+                            parsed_data = std::string(m_in_data_vector.begin(), m_in_data_vector.end());
+                            
+                            // need some detection when transfer is completed!
+                            return;
+                        }
 
                         // Debugging ESC Sequences and data incoming from server.
-                        /*
+                        
                         std::ofstream ostrm("stream_output.txt", std::ios_base::app);
                         if (ostrm.is_open())
                         {
                             ostrm << parsed_data << std::flush;
-                        }*/
+                        }
 
                         // Process Only if data in the buffer.
                         if(parsed_data.size() > 0)
@@ -267,7 +286,7 @@ public:
                             m_sequence_decoder->decodeEscSequenceData(parsed_data);
                         }
 
-                        //ostrm.close();
+                        ostrm.close();
                     }
                     else
                     {
@@ -286,20 +305,10 @@ public:
                         }
                         incoming_data += c;
                     }
-                    
-                    // TODO Initial Testing, to be moved to irc manager/decoder 
-                    std::cout << "irc: " << incoming_data << std::endl;
-                    m_sequence_decoder->decodeEscSequenceData(incoming_data);   
 
-                    std::string::size_type index = 0;
-                    index = incoming_data.find("PING", 0);
-                    if (index != std::string::npos) {
-                        std::string key = incoming_data.substr(6);
-                        std::cout << "key: " << key << std::endl;
-                        std::string ping_reponse = "PONG :" + key + "\r\n";
-                        deliver(ping_reponse);
-                    }                    
-                }                    
+                    m_irc_manager->handleLineRead(incoming_data);
+
+                }
                 else
                 {
                     /** Not in use yet, when time comes change to support m_raw_data_vector
@@ -363,7 +372,7 @@ public:
                 // if the socket is still active, shut it down
                 m_connection->shutdown();
             }
-        }        
+        }
     }
 
     /**
@@ -386,7 +395,7 @@ public:
                                           std::placeholders::_1));
         }
     }
-    
+
     /**
      * @brief Queues ESC[6n Response Sequences
      * @param string_msg
@@ -463,13 +472,23 @@ public:
         }
 
         // Make Sure Ansi Parser/Render is Setup for For connection with Black Screen.
-        m_sequence_decoder->resetParser();
+        m_sequence_parser->reset();
         m_renderer->renderScreen();
         m_renderer->drawTextureScreen();
 
         // Startup the Telnet Instatnce and pass the current session along.
         m_telnet_manager.reset(
             new TelnetManager(shared_from_this())
+        );
+    }
+
+    /**
+     * @brief Create Irc Manager when session is starting.
+     */
+    void createIrcManager()
+    {
+        m_irc_manager.reset (
+            new IrcManager(shared_from_this())
         );
     }
 
@@ -520,14 +539,14 @@ public:
             m_input_handler->getInputSequence(input_sequence);
             if(input_sequence.size() > 0)
             {
-                // Pass to the Socket once we have that setup,
-                deliver(input_sequence);
-                
-                if(m_system_connection->protocol == "IRC") 
+                if(m_system_connection->protocol == "IRC")
                 {
-                   // Echo Input, Server doesn't echo input typed by user.
-                   std::cout << "\n *** input: " << input_sequence << std::endl;
-                   m_sequence_decoder->decodeEscSequenceData(input_sequence);
+                    m_irc_manager->handleUserInput(input_sequence);
+                }
+                else
+                {
+                    // Telnet / SSH etc.. pass through to Server.
+                    deliver(input_sequence);
                 }
             }
         }
@@ -570,7 +589,7 @@ public:
             }
             msgQueue.clear();
         }
-        
+
         // Handle Immediate ESC Position Response Sequences
         // Queue all responses and write out as single output.
         std::string esc_response_sequence = "";
@@ -667,6 +686,8 @@ public:
         }
     }
 
+    // Are are transfering files.
+    bool                     m_is_transfer;
 
     // Is this a local session used for the Dialing Directory.
     bool                     m_is_dial_directory;
@@ -715,8 +736,13 @@ public:
     // Holds System Connection Information (struct resides/passed from MenuManager)
     system_connection_ptr    m_system_connection;
 
+    // Handle to external protocols (file transfers)
+    protocol_ptr             m_protocol;
     // Handle Telnet Option Negoiation and Responses.
     telnet_manager_ptr       m_telnet_manager;
+
+    // IRC Manager for Line and Command Parsing
+    irc_manager_ptr          m_irc_manager;
 
     bool                     m_is_connected;
     bool                     m_is_leaving;
@@ -728,9 +754,9 @@ public:
     time_t                   m_ttime, m_ttime2;
 
     // Input Raw Data Buffer.
-    std::vector<unsigned char> m_in_data_vector;    
+    std::vector<unsigned char> m_in_data_vector;
     SafeQueue<std::string>     m_write_queue;
-        
+
 };
 
 #endif // SESSION_BASE_HPP

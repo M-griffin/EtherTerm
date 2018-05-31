@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 
-#include "tinyxml.hpp"
+#include <TinyXml/tinyxml.hpp>
 
 #include <iostream>
 #include <cmath>
@@ -551,6 +551,12 @@ void SurfaceManager::createSurface(int surfaceType)
                     )
                 );
 
+                // Setup alpha Blending.
+                //SDL_SetSurfaceBlendMode(surface->getSurface(), SDL_BLENDMODE_BLEND);
+
+                // Enable RLE acceleration
+                //SDL_SetSurfaceRLE(surface->getSurface(), 1);
+
                 convertAndAdd(surfaceType, surface);
             }
             break;
@@ -689,6 +695,9 @@ void SurfaceManager::unlockSurface(int surfaceType)
  */
 void SurfaceManager::fillSurfaceColor(int surfaceType, SDL_Rect *rect, SDL_Color *color)
 {
+
+    //SDL_LockSurface(m_surfaceList[surfaceType]->getSurface());
+
     // Fill screen with current RGB Background colors.
     if(SDL_FillRect(
                 m_surfaceList[surfaceType]->getSurface(),
@@ -704,5 +713,7 @@ void SurfaceManager::fillSurfaceColor(int surfaceType, SDL_Rect *rect, SDL_Color
         SDL_Log("fillSurfaceCurrentColor(): %s", SDL_GetError());
         assert(false);
     }
+
+    //SDL_UnlockSurface(m_surfaceList[surfaceType]->getSurface());
 }
 

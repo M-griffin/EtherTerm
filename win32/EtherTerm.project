@@ -17,11 +17,41 @@
  }]]]>
     </Plugin>
   </Plugins>
+  <Reconciliation>
+    <Regexes/>
+    <Excludepaths/>
+    <Ignorefiles/>
+    <Extensions>
+      <![CDATA[cpp;c;h;hpp;xrc;wxcp;fbp]]>
+    </Extensions>
+    <Topleveldir>../win32</Topleveldir>
+  </Reconciliation>
   <Description/>
   <Dependencies/>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <VirtualDirectory Name="src">
+    <File Name="../src/system_connection.hpp" ExcludeProjConfig="Debug;"/>
+    <VirtualDirectory Name="UtfCpp">
+      <File Name="../src/UtfCpp/utf8.h"/>
+      <VirtualDirectory Name="utf8">
+        <File Name="../src/UtfCpp/utf8/unchecked.h"/>
+        <File Name="../src/UtfCpp/utf8/core.h"/>
+        <File Name="../src/UtfCpp/utf8/checked.h"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+    <VirtualDirectory Name="TinyXml">
+      <File Name="../src/TinyXml/tinyxmlparser.cpp"/>
+      <File Name="../src/TinyXml/tinyxmlerror.cpp"/>
+      <File Name="../src/TinyXml/tinyxml.hpp"/>
+      <File Name="../src/TinyXml/tinyxml.cpp"/>
+      <File Name="../src/TinyXml/tinystr.hpp"/>
+      <File Name="../src/TinyXml/tinystr.cpp"/>
+    </VirtualDirectory>
+    <File Name="../src/common_io.hpp"/>
+    <File Name="../src/common_io.cpp"/>
+    <File Name="../src/session_io.hpp"/>
+    <File Name="../src/session_io.cpp"/>
     <VirtualDirectory Name="SDL2_net">
       <File Name="../src/SDL2_net/SDLnetUDP.cpp"/>
       <File Name="../src/SDL2_net/SDLnetTCP.cpp"/>
@@ -69,12 +99,6 @@
     <File Name="../src/telnet_manager.cpp"/>
     <File Name="../src/telnet_manager.hpp"/>
     <File Name="../src/texture.hpp"/>
-    <File Name="../src/tinystr.cpp"/>
-    <File Name="../src/tinystr.hpp"/>
-    <File Name="../src/tinyxml.cpp"/>
-    <File Name="../src/tinyxml.hpp"/>
-    <File Name="../src/tinyxmlerror.cpp"/>
-    <File Name="../src/tinyxmlparser.cpp"/>
     <File Name="../src/window_manager.cpp"/>
     <File Name="../src/window_manager.hpp"/>
     <File Name="../src/socket_handler.cpp"/>
@@ -104,12 +128,11 @@
         <IncludePath Value="../src"/>
         <IncludePath Value="C:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include/SDL2"/>
         <IncludePath Value="C:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2"/>
         <IncludePath Value="C:/OpenSSL-Win32/include"/>
         <IncludePath Value="C:/Users/Blue/Downloads/libssh-0.7.2/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
-        <LibraryPath Value="C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/lib"/>
+        <LibraryPath Value="mingw32/lib"/>
         <LibraryPath Value="C:/libz-1.2.7-1-mingw32-dev/lib"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>

@@ -1,12 +1,13 @@
 <?xml version="1.0" ?>
 <EtherTerm>
     <Phonebook version="1.0">
-        <BBS name="hTc Enthral" ip="htc.zapto.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
+        <BBS name="hTc Enthral" ip="htc.zapto.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x50" textureFilter="0" />
         <BBS name="79 Columns" ip="oddnetwork.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="Black Flag (Mystic)" ip="blackflag.acid.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="1" />
         <BBS name="Black Flag (PCBoard)" ip="blackflag.acid.org" port="2627" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" termType="ANSI" termSize="80x25" textureFilter="0" />
+        <BBS name="Black Flag (OBV/2)" ip="blackflag.acid.org" port="2629" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x50" textureFilter="0" />
         <BBS name="Pharcyde" ip="bbs.pharcyde.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
-        <BBS name="1984" ip="1984.ws" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" termSize="80x25" textureFilter="0" />
+        <BBS name="1984" ip="1984.ws" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="VT100" termType="ANSI" termSize="80x50" textureFilter="0" />
         <BBS name="Blood Island" ip="bloodisland.ph4.se" port="23" protocol="TELNET" login="" password="" font="topazPlus-8x16.bmp" keyMap="VT100" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="d1st" ip="d1st.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="fluph" ip="fluph.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
@@ -30,12 +31,14 @@
         <BBS name="bbs.weather-station.org" ip="bbs.weather-station.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="Prism filegate.net" ip="filegate.net" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="LINUX" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="clutch.darktech.org" ip="clutch.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
-        <BBS name="xibalba.l33t.codes" ip="xibalba.l33t.codes" port="44510" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
+        <BBS name="xibalba.l33t.codes" ip="xibalba.l33t.codes" port="44510" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x50" textureFilter="0" />
         <BBS name="bbs.magickabbs.com" ip="bbs.magickabbs.com" port="2023" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="LINUX" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="bbs.retrohack.se" ip="bbs.retrohack.se" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="bbs.inktwo.com" ip="bbs.inktwo.com" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="theshadowlandsbbs.ssccbogart.info" ip="theshadowlandsbbs.ssccbogart.info" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="iniquity.zapto.org" ip="iniquity.zapto.org" port="2020" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
         <BBS name="facilitybbs.darktech.org" ip="facilitybbs.darktech.org" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
+        <BBS name="twinklebbs.net" ip="twinklebbs.net" port="23" protocol="TELNET" login="" password="" font="vga8x16.bmp" keyMap="ANSI" termType="ANSI" termSize="80x25" textureFilter="0" />
     </Phonebook>
 </EtherTerm>
+

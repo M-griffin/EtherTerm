@@ -58,12 +58,6 @@
     <File Name="../src/telnet_manager.cpp"/>
     <File Name="../src/telnet_manager.hpp"/>
     <File Name="../src/texture.hpp"/>
-    <File Name="../src/tinystr.cpp"/>
-    <File Name="../src/tinystr.hpp"/>
-    <File Name="../src/tinyxml.cpp"/>
-    <File Name="../src/tinyxml.hpp"/>
-    <File Name="../src/tinyxmlerror.cpp"/>
-    <File Name="../src/tinyxmlparser.cpp"/>
     <File Name="../src/window_manager.cpp"/>
     <File Name="../src/window_manager.hpp"/>
     <File Name="../src/io_service.cpp"/>
@@ -84,6 +78,26 @@
       <File Name="../src/SDL2_net/SDLnetsys.hpp"/>
       <File Name="../src/SDL2_net/SDLnetTCP.cpp"/>
       <File Name="../src/SDL2_net/SDLnetUDP.cpp"/>
+    </VirtualDirectory>
+    <File Name="../src/common_io.cpp"/>
+    <File Name="../src/common_io.hpp"/>
+    <File Name="../src/session_io.cpp"/>
+    <File Name="../src/session_io.hpp"/>
+    <VirtualDirectory Name="TinyXml">
+      <File Name="../src/TinyXml/tinystr.cpp"/>
+      <File Name="../src/TinyXml/tinystr.hpp"/>
+      <File Name="../src/TinyXml/tinyxml.cpp"/>
+      <File Name="../src/TinyXml/tinyxml.hpp"/>
+      <File Name="../src/TinyXml/tinyxmlerror.cpp"/>
+      <File Name="../src/TinyXml/tinyxmlparser.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="UtfCpp">
+      <File Name="../src/UtfCpp/utf8.h"/>
+      <VirtualDirectory Name="utf8">
+        <File Name="../src/UtfCpp/utf8/checked.h"/>
+        <File Name="../src/UtfCpp/utf8/core.h"/>
+        <File Name="../src/UtfCpp/utf8/unchecked.h"/>
+      </VirtualDirectory>
     </VirtualDirectory>
   </VirtualDirectory>
   <Settings Type="Executable">
