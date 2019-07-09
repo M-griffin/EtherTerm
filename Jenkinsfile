@@ -10,7 +10,7 @@ def ircNotification(result) {
         (
         echo NICK ${nick}
         echo USER ${nick} 8 * : ${nick}
-        sleep 5
+        sleep 15
         echo "JOIN ${channel}"
         echo "NOTICE ${channel} :${message}"
         echo QUIT
