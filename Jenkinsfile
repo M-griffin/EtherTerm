@@ -32,10 +32,5 @@ pipeline {
         }
       }
     }
-  }
-  post {
-    always {
-      ircNotification(currentBuild.result)
-    }
-  }
+  }  
 }
