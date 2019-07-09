@@ -34,7 +34,7 @@ pipeline {
     }
   }
   post {
-    change {
+    always {
       ircNotification(currentBuild.result)
     }
   }
