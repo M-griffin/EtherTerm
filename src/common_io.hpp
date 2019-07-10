@@ -154,21 +154,10 @@ public:
         m_escape_sequence.erase();
     }
 
-    /* This function will read the OS specific functions
-     * To Determine where the executable is located.
-     * This has only been tested in Windows, Linux, OSX.
-     */
-    std::string getProgramPath(const std::string &program_name);
-
-    /**
-     * Get The BBS System Users HOME directory
-     */
-    std::string getSystemHomeDirectory();
-    
     /**
      * @brief Appends Path Seperator depending on environment.
      * @param path
-     * @return 
+     * @return
      */
     void pathAppend(std::string &path);
 

@@ -31,7 +31,10 @@
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <VirtualDirectory Name="src">
-    <File Name="../src/system_connection.hpp" ExcludeProjConfig="Debug;"/>
+    <File Name="../src/static_methods.hpp"/>
+    <File Name="../src/dialing_directory_dao.cpp"/>
+    <File Name="../src/dialing_directory_dao.hpp"/>
+    <File Name="../src/dialing_directory.hpp"/>
     <VirtualDirectory Name="UtfCpp">
       <File Name="../src/UtfCpp/utf8.h"/>
       <VirtualDirectory Name="utf8">
@@ -39,14 +42,6 @@
         <File Name="../src/UtfCpp/utf8/core.h"/>
         <File Name="../src/UtfCpp/utf8/checked.h"/>
       </VirtualDirectory>
-    </VirtualDirectory>
-    <VirtualDirectory Name="TinyXml">
-      <File Name="../src/TinyXml/tinyxmlparser.cpp"/>
-      <File Name="../src/TinyXml/tinyxmlerror.cpp"/>
-      <File Name="../src/TinyXml/tinyxml.hpp"/>
-      <File Name="../src/TinyXml/tinyxml.cpp"/>
-      <File Name="../src/TinyXml/tinystr.hpp"/>
-      <File Name="../src/TinyXml/tinystr.cpp"/>
     </VirtualDirectory>
     <File Name="../src/common_io.hpp"/>
     <File Name="../src/common_io.cpp"/>
@@ -126,17 +121,19 @@
         <IncludePath Value="."/>
         <IncludePath Value=".."/>
         <IncludePath Value="../src"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include/SDL2"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include"/>
+        <IncludePath Value="F:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include/SDL2"/>
+        <IncludePath Value="F:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include"/>
         <IncludePath Value="C:/OpenSSL-Win32/include"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/libssh-0.7.2/include"/>
+        <IncludePath Value="F:/Users/Blue/Downloads/libssh-0.7.2/include"/>
+        <IncludePath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="mingw32/lib"/>
         <LibraryPath Value="C:/libz-1.2.7-1-mingw32-dev/lib"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
-        <LibraryPath Value="C:/Users/Blue/Downloads/libssh-0.7.2\lib"/>
+        <LibraryPath Value="F:/Users/Blue/Downloads/libssh-0.7.2\lib"/>
+        <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>
         <Library Value="mingw32"/>
         <Library Value="SDL2main"/>
         <Library Value="SDL2"/>
@@ -146,6 +143,7 @@
         <Library Value="libeay32.a"/>
         <Library Value="libssh"/>
         <Library Value="libiphlpapi.a"/>
+        <Library Value="yaml-cpp.dll"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>

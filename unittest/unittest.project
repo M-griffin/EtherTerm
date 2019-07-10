@@ -52,10 +52,10 @@
         <IncludePath Value=".."/>
         <IncludePath Value="../src"/>
         <IncludePath Value="C:/UnitTest++-1.3/src"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include/SDL2"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include"/>
+        <IncludePath Value="F:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include/SDL2"/>
+        <IncludePath Value="F:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include"/>
         <IncludePath Value="C:/OpenSSL-Win32/include"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/libssh-0.7.2/include"/>
+        <IncludePath Value="F:/Users/Blue/Downloads/libssh-0.7.2/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
@@ -65,7 +65,7 @@
         <LibraryPath Value="C:/libz-1.2.7-1-mingw32-dev/lib"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
-        <LibraryPath Value="C:/Users/Blue/Downloads/libssh-0.7.2\lib"/>
+        <LibraryPath Value="F:/Users/Blue/Downloads/libssh-0.7.2\lib"/>
         <Library Value="libUnitTest++.a"/>
         <Library Value="mingw32"/>
         <Library Value="SDL2main"/>

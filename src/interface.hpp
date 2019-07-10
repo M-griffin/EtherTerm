@@ -174,7 +174,7 @@ public:
      * @return
      */
     template <typename T>
-    T stringToNumber ( const std::string &Text )
+    T stringToNumber(const std::string &Text)
     {
         std::istringstream ss(Text);
         T result;
@@ -191,7 +191,7 @@ public:
     {
         std::string::size_type index = termSize.find("x", 0);
 
-        if (index != std::string::npos)
+        if(index != std::string::npos)
         {
             std::string str_width = termSize.substr(0, index);
             std::cout << "termSize Width: " << str_width << std::endl;
@@ -253,10 +253,10 @@ public:
         // TODO, think this sets up the ansi parser might need to break this out.
         //if(system_connection->protocol == "TELNET" || system_connection->protocol == "SSH")
         //{
-            
-            // TODO, right now everything passes through TelnetManager
-            std::cout << "Starting TelnetManager in Interface" << std::endl;
-            new_session->createTelnetManager();
+
+        // TODO, right now everything passes through TelnetManager
+        std::cout << "Starting TelnetManager in Interface" << std::endl;
+        new_session->createTelnetManager();
         //}
 
         // Start Async Read/Writes Loop for Session Socket Data.
@@ -267,7 +267,7 @@ public:
 
         // Start Blinking Cursor for Active connection session.
         new_session->m_sequence_parser->setCursorActive(true);
-        
+
         // IRC setup scrolling region
         if(system_connection->protocol == "IRC")
         {
@@ -279,7 +279,7 @@ public:
         std::string connection_string = system_connection->ip;
         connection_string.append(":");
         connection_string.append(std::to_string(system_connection->port));
-        
+
         // TODO Change this to WriteSequence and use vector, incase passwords or others has colons
         // That could casue issues on string split!
         if(system_connection->protocol == "SSH")
@@ -301,9 +301,11 @@ public:
     void process_event(SDL_Event &event)
     {
         int num_sesisons = m_session_manager->numberOfSessions();
+
         if(num_sesisons > 0 && !m_is_global_shutdown)
         {
             std::set<session_ptr>::iterator itEnd = end(m_session_manager->m_sessions);
+
             for(auto it = begin(m_session_manager->m_sessions); it != itEnd; ++it)
             {
                 // If number of sessions changed, (Window was Closed) restart loop.
@@ -325,6 +327,7 @@ public:
                     if(m_session_manager->numberOfSessions() > 0)
                     {
                         it = begin(m_session_manager->m_sessions);
+
                         if((*it)->m_window_manager->getWindowId() == event.window.windowID)
                         {
                             // Pass the Events to the specific Session for Specific Window and Input Events.

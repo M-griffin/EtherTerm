@@ -88,141 +88,6 @@ wchar_t CP437_TABLE[] =
     L'\u207F', L'\u00B2', L'\u25A0', L'\u00A0'
 };
 
-/**
- * @brief Determine where the executable is located.
- * This has only been tested in Windows, Linux, OSX.
- * @return
- */
-std::string CommonIO::getProgramPath(const std::string &program_name)
-{
-    std::string program_path;
-    std::string program = "/" + program_name;
-
-    // First check for SYSTEM environmental variable:
-    char *pPath;
-    pPath = std::getenv((char *)"OBV2");
-    if(pPath != nullptr)
-    {
-        std::cout << "Found OBV2 Enviroment set: " << pPath << std::endl;
-
-        program_path = pPath;
-
-#ifdef _WIN32
-        if (program_path[program_path.size()-1] != '\\')
-        {
-            program_path.append("\\");
-        }
-#else
-        if (program_path[program_path.size()-1] != '/')
-        {
-            program_path.append("/");
-        }
-#endif
-
-        return program_path;
-    }
-    else
-    {
-        std::cout << "looking up program path." << std::endl;
-    }
-
-    // Get the Folder the Executable runs in.
-#ifdef TARGET_OS_MAC
-    char current_path[PATH_MAX];
-    uint32_t size = sizeof(current_path);
-    if(_NSGetExecutablePath(current_path, &size) != 0)
-    {
-        throw std::runtime_error("getProgramPath: OSX Path");
-    }
-
-    // Remove Executable
-    program_path = current_path;
-    std::string::size_type position;
-    position = program_path.rfind(program);
-    if(position != std::string::npos)
-    {
-        program_path.erase(position+1,program_path.size()-1);
-    }
-
-    // remove extra './'
-    position = program_path.rfind("./");
-    if(position != std::string::npos)
-    {
-        program_path.erase(position,2);
-    }
-
-#elif _WIN32
-    // Get the Current Program path.
-    char current_path[PATH_MAX];
-
-    int result = GetModuleFileName(NULL, current_path, PATH_MAX-1);
-    if(result == 0)
-    {
-        throw std::runtime_error("GetProgramPath: Win32 Path");
-    }
-
-    program_path = current_path;
-    std::string::size_type position = program_path.rfind("\\", program_path.size()-1);
-    if(position != std::string::npos)
-    {
-        program_path.erase(position+1);
-    }
-#else
-
-    char exe_path[PATH_MAX] = {0};
-    ssize_t result = readlink("/proc/self/exe", exe_path, PATH_MAX);
-    if(result < 0)
-    {
-        throw std::runtime_error("getProgramPath: Linux Path");
-    }
-
-    const char* t = " \t\n\r\f\v";
-    program_path = exe_path;
-    std::cout << "ORIG PATH: " << program_path << std::endl;
-    program_path = program_path.erase(program_path.find_last_not_of(t) + 1);
-    program_path += "/";
-
-    // Remove Executable
-    std::string::size_type position;
-    position = program_path.rfind(program);
-    if(position != std::string::npos)
-    {
-        program_path.erase(position+1,program_path.size()-1);
-    }
-
-#endif
-    return program_path;
-}
-
-#ifndef _WIN32
-/**
- * @brief Get The BBS System Users HOME directory
- * @return
- */
-std::string CommonIO::getSystemHomeDirectory()
-{
-    std::string home_directory;
-    const char *homedir;
-
-    homedir = getenv("HOME");
-    if(!homedir)
-    {
-        homedir = getpwuid(getuid())->pw_dir;
-        if(!homedir)
-        {
-            std::cout << "Error: Unable to locate bbs user's home directory: "
-                      << std::endl;
-            home_directory = "";
-            return home_directory;
-        }
-    }
-
-    home_directory = homedir;
-
-    return home_directory;
-}
-#endif
-
 
 /**
  * @brief Appends Path Seperator depending on environment.
@@ -248,11 +113,12 @@ std::string::size_type CommonIO::numberOfChars(const std::string &str)
 {
     std::string line = str;
     std::string::iterator end_it = utf8::find_invalid(line.begin(), line.end());
-    if (end_it != line.end()) 
+
+    if(end_it != line.end())
     {
         std::cout << "This part is fine: " << std::string(line.begin(), end_it) << std::endl;
     }
-    
+
     // Get the line length (at least for the valid part)
     int length = utf8::distance(line.begin(), end_it);
     return length;
@@ -302,7 +168,7 @@ std::string CommonIO::rightTrim(const std::string &str)
                          new_string.rbegin(),
                          new_string.rend(),
                          std::not1(std::ptr_fun<int, int>(std::isspace))).base(),
-                         new_string.end()
+                     new_string.end()
                     );
 
     return new_string;
@@ -316,11 +182,13 @@ std::string CommonIO::rightTrim(const std::string &str)
 std::string CommonIO::trim(const std::string &str)
 {
     std::string new_string = str;
+
     if(new_string.empty())
     {
         //std::cout << "Exception (Common::trim) string length == 0" << std::endl;
         return new_string;
     }
+
     return leftTrim(rightTrim(new_string));
 }
 
@@ -348,28 +216,31 @@ std::string CommonIO::eraseString(const std::string &str,
     else
     {
         end_position = start_position + (end_position-1);
+
         // Make sure we can never go past end of string!
         if(end_position > string_size)
         {
             end_position = string_size;
         }
     }
-   
+
     std::string new_string_builder = "";
+
     if(new_string.empty())
     {
         std::cout << "Exception (Common::EraseString) string length == 0" << std::endl;
         return new_string;
     }
-    
+
     unsigned char_count = 0;
     std::string::iterator it = new_string.begin();
-    std::string::iterator line_end = new_string.end();    
-    
-    while (it != line_end) {                
+    std::string::iterator line_end = new_string.end();
+
+    while(it != line_end)
+    {
         //std::cout << "ut: " << *it << std::endl;
         uint32_t code_point = utf8::next(it, line_end);
-        
+
         if(char_count < start_position || char_count > end_position)
         {
             //std::cout << "append" << std::endl;
@@ -379,11 +250,11 @@ std::string CommonIO::eraseString(const std::string &str,
             utf8::append(code_point, character);
             new_string_builder += (char *)character;
         }
-        
-        //std::cout << "char_count: " << char_count << " " << code_point << std::endl;        
+
+        //std::cout << "char_count: " << char_count << " " << code_point << std::endl;
         ++char_count;
     }
-    
+
     /*
     std::cout << "\r\nStringERASE start_position: " << start_position << std::endl;
     std::cout << "StringERASE end_position: " << end_position << std::endl;
@@ -402,7 +273,9 @@ std::string CommonIO::eraseString(const std::string &str,
 std::string CommonIO::rightPadding(const std::string &str, std::string::size_type space)   // Pad Right
 {
     std::string new_string = str;
+
     if(space == 0) return new_string;
+
     if(new_string.empty())
     {
         //std::cout << "Exception (Common::RightPadding) string length == 0" << std::endl;
@@ -437,6 +310,7 @@ std::string CommonIO::rightPadding(const std::string &str, std::string::size_typ
 std::string CommonIO::leftPadding(const std::string &str, std::string::size_type space)
 {
     std::string new_string = str;
+
     if(space == 0)
     {
         return new_string;
@@ -474,6 +348,7 @@ std::string CommonIO::leftPadding(const std::string &str, std::string::size_type
 std::string CommonIO::centerPadding(const std::string &str, int term_width)
 {
     std::string new_string = str;
+
     if(new_string.empty())
     {
         //std::cout << "Exception (Common::centerPadding) string empty" << std::endl;
@@ -481,11 +356,13 @@ std::string CommonIO::centerPadding(const std::string &str, int term_width)
     }
 
     std::string::size_type length = numberOfChars(new_string);
+
     if(length == 0)
     {
         //std::cout << "Exception (Common::centerPadding) string length == 0" << std::endl;
         return new_string;
     }
+
     int space = term_width / 2;
     space -= term_width % 2;
 
@@ -496,6 +373,7 @@ std::string CommonIO::centerPadding(const std::string &str, int term_width)
     if(space <= 0) return new_string;
 
     std::string padded_line;
+
     for(int i = 0; i < space; i++)
     {
         padded_line += ' ';
@@ -514,6 +392,7 @@ std::string CommonIO::centerPadding(const std::string &str, int term_width)
 std::string CommonIO::maskString(const std::string &str)
 {
     std::string new_string = str;
+
     if(new_string.empty())
     {
         //std::cout << "Exception (Common::maskString) string empty" << std::endl;
@@ -521,6 +400,7 @@ std::string CommonIO::maskString(const std::string &str)
     }
 
     std::string::size_type string_size = numberOfChars(new_string);
+
     if(string_size == 0)
     {
         //std::cout << "Exception (Common::maskString) string length == 0" << std::endl;
@@ -528,6 +408,7 @@ std::string CommonIO::maskString(const std::string &str)
     }
 
     new_string.erase();
+
     for(std::string::size_type i = 0; i < string_size; i++)
     {
         new_string.append("*");
@@ -555,10 +436,12 @@ std::string CommonIO::printWideCharacters(const std::wstring &wide_string)
     std::string output = "";
 
     std::mbstate_t state = std::mbstate_t();
+
     for(wchar_t wc : wide_string)
     {
         std::string mb(MB_CUR_MAX, '\0');
         int ret = std::wcrtomb(&mb[0], wc, &state);
+
         if(ret == 0)
         {
             break;
@@ -593,6 +476,7 @@ std::string CommonIO::translateUnicode(const std::string &standard_string)
     for(std::string::size_type i = 0; i < standard_string.size(); i++)
     {
         ascii_value = std::char_traits<char>().to_int_type(standard_string[i]);
+
         if(ascii_value < 256)
         {
             wide_string += CP437_TABLE[ascii_value];
@@ -620,6 +504,7 @@ std::string CommonIO::getEscapeSequence()
     {
         return m_sequence_map[m_escape_sequence];
     }
+
     return "";
 }
 
@@ -632,6 +517,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
 {
     //std::cout << "character_buffer: " << character_buffer << std::endl;
     int num = numberOfChars(character_buffer);
+
     if((num == 0  ||  character_buffer[0] == '\x1b') &&
             m_is_escape_sequence &&
             m_string_buffer.size() == 1)
@@ -723,12 +609,13 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                         m_string_buffer.erase();
                         return "\x1b";
                     }
+
                     // Bad Sequence, just return ESC as is.
                     m_escape_sequence = m_string_buffer;
                     m_string_buffer.erase();
                     return "\x1b";
 
-                    // Numbers all end in Tildes ~
+                // Numbers all end in Tildes ~
                 case '1': // Home
                 case '2': // Insert
                 case '3': // DEL
@@ -743,8 +630,8 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                     m_string_buffer += character_buffer;
                     return "";
 
-                    // Only SCO F3 ends with [[O, otherwise it
-                    // preceeds in other sequences.
+                // Only SCO F3 ends with [[O, otherwise it
+                // preceeds in other sequences.
                 case 'O': // Precursor to Fucntion Keys [OA etc..
                     if(m_string_buffer == "[[")
                     {
@@ -754,6 +641,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                         m_string_buffer.erase();
                         return "\x1b";
                     }
+
                     // Continue;
                     m_string_buffer += character_buffer;
                     return "";
@@ -793,7 +681,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
                     m_string_buffer.erase();
                     return "\x1b";
 
-                    // End of Number Sequence.
+                // End of Number Sequence.
                 case '~': // Function
                 case '$': // Shift Function RXVT
                 case '^': // CTRL Function RXVT
@@ -833,6 +721,7 @@ std::string CommonIO::parseInput(const std::string &character_buffer)
     {
         return "\n";
     }
+
     //std::cout << "character_buffer: " << character_buffer << std::endl;
     return character_buffer;
 }
@@ -870,6 +759,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         m_line_buffer.erase();
         m_column_position = 0;
     }
+
     // If were starting Off Input with a String already in buffer!  display it!
     if(m_is_new_leadoff && leadoff.size() > 0)
     {
@@ -888,12 +778,14 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     // Gets Parsed input by Char, Multibyte or ESC Sequence.
     // Catch Aborts here!
     character_buffer = parseInput(line);
+
     if(character_buffer.size() == 0 || character_buffer[0] == '\0')
     {
         // No data or in mid ESC sequence
         // Need to wait for next character.
         return "\x1b"; // ""
     }
+
     // If we got an ENTER CR/LF then were done!
     // Set the Flag, so on next call to method, we reset, not before
     // Otherwise we'll clear the buffer we just filled.  :)
@@ -903,11 +795,14 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         m_is_new_leadoff = true;
         return "\n";
     }
+
     // Escape in this case, ignore, later add movement in string
     std::string sequence = "";
+
     if(character_buffer[0] == 27)
     {
         sequence = getEscapeSequence();
+
         if(sequence.size() == 0)
         {
             // Received ESC, Abort!
@@ -950,10 +845,12 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
         if(m_line_buffer.size() > 0)
         {
             std::cout << "ctrl y: " << character_buffer << std::endl;
+
             for(int i = numberOfChars(m_line_buffer); i > 0; i--)
             {
                 output_buffer += "\x1b[D \x1b[D";
             }
+
             m_line_buffer.erase();
             m_column_position = 0;
             return output_buffer;
@@ -984,6 +881,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
             return "empty";
         }
     }
+
     // Normal Input processing, ASCII and Unicode. Add new functions for size!
     if(((signed)m_line_buffer.size() <= length) &&
             ((signed)(character_buffer.size() + m_line_buffer.size()) <= length))
@@ -1003,6 +901,7 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
             return character_buffer;
         }
     }
+
     std::cout << "Past the max length, nothing to add!" << std::endl;
     return "empty"; // ""
 }
@@ -1019,6 +918,7 @@ std::string CommonIO::boolAlpha(bool value)
     {
         return "True";
     }
+
     return "False";
 }
 
@@ -1032,10 +932,12 @@ std::string CommonIO::boolAlpha(bool value)
 void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode, const std::string &replacement)
 {
     std::string::size_type id1 = 0;
+
     do
     {
         // Parse New Message's MCI Code
         id1 = AnsiString.find(mcicode, 0);
+
         if(id1 != std::string::npos)
         {
             AnsiString.replace(id1, mcicode.size(), replacement);
@@ -1044,4 +946,3 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode
     }
     while(id1 != std::string::npos);
 }
-

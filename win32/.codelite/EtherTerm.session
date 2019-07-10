@@ -1,77 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Session Name="C:\Users\Blue\Desktop\EtherTerm\win32\EtherTerm.workspace">
-  <int Value="2" Name="m_selectedTab"/>
+  <int Value="9" Name="m_selectedTab"/>
   <wxString Value="C:\Users\Blue\Desktop\EtherTerm\win32\EtherTerm.workspace" Name="m_workspaceName"/>
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\sequence_decoder.cpp" Name="FileName"/>
-      <int Value="540" Name="FirstVisibleLine"/>
-      <int Value="564" Name="CurrentLine"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\main.cpp" Name="FileName"/>
+      <int Value="165" Name="FirstVisibleLine"/>
+      <int Value="192" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\sequence_decoder.hpp" Name="FileName"/>
-      <int Value="13" Name="FirstVisibleLine"/>
-      <int Value="37" Name="CurrentLine"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\common_io.cpp" Name="FileName"/>
+      <int Value="87" Name="FirstVisibleLine"/>
+      <int Value="89" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\sequence_parser.cpp" Name="FileName"/>
-      <int Value="372" Name="FirstVisibleLine"/>
-      <int Value="388" Name="CurrentLine"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\common_io.hpp" Name="FileName"/>
+      <int Value="153" Name="FirstVisibleLine"/>
+      <int Value="155" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\unittest\main.cpp" Name="FileName"/>
-      <int Value="10" Name="FirstVisibleLine"/>
-      <int Value="4" Name="CurrentLine"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\menu_io.cpp" Name="FileName"/>
+      <int Value="26" Name="FirstVisibleLine"/>
+      <int Value="27" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\session.hpp" Name="FileName"/>
-      <int Value="650" Name="FirstVisibleLine"/>
-      <int Value="19" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks">
-        <wxString Value="19:7"/>
-      </wxArrayString>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\menu_io.hpp" Name="FileName"/>
+      <int Value="21" Name="FirstVisibleLine"/>
+      <int Value="22" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\menu_function.cpp" Name="FileName"/>
+      <int Value="468" Name="FirstVisibleLine"/>
+      <int Value="470" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\menu_function.hpp" Name="FileName"/>
+      <int Value="2" Name="FirstVisibleLine"/>
+      <int Value="3" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\surface_manager.cpp" Name="FileName"/>
+      <int Value="255" Name="FirstVisibleLine"/>
+      <int Value="257" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
       <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\menu_manager.cpp" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="145" Name="CurrentLine"/>
+      <int Value="701" Name="FirstVisibleLine"/>
+      <int Value="703" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\sequenc_decoder_test.cpp" Name="FileName"/>
-      <int Value="400" Name="FirstVisibleLine"/>
-      <int Value="46" Name="CurrentLine"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\dialing_directory.hpp" Name="FileName"/>
+      <int Value="189" Name="FirstVisibleLine"/>
+      <int Value="214" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\socket_ssh.cpp" Name="FileName"/>
-      <int Value="29" Name="FirstVisibleLine"/>
-      <int Value="93" Name="CurrentLine"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\menu_manager.hpp" Name="FileName"/>
+      <int Value="2" Name="FirstVisibleLine"/>
+      <int Value="30" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\io_service.cpp" Name="FileName"/>
-      <int Value="227" Name="FirstVisibleLine"/>
-      <int Value="249" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\interface.hpp" Name="FileName"/>
-      <int Value="111" Name="FirstVisibleLine"/>
-      <int Value="131" Name="CurrentLine"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\irc_manager.cpp" Name="FileName"/>
+      <int Value="33" Name="FirstVisibleLine"/>
+      <int Value="0" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
@@ -79,4 +91,5 @@
   <SerializedObject Name="m_breakpoints">
     <long Value="0" Name="Count"/>
   </SerializedObject>
+  <wxString Value="*.c;*.cpp;*.cxx;*.cc;*.h;*.hpp;*.inc;*.mm;*.m;*.xrc" Name="m_findInFilesMask"/>
 </Session>

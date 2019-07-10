@@ -61,7 +61,9 @@ bool SDLStartUp()
 
     // Turn off, might make a toggle for this later on.
     SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
-    
+
+    // Validate Dialing Directory here, if doesn't exist create default with entries.
+
     return success;
 }
 
@@ -81,6 +83,7 @@ int main(int argc, char* argv[])
      * i = irc
      */
     int c = 0;
+
     while((c = getopt(argc, argv, "h")) != -1)
     {
         switch(c)
@@ -100,6 +103,7 @@ int main(int argc, char* argv[])
 #ifdef TARGET_OS_MAC
     char currentPath[PATH_MAX];
     uint32_t size = sizeof(currentPath);
+
     if(_NSGetExecutablePath(currentPath, &size) != 0)
     {
         std::cout << "Unable to get Program Path!" << std::endl;
@@ -109,11 +113,13 @@ int main(int argc, char* argv[])
     realPath = currentPath;
     std::string::size_type position;
     position = realPath.rfind("/EtherTerm");
+
     if(position != std::string::npos)
         realPath.erase(position+1,realPath.size()-1);
 
     // remove extra './'
     position = realPath.rfind("./");
+
     if(position != std::string::npos)
         realPath.erase(position,2);
 
@@ -121,6 +127,7 @@ int main(int argc, char* argv[])
     // Get the Current Program path.
     char currentPath[PATH_MAX];
     int result = GetModuleFileName(NULL, currentPath, PATH_MAX-1);
+
     if(result == 0)
     {
         std::cout << "Unable to get Program Path!" << std::endl;
@@ -129,16 +136,19 @@ int main(int argc, char* argv[])
 
     realPath = currentPath;
     std::string::size_type position = realPath.rfind("\\",realPath.size()-1);
+
     if(position != std::string::npos)
         realPath.erase(position+1);
+
 #else
 
     char exePath[PATH_MAX] = {0};
- #ifdef __FreeBSD__
+#ifdef __FreeBSD__
     ssize_t result = readlink("/proc/curproc/file", exePath, PATH_MAX);
- #else
+#else
     ssize_t result = readlink("/proc/self/exe", exePath, PATH_MAX);
- #endif
+#endif
+
     if(result < 0)
     {
         std::cout << "Unable to get Program Path!" << std::endl;
@@ -153,6 +163,7 @@ int main(int argc, char* argv[])
     // Remove Executable
     std::string::size_type position;
     position = realPath.rfind("/EtherTerm");
+
     if(position != std::string::npos)
         realPath.erase(position+1,realPath.size()-1);
 
@@ -164,39 +175,39 @@ int main(int argc, char* argv[])
      * For automation and testing
      */
 
-    // Setup the interface for spawning session windows.	
-	// Using Smart Pointer will clear final allocation prior to full exit of system.
-	{
-		interface_ptr interface_spawn(new Interface(realPath));
+    // Setup the interface for spawning session windows.
+    // Using Smart Pointer will clear final allocation prior to full exit of system.
+    {
+        interface_ptr interface_spawn(new Interface(realPath));
 
-		// Don't loaded menu system waiting for user input, just handle
-		// Scripts and connections or parsing functions for testing.
-		if(is_headless)
-		{
-			// Execute scripts / connections via command line
-			// Don't startup SDL since were not using the video
-			// or Waiting for Keyboard input from the window events.
+        // Don't loaded menu system waiting for user input, just handle
+        // Scripts and connections or parsing functions for testing.
+        if(is_headless)
+        {
+            // Execute scripts / connections via command line
+            // Don't startup SDL since were not using the video
+            // or Waiting for Keyboard input from the window events.
 
-			// Nothing to do right now.
-			exit(0);
-		}
-		else
-		{
-			// Startup the Window System and load initial menu
-			// Window with Initialization with window event processing.
-			if(!SDLStartUp())
-			{
-				exit(-1);
-			}
+            // Nothing to do right now.
+            exit(0);
+        }
+        else
+        {
+            // Startup the Window System and load initial menu
+            // Window with Initialization with window event processing.
+            if(!SDLStartUp())
+            {
+                exit(-1);
+            }
 
-			// Lead into Interface spawn for session startup and management.
-			interface_spawn->startup();
-		}
-	}
-	
-	// SDL is done.
-	std::cout << "EtherTerm Shutdown completed." << std::endl;
-	SDL_Quit();
+            // Lead into Interface spawn for session startup and management.
+            interface_spawn->startup();
+        }
+    }
+
+    // SDL is done.
+    std::cout << "EtherTerm Shutdown completed." << std::endl;
+    SDL_Quit();
 
     // Closing Message Box.
     SDL_ShowSimpleMessageBox(

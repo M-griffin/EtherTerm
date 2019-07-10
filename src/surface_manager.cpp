@@ -3,8 +3,6 @@
 
 #include <SDL2/SDL.h>
 
-#include <TinyXml/tinyxml.hpp>
-
 #include <iostream>
 #include <cmath>
 #include <cstdio>
@@ -15,7 +13,7 @@ SurfaceManager::SurfaceManager(window_manager_ptr &window_manager, const std::st
     , m_programPath(program_path)
     , m_currentFont("vga8x16.bmp")
     , m_previousFont("")
-    // Initialize Color Masks.
+      // Initialize Color Masks.
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
     , m_redMask(0xff000000)
     , m_greenMask(0x00ff0000)
@@ -94,6 +92,7 @@ void SurfaceManager::addSurface(int value, surface_ptr surface)
 void SurfaceManager::delSurface(int value)
 {
     auto it = m_surfaceList.find(value);
+
     if(it != m_surfaceList.end())
     {
         m_surfaceList.erase(it);
@@ -107,10 +106,12 @@ void SurfaceManager::delSurface(int value)
 bool SurfaceManager::surfaceExists(int value)
 {
     auto it = m_surfaceList.find(value);
+
     if(it != m_surfaceList.end())
     {
         return true;
     }
+
     return false;
 }
 
@@ -131,6 +132,7 @@ void SurfaceManager::addTexture(int value, texture_ptr texture)
 void SurfaceManager::delTexture(int value)
 {
     auto it = m_textureList.find(value);
+
     if(it != m_textureList.end())
     {
         m_textureList.erase(it);
@@ -144,10 +146,12 @@ void SurfaceManager::delTexture(int value)
 bool SurfaceManager::textureExists(int value)
 {
     auto it = m_textureList.find(value);
+
     if(it != m_textureList.end())
     {
         return true;
     }
+
     return false;
 }
 
@@ -186,16 +190,19 @@ bool SurfaceManager::didFontChange()
  */
 bool SurfaceManager::readFontSets()
 {
+    /*
     FontSet font_set;
     std::string path = getProgramPath();
     path.append("fontsets.xml");
 
     TiXmlDocument doc(path.c_str());
+
     if(!doc.LoadFile())
     {
         std::cout << "readFontSets() Error Reading: " << path << std::endl;
         return false;
     }
+
     TiXmlHandle hDoc(&doc);
     TiXmlElement* pElem;
     TiXmlHandle hRoot(0);
@@ -206,16 +213,19 @@ bool SurfaceManager::readFontSets()
         m_fontSet.clear();
         std::vector<FontSet>().swap(m_fontSet);
     }
+
     // block: EtherTerm
     {
         std::cout << "readFontConfiguration - FirstChildElement" << std::endl;
         pElem=hDoc.FirstChildElement().Element();
+
         // should always have a valid root but handle gracefully if it does
         if(!pElem)
         {
             std::cout << "readFontConfiguration - EtherTerm Element not found!" << std::endl;
             return false;
         }
+
         std::cout << "Root Value: " << pElem->Value() << std::endl;
         // save this for later
         hRoot=TiXmlHandle(pElem);
@@ -230,6 +240,7 @@ bool SurfaceManager::readFontSets()
     {
         //std::cout << "readDialDirectory - BBS" << std::endl;
         pElem=hRoot.FirstChild("Fontset").FirstChild().Element();
+
         for(; pElem; pElem=pElem->NextSiblingElement())
         {
             font_set.name = pElem->Attribute("name");
@@ -244,6 +255,7 @@ bool SurfaceManager::readFontSets()
         }
     }
     std::cout << "readFontConfiguration - Done" << std::endl;
+    */
     return true;
 }
 
@@ -255,13 +267,15 @@ bool SurfaceManager::readFontSets()
 FontSet SurfaceManager::getFontFromSet(const std::string &value)
 {
     FontSet font_set;
-    for (FontSet f : m_fontSet)
+
+    for(FontSet f : m_fontSet)
     {
-        if (f.filename == value)
+        if(f.filename == value)
         {
             font_set = f;
         }
     }
+
     return font_set;
 }
 
@@ -274,36 +288,39 @@ bool SurfaceManager::loadFont()
 {
     bool is_loaded = false;
 
-    if (m_fontSet.size() == 0)
+    if(m_fontSet.size() == 0)
     {
         is_loaded = readFontSets();
-        if (is_loaded)
+
+        if(is_loaded)
         {
             std::cout << "Error, Fontsets not loaded!" << std::endl;
             return false;
         }
+
         // reset.
         is_loaded = false;
     }
 
     FontSet font(getFontFromSet(m_currentFont));
-    if (font.filename != m_currentFont)
+
+    if(font.filename != m_currentFont)
     {
         std::cout << "Error, unable to load front from set!" << std::endl;
         assert(false);
     }
 
     // If type = bmp or bitmap.
-    if (font.type == "bmp")
+    if(font.type == "bmp")
     {
         is_loaded = loadBitmapFontImage();
     }
     // True Type (WIP) for Unicode fonts.
-    else if (font.type == "ttf")
+    else if(font.type == "ttf")
     {  }
 
     // If font loaded, then read and set the properties.
-    if (is_loaded)
+    if(is_loaded)
     {
         /**
          * Important note, if these change, but there static right now
@@ -314,6 +331,7 @@ bool SurfaceManager::loadFont()
         m_characterWidth = font.width;
         m_characterHeight = font.height;
     }
+
     return is_loaded;
 }
 
@@ -355,6 +373,7 @@ bool SurfaceManager::loadBitmapFontImage()
         SDL_Log("Error Converting Font Surface!");
         return false;
     }
+
     addSurface(SURFACE_FONT, fontSurface);
 
     return true;
@@ -387,7 +406,8 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
 {
     // Handle to Window Manager
     window_manager_ptr window = m_weak_window_manager.lock();
-    if (!window)
+
+    if(!window)
     {
         return;
     }
@@ -395,87 +415,88 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
     switch(textureType)
     {
         case TEXTURE_MAIN_SCREEN:
+        {
+            // If Exists, Recreate it.
+            if(textureExists(textureType))
             {
-                // If Exists, Recreate it.
-                if(textureExists(textureType))
-                {
-                    delTexture(textureType);
-                }
-
-                 // Handle to Window Manager
-                window_manager_ptr window = m_weak_window_manager.lock();
-                if (!window)
-                {
-                    return;
-                }
-
-                // Get the Actual size of the Renderer to match the surface for scaling.
-
-                // m_is_scalling_surface!!  Add Toggle for Scaling here,
-                // Otherwise should use same size as main surface!
-                int screenWidth, screenHeight;
-                SDL_GetRendererOutputSize(
-                    window->getRenderer(),
-                    &screenWidth,
-                    &screenHeight
-                );
-
-                // Create Texture: SDL_TEXTUREACCESS_STREAMING
-                texture_ptr texture(
-                    new Textures(
-                        SDL_CreateTexture(
-                            window->getRenderer(),
-                            SDL_PIXELFORMAT_ARGB8888,
-                            SDL_TEXTUREACCESS_STREAMING,
-                            screenWidth, screenHeight
-                        )
-                    )
-                );
-
-                addTexture(textureType, texture);
-
-                // Set the Blend Mode of the Texture NONE
-                if(SDL_SetTextureBlendMode(
-                            texture->getTexture(),
-                            SDL_BLENDMODE_NONE) < 0)
-                {
-                    SDL_Log("Error Setting Blend on Texture - %s", SDL_GetError());
-                }
+                delTexture(textureType);
             }
-            break;
+
+            // Handle to Window Manager
+            window_manager_ptr window = m_weak_window_manager.lock();
+
+            if(!window)
+            {
+                return;
+            }
+
+            // Get the Actual size of the Renderer to match the surface for scaling.
+
+            // m_is_scalling_surface!!  Add Toggle for Scaling here,
+            // Otherwise should use same size as main surface!
+            int screenWidth, screenHeight;
+            SDL_GetRendererOutputSize(
+                window->getRenderer(),
+                &screenWidth,
+                &screenHeight
+            );
+
+            // Create Texture: SDL_TEXTUREACCESS_STREAMING
+            texture_ptr texture(
+                new Textures(
+                    SDL_CreateTexture(
+                        window->getRenderer(),
+                        SDL_PIXELFORMAT_ARGB8888,
+                        SDL_TEXTUREACCESS_STREAMING,
+                        screenWidth, screenHeight
+                    )
+                )
+            );
+
+            addTexture(textureType, texture);
+
+            // Set the Blend Mode of the Texture NONE
+            if(SDL_SetTextureBlendMode(
+                        texture->getTexture(),
+                        SDL_BLENDMODE_NONE) < 0)
+            {
+                SDL_Log("Error Setting Blend on Texture - %s", SDL_GetError());
+            }
+        }
+        break;
 
         case TEXTURE_SELECTION:
         case TEXTURE_HILIGHT:
+        {
+            // If Exists, Recreate it.
+            if(textureExists(textureType))
             {
-                // If Exists, Recreate it.
-                if(textureExists(textureType))
-                {
-                    delTexture(textureType);
-                }
-
-                // Create Texture: SDL_TEXTUREACCESS_TARGET
-                texture_ptr texture(
-                    new Textures(
-                        SDL_CreateTexture(
-                            window->getRenderer(),
-                            SDL_PIXELFORMAT_ARGB8888,
-                            SDL_TEXTUREACCESS_TARGET,
-                            surface->w, surface->h
-                        )
-                    )
-                );
-
-                addTexture(textureType, texture);
-
-                // Set the Blend Mode of the Texture ADD
-                if(SDL_SetTextureBlendMode(
-                            texture->getTexture(),
-                            SDL_BLENDMODE_ADD) < 0)
-                {
-                    SDL_Log("Error Setting Blend on Texture - %s", SDL_GetError());
-                }
+                delTexture(textureType);
             }
-            break;
+
+            // Create Texture: SDL_TEXTUREACCESS_TARGET
+            texture_ptr texture(
+                new Textures(
+                    SDL_CreateTexture(
+                        window->getRenderer(),
+                        SDL_PIXELFORMAT_ARGB8888,
+                        SDL_TEXTUREACCESS_TARGET,
+                        surface->w, surface->h
+                    )
+                )
+            );
+
+            addTexture(textureType, texture);
+
+            // Set the Blend Mode of the Texture ADD
+            if(SDL_SetTextureBlendMode(
+                        texture->getTexture(),
+                        SDL_BLENDMODE_ADD) < 0)
+            {
+                SDL_Log("Error Setting Blend on Texture - %s", SDL_GetError());
+            }
+        }
+        break;
 
         default:
             break;
@@ -489,6 +510,7 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
 void SurfaceManager::clearSurface(int value)
 {
     auto it = m_surfaceList.find(value);
+
     if(it != m_surfaceList.end())
     {
         (*it).second->clear();
@@ -529,96 +551,57 @@ void SurfaceManager::createSurface(int surfaceType)
     // Run Through Surface Alias and create surface.
     switch(surfaceType)
     {
-            // Handle Individual Character Surfaces
+        // Handle Individual Character Surfaces
         case SURFACE_CHARACTER:
         case SURFACE_CURSOR_ON:
         case SURFACE_CURSOR_OFF:
+        {
+            // If Exists, Recreate it.
+            if(surfaceExists(surfaceType))
             {
-                // If Exists, Recreate it.
-                if(surfaceExists(surfaceType))
-                {
-                    delSurface(surfaceType);
-                }
+                delSurface(surfaceType);
+            }
 
-                // Create Surface with Smart pointer.
-                surface_ptr surface(
-                    new Surfaces(
-                        SDL_CreateRGBSurface(
-                            SDL_SWSURFACE,
-                            m_characterWidth, m_characterHeight, m_surfaceBits,
-                            m_redMask, m_greenMask, m_blueMask, m_alphaMask
-                        )
+            // Create Surface with Smart pointer.
+            surface_ptr surface(
+                new Surfaces(
+                    SDL_CreateRGBSurface(
+                        SDL_SWSURFACE,
+                        m_characterWidth, m_characterHeight, m_surfaceBits,
+                        m_redMask, m_greenMask, m_blueMask, m_alphaMask
                     )
-                );
+                )
+            );
 
-                // Setup alpha Blending.
-                //SDL_SetSurfaceBlendMode(surface->getSurface(), SDL_BLENDMODE_BLEND);
+            // Setup alpha Blending.
+            //SDL_SetSurfaceBlendMode(surface->getSurface(), SDL_BLENDMODE_BLEND);
 
-                // Enable RLE acceleration
-                //SDL_SetSurfaceRLE(surface->getSurface(), 1);
+            // Enable RLE acceleration
+            //SDL_SetSurfaceRLE(surface->getSurface(), 1);
 
-                convertAndAdd(surfaceType, surface);
-            }
-            break;
+            convertAndAdd(surfaceType, surface);
+        }
+        break;
 
-            // Handles Main Screen Surfaces
+        // Handles Main Screen Surfaces
         case SURFACE_MAIN_SCREEN:
+        {
+            // If Exists, Recreate it.
+            if(surfaceExists(surfaceType))
             {
-                // If Exists, Recreate it.
-                if(surfaceExists(surfaceType))
-                {
-                    delSurface(surfaceType);
-                }
-
-                window_manager_ptr window = m_weak_window_manager.lock();
-                if (window)
-                {
-                    // Create Surface with Smart pointer
-                    surface_ptr surface(
-                        new Surfaces(
-                            SDL_CreateRGBSurface(
-                                SDL_SWSURFACE,
-                                window->getWindowWidth(), window->getWindowHeight(), m_surfaceBits,
-                                m_redMask, m_greenMask, m_blueMask, m_alphaMask
-                            )
-                        )
-                    );
-
-                    convertAndAdd(surfaceType, surface);
-                }
+                delSurface(surfaceType);
             }
-            break;
 
-            // Handles Screen Surface Scaled to Match Texture Dimensions.
-        case SURFACE_MAIN_SCALED:
+            window_manager_ptr window = m_weak_window_manager.lock();
+
+            if(window)
             {
-                // If Exists, Recreate it.
-                if(surfaceExists(surfaceType))
-                {
-                    delSurface(surfaceType);
-                }
-
-                 // Handle to Window Manager
-                window_manager_ptr window = m_weak_window_manager.lock();
-                if (!window)
-                {
-                    return;
-                }
-
-                // Get the Actual size of the Renderer to match the surface for scaling.
-                int screenWidth, screenHeight;
-                SDL_GetRendererOutputSize(
-                    window->getRenderer(),
-                    &screenWidth,
-                    &screenHeight
-                );
-
                 // Create Surface with Smart pointer
                 surface_ptr surface(
                     new Surfaces(
                         SDL_CreateRGBSurface(
                             SDL_SWSURFACE,
-                            screenWidth, screenHeight, m_surfaceBits,
+                            window->getWindowWidth(), window->getWindowHeight(), m_surfaceBits,
                             m_redMask, m_greenMask, m_blueMask, m_alphaMask
                         )
                     )
@@ -626,38 +609,79 @@ void SurfaceManager::createSurface(int surfaceType)
 
                 convertAndAdd(surfaceType, surface);
             }
-            break;
+        }
+        break;
 
-            // Handles Last Row of a Surface for Scrolling
-            // Currently used for Main Screen, might need scaled version instead?
-        case SURFACE_BOTTOM_ROW:
+        // Handles Screen Surface Scaled to Match Texture Dimensions.
+        case SURFACE_MAIN_SCALED:
+        {
+            // If Exists, Recreate it.
+            if(surfaceExists(surfaceType))
             {
-                // If Exists, Recreate it.
-                if(surfaceExists(surfaceType))
-                {
-                    delSurface(surfaceType);
-                }
-
-                if(!surfaceExists(SURFACE_MAIN_SCREEN))
-                {
-                    SDL_Log("Main Screen Doesn't Exist for Bottom Row Surface!");
-                    assert(false);
-                }
-
-                // Create Surface with Smart pointer, uses with of Main Screen, Must exist first!
-                surface_ptr surface(
-                    new Surfaces(
-                        SDL_CreateRGBSurface(
-                            SDL_SWSURFACE,
-                            m_surfaceList[SURFACE_MAIN_SCREEN]->getSurface()->w, m_characterHeight, m_surfaceBits,
-                            m_redMask, m_greenMask, m_blueMask, m_alphaMask
-                        )
-                    )
-                );
-
-                convertAndAdd(surfaceType, surface);
+                delSurface(surfaceType);
             }
-            break;
+
+            // Handle to Window Manager
+            window_manager_ptr window = m_weak_window_manager.lock();
+
+            if(!window)
+            {
+                return;
+            }
+
+            // Get the Actual size of the Renderer to match the surface for scaling.
+            int screenWidth, screenHeight;
+            SDL_GetRendererOutputSize(
+                window->getRenderer(),
+                &screenWidth,
+                &screenHeight
+            );
+
+            // Create Surface with Smart pointer
+            surface_ptr surface(
+                new Surfaces(
+                    SDL_CreateRGBSurface(
+                        SDL_SWSURFACE,
+                        screenWidth, screenHeight, m_surfaceBits,
+                        m_redMask, m_greenMask, m_blueMask, m_alphaMask
+                    )
+                )
+            );
+
+            convertAndAdd(surfaceType, surface);
+        }
+        break;
+
+        // Handles Last Row of a Surface for Scrolling
+        // Currently used for Main Screen, might need scaled version instead?
+        case SURFACE_BOTTOM_ROW:
+        {
+            // If Exists, Recreate it.
+            if(surfaceExists(surfaceType))
+            {
+                delSurface(surfaceType);
+            }
+
+            if(!surfaceExists(SURFACE_MAIN_SCREEN))
+            {
+                SDL_Log("Main Screen Doesn't Exist for Bottom Row Surface!");
+                assert(false);
+            }
+
+            // Create Surface with Smart pointer, uses with of Main Screen, Must exist first!
+            surface_ptr surface(
+                new Surfaces(
+                    SDL_CreateRGBSurface(
+                        SDL_SWSURFACE,
+                        m_surfaceList[SURFACE_MAIN_SCREEN]->getSurface()->w, m_characterHeight, m_surfaceBits,
+                        m_redMask, m_greenMask, m_blueMask, m_alphaMask
+                    )
+                )
+            );
+
+            convertAndAdd(surfaceType, surface);
+        }
+        break;
 
         default:
             break;
@@ -716,4 +740,3 @@ void SurfaceManager::fillSurfaceColor(int surfaceType, SDL_Rect *rect, SDL_Color
 
     //SDL_UnlockSurface(m_surfaceList[surfaceType]->getSurface());
 }
-

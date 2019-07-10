@@ -5,8 +5,6 @@
 #include "session.hpp"
 #include "session_manager.hpp"
 
-#include <TinyXml/tinyxml.hpp>
-
 #include <algorithm>
 #include <iostream>
 #include <fstream>
@@ -38,10 +36,10 @@ MenuManager::~MenuManager()
 {
     std::cout << "~MenuManager" << std::endl;
     std::vector<list_bar>()
-        .swap(m_result);
+    .swap(m_result);
 
     std::vector<SystemConnection>()
-        .swap(m_systemConnection);
+    .swap(m_systemConnection);
 }
 
 /**
@@ -102,20 +100,24 @@ void MenuManager::readinAnsi(std::string FileName, std::string &buff)
 
     int sequence = 0;
     FILE *fp;
+
     if((fp = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         std::cout << "ANSI not found: " << path << std::endl;
         return;
     }
+
     do
     {
         sequence = getc(fp);
+
         if(sequence != EOF)
         {
             buff += (char)sequence;
         }
     }
     while(sequence != EOF);
+
     fclose(fp);
 }
 
@@ -142,10 +144,10 @@ void MenuManager::parseHeader(std::string FileName)
             return;
         }
     }
-    
+
     // This needs the session! or not needed here.
     // m_sequence_decoder->resetParser();
-    
+
     m_menu_function.m_menu_io.displayMenuAnsi(FileName);
 }
 
@@ -158,7 +160,7 @@ void MenuManager::readDirectoryListing()
      * NOTE this should be set up by the last used theme!
      * Right now it uses default on startup!
      */
-    if (m_current_theme_index == 0)
+    if(m_current_theme_index == 0)
     {
         m_menu_config.m_ini_name = "directory.ini";
     }
@@ -184,6 +186,7 @@ bool MenuManager::changeTheme(int index)
         // Theme Doesn't Exist.
         return false;
     }
+
     // Set the new index, then reset the margins for the list.
     m_current_theme_index = index;
     m_link_list.m_top_margin = m_menu_config.m_top_margin;
@@ -198,6 +201,7 @@ bool MenuManager::changeTheme(int index)
 std::string MenuManager::padString(const std::string &value, const std::string &justify, int padding)
 {
     std::string stringReplace = value;
+
     if(justify == "LEFT")
     {
         m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
@@ -216,6 +220,7 @@ std::string MenuManager::padString(const std::string &value, const std::string &
             ' ', '.'
         );
     }
+
     return stringReplace;
 }
 
@@ -259,27 +264,34 @@ std::vector<list_bar> MenuManager::buildDialList()
         std::cout << "Error Mid ANSI 1: " <<  path << std::endl;
         return result;
     }
+
     while(sequence != EOF)
     {
         sequence = getc(inStream);
+
         if(sequence != EOF) ansiScreen1 += sequence;
     }
+
     fclose(inStream);
     sequence = '\0';
 
     // Process the Second Mid Ansi File
     path = getDirectoryPath();
     path.append(m_menu_config.m_mid_ansi_2);
+
     if((inStream = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         std::cout << "Error Mid ANSI 2: " <<  path << std::endl;
         return result;
     }
+
     while(sequence != EOF)
     {
         sequence = getc(inStream);
+
         if(sequence != EOF) ansiScreen2 += sequence;
     }
+
     fclose(inStream);
 
     unsigned long maxSystems    = 0;
@@ -288,10 +300,13 @@ std::vector<list_bar> MenuManager::buildDialList()
     std::cout << "systemConnection.size(): " << m_systemConnection.size() << std::endl;
 
     int counter = 0;
+
     while(currentSystem < maxSystems)
     {
         if(currentSystem == maxSystems) break;
+
         stringBuilder.erase();
+
         for(int ansiCount = 0; ansiCount < 2; ansiCount++)
         {
             switch(ansiCount)
@@ -307,14 +322,18 @@ std::vector<list_bar> MenuManager::buildDialList()
                 default:
                     break;
             }
+
             counter = 0;
             sequence = 0;
+
             // Parse MCI Codes per each light bar ANSI file
             do
             {
                 memset(&mciCode,0,sizeof(mciCode));
                 sequence = currnetScreen[counter];
+
                 if(sequence == '\0') break;
+
                 // Check for Spacing MCI Code
                 switch(sequence)
                 {
@@ -322,6 +341,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                         mciCode[0] = currnetScreen[++counter];
                         mciCode[1] = currnetScreen[++counter];
                         padding = atoi(mciCode);
+
                         if(padding != 0)
                         {
                             isLeftPadding = true;
@@ -331,12 +351,14 @@ std::vector<list_bar> MenuManager::buildDialList()
                             stringBuilder += sequence;
                             stringBuilder += mciCode;
                         }
+
                         break;
 
                     case '}' : // Right Justify
                         mciCode[0] = currnetScreen[++counter];
                         mciCode[1] = currnetScreen[++counter];
                         padding = atoi(mciCode);
+
                         if(padding != 0)
                         {
                             isRightPadding = true;
@@ -346,14 +368,17 @@ std::vector<list_bar> MenuManager::buildDialList()
                             stringBuilder += sequence;
                             stringBuilder += mciCode;
                         }
+
                         break;
 
                     case '|' : // Pipe Codes
                         mciCode[0] = currnetScreen[++counter];
                         mciCode[1] = currnetScreen[++counter];
+
                         if(strcmp(mciCode,"##") == 0)
                         {
                             sprintf(temp2,"%lu", currentSystem+1);
+
                             if(isLeftPadding)
                             {
                                 stringBuilder += padString(temp2, "LEFT", padding);
@@ -369,6 +394,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                         {
                             std::string stringReplace =
                                 m_systemConnection[currentSystem].name;
+
                             if(isLeftPadding)
                             {
                                 m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
@@ -379,6 +405,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                                 m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
                                 isRightPadding = false;
                             }
+
                             stringBuilder += stringReplace;
                         }
                         else if(strcmp(mciCode,"FO") == 0)
@@ -391,6 +418,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                             );
                             // Replace with the Font name from XML.
                             std::string stringReplace = font.name;
+
                             if(isLeftPadding)
                             {
                                 m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
@@ -401,6 +429,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                                 m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
                                 isRightPadding = false;
                             }
+
                             stringBuilder += stringReplace;
                         }
                         else if(strcmp(mciCode,"PO") == 0)
@@ -408,6 +437,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                             sprintf(temp2,"%i",
                                     m_systemConnection[currentSystem].port);
                             std::string stringReplace = temp2;
+
                             if(isLeftPadding)
                             {
                                 m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
@@ -418,12 +448,14 @@ std::vector<list_bar> MenuManager::buildDialList()
                                 m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
                                 isRightPadding = false;
                             }
+
                             stringBuilder += stringReplace;
                         }
                         else if(strcmp(mciCode,"PR") == 0)
                         {
                             std::string stringReplace =
                                 m_systemConnection[currentSystem].protocol;
+
                             if(isLeftPadding)
                             {
                                 m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
@@ -434,12 +466,14 @@ std::vector<list_bar> MenuManager::buildDialList()
                                 m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
                                 isRightPadding = false;
                             }
+
                             stringBuilder += stringReplace;
                         }
                         else if(strcmp(mciCode,"KM") == 0)
                         {
                             std::string stringReplace =
                                 m_systemConnection[currentSystem].keyMap;
+
                             if(isLeftPadding)
                             {
                                 m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
@@ -450,6 +484,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                                 m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
                                 isRightPadding = false;
                             }
+
                             stringBuilder += stringReplace;
                         }
                         else
@@ -457,6 +492,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                             stringBuilder += sequence;
                             stringBuilder += mciCode;
                         }
+
                         break;
 
                     case '\n' :
@@ -467,16 +503,19 @@ std::vector<list_bar> MenuManager::buildDialList()
                         stringBuilder += sequence;
                         break;
                 }
+
                 ++counter;
             }
             while(sequence != '\0');
 
             stringBuilder += "\r";
+
             switch(ansiCount)
             {
                 case 0:
                     _lightbar.inactive_lightbar = stringBuilder;
                     break; // Display High-light None.  ON
+
                 case 1:
                     _lightbar.active_lightbar = stringBuilder;
                     break; // Display Low-light None    OFF
@@ -484,13 +523,16 @@ std::vector<list_bar> MenuManager::buildDialList()
                 default:
                     break;
             }
+
             stringBuilder.erase();
         } // End of (4) Look for each string.
+
         result.push_back(_lightbar);
         stringBuilder.erase();
         ++currentSystem;
         ++index;
     }
+
     return result;
 }
 
@@ -503,12 +545,16 @@ bool MenuManager::readDialDirectory()
     SystemConnection sysconn;
     std::string path = getAssetPath();
     path.append("dialdirectory.xml");
+
+    /*
     TiXmlDocument doc(path.c_str());
+
     if(!doc.LoadFile())
     {
         std::cout << "Error Reading XML" << path << std::endl;
         return false;
     }
+
     TiXmlHandle hDoc(&doc);
     TiXmlElement* pElem;
     TiXmlHandle hRoot(0);
@@ -519,16 +565,19 @@ bool MenuManager::readDialDirectory()
         m_systemConnection.clear();
         std::vector<SystemConnection>().swap(m_systemConnection);
     }
+
     // block: EtherTerm
     {
         std::cout << "readDialDirectory - FirstChildElement" << std::endl;
         pElem=hDoc.FirstChildElement().Element();
+
         // should always have a valid root but handle gracefully if it does
         if(!pElem)
         {
             std::cout << "readDialDirectory - EtherTerm Element not found!" << std::endl;
             return false;
         }
+
         std::cout << "Root Value: " << pElem->Value() << std::endl;
         // save this for later
         hRoot=TiXmlHandle(pElem);
@@ -543,6 +592,7 @@ bool MenuManager::readDialDirectory()
     {
         //std::cout << "readDialDirectory - BBS" << std::endl;
         pElem=hRoot.FirstChild("Phonebook").FirstChild().Element();
+
         for(; pElem; pElem=pElem->NextSiblingElement())
         {
             sysconn.name = pElem->Attribute("name");
@@ -559,6 +609,7 @@ bool MenuManager::readDialDirectory()
             m_systemConnection.push_back(sysconn);
         }
     }
+    */
     std::cout << "readDialDirectory - Done" << std::endl;
     return true;
 }
@@ -571,7 +622,7 @@ void MenuManager::createDialDirectory()
     // Create Default Phone Book.
     std::string path = getAssetPath();
     path.append("dialdirectory.xml");
-
+    /*
     TiXmlDocument doc;
     TiXmlDeclaration * decl = new TiXmlDeclaration("1.0", "", "");
     doc.LinkEndChild(decl);
@@ -611,6 +662,7 @@ void MenuManager::createDialDirectory()
     element4->SetAttribute("termType", "ANSI");
     element4->SetAttribute("termSize", "80x25");
     doc.SaveFile(path.c_str());
+    */
 }
 
 /**
@@ -622,6 +674,7 @@ void MenuManager::writeDialDirectory()
     std::string path = getAssetPath();
     path.append("dialdirectory.xml");
 
+    /*
     TiXmlDocument doc;
     TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
     doc.LinkEndChild(decl);
@@ -650,7 +703,9 @@ void MenuManager::writeDialDirectory()
         system->SetAttribute("termType", it.termType);
         system->SetAttribute("termSize", it.termSize);
     }
+
     doc.SaveFile(path.c_str());
+    */
 }
 
 /**
@@ -666,6 +721,7 @@ void MenuManager::setupDialDirectory()
     if(!readDialDirectory())
     {
         createDialDirectory();
+
         if(!readDialDirectory())
         {
             std::cout << "Error: creating dialdirectory.xml"
@@ -745,6 +801,7 @@ int MenuManager::handleMenuUpdates(const std::string &inputSequence)
         std::string sequence = returnParameters;
         return(handleMenuActions(sequence));
     }
+
     return 0;
 }
 
@@ -770,6 +827,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                     m_lightbar_position = m_current_page * m_box_size;
                     m_link_list.drawVectorList(m_current_page, m_lightbar_position);
                 }
+
                 break;
 
             case 'D': // Page Down
@@ -780,35 +838,41 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                     m_lightbar_position = m_current_page * m_box_size;
                     m_link_list.drawVectorList(m_current_page, m_lightbar_position);
                 }
+
                 break;
 
-                // hit ENTER
+            // hit ENTER
             case 'E': // Selected Current System to Dial
             {
                 // Grab Handle to the Current Session/Session Manager to Add to Queue.
                 session_ptr session = m_renderer->m_weak_session.lock();
-                if (session)
+
+                if(session)
                 {
                     session_manager_ptr session_mgr = session->m_weak_session_manager.lock();
-                    if (session_mgr)
+
+                    if(session_mgr)
                     {
                         // Create a New System Connection Pointer of Selected System
                         system_connection_ptr new_connection(
-                                                new SystemConnection(
-                                                    m_systemConnection[m_lightbar_position]
-                                                ));
+                            new SystemConnection(
+                                m_systemConnection[m_lightbar_position]
+                            ));
                         // Add the System to the Connection Queue.
                         session_mgr->m_new_connections.enqueue(new_connection);
                     }
                 }
+
                 return m_lightbar_position;
             }
+
             case '+': // Next Message - Move Down
                 if(m_lightbar_position+1 >= m_link_list.m_listing.size() ||
                         m_link_list.m_listing.size() == 0)
                     break;
 
                 ++m_lightbar_position;
+
                 //Calculate if we go down, ++Current Area, are we on next page or not.
                 // Because 0 Based, need to add +1
                 // Test if we moved to next page.
@@ -836,7 +900,9 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                     ++m_current_page;
                     m_link_list.drawVectorList(m_current_page,m_lightbar_position);
                 }
+
                 break;
+
             case '-': // Previous Message - Move Up
 
                 // Skipping to JMPINPUT bypasses redraws, much faster!
@@ -869,6 +935,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                     --m_current_page;
                     m_link_list.drawVectorList(m_current_page,m_lightbar_position);
                 }
+
                 break;
 
             case 'Q': // Quit Received, Hard Exit.
@@ -897,7 +964,8 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 int idx = m_current_theme_index;
                 ++idx;
                 bool is_theme_changed = changeTheme(idx);
-                if (is_theme_changed)
+
+                if(is_theme_changed)
                 {
                     std::string output = "|CS|CR|15You've switched to the ";
                     output.append(m_menu_config.m_theme_name);
@@ -910,6 +978,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                         "|CS|CR|04You've hit the highest theme available."
                     );
                 }
+
                 m_menu_function.m_previous_menu.erase();
                 // Now redraw the dialing directory
                 parseHeader(m_menu_config.m_ansi_filename);
@@ -922,7 +991,8 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 int idx = m_current_theme_index;
                 --idx;
                 bool is_theme_changed = changeTheme(idx);
-                if (is_theme_changed)
+
+                if(is_theme_changed)
                 {
                     std::string output = "|CS|CR|15You've switched to the ";
                     output.append(m_menu_config.m_theme_name);
@@ -936,6 +1006,7 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                     );
 
                 }
+
                 // Now redraw the dialing directory
                 m_menu_function.m_previous_menu.erase();
                 parseHeader(m_menu_config.m_ansi_filename);
@@ -961,5 +1032,6 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 break;
         }
     }
+
     return 0;
 }

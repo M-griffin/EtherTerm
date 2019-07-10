@@ -118,6 +118,7 @@ public:
         m_protocol.reset(new Protocol(shared_from_this(), m_connection, m_program_path));
         // On creation, load a list of Available Font Sets XML
         bool is_loaded = m_surface_manager->readFontSets();
+
         if(!is_loaded)
         {
             std::cout << "Error: m_surface_manager->readFontSets()" << std::endl;
@@ -180,15 +181,16 @@ public:
      */
     void handleConnection(const std::error_code& error)
     {
-        if (error)
+        if(error)
         {
             std::cout << "Unable to Connect, closing down session." << std::endl;
+
             // Close the Socket here so shutdown doesn't call both close() and shutdown() on socket.
             if(m_connection->socket()->isActive())
             {
                 m_connection->socket()->close();
             }
-            
+
             m_is_leaving = true;
             std::cout << "Connection Closed, Leaving Session! " << std::endl;
 
@@ -196,11 +198,13 @@ public:
             if(!m_input_handler->isGlobalShutdown())
             {
                 session_manager_ptr session_mgr = m_weak_session_manager.lock();
+
                 if(session_mgr)
                 {
                     session_mgr->leave(shared_from_this());
                 }
             }
+
             return;
         }
 
@@ -216,6 +220,7 @@ public:
         // Important, clear out buffer before each read.
         // A reference is passed by Session through the IO Service.
         std::vector<unsigned char>().swap(m_in_data_vector);
+
         if(m_connection->socket()->isActive() && !m_is_shutdown)
         {
             m_connection->async_read(m_in_data_vector,
@@ -245,6 +250,7 @@ public:
         }
 
         session_manager_ptr session_mgr = m_weak_session_manager.lock();
+
         if(session_mgr && !m_is_shutdown)
         {
             if(!error)
@@ -259,26 +265,27 @@ public:
                     if(m_telnet_manager)
                     {
                         std::string parsed_data = "";
+
                         if(!m_is_transfer)
                         {
-                        	parsed_data = m_telnet_manager->parseIncomingData(m_in_data_vector);
+                            parsed_data = m_telnet_manager->parseIncomingData(m_in_data_vector);
                         }
                         else
                         {
                             // Were in a file transfer, forward
                             parsed_data = std::string(m_in_data_vector.begin(), m_in_data_vector.end());
-                            
+
                             // need some detection when transfer is completed!
                             return;
                         }
 
                         // Debugging ESC Sequences and data incoming from server.
-                        
+                        /*
                         std::ofstream ostrm("stream_output.txt", std::ios_base::app);
                         if (ostrm.is_open())
                         {
                             ostrm << parsed_data << std::flush;
-                        }
+                        }*/
 
                         // Process Only if data in the buffer.
                         if(parsed_data.size() > 0)
@@ -286,7 +293,7 @@ public:
                             m_sequence_decoder->decodeEscSequenceData(parsed_data);
                         }
 
-                        ostrm.close();
+                        //ostrm.close();
                     }
                     else
                     {
@@ -296,6 +303,7 @@ public:
                 else if(m_system_connection->protocol == "IRC")
                 {
                     std::string incoming_data = "";
+
                     for(auto c : m_in_data_vector)
                     {
                         // Ignore null's
@@ -303,6 +311,7 @@ public:
                         {
                             break;
                         }
+
                         incoming_data += c;
                     }
 
@@ -317,6 +326,7 @@ public:
                     if(m_in_data_vector.size() != 0)
                     {
                         std::string incoming_data = "";
+
                         for(auto c : m_in_data_vector)
                         {
                             // Ignore null's
@@ -324,8 +334,10 @@ public:
                             {
                                 break;
                             }
+
                             incoming_data += c;
                         }
+
                         m_sequence_decoder->decodeEscSequenceData(incoming_data);
                     }
                 }
@@ -367,6 +379,7 @@ public:
         else
         {
             std::cout << "Error, Not connected to the SessionManager!" << std::endl;
+
             if(m_connection->socket()->isActive())
             {
                 // if the socket is still active, shut it down
@@ -430,7 +443,7 @@ public:
                 }
 
             }
-            catch (std::exception &ex)
+            catch(std::exception &ex)
             {
                 std::cout << "handleWrite() - Caught Exception on shutdown: " << ex.what();
             }
@@ -487,7 +500,7 @@ public:
      */
     void createIrcManager()
     {
-        m_irc_manager.reset (
+        m_irc_manager.reset(
             new IrcManager(shared_from_this())
         );
     }
@@ -518,7 +531,7 @@ public:
             {
                 // Menu Key returned EOF for System Exit.
                 // Handle Closing Windows and Program.
-                if (m_menu_manager->handleMenuUpdates(input_sequence) == EOF)
+                if(m_menu_manager->handleMenuUpdates(input_sequence) == EOF)
                 {
                     // This is mirror clicking X on the Window and proceed with
                     // Proper shutdown and de-allocation.
@@ -529,6 +542,7 @@ public:
                     SDL_PushEvent(&event);
                     return;
                 }
+
                 m_menu_manager->updateDialDirectory();
             }
         }
@@ -537,6 +551,7 @@ public:
             // We have Socket Connection, pass input back to the server.
             std::string input_sequence;
             m_input_handler->getInputSequence(input_sequence);
+
             if(input_sequence.size() > 0)
             {
                 if(m_system_connection->protocol == "IRC")
@@ -575,6 +590,7 @@ public:
         while(!m_data_queue.is_empty() && !m_is_shutdown)
         {
             msgQueue = std::move(m_data_queue.dequeue());
+
             if(msgQueue.m_text.empty())
             {
                 // Make Sure Vector is not Empty!
@@ -587,18 +603,20 @@ public:
             {
                 m_sequence_parser->textInput(msgQueue.m_text);
             }
+
             msgQueue.clear();
         }
 
         // Handle Immediate ESC Position Response Sequences
         // Queue all responses and write out as single output.
         std::string esc_response_sequence = "";
-        while (m_write_queue.size() > 0 && !m_is_shutdown)
+
+        while(m_write_queue.size() > 0 && !m_is_shutdown)
         {
             esc_response_sequence += m_write_queue.dequeue();
         }
 
-        if (esc_response_sequence.size() > 0)
+        if(esc_response_sequence.size() > 0)
         {
             deliver(esc_response_sequence);
         }
@@ -641,6 +659,7 @@ public:
                     if(m_cursor_blink % 2 == 0)
                     {
                         m_ttime2 = SDL_GetTicks();
+
                         if(m_start_blinking && (m_ttime2 - m_ttime) > 400)
                         {
                             m_renderer->renderCursorOffScreen();
@@ -652,6 +671,7 @@ public:
                     else
                     {
                         m_ttime2 = SDL_GetTicks();
+
                         if(m_start_blinking && (m_ttime2 - m_ttime) > 400)
                         {
                             m_renderer->renderCursorOnScreen();
@@ -672,6 +692,7 @@ public:
     {
         // Remove our session from the list close the session.
         session_manager_ptr session_mgr = m_weak_session_manager.lock();
+
         if(session_mgr)
         {
             // If dialing directory is closed, then shutdown all windows/sessions
