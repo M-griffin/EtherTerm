@@ -31,6 +31,8 @@
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <VirtualDirectory Name="src">
+    <File Name="../src/dialing_manager.cpp"/>
+    <File Name="../src/dialing_manager.hpp"/>
     <File Name="../src/static_methods.hpp"/>
     <File Name="../src/dialing_directory_dao.cpp"/>
     <File Name="../src/dialing_directory_dao.hpp"/>

@@ -1,6 +1,6 @@
 
 /*
- *  EtherTerm (c) 2014-2018 Michael Griffin <mrmisticismo@hotmail.com>
+ *  EtherTerm (c) 2014-2019 Michael Griffin <mrmisticismo@hotmail.com>
  *  An Emulated Client Terminal in SDL 2.0
  *  With CP437 Character and ANSI Graphics Support.
  *
@@ -9,6 +9,7 @@
  */
 
 #include "interface.hpp"
+#include "dialing_manager.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -39,10 +40,10 @@
 #include <memory>
 
 /**
- * @brief Initial Startup for SDL with Video
+ * @brief Program Initilization
  * @return
  */
-bool SDLStartUp()
+bool startup(std::string &program_path)
 {
     bool success = true;
 
@@ -56,19 +57,29 @@ bool SDLStartUp()
     if(SDLNet_Init()==-1)
     {
         std::cout << "SDL_Net could not initialize! SDL Error: " << SDL_GetError() << std::endl;
-        exit(2);
+        success = false;
     }
 
     // Turn off, might make a toggle for this later on.
     SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
 
-    // Validate Dialing Directory here, if doesn't exist create default with entries.
+    // Validate Dialing Directory here, if doesn't exist create default with an entry.
+    dial_manager_ptr dial_manager(new DialingManager(program_path));
+
+    if(!dial_manager->validateFile())
+    {
+        std::cout << "Dialing Directory Validation has failed. " << std::endl;
+        success = false;
+    }
 
     return success;
 }
 
-/*
- *  Main Program Entrance
+/**
+ * @brief Main Program Entrance
+ * @param argc
+ * @param argv
+ * @return
  */
 int main(int argc, char* argv[])
 {
@@ -99,34 +110,34 @@ int main(int argc, char* argv[])
     }
 
     // Get the Folder the Executable runs in.
-    std::string realPath;
+    std::string real_path;
 #ifdef TARGET_OS_MAC
-    char currentPath[PATH_MAX];
-    uint32_t size = sizeof(currentPath);
+    char current_path[PATH_MAX];
+    uint32_t size = sizeof(current_path);
 
-    if(_NSGetExecutablePath(currentPath, &size) != 0)
+    if(_NSGetExecutablePath(current_path, &size) != 0)
     {
         std::cout << "Unable to get Program Path!" << std::endl;
     }
 
     // Remove Executable
-    realPath = currentPath;
+    real_path = current_path;
     std::string::size_type position;
-    position = realPath.rfind("/EtherTerm");
+    position = real_path.rfind("/EtherTerm");
 
     if(position != std::string::npos)
-        realPath.erase(position+1,realPath.size()-1);
+        real_path.erase(position+1,real_path.size()-1);
 
     // remove extra './'
-    position = realPath.rfind("./");
+    position = real_path.rfind("./");
 
     if(position != std::string::npos)
-        realPath.erase(position,2);
+        real_path.erase(position,2);
 
 #elif _WIN32
     // Get the Current Program path.
-    char currentPath[PATH_MAX];
-    int result = GetModuleFileName(NULL, currentPath, PATH_MAX-1);
+    char current_path[PATH_MAX];
+    int result = GetModuleFileName(NULL, current_path, PATH_MAX-1);
 
     if(result == 0)
     {
@@ -134,19 +145,19 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    realPath = currentPath;
-    std::string::size_type position = realPath.rfind("\\",realPath.size()-1);
+    real_path = current_path;
+    std::string::size_type position = real_path.rfind("\\",real_path.size()-1);
 
     if(position != std::string::npos)
-        realPath.erase(position+1);
+        real_path.erase(position+1);
 
 #else
 
-    char exePath[PATH_MAX] = {0};
+    char exe_path[PATH_MAX] = {0};
 #ifdef __FreeBSD__
-    ssize_t result = readlink("/proc/curproc/file", exePath, PATH_MAX);
+    ssize_t result = readlink("/proc/curproc/file", exe_path, PATH_MAX);
 #else
-    ssize_t result = readlink("/proc/self/exe", exePath, PATH_MAX);
+    ssize_t result = readlink("/proc/self/exe", exe_path, PATH_MAX);
 #endif
 
     if(result < 0)
@@ -156,19 +167,19 @@ int main(int argc, char* argv[])
     }
 
     const char* t = " \t\n\r\f\v";
-    realPath = exePath;
-    realPath = realPath.erase(realPath.find_last_not_of(t) + 1);
-    realPath += "/";
+    real_path = exe_path;
+    real_path = real_path.erase(real_path.find_last_not_of(t) + 1);
+    real_path += "/";
 
     // Remove Executable
     std::string::size_type position;
-    position = realPath.rfind("/EtherTerm");
+    position = real_path.rfind("/EtherTerm");
 
     if(position != std::string::npos)
-        realPath.erase(position+1,realPath.size()-1);
+        real_path.erase(position+1,real_path.size()-1);
 
 #endif
-    std::cout << "EtherTerm Working directory is: " << realPath << std::endl;
+    std::cout << "EtherTerm Working directory is: " << real_path << std::endl;
 
     /*
      * We want to be able to run the program headless without SDL loaded
@@ -178,7 +189,7 @@ int main(int argc, char* argv[])
     // Setup the interface for spawning session windows.
     // Using Smart Pointer will clear final allocation prior to full exit of system.
     {
-        interface_ptr interface_spawn(new Interface(realPath));
+        interface_ptr interface_spawn(new Interface(real_path));
 
         // Don't loaded menu system waiting for user input, just handle
         // Scripts and connections or parsing functions for testing.
@@ -189,14 +200,20 @@ int main(int argc, char* argv[])
             // or Waiting for Keyboard input from the window events.
 
             // Nothing to do right now.
+            std::cout << "is_headless not implemented - exiting" << std::endl;
+            interface_spawn->m_is_global_shutdown = true;
+            Sleep(2000);
             exit(0);
         }
         else
         {
             // Startup the Window System and load initial menu
             // Window with Initialization with window event processing.
-            if(!SDLStartUp())
+            if(!startup(real_path))
             {
+                std::cout << "Startup issues - exiting" << std::endl;
+                interface_spawn->m_is_global_shutdown = true;
+                Sleep(2000);
                 exit(-1);
             }
 
