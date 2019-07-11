@@ -1,4 +1,5 @@
 
+
 .. image:: http://htc.zapto.org:1024/jenkins/job/EtherTerm/badge/icon?png
     :target: https://htc.zapto.org/jenkins/job/EtherTerm/
 
@@ -126,13 +127,12 @@ Generally, the following libraries must be installed:
 As well as a recent version of gnu/gcc providing g++, or clang.
 ``GCC/G++ version 5.x and above are required along with -std=c++11``
 
-I highly reccomend and IDE such as - `CodeLite <https://www.codelite.org>`_
-Makefiles generated from Codelite are available in the project folders for building on the commandline.
+- I highly reccomend and IDE such as - `CodeLite <https://www.codelite.org>`_
+- Makefiles generated from Codelite are available in the project folders for building on the commandline.
+- **FreeBSD 11 and OSX High Sierra have been tested with latest version of clang LLVM**
+- For Windows, mingw32 or 64 is required.
 
-**FreeBSD 11 and OSX High Sierra have been tested with latest version of clang LLVM**
-For Windows, mingw32 or 64 is required.
-
-- **NOTE**: EtherTerm will seek an ``./assets`` folder relative to the executable.  In this way,
+**NOTE**: EtherTerm will seek an ``./assets`` folder relative to the executable.  In this way,
   it is not (yet) a very "portable" executable.  At this stage, a build folder has been created with quick scripts that will copy from the DEBUG folder to the build folder where the assets is now located by default.
 
 

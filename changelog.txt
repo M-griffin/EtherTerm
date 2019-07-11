@@ -1,4 +1,12 @@
 
+Change Log 0.4.7 - 2019-07-10 - Merge to Master
+- Fixed Posix issue with missing SOCKET definition on some linux builds
+- Added new PostBuild to cleanup of Makefiles to remove my develop paths to make it
+  easier to build from the command line.  This will now automatically clean when i build the project
+  so when code changes are commited the Makefiles will be already cleaned.
+  NOTE, i don't have FreeBSD and OSX VM's working right now, so those projects will be updated lateron.
+- Fixed Display bug in Posix with Dialing Directory and MCI Code Off-Sets
+
 Change Log 0.4.7 - 2018-04-07
 - Re-Added Back Protocol for testing downloads. WIP.
 - Added back pulling screen size 80x25, 80x50 etc.. from Dialing Directory.
