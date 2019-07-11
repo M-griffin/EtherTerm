@@ -65,7 +65,7 @@ bool DialingDirectoryDao::saveDialingDirectory(dial_directory_ptr dialing_direct
     {
         auto &opt = dialing_directory->system_entries[i];
 
-        out << YAML::Key << "system_entries";
+        out << YAML::Key << "system_entry";
         out << YAML::Value << YAML::BeginMap;
         out << YAML::Key << "index" << YAML::Value << opt.index;
         out << YAML::Key << "name" << YAML::Value << opt.name;

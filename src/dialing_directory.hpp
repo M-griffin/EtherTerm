@@ -175,7 +175,7 @@ struct convert<DialingDirectory>
             system["term_type"]        = sys.term_type;
             system["term_size"]        = sys.term_size;
 
-            node["system_entries"].push_back(sys);
+            node["system_entry"].push_back(sys);
         }
 
         return node;
@@ -199,7 +199,7 @@ struct convert<DialingDirectory>
             key.clear();
             key = it->first.as<std::string>();
 
-            if(key == "system_entries")
+            if(key == "system_entry")
             {
                 rhs.system_entries.push_back(it->second.as<SystemEntry>());
             }
