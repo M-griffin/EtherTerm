@@ -37,15 +37,15 @@ public:
     explicit SystemEntry()
         : index(-1)
         , name("A New System")
-        , ip("")
+        , ip("localhost")
         , port(23)
-        , protocol("")
+        , protocol("TELNET")
         , login("")
         , password("")
-        , font("")
-        , key_map("")
-        , term_type("")
-        , term_size("")
+        , font("vga8x16.bmp")
+        , key_map("ANSI")
+        , term_type("ANSI")
+        , term_size("80x25")
     { }
 
     ~SystemEntry() { }
@@ -211,7 +211,7 @@ struct convert<DialingDirectory>
 
 }
 
+typedef std::shared_ptr<SystemEntry> system_entry_ptr;
 typedef std::shared_ptr<DialingDirectory> dial_directory_ptr;
-typedef std::weak_ptr<DialingDirectory> dial_directory_wptr;
 
 #endif // DIALING_DIRECTORY_HPP

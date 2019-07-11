@@ -5,6 +5,7 @@
 #include "session_io.hpp"
 #include "session_manager.hpp"
 #include "socket_handler.hpp"
+#include "dialing_directory.hpp"
 #include "io_service.hpp"
 
 #include <sstream>
@@ -120,15 +121,14 @@ public:
                     // Now test for any waiting connection spawns
                     while(!m_session_manager->m_new_connections.is_empty())
                     {
-                        system_connection_ptr new_system;
-                        new_system = m_session_manager->m_new_connections.dequeue();
+                        system_entry_ptr new_system_connection = m_session_manager->m_new_connections.dequeue();
 
                         std::cout << "Swaping a new system connection from Interface!" << std::endl;
-                        spawnConnectionSession(new_system);
+                        spawnConnectionSession(new_system_connection);
                     }
                 }
 
-                // Delay for CPU Usage, 10 ms is pretty good.
+                // Delay for CPU Usage
                 SDL_Delay(15);
 
             }
@@ -144,8 +144,8 @@ public:
      */
     void spawnLocalSession()
     {
-
-        // Hard Coded for testing, move this to direcotry.ini!
+        // Hard Coded for for Dialing Directory
+        // Maybe created a System INI file or YAML for this in the future / Themes
         int height = 25;
         int width = 80;
 
@@ -168,6 +168,7 @@ public:
         // Start the Dialing Directory on the local instance
         new_session->startMenuInstance();
     }
+
     /**
      * @brief Template for String to Integer.
      * @param Text
@@ -181,24 +182,23 @@ public:
         return ss >> result ? result : 0;
     }
 
-
     /**
      * @brief Parses the SystemConnection and Sets Hight and Width
      * @param height
      * @param width
      */
-    void parseTermSize(std::string termSize, int &height, int &width)
+    void parseTermSize(std::string term_size, int &height, int &width)
     {
-        std::string::size_type index = termSize.find("x", 0);
+        std::string::size_type index = term_size.find("x", 0);
 
         if(index != std::string::npos)
         {
-            std::string str_width = termSize.substr(0, index);
+            std::string str_width = term_size.substr(0, index);
             std::cout << "termSize Width: " << str_width << std::endl;
             width = stringToNumber<int>(str_width);
 
 
-            std::string str_height = termSize.substr(index+1);
+            std::string str_height = term_size.substr(index+1);
             std::cout << "termSize Height: " << str_height << std::endl;
             height = stringToNumber<int>(str_height);
         }
@@ -208,56 +208,50 @@ public:
      * @brief Spawn Connection Sessions
      *        Connection Sessions handle their own IO
      */
-    void spawnConnectionSession(system_connection_ptr system_connection)
+    void spawnConnectionSession(system_entry_ptr system_entry)
     {
-        if(!system_connection)
+        if(!system_entry)
         {
             return;
         }
 
         // Basic Debugging.
         std::cout << "Connecting to: "
-                  << system_connection->protocol
+                  << system_entry->protocol
                   << " "
-                  << system_connection->name
+                  << system_entry->name
                   << " "
-                  << system_connection->ip
+                  << system_entry->ip
                   << " "
-                  << system_connection->port
+                  << system_entry->port
                   << std::endl;
 
         // Connection handles TCP_Socket
         connection_ptr new_connection(new async_connection(m_io_service));
 
-        // Hard Coded for testing, move this to direcotry.ini!
+        // Set Default Values, overridden by dialing Directory Values.
         int height = 25;
         int width = 80;
 
-        parseTermSize(system_connection->termSize, height, width);
+        parseTermSize(system_entry->term_size, height, width);
 
         // Create the Session before passing to the Connection (Async Thread)
         session_ptr new_session = Session::create(
                                       new_connection,
                                       m_session_manager,
                                       m_program_path,
-                                      system_connection,
+                                      system_entry,
                                       height,
                                       width
                                   );
-        std::cout << "Connected Session Created" << std::endl;
+        std::cout << "Connection Session Created for " << system_entry->name << std::endl;
 
         // Call Startup outside of constructor for shared_from_this() handle.
         new_session->startup();
 
-        // If Telnet Session spawn it, Add Other Instances later on, SSH, IRC, FTP etc..
-        // TODO, think this sets up the ansi parser might need to break this out.
-        //if(system_connection->protocol == "TELNET" || system_connection->protocol == "SSH")
-        //{
-
         // TODO, right now everything passes through TelnetManager
         std::cout << "Starting TelnetManager in Interface" << std::endl;
         new_session->createTelnetManager();
-        //}
 
         // Start Async Read/Writes Loop for Session Socket Data.
         // Required only for Sessions that make connections, Local sessions do not use this.
@@ -269,28 +263,28 @@ public:
         new_session->m_sequence_parser->setCursorActive(true);
 
         // IRC setup scrolling region
-        if(system_connection->protocol == "IRC")
+        if(system_entry->protocol == "IRC")
         {
             new_session->createIrcManager();
             new_session->m_irc_manager->startUp();
         }
 
         // Setup the Connection String
-        std::string connection_string = system_connection->ip;
+        std::string connection_string = system_entry->ip;
         connection_string.append(":");
-        connection_string.append(std::to_string(system_connection->port));
+        connection_string.append(std::to_string(system_entry->port));
 
         // TODO Change this to WriteSequence and use vector, incase passwords or others has colons
         // That could casue issues on string split!
-        if(system_connection->protocol == "SSH")
+        if(system_entry->protocol == "SSH")
         {
             connection_string.append(":");
-            connection_string.append(system_connection->login);
+            connection_string.append(system_entry->login);
             connection_string.append(":");
-            connection_string.append(system_connection->password);
+            connection_string.append(system_entry->password);
         }
 
-        new_session->createConnection(connection_string, system_connection->protocol);
+        new_session->createConnection(connection_string, system_entry->protocol);
     }
 
     /**
@@ -304,9 +298,9 @@ public:
 
         if(num_sesisons > 0 && !m_is_global_shutdown)
         {
-            std::set<session_ptr>::iterator itEnd = end(m_session_manager->m_sessions);
+            std::set<session_ptr>::iterator iterator_end = end(m_session_manager->m_sessions);
 
-            for(auto it = begin(m_session_manager->m_sessions); it != itEnd; ++it)
+            for(auto it = begin(m_session_manager->m_sessions); it != iterator_end; ++it)
             {
                 // If number of sessions changed, (Window was Closed) restart loop.
                 if(m_session_manager->numberOfSessions() == num_sesisons)
@@ -317,7 +311,7 @@ public:
                     {
                         // Pass the Events to the specific Session for Specific Window and Input Events.
                         (*it)->m_input_handler->update(event);
-                        return;
+                        continue;
                     }
                 }
                 else
@@ -332,7 +326,7 @@ public:
                         {
                             // Pass the Events to the specific Session for Specific Window and Input Events.
                             (*it)->m_input_handler->update(event);
-                            return;
+                            continue;
                         }
                     }
                     else

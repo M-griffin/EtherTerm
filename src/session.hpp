@@ -12,6 +12,7 @@
 #include "message_queue.hpp"
 #include "menu_manager.hpp"
 #include "session_manager.hpp"
+#include "dialing_directory.hpp"
 #include "telnet_manager.hpp"
 #include "irc_manager.hpp"
 #include "safe_queue.hpp"
@@ -48,7 +49,7 @@ public:
         connection_ptr           &connection,
         std::string              &program_path,
         session_manager_ptr      &session_manager,
-        system_connection_ptr    &system_connection,
+        system_entry_ptr         &system_entry,
         int                      &term_height,
         int                      &term_width
     )
@@ -68,7 +69,7 @@ public:
           )
         , m_surface_manager(new SurfaceManager(m_window_manager, program_path))
         , m_connection(connection)
-        , m_system_connection(system_connection)
+        , m_system_entry(system_entry)
         , m_is_connected(false)
         , m_is_leaving(false)
         , m_is_shutdown(false)
@@ -140,7 +141,7 @@ public:
         connection_ptr           connection,
         session_manager_ptr      &session_manager,
         std::string              &program_path,
-        system_connection_ptr    system_connection,
+        system_entry_ptr         system_entry,
         int                      &term_height,
         int                      &term_width)
 
@@ -151,7 +152,7 @@ public:
                 connection,
                 program_path,
                 session_manager,
-                system_connection,
+                system_entry,
                 term_height,
                 term_width
             )
@@ -258,7 +259,7 @@ public:
                 // Parse incoming data, send through decoder
                 //std::string incoming_data = m_raw_data;
 
-                if(m_system_connection->protocol == "TELNET")
+                if(m_system_entry->protocol == "TELNET")
                 {
                     // Handle Telnet option parsing from incoming data.
                     // Returns Test and ESC Sequence, All Options are Responsed to in the Manager.
@@ -300,7 +301,7 @@ public:
                         std::cout << "Error: m_telnet_manager inaccessable!" << std::endl;
                     }
                 }
-                else if(m_system_connection->protocol == "IRC")
+                else if(m_system_entry->protocol == "IRC")
                 {
                     std::string incoming_data = "";
 
@@ -478,9 +479,9 @@ public:
     void createTelnetManager()
     {
         // Setup and Load Font from Dialing Directory for Selected System
-        if(m_system_connection->font != "")
+        if(m_system_entry->font != "")
         {
-            m_surface_manager->setCurrentFont(m_system_connection->font);
+            m_surface_manager->setCurrentFont(m_system_entry->font);
             m_surface_manager->loadBitmapFontImage();
         }
 
@@ -554,7 +555,7 @@ public:
 
             if(input_sequence.size() > 0)
             {
-                if(m_system_connection->protocol == "IRC")
+                if(m_system_entry->protocol == "IRC")
                 {
                     m_irc_manager->handleUserInput(input_sequence);
                 }
@@ -755,7 +756,7 @@ public:
     menu_manager_ptr         m_menu_manager;
 
     // Holds System Connection Information (struct resides/passed from MenuManager)
-    system_connection_ptr    m_system_connection;
+    system_entry_ptr         m_system_entry;
 
     // Handle to external protocols (file transfers)
     protocol_ptr             m_protocol;

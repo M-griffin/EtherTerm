@@ -26,6 +26,51 @@ public:
 #endif
     }
 
+    /**
+     * @brief Helper to append folder to path
+     */
+    static std::string getAssetPath(std::string program_path)
+    {
+        // Create Default Phone Book.
+        std::string path = program_path;
+#ifdef _WIN32
+        path.append("assets\\");
+#else
+        path.append("assets/");
+#endif
+        return path;
+    }
+
+    /**
+     * @brief Helper to append directory path
+     */
+    static std::string getDirectoryPath(std::string program_path)
+    {
+        // Create Default Phone Book.
+        std::string path = getAssetPath(program_path);
+#ifdef _WIN32
+        path.append("directory\\");
+#else
+        path.append("directory/");
+#endif
+        return path;
+    }
+
+    /**
+     * @brief Helper to append ansi path
+     */
+    static std::string getAnsiPath(std::string program_path)
+    {
+        // Create Default Phone Book.
+        std::string path = getAssetPath(program_path);
+#ifdef _WIN32
+        path.append("ansi\\");
+#else
+        path.append("ansi/");
+#endif
+        return path;
+    }
+
 };
 
 #endif // STATIC_METHODS_HPP

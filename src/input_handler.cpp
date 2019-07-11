@@ -23,12 +23,13 @@ InputHandler::InputHandler(surface_manager_ptr &surface_manager, session_ptr ses
 
     // Setup default keymapping, grab from session
     session_ptr weak_session = m_weak_session.lock();
+
     if(weak_session)
     {
-        if(weak_session->m_system_connection)
+        if(weak_session->m_system_entry)
         {
             // System Connection is populated from DialDirectory.XML File for each system
-            m_keyMap = weak_session->m_system_connection->keyMap;
+            m_keyMap = weak_session->m_system_entry->key_map;
         }
     }
 }
@@ -70,17 +71,20 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_EXPOSED:
+        {
+            SDL_Log("Window %d exposed", event.window.windowID);
+            session_ptr session = m_weak_session.lock();
+
+            if(session)
             {
-                SDL_Log("Window %d exposed", event.window.windowID);
-                session_ptr session = m_weak_session.lock();
-                if(session)
-                {
-                    session->m_renderer->renderScreen();
-                    session->m_renderer->drawTextureScreen();
-                }
-                break;
+                session->m_renderer->renderScreen();
+                session->m_renderer->drawTextureScreen();
             }
+
             break;
+        }
+        break;
+
         case SDL_WINDOWEVENT_MOVED:
             /*
             SDL_Log("Window %d moved to %d,%d",
@@ -89,65 +93,72 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_RESIZED:
-            {
-                SDL_Log("Window %d resized to %dx%d",
-                        event.window.windowID,
-                        event.window.data1,
-                        event.window.data2);
+        {
+            SDL_Log("Window %d resized to %dx%d",
+                    event.window.windowID,
+                    event.window.data1,
+                    event.window.data2);
 
-                session_ptr session = m_weak_session.lock();
-                if(session)
-                {
-                    session->m_renderer->renderScreen();
-                    session->m_renderer->drawTextureScreen();
-                }
+            session_ptr session = m_weak_session.lock();
+
+            if(session)
+            {
+                session->m_renderer->renderScreen();
+                session->m_renderer->drawTextureScreen();
             }
-            break;
+        }
+        break;
 
         case SDL_WINDOWEVENT_MINIMIZED:
             //SDL_Log("Window %d minimized", event.window.windowID);
             break;
 
         case SDL_WINDOWEVENT_MAXIMIZED:
-            {
-                SDL_Log("Window %d maximized", event.window.windowID);
+        {
+            SDL_Log("Window %d maximized", event.window.windowID);
 
-                session_ptr session = m_weak_session.lock();
-                if(session)
-                {
-                    session->m_renderer->renderScreen();
-                    session->m_renderer->drawTextureScreen();
-                }
+            session_ptr session = m_weak_session.lock();
+
+            if(session)
+            {
+                session->m_renderer->renderScreen();
+                session->m_renderer->drawTextureScreen();
             }
-            break;
+        }
+        break;
 
         case SDL_WINDOWEVENT_RESTORED:
-            {
-                SDL_Log("Window %d restored", event.window.windowID);
+        {
+            SDL_Log("Window %d restored", event.window.windowID);
 
-                session_ptr session = m_weak_session.lock();
-                if(session)
-                {
-                    session->m_renderer->renderScreen();
-                    session->m_renderer->drawTextureScreen();
-                }
+            session_ptr session = m_weak_session.lock();
+
+            if(session)
+            {
+                session->m_renderer->renderScreen();
+                session->m_renderer->drawTextureScreen();
             }
-            break;
+        }
+        break;
 
         case SDL_WINDOWEVENT_CLOSE:
+        {
+            SDL_Log("Window %d closed received by user!", event.window.windowID);
+
+            if(!m_globalShutdown)
             {
-                SDL_Log("Window %d closed received by user!", event.window.windowID);
-                if(!m_globalShutdown)
+                m_globalShutdown = true;
+                session_ptr session = m_weak_session.lock();
+
+                if(session)
                 {
-                    m_globalShutdown = true;
-                    session_ptr session = m_weak_session.lock();
-                    if(session)
-                    {
-                        session->closeThisSession();
-                    }
+                    session->closeThisSession();
                 }
-                return;
             }
+
+            return;
+        }
+
         case SDL_WINDOWEVENT_ENTER:
             //SDL_Log("Mouse entered window %d",
             //event.window.windowID);
@@ -158,41 +169,47 @@ void InputHandler::handleWindowEvents(SDL_Event &event)
             break;
 
         case SDL_WINDOWEVENT_FOCUS_GAINED:
+        {
+            SDL_Log("Window %d gained keyboard focus",
+                    event.window.windowID);
+
+            if(!m_globalShutdown)
             {
-                SDL_Log("Window %d gained keyboard focus",
-                        event.window.windowID);
-
-                if(!m_globalShutdown)
-                {
-                    SDL_StartTextInput();
-                }
-
-                // Mark the current window as active.
-                session_ptr session = m_weak_session.lock();
-                if(session)
-                {
-                    session->m_window_manager->setActiveWindow(true);
-                }
-                break;
+                SDL_StartTextInput();
             }
+
+            // Mark the current window as active.
+            session_ptr session = m_weak_session.lock();
+
+            if(session)
+            {
+                session->m_window_manager->setActiveWindow(true);
+            }
+
+            break;
+        }
+
         case SDL_WINDOWEVENT_FOCUS_LOST:
+        {
+            SDL_Log("Window %d lost keyboard focus",
+                    event.window.windowID);
+
+            if(!m_globalShutdown)
             {
-                SDL_Log("Window %d lost keyboard focus",
-                        event.window.windowID);
-
-                if(!m_globalShutdown)
-                {
-                    SDL_StopTextInput();
-                }
-
-                // Mark the current window as inactive.
-                session_ptr session = m_weak_session.lock();
-                if(session)
-                {
-                    session->m_window_manager->setActiveWindow(false);
-                }
-                break;
+                SDL_StopTextInput();
             }
+
+            // Mark the current window as inactive.
+            session_ptr session = m_weak_session.lock();
+
+            if(session)
+            {
+                session->m_window_manager->setActiveWindow(false);
+            }
+
+            break;
+        }
+
         default:
             //SDL_Log("Window %d got unknown event %d",
             //event.window.windowID, event.window.event);
@@ -234,6 +251,7 @@ void InputHandler::handleMouseButtonUpEvent(SDL_Event &event)
         m_mouseReleaseYPosition = event.button.y;
 
         session_ptr session = m_weak_session.lock();
+
         if(session)
         {
             // Clear and redraw the screen (remove selection box).
@@ -274,6 +292,7 @@ void InputHandler::handleMouseMotionEvent(SDL_Event &event)
             << std::endl;
         */
         session_ptr session = m_weak_session.lock();
+
         if(session)
         {
             // Process the Mouse Position from the Origin
@@ -316,42 +335,50 @@ bool InputHandler::handleMouseButtonDownEvent(SDL_Event &event)
         inputText = SDL_GetClipboardText();
         // Some input filtering
         std::string::size_type id1 = 0;
+
         while(1)
         {
             // Replace \r\n with \r
             id1 = inputText.find("\r\n", 0);
+
             if(id1 != std::string::npos)
             {
                 inputText.erase(id1+1,1);
             }
             else break;
         }
+
         while(1)
         {
             // Replace Tabs with (4) Spaces.
             // Need Toggle in INI for \t or 4 spaces
             // On Paste, not all systems handle \t.
             id1 = inputText.find("\t", 0);
+
             if(id1 != std::string::npos)
             {
                 inputText.replace(id1,1,"    ");
             }
             else break;
         }
+
         while(1)
         {
             // Change \n to \r
             id1 = inputText.find("\n", 0);
+
             if(id1 != std::string::npos)
             {
                 inputText[id1] = '\r';
             }
             else break;
         }
+
         setInputSequence(inputText);
         inputText.erase();
         return true;
     }
+
     return false;
 }
 
@@ -376,6 +403,7 @@ bool InputHandler::handleShiftControlKeys(SDL_Event &event)
             //<< event.key.keysym.sym << std::endl;
             break;
     }
+
     return false;
 }
 
@@ -391,6 +419,7 @@ bool InputHandler::handleControlKeys(SDL_Event &event)
     // Grab the Current Key Symbol.
     char ch = static_cast<char>(event.key.keysym.sym);
     std::string sequence(&ch);
+
     if((event.key.keysym.sym >= (Uint16)'a') &&
             (event.key.keysym.sym <= (Uint16)'z'))
     {
@@ -400,6 +429,7 @@ bool InputHandler::handleControlKeys(SDL_Event &event)
         setInputSequence(sequence);
         return true;
     }
+
     return false;
 }
 
@@ -416,22 +446,26 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
             if(!m_globalShutdown)
             {
                 session_ptr session = m_weak_session.lock();
+
                 if(session && !session->m_is_dial_directory)
                 {
                     m_globalShutdown = true;
                     session->closeThisSession();
                 }
             }
+
             return false;
 
-		case 'd': // ALT D - Start Download
+        case 'd': // ALT D - Start Download
             if(!m_globalShutdown)
             {
                 session_ptr session = m_weak_session.lock();
+
                 if(session && !session->m_is_dial_directory)
                 {
                     // Start External Protocol Session
-                    if (session->m_is_transfer) {
+                    if(session->m_is_transfer)
+                    {
                         std::cout << "ALT - D [End Download]" << std::endl;
                         session->m_is_transfer = false;
 
@@ -446,106 +480,108 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
                     }
                 }
             }
+
             return false;
-			
+
         case SDLK_RETURN:
+        {
+            session_ptr session = m_weak_session.lock();
+
+            if(session)
             {
-                session_ptr session = m_weak_session.lock();
-                if(session)
-                {
-                    // Ignore full screen on dialing directory
-                    // Allow other window resizing, Full screen
-                    // Should be limited to connection windows.
-                    if (session->m_window_manager->getWindowId() == 1 ||
+                // Ignore full screen on dialing directory
+                // Allow other window resizing, Full screen
+                // Should be limited to connection windows.
+                if(session->m_window_manager->getWindowId() == 1 ||
                         session->m_is_dial_directory)
+                {
+
+                    if(m_fullScreenWindowSize == 0)
                     {
-
-                        if (m_fullScreenWindowSize == 0)
-                        {
-                            SDL_Log("1280x800");
-                            session->m_window_manager->setWindowWidth(1280);
-                            session->m_window_manager->setWindowHeight(800);
-                            SDL_SetWindowSize(session->m_window_manager->getWindow(), 1280, 800);
-                            m_fullScreenWindowSize = 1;
-                        }
-                        else if (m_fullScreenWindowSize == 1)
-                        {
-                            SDL_Log("640x400");
-                            session->m_window_manager->setWindowWidth(640);
-                            session->m_window_manager->setWindowHeight(400);
-                            SDL_SetWindowSize(session->m_window_manager->getWindow(), 640, 400);
-                            session->m_renderer->clearScreen();
-                            session->m_renderer->drawTextureScreen();
-                            m_fullScreenWindowSize = 0;
-                        }
-                        // Just some Testing, only avilable SDL2.0.5+
-                        else if (m_fullScreenWindowSize == 2)
-                        {
-                            SDL_Log("Full Window");
-                            /*
-                            int display_index = SDL_GetWindowDisplayIndex(
-                                                    session->m_window_manager->getWindow()
-                                                );
-                            if (display_index < 0)
-                            {
-                                SDL_Log("error getting window display");
-                                break;
-                            }
-                               
-                            SDL_Rect usable_bounds;
-                            if (0 != SDL_GetDisplayUsableBounds(
-                                        display_index,
-                                        &usable_bounds))
-                            {
-                                SDL_Log("error getting usable bounds");
-                                break;
-                            }
-
-                            SDL_SetWindowPosition(
-                                session->m_window_manager->getWindow(),
-                                usable_bounds.x,
-                                usable_bounds.y);
-
-                            SDL_SetWindowSize(
-                                session->m_window_manager->getWindow(),
-                                usable_bounds.w,
-                                usable_bounds.h);
-                            */
-                            session->m_renderer->clearScreen();
-                            session->m_renderer->drawTextureScreen();
-                            m_fullScreenWindowSize = 0;
-                        }
-
-
-                        break;
+                        SDL_Log("1280x800");
+                        session->m_window_manager->setWindowWidth(1280);
+                        session->m_window_manager->setWindowHeight(800);
+                        SDL_SetWindowSize(session->m_window_manager->getWindow(), 1280, 800);
+                        m_fullScreenWindowSize = 1;
                     }
-
-                    // Else all Connection Windows.
-                    if (m_isWindowMode)
+                    else if(m_fullScreenWindowSize == 1)
                     {
-                        m_isWindowMode = false;
-                        SDL_SetWindowFullscreen(
-                            session->m_window_manager->getWindow(),
-                            SDL_WINDOW_FULLSCREEN_DESKTOP
-                        );
-
+                        SDL_Log("640x400");
+                        session->m_window_manager->setWindowWidth(640);
+                        session->m_window_manager->setWindowHeight(400);
+                        SDL_SetWindowSize(session->m_window_manager->getWindow(), 640, 400);
                         session->m_renderer->clearScreen();
                         session->m_renderer->drawTextureScreen();
+                        m_fullScreenWindowSize = 0;
                     }
-                    else
+                    // Just some Testing, only avilable SDL2.0.5+
+                    else if(m_fullScreenWindowSize == 2)
                     {
-                        m_isWindowMode = true;
-                        SDL_SetWindowFullscreen(
-                            session->m_window_manager->getWindow(),
-                            0
-                        );
+                        SDL_Log("Full Window");
+                        /*
+                        int display_index = SDL_GetWindowDisplayIndex(
+                                                session->m_window_manager->getWindow()
+                                            );
+                        if (display_index < 0)
+                        {
+                            SDL_Log("error getting window display");
+                            break;
+                        }
 
+                        SDL_Rect usable_bounds;
+                        if (0 != SDL_GetDisplayUsableBounds(
+                                    display_index,
+                                    &usable_bounds))
+                        {
+                            SDL_Log("error getting usable bounds");
+                            break;
+                        }
+
+                        SDL_SetWindowPosition(
+                            session->m_window_manager->getWindow(),
+                            usable_bounds.x,
+                            usable_bounds.y);
+
+                        SDL_SetWindowSize(
+                            session->m_window_manager->getWindow(),
+                            usable_bounds.w,
+                            usable_bounds.h);
+                        */
                         session->m_renderer->clearScreen();
                         session->m_renderer->drawTextureScreen();
+                        m_fullScreenWindowSize = 0;
                     }
 
+
+                    break;
                 }
+
+                // Else all Connection Windows.
+                if(m_isWindowMode)
+                {
+                    m_isWindowMode = false;
+                    SDL_SetWindowFullscreen(
+                        session->m_window_manager->getWindow(),
+                        SDL_WINDOW_FULLSCREEN_DESKTOP
+                    );
+
+                    session->m_renderer->clearScreen();
+                    session->m_renderer->drawTextureScreen();
+                }
+                else
+                {
+                    m_isWindowMode = true;
+                    SDL_SetWindowFullscreen(
+                        session->m_window_manager->getWindow(),
+                        0
+                    );
+
+                    session->m_renderer->clearScreen();
+                    session->m_renderer->drawTextureScreen();
+                }
+
             }
+        }
 
             /*
                         // If not Full Screen Then Toggle to Next Mode.
@@ -646,11 +682,12 @@ bool InputHandler::handleAlternateKeys(SDL_Event &event)
                             }
                             return false;
                         }*/
-            break;
+        break;
 
         default:
             break;
     }
+
     return false;
 }
 
@@ -679,27 +716,34 @@ bool InputHandler::handleKeyPadAndFunctionKeys(SDL_Event &event)
                 setInputSequence("\x1b[A");
                 return true;
             }
+
             break;
+
         case SDLK_KP_2: // DN
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[B");
                 return true;
             }
+
             break;
+
         case SDLK_KP_6: // RIGHT
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[C");
                 return true;
             }
+
             break;
+
         case SDLK_KP_4: // LEFT
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[D");
                 return true;
             }
+
             break;
 
         case SDLK_ESCAPE:
@@ -712,25 +756,33 @@ bool InputHandler::handleKeyPadAndFunctionKeys(SDL_Event &event)
                 setInputSequence("\x1b[1;2A");
             else
                 setInputSequence("\x1b[A");
+
             return true;
+
         case SDLK_DOWN:
             if(event.key.keysym.mod & KMOD_SHIFT)
                 setInputSequence("\x1b[1;2B");
             else
                 setInputSequence("\x1b[B");
+
             return true;
+
         case SDLK_RIGHT:
             if(event.key.keysym.mod & KMOD_SHIFT)
                 setInputSequence("\x1b[1;2C");
             else
                 setInputSequence("\x1b[C");
+
             return true;
+
         case SDLK_LEFT:
             if(event.key.keysym.mod & KMOD_SHIFT)
                 setInputSequence("\x1b[1;2D");
             else
                 setInputSequence("\x1b[D");
+
             return true;
+
         case SDLK_RETURN:
         case SDLK_KP_ENTER:
             setInputSequence("\r");
@@ -742,11 +794,13 @@ bool InputHandler::handleKeyPadAndFunctionKeys(SDL_Event &event)
                 setInputSequence("\x1b[Z");
             else
                 setInputSequence("\t");
+
             return true;
 
         default:
             break;
     }
+
     return false;
 }
 
@@ -765,6 +819,7 @@ bool InputHandler::handleANSIKeyMapFunctionKeys(SDL_Event &event)
         case SDLK_BACKSPACE:
             setInputSequence("\x08");
             return true;
+
         case SDLK_DELETE:
             setInputSequence("\x7f");
             return true;
@@ -772,15 +827,19 @@ bool InputHandler::handleANSIKeyMapFunctionKeys(SDL_Event &event)
         case SDLK_INSERT:   // insert
             setInputSequence("\x1b[@");
             return true;
+
         case SDLK_HOME:     // home
             setInputSequence("\x1b[H");
             return true;
+
         case SDLK_END:      // end
             setInputSequence("\x1b[K");
             return true;
+
         case SDLK_PAGEUP:   // page up
             setInputSequence("\x1b[V");
             return true;
+
         case SDLK_PAGEDOWN: // page down
             setInputSequence("\x1b[U");
             return true;
@@ -793,84 +852,108 @@ bool InputHandler::handleANSIKeyMapFunctionKeys(SDL_Event &event)
                 setInputSequence("\x7f");
                 return true;
             }
+
             break;
+
         case SDLK_KP_0: // INS
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[@");
                 return true;
             }
+
             break;
+
         case SDLK_KP_1: // END
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[K");
                 return true;
             }
+
             break;
+
         case SDLK_KP_3: // PGDN
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[U");
                 return true;
             }
+
             break;
+
         case SDLK_KP_5: // Empty, space?
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
 
             }
+
             break;
+
         case SDLK_KP_7: // HOME
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[H");
                 return true;
             }
+
             break;
+
         case SDLK_KP_9: // PAGEUP
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[V");
                 return true;
             }
+
             break;
 
         // Function Keys
         case SDLK_F1:
             setInputSequence("\x1b[OP");
             return true;
+
         case SDLK_F2:
             setInputSequence("\x1b[OQ");
             return true;
+
         case SDLK_F3:
             setInputSequence("\x1b[OR");
             return true;
+
         case SDLK_F4:
             setInputSequence("\x1b[OS");
             return true;
+
         case SDLK_F5:
             // Windows Console Telnet \\x1b[[15~
             setInputSequence("\x1b[OT");
             return true;
+
         case SDLK_F6:
             setInputSequence("\x1b[[17~");
             return true;
+
         case SDLK_F7:
             setInputSequence("\x1b[[18~");
             return true;
+
         case SDLK_F8:
             setInputSequence("\x1b[[19~");
             return true;
+
         case SDLK_F9:
             setInputSequence("\x1b[[20~");
             return true;
+
         case SDLK_F10:
             setInputSequence("\x1b[[21~");
             return true;
+
         case SDLK_F11:
             setInputSequence("\x1b[[23~");
             return true;
+
         case SDLK_F12:
             setInputSequence("\x1b[[24~");
             return true;
@@ -878,6 +961,7 @@ bool InputHandler::handleANSIKeyMapFunctionKeys(SDL_Event &event)
         default:
             break;
     }
+
     return false;
 }
 
@@ -896,6 +980,7 @@ bool InputHandler::handleVT100KeyMapFunctionKeys(SDL_Event &event)
         case SDLK_BACKSPACE:
             setInputSequence("\x7f");
             return true;
+
         case SDLK_DELETE:
             setInputSequence("\x1b[3~");
             return true;
@@ -903,15 +988,19 @@ bool InputHandler::handleVT100KeyMapFunctionKeys(SDL_Event &event)
         case SDLK_INSERT:   // insert
             setInputSequence("\x1b[2~");
             return true;
+
         case SDLK_HOME:     // home
             setInputSequence("\x1b[1~");
             return true;
+
         case SDLK_END:      // end
             setInputSequence("\x1b[4~");
             return true;
+
         case SDLK_PAGEUP:   // page up
             setInputSequence("\x1b[5~");
             return true;
+
         case SDLK_PAGEDOWN: // page down
             setInputSequence("\x1b[6~");
             return true;
@@ -924,83 +1013,107 @@ bool InputHandler::handleVT100KeyMapFunctionKeys(SDL_Event &event)
                 setInputSequence("\x1b[3~");
                 return true;
             }
+
             break;
+
         case SDLK_KP_0: // INS
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[2~");
                 return true;
             }
+
             break;
+
         case SDLK_KP_1: // END
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[4~");
                 return true;
             }
+
             break;
+
         case SDLK_KP_3: // PGDN
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[6~");
                 return true;
             }
+
             break;
+
         case SDLK_KP_5: // Empty, space?
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
 
             }
+
             break;
+
         case SDLK_KP_7: // HOME
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[1~");
                 return true;
             }
+
             break;
+
         case SDLK_KP_9: // PAGEUP
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[5~");
                 return true;
             }
+
             break;
 
         // Function Keys
         case SDLK_F1:
             setInputSequence("\x1b[OP");
             return true;
+
         case SDLK_F2:
             setInputSequence("\x1b[OQ");
             return true;
+
         case SDLK_F3:
             setInputSequence("\x1b[OR");
             return true;
+
         case SDLK_F4:
             setInputSequence("\x1b[OS");
             return true;
+
         case SDLK_F5:
             setInputSequence("\x1b[OT");
             return true;
+
         case SDLK_F6:
             setInputSequence("\x1b[OU");
             return true;
+
         case SDLK_F7:
             setInputSequence("\x1b[OV");
             return true;
+
         case SDLK_F8:
             setInputSequence("\x1b[OW");
             return true;
+
         case SDLK_F9:
             setInputSequence("\x1b[OX");
             return true;
+
         case SDLK_F10:
             setInputSequence("\x1b[OY");
             return true;
+
         case SDLK_F11:
             setInputSequence("\x1b[OZ");
             return true;
+
         case SDLK_F12:
             setInputSequence("\x1b[O[");
             return true;
@@ -1008,6 +1121,7 @@ bool InputHandler::handleVT100KeyMapFunctionKeys(SDL_Event &event)
         default:
             break;
     }
+
     return false;
 }
 
@@ -1026,6 +1140,7 @@ bool InputHandler::handleLINUXKeyMapFunctionKeys(SDL_Event &event)
         case SDLK_BACKSPACE:
             setInputSequence("\x7f");
             return true;
+
         case SDLK_DELETE:
             setInputSequence("\x1b[3~");
             return true;
@@ -1033,15 +1148,19 @@ bool InputHandler::handleLINUXKeyMapFunctionKeys(SDL_Event &event)
         case SDLK_INSERT:   // insert
             setInputSequence("\x1b[2~");
             return true;
+
         case SDLK_HOME:     // home
             setInputSequence("\x1b[1~");
             return true;
+
         case SDLK_END:      // end
             setInputSequence("\x1b[4~");
             return true;
+
         case SDLK_PAGEUP:   // page up
             setInputSequence("\x1b[5~");
             return true;
+
         case SDLK_PAGEDOWN: // page down
             setInputSequence("\x1b[6~");
             return true;
@@ -1054,83 +1173,107 @@ bool InputHandler::handleLINUXKeyMapFunctionKeys(SDL_Event &event)
                 setInputSequence("\x1b[3~");
                 return true;
             }
+
             break;
+
         case SDLK_KP_0: // INS
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[2~");
                 return true;
             }
+
             break;
+
         case SDLK_KP_1: // END
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[4~");
                 return true;
             }
+
             break;
+
         case SDLK_KP_3: // PGDN
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[6~");
                 return true;
             }
+
             break;
+
         case SDLK_KP_5: // Empty, space?
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
 
             }
+
             break;
+
         case SDLK_KP_7: // HOME
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[1~");
                 return true;
             }
+
             break;
+
         case SDLK_KP_9: // PAGEUP
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[5~");
                 return true;
             }
+
             break;
 
         // Function Keys
         case SDLK_F1:
             setInputSequence("\x1b[[A");
             return true;
+
         case SDLK_F2:
             setInputSequence("\x1b[[B");
             return true;
+
         case SDLK_F3:
             setInputSequence("\x1b[[C");
             return true;
+
         case SDLK_F4:
             setInputSequence("\x1b[[D");
             return true;
+
         case SDLK_F5:
             setInputSequence("\x1b[[E");
             return true;
+
         case SDLK_F6:
             setInputSequence("\x1b[[17~");
             return true;
+
         case SDLK_F7:
             setInputSequence("\x1b[[18~");
             return true;
+
         case SDLK_F8:
             setInputSequence("\x1b[[19~");
             return true;
+
         case SDLK_F9:
             setInputSequence("\x1b[[20~");
             return true;
+
         case SDLK_F10:
             setInputSequence("\x1b[[21~");
             return true;
+
         case SDLK_F11:
             setInputSequence("\x1b[[23~");
             return true;
+
         case SDLK_F12:
             setInputSequence("\x1b[[24~");
             return true;
@@ -1138,6 +1281,7 @@ bool InputHandler::handleLINUXKeyMapFunctionKeys(SDL_Event &event)
         default:
             break;
     }
+
     return false;
 }
 
@@ -1156,21 +1300,27 @@ bool InputHandler::handleSCOKeyMapFunctionKeys(SDL_Event &event)
         case SDLK_BACKSPACE:
             setInputSequence("\x7f");
             return true;
+
         case SDLK_DELETE:
             setInputSequence("\x08");
             return true;
+
         case SDLK_INSERT:   // insert
             setInputSequence("\x1b[L");
             return true;
+
         case SDLK_HOME:     // home
             setInputSequence("\x1b[H");
             return true;
+
         case SDLK_END:      // end
             setInputSequence("\x1b[F");
             return true;
+
         case SDLK_PAGEUP:   // page up
             setInputSequence("\x1b[I");
             return true;
+
         case SDLK_PAGEDOWN: // page down
             setInputSequence("\x1b[G");
             return true;
@@ -1183,83 +1333,107 @@ bool InputHandler::handleSCOKeyMapFunctionKeys(SDL_Event &event)
                 setInputSequence("\x08");
                 return true;
             }
+
             break;
+
         case SDLK_KP_0: // INS
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[L");
                 return true;
             }
+
             break;
+
         case SDLK_KP_1: // END
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[F");
                 return true;
             }
+
             break;
+
         case SDLK_KP_3: // PGDN
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[G");
                 return true;
             }
+
             break;
+
         case SDLK_KP_5: // Empty, space?
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
 
             }
+
             break;
+
         case SDLK_KP_7: // HOME
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[H");
                 return true;
             }
+
             break;
+
         case SDLK_KP_9: // PAGEUP
             if(!(event.key.keysym.mod & KMOD_NUM))
             {
                 setInputSequence("\x1b[I");
                 return true;
             }
+
             break;
 
         // Function Keys
         case SDLK_F1:
             setInputSequence("\x1b[[M");
             return true;
+
         case SDLK_F2:
             setInputSequence("\x1b[[N");
             return true;
+
         case SDLK_F3:
             setInputSequence("\x1b[[O");
             return true;
+
         case SDLK_F4:
             setInputSequence("\x1b[[P");
             return true;
+
         case SDLK_F5:
             setInputSequence("\x1b[[Q");
             return true;
+
         case SDLK_F6:
             setInputSequence("\x1b[[R");
             return true;
+
         case SDLK_F7:
             setInputSequence("\x1b[[S");
             return true;
+
         case SDLK_F8:
             setInputSequence("\x1b[[T");
             return true;
+
         case SDLK_F9:
             setInputSequence("\x1b[[U");
             return true;
+
         case SDLK_F10:
             setInputSequence("\x1b[[V");
             return true;
+
         case SDLK_F11:
             setInputSequence("\x1b[[W");
             return true;
+
         case SDLK_F12:
             setInputSequence("\x1b[[X");
             return true;
@@ -1267,6 +1441,7 @@ bool InputHandler::handleSCOKeyMapFunctionKeys(SDL_Event &event)
         default:
             break;
     }
+
     return false;
 }
 
@@ -1284,6 +1459,7 @@ bool InputHandler::handleKeyDownEvents(SDL_Event &event)
     {
         return handleShiftControlKeys(event);
     }
+
     // Handle CTRL + KEY
     if(event.key.keysym.mod & KMOD_CTRL)
     {
@@ -1325,6 +1501,7 @@ bool InputHandler::handleKeyDownEvents(SDL_Event &event)
             }
         }
     }
+
     return false;
 }
 

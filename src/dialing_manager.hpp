@@ -26,7 +26,7 @@ public:
     bool validateFile();
 
 private:
-    std::string m_path;
+
     dial_directory_dao_ptr m_dial_directory_dao;
 };
 

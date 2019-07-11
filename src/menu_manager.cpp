@@ -35,67 +35,21 @@ MenuManager::MenuManager(
 MenuManager::~MenuManager()
 {
     std::cout << "~MenuManager" << std::endl;
-    std::vector<list_bar>()
-    .swap(m_result);
-
-    std::vector<SystemConnection>()
-    .swap(m_systemConnection);
+    std::vector<list_bar>().swap(m_result);
+    std::vector<SystemEntry>().swap(m_system_entries);
 }
 
-/**
- * @brief Helper to append folder to path
- */
-std::string MenuManager::getAssetPath()
-{
-    // Create Default Phone Book.
-    std::string path = m_program_path;
-#ifdef _WIN32
-    path.append("assets\\");
-#else
-    path.append("assets/");
-#endif
-    return path;
-}
 
-/**
- * @brief Helper to append directory path
- */
-std::string MenuManager::getDirectoryPath()
-{
-    // Create Default Phone Book.
-    std::string path = getAssetPath();
-#ifdef _WIN32
-    path.append("directory\\");
-#else
-    path.append("directory/");
-#endif
-    return path;
-}
-
-/**
- * @brief Helper to append ansi path
- */
-std::string MenuManager::getAnsiPath()
-{
-    // Create Default Phone Book.
-    std::string path = getAssetPath();
-#ifdef _WIN32
-    path.append("ansi\\");
-#else
-    path.append("ansi/");
-#endif
-    return path;
-}
 
 /**
  * @brief Reads in ANSI file into Buffer Only for Parsing.
- * @param FileName
+ * @param file_name
  * @param buff
  */
-void MenuManager::readinAnsi(std::string FileName, std::string &buff)
+void MenuManager::readinAnsi(std::string file_name, std::string &buff)
 {
-    std::string path = getAnsiPath();
-    path.append(FileName);
+    std::string path = StaticMethods::getAnsiPath(m_program_path);
+    path.append(file_name);
     path.append(".ans");
 
     int sequence = 0;
@@ -123,9 +77,9 @@ void MenuManager::readinAnsi(std::string FileName, std::string &buff)
 
 /**
  * @brief Parse Ansi Template (Dialing Directory)
- * @param FileName
+ * @param file_name
  */
-void MenuManager::parseHeader(std::string FileName)
+void MenuManager::parseHeader(std::string file_name)
 {
     std::cout << "parseHeader()" << std::endl;
     std::cout << "sFONT_SET: " << m_menu_config.m_font_set << std::endl;
@@ -148,7 +102,7 @@ void MenuManager::parseHeader(std::string FileName)
     // This needs the session! or not needed here.
     // m_sequence_decoder->resetParser();
 
-    m_menu_function.m_menu_io.displayMenuAnsi(FileName);
+    m_menu_function.m_menu_io.displayMenuAnsi(file_name);
 }
 
 /**
@@ -200,28 +154,28 @@ bool MenuManager::changeTheme(int index)
  */
 std::string MenuManager::padString(const std::string &value, const std::string &justify, int padding)
 {
-    std::string stringReplace = value;
+    std::string string_replace = value;
 
     if(justify == "LEFT")
     {
-        m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
+        m_menu_function.m_menu_io.leftSpacing(string_replace, padding);
         std::replace(
-            stringReplace.begin(),
-            stringReplace.end(),
+            string_replace.begin(),
+            string_replace.end(),
             ' ', '.'
         );
     }
     else if(justify == "RIGHT")
     {
-        m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
+        m_menu_function.m_menu_io.rightSpacing(string_replace, padding);
         std::replace(
-            stringReplace.begin(),
-            stringReplace.end(),
+            string_replace.begin(),
+            string_replace.end(),
             ' ', '.'
         );
     }
 
-    return stringReplace;
+    return string_replace;
 }
 
 /**
@@ -234,19 +188,19 @@ std::vector<list_bar> MenuManager::buildDialList()
     std::vector<list_bar>    result;
 
     int sequence = 0;
-    std::string stringBuilder = "";
+    std::string string_builder = "";
 
-    FILE               *inStream;
+    FILE               *in_stream;
     long index          = 1;
-    char mciCode[3]     = {0};
-    char temp2[100]     = {0};
+    char mci_code[3]    = {0};
+    char temp2[2048]    = {0};
     int  padding        = 0;
-    bool isRightPadding = false;
-    bool isLeftPadding  = false;
+    bool is_right_padding = false;
+    bool is_left_padding  = false;
 
-    std::string currnetScreen  = "";
-    std::string ansiScreen1 = "";
-    std::string ansiScreen2 = "";
+    std::string currnet_screen  = "";
+    std::string ansi_screen_1 = "";
+    std::string ansi_screen_2 = "";
 
     // Pre-fetch ANSI light bar themes
     // These ANSI are used as the light bars to be displayed,
@@ -256,10 +210,10 @@ std::vector<list_bar> MenuManager::buildDialList()
     //
     // We cache array with all four choices so we can
     // easily switch between them in the listing.
-    std::string path = getDirectoryPath();
+    std::string path = StaticMethods::getDirectoryPath(m_program_path);
     path.append(m_menu_config.m_mid_ansi_1);
 
-    if((inStream = fopen(path.c_str(), "r+")) ==  nullptr)
+    if((in_stream = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         std::cout << "Error Mid ANSI 1: " <<  path << std::endl;
         return result;
@@ -267,19 +221,19 @@ std::vector<list_bar> MenuManager::buildDialList()
 
     while(sequence != EOF)
     {
-        sequence = getc(inStream);
+        sequence = getc(in_stream);
 
-        if(sequence != EOF) ansiScreen1 += sequence;
+        if(sequence != EOF) ansi_screen_1 += sequence;
     }
 
-    fclose(inStream);
+    fclose(in_stream);
     sequence = '\0';
 
     // Process the Second Mid Ansi File
-    path = getDirectoryPath();
+    path = StaticMethods::getDirectoryPath(m_program_path);
     path.append(m_menu_config.m_mid_ansi_2);
 
-    if((inStream = fopen(path.c_str(), "r+")) ==  nullptr)
+    if((in_stream = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         std::cout << "Error Mid ANSI 2: " <<  path << std::endl;
         return result;
@@ -287,36 +241,36 @@ std::vector<list_bar> MenuManager::buildDialList()
 
     while(sequence != EOF)
     {
-        sequence = getc(inStream);
+        sequence = getc(in_stream);
 
-        if(sequence != EOF) ansiScreen2 += sequence;
+        if(sequence != EOF) ansi_screen_2 += sequence;
     }
 
-    fclose(inStream);
+    fclose(in_stream);
 
-    unsigned long maxSystems    = 0;
-    unsigned long currentSystem = 0;
-    maxSystems = m_systemConnection.size();
-    std::cout << "systemConnection.size(): " << m_systemConnection.size() << std::endl;
+    unsigned long max_systems    = 0;
+    unsigned long current_system = 0;
+    max_systems = m_system_entries.size();
+    std::cout << "m_system_entries.size(): " << m_system_entries.size() << std::endl;
 
     int counter = 0;
 
-    while(currentSystem < maxSystems)
+    while(current_system < max_systems)
     {
-        if(currentSystem == maxSystems) break;
+        if(current_system == max_systems) break;
 
-        stringBuilder.erase();
+        string_builder.erase();
 
-        for(int ansiCount = 0; ansiCount < 2; ansiCount++)
+        for(int ansi_count = 0; ansi_count < 2; ansi_count++)
         {
-            switch(ansiCount)
+            switch(ansi_count)
             {
                 case 0:
-                    currnetScreen = ansiScreen2;
+                    currnet_screen = ansi_screen_2;
                     break; // Display High-light None.  ON
 
                 case 1:
-                    currnetScreen = ansiScreen1;
+                    currnet_screen = ansi_screen_1;
                     break; // Display Low-light None    OFF
 
                 default:
@@ -329,8 +283,8 @@ std::vector<list_bar> MenuManager::buildDialList()
             // Parse MCI Codes per each light bar ANSI file
             do
             {
-                memset(&mciCode,0,sizeof(mciCode));
-                sequence = currnetScreen[counter];
+                memset(&mci_code,0,sizeof(mci_code));
+                sequence = currnet_screen[counter];
 
                 if(sequence == '\0') break;
 
@@ -338,169 +292,169 @@ std::vector<list_bar> MenuManager::buildDialList()
                 switch(sequence)
                 {
                     case '{' : // Left Justify
-                        mciCode[0] = currnetScreen[++counter];
-                        mciCode[1] = currnetScreen[++counter];
-                        padding = atoi(mciCode);
+                        mci_code[0] = currnet_screen[++counter];
+                        mci_code[1] = currnet_screen[++counter];
+                        padding = atoi(mci_code);
 
                         if(padding != 0)
                         {
-                            isLeftPadding = true;
+                            is_left_padding = true;
                         }
                         else
                         {
-                            stringBuilder += sequence;
-                            stringBuilder += mciCode;
+                            string_builder += sequence;
+                            string_builder += mci_code;
                         }
 
                         break;
 
                     case '}' : // Right Justify
-                        mciCode[0] = currnetScreen[++counter];
-                        mciCode[1] = currnetScreen[++counter];
-                        padding = atoi(mciCode);
+                        mci_code[0] = currnet_screen[++counter];
+                        mci_code[1] = currnet_screen[++counter];
+                        padding = atoi(mci_code);
 
                         if(padding != 0)
                         {
-                            isRightPadding = true;
+                            is_right_padding = true;
                         }
                         else
                         {
-                            stringBuilder += sequence;
-                            stringBuilder += mciCode;
+                            string_builder += sequence;
+                            string_builder += mci_code;
                         }
 
                         break;
 
                     case '|' : // Pipe Codes
-                        mciCode[0] = currnetScreen[++counter];
-                        mciCode[1] = currnetScreen[++counter];
+                        mci_code[0] = currnet_screen[++counter];
+                        mci_code[1] = currnet_screen[++counter];
 
-                        if(strcmp(mciCode,"##") == 0)
+                        if(strcmp(mci_code,"##") == 0)
                         {
-                            sprintf(temp2,"%lu", currentSystem+1);
+                            sprintf(temp2,"%lu", current_system+1);
 
-                            if(isLeftPadding)
+                            if(is_left_padding)
                             {
-                                stringBuilder += padString(temp2, "LEFT", padding);
-                                isLeftPadding = false;
+                                string_builder += padString(temp2, "LEFT", padding);
+                                is_left_padding = false;
                             }
-                            else if(isRightPadding)
+                            else if(is_right_padding)
                             {
-                                stringBuilder += padString(temp2, "RIGHT", padding);
-                                isRightPadding = false;
+                                string_builder += padString(temp2, "RIGHT", padding);
+                                is_right_padding = false;
                             }
                         }
-                        else if(strcmp(mciCode,"NA") == 0)
+                        else if(strcmp(mci_code,"NA") == 0)
                         {
-                            std::string stringReplace =
-                                m_systemConnection[currentSystem].name;
+                            std::string string_replace =
+                                m_system_entries[current_system].name;
 
-                            if(isLeftPadding)
+                            if(is_left_padding)
                             {
-                                m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
-                                isLeftPadding = false;
+                                m_menu_function.m_menu_io.leftSpacing(string_replace, padding);
+                                is_left_padding = false;
                             }
-                            else if(isRightPadding)
+                            else if(is_right_padding)
                             {
-                                m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
-                                isRightPadding = false;
+                                m_menu_function.m_menu_io.rightSpacing(string_replace, padding);
+                                is_right_padding = false;
                             }
 
-                            stringBuilder += stringReplace;
+                            string_builder += string_replace;
                         }
-                        else if(strcmp(mciCode,"FO") == 0)
+                        else if(strcmp(mci_code,"FO") == 0)
                         {
                             // Load the Font from the selected system
                             FontSet font(
                                 m_renderer->m_surface_manager->getFontFromSet(
-                                    m_systemConnection[currentSystem].font
+                                    m_system_entries[current_system].font
                                 )
                             );
                             // Replace with the Font name from XML.
-                            std::string stringReplace = font.name;
+                            std::string string_replace = font.name;
 
-                            if(isLeftPadding)
+                            if(is_left_padding)
                             {
-                                m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
-                                isLeftPadding = false;
+                                m_menu_function.m_menu_io.leftSpacing(string_replace, padding);
+                                is_left_padding = false;
                             }
-                            else if(isRightPadding)
+                            else if(is_right_padding)
                             {
-                                m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
-                                isRightPadding = false;
+                                m_menu_function.m_menu_io.rightSpacing(string_replace, padding);
+                                is_right_padding = false;
                             }
 
-                            stringBuilder += stringReplace;
+                            string_builder += string_replace;
                         }
-                        else if(strcmp(mciCode,"PO") == 0)
+                        else if(strcmp(mci_code,"PO") == 0)
                         {
                             sprintf(temp2,"%i",
-                                    m_systemConnection[currentSystem].port);
-                            std::string stringReplace = temp2;
+                                    m_system_entries[current_system].port);
+                            std::string string_replace = temp2;
 
-                            if(isLeftPadding)
+                            if(is_left_padding)
                             {
-                                m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
-                                isLeftPadding = false;
+                                m_menu_function.m_menu_io.leftSpacing(string_replace, padding);
+                                is_left_padding = false;
                             }
-                            else if(isRightPadding)
+                            else if(is_right_padding)
                             {
-                                m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
-                                isRightPadding = false;
+                                m_menu_function.m_menu_io.rightSpacing(string_replace, padding);
+                                is_right_padding = false;
                             }
 
-                            stringBuilder += stringReplace;
+                            string_builder += string_replace;
                         }
-                        else if(strcmp(mciCode,"PR") == 0)
+                        else if(strcmp(mci_code,"PR") == 0)
                         {
-                            std::string stringReplace =
-                                m_systemConnection[currentSystem].protocol;
+                            std::string string_replace =
+                                m_system_entries[current_system].protocol;
 
-                            if(isLeftPadding)
+                            if(is_left_padding)
                             {
-                                m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
-                                isLeftPadding = false;
+                                m_menu_function.m_menu_io.leftSpacing(string_replace, padding);
+                                is_left_padding = false;
                             }
-                            else if(isRightPadding)
+                            else if(is_right_padding)
                             {
-                                m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
-                                isRightPadding = false;
+                                m_menu_function.m_menu_io.rightSpacing(string_replace, padding);
+                                is_right_padding = false;
                             }
 
-                            stringBuilder += stringReplace;
+                            string_builder += string_replace;
                         }
-                        else if(strcmp(mciCode,"KM") == 0)
+                        else if(strcmp(mci_code,"KM") == 0)
                         {
-                            std::string stringReplace =
-                                m_systemConnection[currentSystem].keyMap;
+                            std::string string_replace =
+                                m_system_entries[current_system].key_map;
 
-                            if(isLeftPadding)
+                            if(is_left_padding)
                             {
-                                m_menu_function.m_menu_io.leftSpacing(stringReplace, padding);
-                                isLeftPadding = false;
+                                m_menu_function.m_menu_io.leftSpacing(string_replace, padding);
+                                is_left_padding = false;
                             }
-                            else if(isRightPadding)
+                            else if(is_right_padding)
                             {
-                                m_menu_function.m_menu_io.rightSpacing(stringReplace, padding);
-                                isRightPadding = false;
+                                m_menu_function.m_menu_io.rightSpacing(string_replace, padding);
+                                is_right_padding = false;
                             }
 
-                            stringBuilder += stringReplace;
+                            string_builder += string_replace;
                         }
                         else
                         {
-                            stringBuilder += sequence;
-                            stringBuilder += mciCode;
+                            string_builder += sequence;
+                            string_builder += mci_code;
                         }
 
                         break;
 
                     case '\n' :
-                        //  stringBuilder += '\r';
+                        //  string_builder += '\r';
                         break;
 
                     default :
-                        stringBuilder += sequence;
+                        string_builder += sequence;
                         break;
                 }
 
@@ -508,28 +462,28 @@ std::vector<list_bar> MenuManager::buildDialList()
             }
             while(sequence != '\0');
 
-            stringBuilder += "\r";
+            string_builder += "\r";
 
-            switch(ansiCount)
+            switch(ansi_count)
             {
                 case 0:
-                    _lightbar.inactive_lightbar = stringBuilder;
+                    _lightbar.inactive_lightbar = string_builder;
                     break; // Display High-light None.  ON
 
                 case 1:
-                    _lightbar.active_lightbar = stringBuilder;
+                    _lightbar.active_lightbar = string_builder;
                     break; // Display Low-light None    OFF
 
                 default:
                     break;
             }
 
-            stringBuilder.erase();
+            string_builder.erase();
         } // End of (4) Look for each string.
 
         result.push_back(_lightbar);
-        stringBuilder.erase();
-        ++currentSystem;
+        string_builder.erase();
+        ++current_system;
         ++index;
     }
 
@@ -542,8 +496,8 @@ std::vector<list_bar> MenuManager::buildDialList()
  */
 bool MenuManager::readDialDirectory()
 {
-    SystemConnection sysconn;
-    std::string path = getAssetPath();
+    //SystemConnection sysconn;
+    std::string path = StaticMethods::getAssetPath(m_program_path);
     path.append("dialdirectory.xml");
 
     /*
@@ -620,7 +574,7 @@ bool MenuManager::readDialDirectory()
 void MenuManager::createDialDirectory()
 {
     // Create Default Phone Book.
-    std::string path = getAssetPath();
+    std::string path = StaticMethods::getAssetPath(m_program_path);
     path.append("dialdirectory.xml");
     /*
     TiXmlDocument doc;
@@ -671,7 +625,7 @@ void MenuManager::createDialDirectory()
 void MenuManager::writeDialDirectory()
 {
     // Create Default Phone Book.
-    std::string path = getAssetPath();
+    std::string path = StaticMethods::getAssetPath(m_program_path);
     path.append("dialdirectory.xml");
 
     /*
@@ -747,13 +701,13 @@ void MenuManager::setupDialDirectory()
  */
 void MenuManager::updateDialDirectory()
 {
-    std::string outputBuffer;
-    char outBuffer[1024] = {0};
+    std::string output_buffer;
+    char outBuffer[2048] = {0};
 
     //  Make sure we have areas, then pull the list into the string buffer.
     if(m_result.size() > 0)
     {
-        outputBuffer = m_link_list.drawVectorList(m_current_page, m_lightbar_position);
+        output_buffer = m_link_list.drawVectorList(m_current_page, m_lightbar_position);
     }
     else
     {
@@ -765,21 +719,21 @@ void MenuManager::updateDialDirectory()
 
     m_link_list.m_total_lines = m_result.size();
 
-    //outputBuffer.erase();
-    outputBuffer += "|16"; // Clear Color Bleeding, reset background to black.
+    //output_buffer.erase();
+    output_buffer += "|16"; // Clear Color Bleeding, reset background to black.
 
     // Show Current/Total Pages in Dialing Directory
     sprintf(outBuffer,"%s%.3d",(char *)m_menu_config.m_page_number.c_str(), m_link_list.m_current_page+1);
-    outputBuffer += outBuffer;
+    output_buffer += outBuffer;
     sprintf(outBuffer,"%s%.3d",(char *)m_menu_config.m_page_total.c_str(), m_link_list.m_total_pages);
-    outputBuffer += outBuffer;
+    output_buffer += outBuffer;
 
     // # of Systems in Dialing Directory
     sprintf(outBuffer,"%s%.3d",(char *)m_menu_config.m_max_systems.c_str(), m_link_list.m_total_lines);
-    outputBuffer += outBuffer;
+    output_buffer += outBuffer;
 
     // Parse Sequence to ANSI output and Send to Queue.
-    m_menu_function.m_menu_io.sequenceToAnsi(outputBuffer);
+    m_menu_function.m_menu_io.sequenceToAnsi(output_buffer);
 
     // Initial Menu Command Read In and Setup.
     m_menu_function.menuStart(m_menu_config.m_menu_prompt_text);
@@ -787,13 +741,13 @@ void MenuManager::updateDialDirectory()
 
 /**
  * @brief Pass-Through updates and returns changes.
- * @param inputSequence
+ * @param input_sequence
  * @return
  */
-int MenuManager::handleMenuUpdates(const std::string &inputSequence)
+int MenuManager::handleMenuUpdates(const std::string &input_sequence)
 {
     char returnParameters[10] = {0};
-    m_menu_function.menuProcess(returnParameters, inputSequence, m_lightbar_position);
+    m_menu_function.menuProcess(returnParameters, input_sequence, m_lightbar_position);
 
     // If we got a pass through command back, then execute it!
     if(strlen(returnParameters) > 0)
@@ -807,17 +761,17 @@ int MenuManager::handleMenuUpdates(const std::string &inputSequence)
 
 /**
  * @brief Handle Menu Actions from Input
- * @param inputSequence
+ * @param input_sequence
  * @return
  */
-int MenuManager::handleMenuActions(const std::string &inputSequence)
+int MenuManager::handleMenuActions(const std::string &input_sequence)
 {
-    std::string outputBuffer;
-    char stringBuffer[1024] = {0};
+    std::string output_buffer;
+    char string_buffer[1024] = {0};
 
-    if(inputSequence[0] == '!')
+    if(input_sequence[0] == '!')
     {
-        switch(toupper(inputSequence[1]))
+        switch(toupper(input_sequence[1]))
         {
             case 'U': // Page Up
                 if(m_current_page != 0)
@@ -854,9 +808,9 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                     if(session_mgr)
                     {
                         // Create a New System Connection Pointer of Selected System
-                        system_connection_ptr new_connection(
-                            new SystemConnection(
-                                m_systemConnection[m_lightbar_position]
+                        system_entry_ptr new_connection(
+                            new SystemEntry(
+                                m_system_entries[m_lightbar_position]
                             ));
                         // Add the System to the Connection Queue.
                         session_mgr->m_new_connections.enqueue(new_connection);
@@ -879,20 +833,20 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 if((signed)m_lightbar_position+1 < (m_box_size*(m_current_page+1))+1)
                 {
                     // Low-light Current, then Highlight Next.
-                    sprintf(stringBuffer, "\x1b[%i;%iH|16%s",
+                    sprintf(string_buffer, "\x1b[%i;%iH|16%s",
                             m_link_list.m_current_selection, 1,
                             (char *)m_link_list.m_listing[m_lightbar_position-1].active_lightbar.c_str());
 
-                    outputBuffer += stringBuffer;
+                    output_buffer += string_buffer;
                     m_link_list.m_current_selection += 1;
 
-                    sprintf(stringBuffer, "\x1b[%i;%iH|16%s",
+                    sprintf(string_buffer, "\x1b[%i;%iH|16%s",
                             m_link_list.m_current_selection, 1,
                             (char *)m_link_list.m_listing[m_lightbar_position].inactive_lightbar.c_str());
 
-                    outputBuffer += stringBuffer;
-                    m_menu_function.m_menu_io.sequenceToAnsi(outputBuffer);
-                    outputBuffer.erase();
+                    output_buffer += string_buffer;
+                    m_menu_function.m_menu_io.sequenceToAnsi(output_buffer);
+                    output_buffer.erase();
                 }
                 else
                 {
@@ -918,16 +872,16 @@ int MenuManager::handleMenuActions(const std::string &inputSequence)
                 {
                     // Still on Same Page
                     // Low-light Current, then Highlight Next.
-                    sprintf(stringBuffer, "\x1b[%i;%iH|16%s", m_link_list.m_current_selection, 1,
+                    sprintf(string_buffer, "\x1b[%i;%iH|16%s", m_link_list.m_current_selection, 1,
                             (char *)m_link_list.m_listing[m_lightbar_position+1].active_lightbar.c_str());
-                    outputBuffer = stringBuffer;
+                    output_buffer = string_buffer;
                     m_link_list.m_current_selection -= 1;
 
-                    sprintf(stringBuffer, "\x1b[%i;%iH|16%s", m_link_list.m_current_selection, 1,
+                    sprintf(string_buffer, "\x1b[%i;%iH|16%s", m_link_list.m_current_selection, 1,
                             (char *)m_link_list.m_listing[m_lightbar_position].inactive_lightbar.c_str());
-                    outputBuffer += stringBuffer;
-                    m_menu_function.m_menu_io.sequenceToAnsi(outputBuffer);
-                    outputBuffer.erase();
+                    output_buffer += string_buffer;
+                    m_menu_function.m_menu_io.sequenceToAnsi(output_buffer);
+                    output_buffer.erase();
                 }
                 else
                 {

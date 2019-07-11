@@ -4,6 +4,7 @@
 #include "menu_function.hpp"
 #include "link_list.hpp"
 #include "menu_config.hpp"
+#include "static_methods.hpp"
 
 #include <string>
 #include <vector>
@@ -17,30 +18,8 @@ typedef std::shared_ptr<SequenceDecoder> sequence_decoder_ptr;
 class Renderer;
 typedef std::shared_ptr<Renderer> renderer_ptr;
 
-/**
- * @class SystemConnection
- * @author Michael Griffin
- * @date 12/22/2015
- * @file menu_manager.hpp
- * @brief Connection data pulled from XML
- */
-class SystemConnection
-{
-public:
-    std::string name;
-    std::string ip;
-    int         port;
-    std::string protocol;
-    std::string login;
-    std::string password;  // Make this encrypted with more time.
-    std::string font;
-    std::string keyMap;    // ANSI, VT100 etc..
-    std::string termType;  // ANSI, XTERM etc..
-    std::string termSize;      // 80x25, 80x50
-
-};
-
-typedef std::shared_ptr<SystemConnection> system_connection_ptr;
+class SystemEntry;
+typedef std::shared_ptr<SystemEntry> system_entry_ptr;
 
 
 /**
@@ -80,22 +59,7 @@ public:
     // Class Types for use
     LinkList                      m_link_list;
     std::vector<list_bar>         m_result;
-    std::vector<SystemConnection> m_systemConnection;
-
-    /**
-     * @brief Helper to append folder to path
-     */
-    std::string getAssetPath();
-
-    /**
-     * @brief Helper to append directory path
-     */
-    std::string getDirectoryPath();
-
-    /**
-     * @brief Helper to append ansi path
-     */
-    std::string getAnsiPath();
+    std::vector<SystemEntry>      m_system_entries;
 
     /**
      * @brief Helper Function to Handle left and right padding
@@ -104,8 +68,8 @@ public:
     std::string padString(const std::string &value, const std::string &justify, int padding);
 
     std::vector<list_bar> buildDialList();
-    void  readinAnsi(std::string FileName, std::string &buff);
-    void  parseHeader(std::string FileName);
+    void  readinAnsi(std::string file_name, std::string &buff);
+    void  parseHeader(std::string file_name);
     bool  changeTheme(int idx);
     void  readDirectoryListing();
 
@@ -120,10 +84,10 @@ public:
     void  updateDialDirectory();
 
     // Take Input from update();
-    int  handleMenuUpdates(const std::string &inputSequence);
+    int  handleMenuUpdates(const std::string &input_sequence);
 
     // Handles Returned Menu Command From Selection.
-    int  handleMenuActions(const std::string &inputSequence);
+    int  handleMenuActions(const std::string &input_sequence);
 
 };
 

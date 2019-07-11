@@ -3,8 +3,7 @@
 #include "dialing_directory.hpp"
 
 DialingManager::DialingManager(std::string path)
-    : m_path(path)
-    , m_dial_directory_dao(new DialingDirectoryDao(path))
+    : m_dial_directory_dao(new DialingDirectoryDao(path))
 {
 }
 
@@ -16,7 +15,7 @@ bool DialingManager::validateFile()
 {
     if(!m_dial_directory_dao->fileExists())
     {
-        // Create Defaults here with at least one system.
+        // Create a NEw file here with at least one system.
         dial_directory_ptr dial_directory(new DialingDirectory());
         SystemEntry entry;
         entry.index = 0;

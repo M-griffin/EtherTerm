@@ -57,7 +57,7 @@ public:
 
 
     dial_directory_ptr m_dial_directory;
-    std::string        m_path;
+    std::string        m_program_path;
     std::string        m_filename;
 };
 

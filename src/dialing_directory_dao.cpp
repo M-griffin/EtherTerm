@@ -8,12 +8,12 @@
 #include <algorithm>
 #include <cassert>
 
-// Setup the file version for the config file.
+// Setup the file version for the dialing directory file.
 const std::string DialingDirectory::FILE_VERSION = "1.0.0";
 
 DialingDirectoryDao::DialingDirectoryDao(std::string path)
     : m_dial_directory(new DialingDirectory())
-    , m_path(path)
+    , m_program_path(path)
     , m_filename("dialing_directory.yaml")
 {
 }
@@ -28,8 +28,7 @@ DialingDirectoryDao::~DialingDirectoryDao()
  */
 bool DialingDirectoryDao::fileExists()
 {
-    std::string path = m_path;
-    StaticMethods::pathSeperator(path);
+    std::string path = StaticMethods::getAssetPath(m_program_path);
     path.append(m_filename);
 
     std::ifstream ifs(path);
@@ -43,7 +42,6 @@ bool DialingDirectoryDao::fileExists()
     return true;
 }
 
-
 /**
  * @brief Creates and Saves a newly Generated Menu File.
  * @param cfg
@@ -51,8 +49,7 @@ bool DialingDirectoryDao::fileExists()
  */
 bool DialingDirectoryDao::saveDialingDirectory(dial_directory_ptr dialing_directory)
 {
-    std::string path = m_path;
-    StaticMethods::pathSeperator(path);
+    std::string path = StaticMethods::getAssetPath(m_program_path);
     path.append(m_filename);
 
     YAML::Emitter out;
@@ -85,9 +82,6 @@ bool DialingDirectoryDao::saveDialingDirectory(dial_directory_ptr dialing_direct
     }
 
     out << YAML::EndMap;
-
-
-    // Setup file to Write out File.
     std::ofstream ofs(path);
 
     if(!ofs.is_open())
@@ -128,8 +122,7 @@ void DialingDirectoryDao::encode(const DialingDirectory &rhs)
  */
 dial_directory_ptr DialingDirectoryDao::loadDialingDirectory()
 {
-    std::string path = m_path;
-    StaticMethods::pathSeperator(path);
+    std::string path = StaticMethods::getAssetPath(m_program_path);
     path.append(m_filename);
 
     YAML::Node node;
@@ -156,9 +149,8 @@ dial_directory_ptr DialingDirectoryDao::loadDialingDirectory()
             return nullptr;
         }
 
-        DialingDirectory dir = node.as<DialingDirectory>();
-
         // Moves the Loaded config to the Class shared pointer instance for return.
+        DialingDirectory dir = node.as<DialingDirectory>();
         encode(dir);
 
         // Loaded with System Entries, then Successful
