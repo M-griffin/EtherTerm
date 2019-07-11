@@ -79,14 +79,6 @@
       <File Name="../src/SDL2_net/SDLnetUDP.cpp"/>
     </VirtualDirectory>
     <File Name="../src/socket_irc.cpp"/>
-    <VirtualDirectory Name="TinyXml">
-      <File Name="../src/TinyXml/tinystr.cpp"/>
-      <File Name="../src/TinyXml/tinystr.hpp"/>
-      <File Name="../src/TinyXml/tinyxml.cpp"/>
-      <File Name="../src/TinyXml/tinyxml.hpp"/>
-      <File Name="../src/TinyXml/tinyxmlerror.cpp"/>
-      <File Name="../src/TinyXml/tinyxmlparser.cpp"/>
-    </VirtualDirectory>
     <VirtualDirectory Name="UtfCpp">
       <File Name="../src/UtfCpp/utf8.h"/>
       <VirtualDirectory Name="utf8">
@@ -99,6 +91,12 @@
     <File Name="../src/session_io.hpp"/>
     <File Name="../src/common_io.cpp"/>
     <File Name="../src/common_io.hpp"/>
+    <File Name="../src/dialing_directory.hpp"/>
+    <File Name="../src/dialing_directory_dao.cpp"/>
+    <File Name="../src/dialing_directory_dao.hpp"/>
+    <File Name="../src/dialing_manager.cpp"/>
+    <File Name="../src/dialing_manager.hpp"/>
+    <File Name="../src/static_methods.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -121,6 +119,7 @@
         <Library Value="SDL2"/>
         <Library Value="pthread"/>
         <Library Value="libssh"/>
+        <Library Value="yaml-cpp"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
@@ -133,7 +132,15 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild/>
-      <PostBuild/>
+      <PostBuild>
+        <Command Enabled="no"># Remove Path from Source Files and use current Working Folder</Command>
+        <Command Enabled="yes">sed -i 's+/home/blue/code/EtherTerm/src/+../src/+' EtherTerm.mk</Command>
+        <Command Enabled="yes">sed -i 's+/home/merc/code/EtherTerm/src/+../src/+' EtherTerm.mk</Command>
+        <Command Enabled="yes"/>
+        <Command Enabled="no"># Remove Path from Project Workspace</Command>
+        <Command Enabled="yes">sed -i 's+/home/blue/code/EtherTerm/linux+EtherTerm/linux+' EtherTerm.mk</Command>
+        <Command Enabled="yes">sed -i 's+/home/merc/code/EtherTerm/linux+EtherTerm/linux+' EtherTerm.mk</Command>
+      </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
         <CleanCommand/>

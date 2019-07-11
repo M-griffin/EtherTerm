@@ -202,7 +202,7 @@ int main(int argc, char* argv[])
             // Nothing to do right now.
             std::cout << "is_headless not implemented - exiting" << std::endl;
             interface_spawn->m_is_global_shutdown = true;
-            Sleep(2000);
+            SDL_Delay(2000);
             exit(0);
         }
         else
@@ -213,7 +213,7 @@ int main(int argc, char* argv[])
             {
                 std::cout << "Startup issues - exiting" << std::endl;
                 interface_spawn->m_is_global_shutdown = true;
-                Sleep(2000);
+                SDL_Delay(2000);
                 exit(-1);
             }
 

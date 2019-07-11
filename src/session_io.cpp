@@ -638,22 +638,22 @@ std::string SessionIO::parseCodeMap(const std::string &screen, std::vector<MapTy
                 }
                 break;
 
-/*
-            case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
-                {
-//                    std::cout << "replacing %%FILENAME.EXT codes" << std::endl;
-                    std::string result = parseFilename(my_matches.m_code);
-                    if(result.size() != 0)
-                    {
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
-                    }
-                    else
-                    {
-                        std::string s(my_matches.m_length, ' ');
-                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, s);
-                    }
-                }
-                break;*/
+                /*
+                            case 5: // %%FILENAME.EXT  get filenames for loading from string prompts
+                                {
+                //                    std::cout << "replacing %%FILENAME.EXT codes" << std::endl;
+                                    std::string result = parseFilename(my_matches.m_code);
+                                    if(result.size() != 0)
+                                    {
+                                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, result);
+                                    }
+                                    else
+                                    {
+                                        std::string s(my_matches.m_length, ' ');
+                                        ansi_string.replace(my_matches.m_offset, my_matches.m_length, s);
+                                    }
+                                }
+                                break;*/
 
             case 6: // Percent w/ 2 CHARS
                 {
@@ -769,19 +769,17 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
 
     std::smatch matches;
     std::string::const_iterator start = ansi_string.begin(), end = ansi_string.end();
-    std::string::size_type offset = 0;
-    std::string::size_type length = 0;
 
     std::regex_constants::match_flag_type flags = std::regex_constants::match_default;
     while(std::regex_search(start, end, matches, expr, flags))
     {
-        // Found a match!        
+        // Found a match!
         /*
         std::cout << "Matched Sub '" << matches.str()
                   << "' following ' " << matches.prefix().str()
                   << "' preceeding ' " << matches.suffix().str()
                   << std::endl;*/
-        
+
         // Avoid Infinite loop and make sure the existing
         // is not the same as the next!
         if (start == matches[0].second)
@@ -789,11 +787,11 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
             std::cout << "no more matches!" << std::endl;
             break;
         }
-        
-        // Since were replacing on the fly, we need to rescan the 
+
+        // Since were replacing on the fly, we need to rescan the
         // string for next code
         start = matches[0].second;
-        
+
 
         // Loop each match, and grab the starting position and length to replace.
         for(size_t s = 1; s < matches.size(); ++s)
@@ -801,8 +799,8 @@ std::vector<MapType> SessionIO::parseToCodeMap(const std::string &sequence, cons
             // Make sure the Match is true! otherwise skip.
             if(matches[s].matched)
             {
-                offset = matches[s].first - ansi_string.begin();
-                length = matches[s].length();
+                //std::string::size_type offset = matches[s].first - ansi_string.begin();
+                //std::string::size_type length = matches[s].length();
 
                 // Test output s registers which pattern matched, 1, 2, or 3!
                 /*

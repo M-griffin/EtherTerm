@@ -16,7 +16,8 @@
  * @file socket_telnet.cpp
  * @brief Pulled from SDLnetTCP needed to access socket channel.
  */
-struct _TCPsocket {
+struct _TCPsocket
+{
     int ready;
     SOCKET channel;
     IPaddress remoteAddress;
@@ -63,7 +64,7 @@ int SDL_Socket::recvSocket(char *message)
         }
         message[result] = 0;
     }
-    
+
     return result;
 }
 
@@ -160,7 +161,7 @@ bool SDL_Socket::onExit()
 
 /**
  * @brief Return Socket Instance for Duplication
- * @return 
+ * @return
  */
 int SDL_Socket::getSocketInstance()
 {
