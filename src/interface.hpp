@@ -311,7 +311,7 @@ public:
                     {
                         // Pass the Events to the specific Session for Specific Window and Input Events.
                         (*it)->m_input_handler->update(event);
-                        continue;
+                        return;
                     }
                 }
                 else
@@ -326,7 +326,7 @@ public:
                         {
                             // Pass the Events to the specific Session for Specific Window and Input Events.
                             (*it)->m_input_handler->update(event);
-                            continue;
+                            return;
                         }
                     }
                     else
