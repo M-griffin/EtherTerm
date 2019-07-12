@@ -456,9 +456,10 @@ SDL_FORCE_INLINE Uint32 _SDLNet_Read32(const void *areap)
 //#include "close_code.h"
 
 // Handle for posix Implementations
+#ifndef _WIN32
 #ifndef SOCKET
 #define SOCKET int
 #endif
-
+#endif
 
 #endif /* SDL_NET_H_ */
