@@ -101,15 +101,15 @@
         <IncludePath Value="."/>
         <IncludePath Value=".."/>
         <IncludePath Value="../src"/>
-        <IncludePath Value="/usr/local/Cellar/sdl2/2.0.7/include"/>
-        <IncludePath Value="/usr/local/Cellar/sdl2/2.0.7/include/SDL2"/>
-        <IncludePath Value="/usr/local/Cellar/libssh/0.7.5/include"/>
+        <IncludePath Value="/usr/local/opt/sdl2/include"/>
+        <IncludePath Value="/usr/local/opt/sdl2/include/SDL2"/>
+        <IncludePath Value="/usr/local/opt/libssh/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
         <LibraryPath Value=".."/>
-        <LibraryPath Value="/usr/local/Cellar/sdl2/2.0.7/lib"/>
-        <LibraryPath Value="/usr/local/Cellar/libssh/0.7.5/lib"/>
+        <LibraryPath Value="/usr/local/opt/sdl2/lib"/>
+        <LibraryPath Value="/usr/local/opt/libssh/lib"/>
         <Library Value="SDL2main"/>
         <Library Value="SDL2"/>
         <Library Value="pthread"/>
@@ -126,7 +126,10 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="no"># Only Needed in IDE for Clearning Dev Paths from Make File.  Need Brew Install gnu-sed</Command>
+        <Command Enabled="yes">/usr/local/opt/gnu-sed/libexec/gnubin/sed -i 's+/Users/admin/code/EtherTerm+..+' EtherTerm.mk</Command>
+      </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

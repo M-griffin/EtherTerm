@@ -114,17 +114,23 @@ void TiXmlBase::ConvertUTF32ToUTF8(unsigned long input, char* output, int* lengt
             --output;
             *output = (char)((input | BYTE_MARK) & BYTE_MASK);
             input >>= 6;
+#ifndef __clang__
             [[gnu::fallthrough]]; // c++11 and c++14
+#endif			
         case 3:
             --output;
             *output = (char)((input | BYTE_MARK) & BYTE_MASK);
             input >>= 6;
+#ifndef __clang__			
             [[gnu::fallthrough]]; // c++11 and c++14
+#endif			
         case 2:
             --output;
             *output = (char)((input | BYTE_MARK) & BYTE_MASK);
             input >>= 6;
+#ifndef __clang__			
             [[gnu::fallthrough]]; // c++11 and c++14
+#endif
         case 1:
             --output;
             *output = (char)(input | FIRST_BYTE_MARK[*length]);
