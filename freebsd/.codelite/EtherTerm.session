@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Session Name="/home/blue/code/EtherTerm/freebsd/EtherTerm.workspace">
-  <int Value="0" Name="m_selectedTab"/>
+  <int Value="1" Name="m_selectedTab"/>
   <wxString Value="/home/blue/code/EtherTerm/freebsd/EtherTerm.workspace" Name="m_workspaceName"/>
-  <TabInfoArray Name="TabInfoArray"/>
+  <TabInfoArray Name="TabInfoArray">
+    <TabInfo>
+      <wxString Value="/usr/home/blue/code/EtherTerm/src/session_manager.cpp" Name="FileName"/>
+      <int Value="59" Name="FirstVisibleLine"/>
+      <int Value="60" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="/usr/home/blue/code/EtherTerm/src/menu_io.cpp" Name="FileName"/>
+      <int Value="640" Name="FirstVisibleLine"/>
+      <int Value="638" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+  </TabInfoArray>
   <SerializedObject Name="m_breakpoints">
     <long Value="0" Name="Count"/>
   </SerializedObject>

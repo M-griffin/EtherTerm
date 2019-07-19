@@ -635,7 +635,7 @@ void MenuIO::sequenceToAnsi(const std::string &sequence)
                     // Clear Background Attribute first
                     backgroundColorSequence(esc_sequence, 16);
 
-                    char char_replacement[200] = {0};
+                    char char_replacement[2048] = {0};
                     sprintf(char_replacement,"%s\x1b[%i;%iH", esc_sequence, atoi(pipe_position2), atoi(pipe_position1));
                     data_string.replace(id1, 7, char_replacement);
                 }

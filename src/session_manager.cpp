@@ -57,7 +57,7 @@ void SessionManager::leave(session_ptr session)
         // Mark that a system has disconnect to reset window focus
         m_is_system_disconnected = true;
     }
-    catch (std::exception ex)
+    catch (std::exception &ex)
     {
         std::cout << "SessionManager::leave() - Caught Exception on shutdown: " << ex.what();
     }
