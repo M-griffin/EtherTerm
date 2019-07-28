@@ -1,4 +1,12 @@
 #!/usr/local/bin/bash
-# Quick Batch File to copy from Debug to current folder.
 
+#build project
+cd ../freebsd
+make -f EtherTerm.mk
+cd ../build
+
+# Quick Batch File to copy from Debug to current folder.
 cp ../freebsd/Debug/EtherTerm .
+
+echo 
+echo 'Done!  ./EtherTerm to start Program'

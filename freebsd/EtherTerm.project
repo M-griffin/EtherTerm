@@ -111,7 +111,7 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="clang++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" C_Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-g;-O0;-W;-std=c++11" C_Options="-g;-O0;-W;-std=c++11" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value=".."/>
         <IncludePath Value="../src"/>
@@ -137,8 +137,12 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
-      <PostBuild/>
+      <PreBuild>
+        <Command Enabled="yes"/>
+      </PreBuild>
+      <PostBuild>
+        <Command Enabled="yes">sed -i '' 's+/home/blue/code/EtherTerm/+../+g' EtherTerm.mk</Command>
+      </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
         <CleanCommand/>
