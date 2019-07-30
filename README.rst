@@ -8,7 +8,6 @@
 You can follow the latest updates and work in the following branches:
 
 - ``master`` - current release branch at 0.4.7-alpha
-- ``feature/0.4.9-alpha`` - various rewrite and testing, stable development branch
 - ``feature/0.4.10-alpha`` - new develop, not stable yet and under going code rewrite.
 
 .. contents:: Table of Contents
