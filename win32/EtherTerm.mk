@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=11/07/2019
+Date                   :=16/08/2019
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
@@ -62,10 +62,10 @@ AS       := C:/MinGW-5.1.0/mingw32/bin/as.exe
 ## User defined environment variables
 ##
 CodeLiteDir:=C:\Program Files\CodeLite
-Objects0=$(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_window_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_irc_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_protocol.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_screen_buffer.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_dialing_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_link_list.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_main.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/up_src_menu_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetselect.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_function.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix) \
-	
+Objects0=$(IntermediateDirectory)/up_src_font_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_window_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_telnet_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_screen_buffer.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/up_src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_telnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_irc_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_protocol.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_font_set_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_dialing_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_link_list.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_SDL2_net_SDLnetselect.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_function.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_menu_io.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(ObjectSuffix) 
 
 
 
@@ -103,6 +103,14 @@ PreBuild:
 ##
 ## Objects
 ##
+$(IntermediateDirectory)/up_src_font_manager.cpp$(ObjectSuffix): ../src/font_manager.cpp $(IntermediateDirectory)/up_src_font_manager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//font_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_font_manager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_font_manager.cpp$(DependSuffix): ../src/font_manager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_font_manager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_font_manager.cpp$(DependSuffix) -MM ../src/font_manager.cpp
+
+$(IntermediateDirectory)/up_src_font_manager.cpp$(PreprocessSuffix): ../src/font_manager.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_font_manager.cpp$(PreprocessSuffix) ../src/font_manager.cpp
+
 $(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(ObjectSuffix): ../src/SDL2_net/SDLnetUDP.cpp $(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//SDL2_net/SDLnetUDP.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_src_SDL2_net_SDLnetUDP.cpp$(DependSuffix): ../src/SDL2_net/SDLnetUDP.cpp
@@ -159,6 +167,14 @@ $(IntermediateDirectory)/up_src_session_manager.cpp$(DependSuffix): ../src/sessi
 $(IntermediateDirectory)/up_src_session_manager.cpp$(PreprocessSuffix): ../src/session_manager.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_session_manager.cpp$(PreprocessSuffix) ../src/session_manager.cpp
 
+$(IntermediateDirectory)/up_src_screen_buffer.cpp$(ObjectSuffix): ../src/screen_buffer.cpp $(IntermediateDirectory)/up_src_screen_buffer.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//screen_buffer.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_screen_buffer.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_screen_buffer.cpp$(DependSuffix): ../src/screen_buffer.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_screen_buffer.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_screen_buffer.cpp$(DependSuffix) -MM ../src/screen_buffer.cpp
+
+$(IntermediateDirectory)/up_src_screen_buffer.cpp$(PreprocessSuffix): ../src/screen_buffer.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_screen_buffer.cpp$(PreprocessSuffix) ../src/screen_buffer.cpp
+
 $(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix): ../src/socket_irc.cpp $(IntermediateDirectory)/up_src_socket_irc.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//socket_irc.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_socket_irc.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_src_socket_irc.cpp$(DependSuffix): ../src/socket_irc.cpp
@@ -207,21 +223,13 @@ $(IntermediateDirectory)/up_src_protocol.cpp$(DependSuffix): ../src/protocol.cpp
 $(IntermediateDirectory)/up_src_protocol.cpp$(PreprocessSuffix): ../src/protocol.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_protocol.cpp$(PreprocessSuffix) ../src/protocol.cpp
 
-$(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix): ../src/input_handler.cpp $(IntermediateDirectory)/up_src_input_handler.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//input_handler.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_input_handler.cpp$(DependSuffix): ../src/input_handler.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_input_handler.cpp$(DependSuffix) -MM ../src/input_handler.cpp
+$(IntermediateDirectory)/up_src_font_set_dao.cpp$(ObjectSuffix): ../src/font_set_dao.cpp $(IntermediateDirectory)/up_src_font_set_dao.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//font_set_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_font_set_dao.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_font_set_dao.cpp$(DependSuffix): ../src/font_set_dao.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_font_set_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_font_set_dao.cpp$(DependSuffix) -MM ../src/font_set_dao.cpp
 
-$(IntermediateDirectory)/up_src_input_handler.cpp$(PreprocessSuffix): ../src/input_handler.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_input_handler.cpp$(PreprocessSuffix) ../src/input_handler.cpp
-
-$(IntermediateDirectory)/up_src_screen_buffer.cpp$(ObjectSuffix): ../src/screen_buffer.cpp $(IntermediateDirectory)/up_src_screen_buffer.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//screen_buffer.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_screen_buffer.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_screen_buffer.cpp$(DependSuffix): ../src/screen_buffer.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_screen_buffer.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_screen_buffer.cpp$(DependSuffix) -MM ../src/screen_buffer.cpp
-
-$(IntermediateDirectory)/up_src_screen_buffer.cpp$(PreprocessSuffix): ../src/screen_buffer.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_screen_buffer.cpp$(PreprocessSuffix) ../src/screen_buffer.cpp
+$(IntermediateDirectory)/up_src_font_set_dao.cpp$(PreprocessSuffix): ../src/font_set_dao.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_font_set_dao.cpp$(PreprocessSuffix) ../src/font_set_dao.cpp
 
 $(IntermediateDirectory)/up_src_common_io.cpp$(ObjectSuffix): ../src/common_io.cpp $(IntermediateDirectory)/up_src_common_io.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//common_io.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_common_io.cpp$(ObjectSuffix) $(IncludePath)
@@ -231,6 +239,14 @@ $(IntermediateDirectory)/up_src_common_io.cpp$(DependSuffix): ../src/common_io.c
 $(IntermediateDirectory)/up_src_common_io.cpp$(PreprocessSuffix): ../src/common_io.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_common_io.cpp$(PreprocessSuffix) ../src/common_io.cpp
 
+$(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(ObjectSuffix): ../src/dialing_directory_dao.cpp $(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//dialing_directory_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(DependSuffix): ../src/dialing_directory_dao.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(DependSuffix) -MM ../src/dialing_directory_dao.cpp
+
+$(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(PreprocessSuffix): ../src/dialing_directory_dao.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(PreprocessSuffix) ../src/dialing_directory_dao.cpp
+
 $(IntermediateDirectory)/up_src_dialing_manager.cpp$(ObjectSuffix): ../src/dialing_manager.cpp $(IntermediateDirectory)/up_src_dialing_manager.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//dialing_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_dialing_manager.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_src_dialing_manager.cpp$(DependSuffix): ../src/dialing_manager.cpp
@@ -239,13 +255,21 @@ $(IntermediateDirectory)/up_src_dialing_manager.cpp$(DependSuffix): ../src/diali
 $(IntermediateDirectory)/up_src_dialing_manager.cpp$(PreprocessSuffix): ../src/dialing_manager.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_dialing_manager.cpp$(PreprocessSuffix) ../src/dialing_manager.cpp
 
-$(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(ObjectSuffix): ../src/dialing_directory_dao.cpp $(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//dialing_directory_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(DependSuffix): ../src/dialing_directory_dao.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(DependSuffix) -MM ../src/dialing_directory_dao.cpp
+$(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix): ../src/renderer.cpp $(IntermediateDirectory)/up_src_renderer.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//renderer.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_renderer.cpp$(DependSuffix): ../src/renderer.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_renderer.cpp$(DependSuffix) -MM ../src/renderer.cpp
 
-$(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(PreprocessSuffix): ../src/dialing_directory_dao.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_dialing_directory_dao.cpp$(PreprocessSuffix) ../src/dialing_directory_dao.cpp
+$(IntermediateDirectory)/up_src_renderer.cpp$(PreprocessSuffix): ../src/renderer.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_renderer.cpp$(PreprocessSuffix) ../src/renderer.cpp
+
+$(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix): ../src/input_handler.cpp $(IntermediateDirectory)/up_src_input_handler.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//input_handler.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_input_handler.cpp$(DependSuffix): ../src/input_handler.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_input_handler.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_input_handler.cpp$(DependSuffix) -MM ../src/input_handler.cpp
+
+$(IntermediateDirectory)/up_src_input_handler.cpp$(PreprocessSuffix): ../src/input_handler.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_input_handler.cpp$(PreprocessSuffix) ../src/input_handler.cpp
 
 $(IntermediateDirectory)/up_src_link_list.cpp$(ObjectSuffix): ../src/link_list.cpp $(IntermediateDirectory)/up_src_link_list.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//link_list.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_link_list.cpp$(ObjectSuffix) $(IncludePath)
@@ -303,6 +327,22 @@ $(IntermediateDirectory)/up_src_menu_function.cpp$(DependSuffix): ../src/menu_fu
 $(IntermediateDirectory)/up_src_menu_function.cpp$(PreprocessSuffix): ../src/menu_function.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_menu_function.cpp$(PreprocessSuffix) ../src/menu_function.cpp
 
+$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix): ../src/sequence_decoder.cpp $(IntermediateDirectory)/up_src_sequence_decoder.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//sequence_decoder.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(DependSuffix): ../src/sequence_decoder.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(DependSuffix) -MM ../src/sequence_decoder.cpp
+
+$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(PreprocessSuffix): ../src/sequence_decoder.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_sequence_decoder.cpp$(PreprocessSuffix) ../src/sequence_decoder.cpp
+
+$(IntermediateDirectory)/up_src_menu_io.cpp$(ObjectSuffix): ../src/menu_io.cpp $(IntermediateDirectory)/up_src_menu_io.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//menu_io.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_menu_io.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_src_menu_io.cpp$(DependSuffix): ../src/menu_io.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_menu_io.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_menu_io.cpp$(DependSuffix) -MM ../src/menu_io.cpp
+
+$(IntermediateDirectory)/up_src_menu_io.cpp$(PreprocessSuffix): ../src/menu_io.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_menu_io.cpp$(PreprocessSuffix) ../src/menu_io.cpp
+
 $(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(ObjectSuffix): ../src/SDL2_net/SDLnet.cpp $(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//SDL2_net/SDLnet.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/up_src_SDL2_net_SDLnet.cpp$(DependSuffix): ../src/SDL2_net/SDLnet.cpp
@@ -318,30 +358,6 @@ $(IntermediateDirectory)/up_src_socket_ssh.cpp$(DependSuffix): ../src/socket_ssh
 
 $(IntermediateDirectory)/up_src_socket_ssh.cpp$(PreprocessSuffix): ../src/socket_ssh.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_socket_ssh.cpp$(PreprocessSuffix) ../src/socket_ssh.cpp
-
-$(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix): ../src/renderer.cpp $(IntermediateDirectory)/up_src_renderer.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//renderer.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_renderer.cpp$(DependSuffix): ../src/renderer.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_renderer.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_renderer.cpp$(DependSuffix) -MM ../src/renderer.cpp
-
-$(IntermediateDirectory)/up_src_renderer.cpp$(PreprocessSuffix): ../src/renderer.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_renderer.cpp$(PreprocessSuffix) ../src/renderer.cpp
-
-$(IntermediateDirectory)/up_src_menu_io.cpp$(ObjectSuffix): ../src/menu_io.cpp $(IntermediateDirectory)/up_src_menu_io.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//menu_io.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_menu_io.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_menu_io.cpp$(DependSuffix): ../src/menu_io.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_menu_io.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_menu_io.cpp$(DependSuffix) -MM ../src/menu_io.cpp
-
-$(IntermediateDirectory)/up_src_menu_io.cpp$(PreprocessSuffix): ../src/menu_io.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_menu_io.cpp$(PreprocessSuffix) ../src/menu_io.cpp
-
-$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix): ../src/sequence_decoder.cpp $(IntermediateDirectory)/up_src_sequence_decoder.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src//sequence_decoder.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(DependSuffix): ../src/sequence_decoder.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(DependSuffix) -MM ../src/sequence_decoder.cpp
-
-$(IntermediateDirectory)/up_src_sequence_decoder.cpp$(PreprocessSuffix): ../src/sequence_decoder.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_src_sequence_decoder.cpp$(PreprocessSuffix) ../src/sequence_decoder.cpp
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

@@ -28,9 +28,12 @@
   </Reconciliation>
   <Description/>
   <Dependencies/>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="src">
+    <File Name="../src/font_manager.cpp"/>
+    <File Name="../src/font_manager.hpp"/>
+    <File Name="../src/font_set_dao.cpp"/>
+    <File Name="../src/font_set_dao.hpp"/>
+    <File Name="../src/font_set.hpp"/>
     <File Name="../src/dialing_manager.cpp"/>
     <File Name="../src/dialing_manager.hpp"/>
     <File Name="../src/static_methods.hpp"/>
@@ -226,4 +229,6 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>
