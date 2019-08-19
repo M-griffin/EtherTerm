@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Michae Griffin
-Date                   :=11/07/19
+Date                   :=18/08/19
 CodeLitePath           :="/home/merc/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -62,8 +62,8 @@ AS       := /usr/bin/as
 CodeLiteDir:=/usr/share/codelite
 Objects0=$(IntermediateDirectory)/src_input_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_link_list.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_function.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_protocol.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_renderer.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_screen_buffer.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/src_sequence_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_telnet_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_window_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_telnet.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_irc_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_irc.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_dialing_directory_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_dialing_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnetselect.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnetUDP.cpp$(ObjectSuffix) \
-	
+	$(IntermediateDirectory)/src_irc_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_irc.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_dialing_directory_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_dialing_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_font_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_font_set_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnetselect.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/SDL2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnetUDP.cpp$(ObjectSuffix) 
 
 
 
@@ -84,9 +84,7 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 PostBuild:
 	@echo Executing Post Build commands ...
 	sed -i 's+../src/+../src/+' EtherTerm.mk
-	sed -i 's+../src/+../src/+' EtherTerm.mk
 	
-	sed -i 's+EtherTerm/linux+EtherTerm/linux+' EtherTerm.mk
 	sed -i 's+EtherTerm/linux+EtherTerm/linux+' EtherTerm.mk
 	@echo Done
 
@@ -310,6 +308,22 @@ $(IntermediateDirectory)/src_dialing_manager.cpp$(DependSuffix): ../src/dialing_
 
 $(IntermediateDirectory)/src_dialing_manager.cpp$(PreprocessSuffix): ../src/dialing_manager.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_dialing_manager.cpp$(PreprocessSuffix) "../src/dialing_manager.cpp"
+
+$(IntermediateDirectory)/src_font_manager.cpp$(ObjectSuffix): ../src/font_manager.cpp $(IntermediateDirectory)/src_font_manager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/font_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_font_manager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_font_manager.cpp$(DependSuffix): ../src/font_manager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_font_manager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_font_manager.cpp$(DependSuffix) -MM "../src/font_manager.cpp"
+
+$(IntermediateDirectory)/src_font_manager.cpp$(PreprocessSuffix): ../src/font_manager.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_font_manager.cpp$(PreprocessSuffix) "../src/font_manager.cpp"
+
+$(IntermediateDirectory)/src_font_set_dao.cpp$(ObjectSuffix): ../src/font_set_dao.cpp $(IntermediateDirectory)/src_font_set_dao.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/font_set_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_font_set_dao.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_font_set_dao.cpp$(DependSuffix): ../src/font_set_dao.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_font_set_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_font_set_dao.cpp$(DependSuffix) -MM "../src/font_set_dao.cpp"
+
+$(IntermediateDirectory)/src_font_set_dao.cpp$(PreprocessSuffix): ../src/font_set_dao.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_font_set_dao.cpp$(PreprocessSuffix) "../src/font_set_dao.cpp"
 
 $(IntermediateDirectory)/SDL2_net_SDLnet.cpp$(ObjectSuffix): ../src/SDL2_net/SDLnet.cpp $(IntermediateDirectory)/SDL2_net_SDLnet.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/SDL2_net/SDLnet.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IncludePath)
