@@ -24,6 +24,7 @@ public:
     ~DialingManager();
 
     bool validateFile();
+    dial_directory_ptr retrieveDialingDirectory();
 
 private:
 

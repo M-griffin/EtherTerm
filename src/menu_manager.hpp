@@ -18,6 +18,9 @@ typedef std::shared_ptr<SequenceDecoder> sequence_decoder_ptr;
 class Renderer;
 typedef std::shared_ptr<Renderer> renderer_ptr;
 
+class DialingManager;
+typedef std::shared_ptr<DialingManager> dial_manager_ptr;
+
 class SystemEntry;
 typedef std::shared_ptr<SystemEntry> system_entry_ptr;
 
@@ -47,6 +50,7 @@ public:
     sequence_decoder_ptr m_sequence_decoder;
     MenuFunction         m_menu_function;
     renderer_ptr         m_renderer;
+    dial_manager_ptr     m_dialing_manager;
 
     // Dialing Directory
     unsigned long        m_lightbar_position;

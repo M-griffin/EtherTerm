@@ -86,6 +86,7 @@ struct convert<FontEntry>
         Node node;
         node["index"]            = rhs.index;
         node["name"]             = rhs.name;
+        node["type"]             = rhs.type;
         node["width"]            = rhs.width;
         node["height"]           = rhs.height;
         node["filename"]         = rhs.filename;

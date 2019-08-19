@@ -34,33 +34,36 @@ Renderer::Renderer(surface_manager_ptr surface,
     , m_window_manager(window)
     , m_input_handler(input)
     , m_weak_session(session)
-    , BLACK( {   0,   0,   0,   0 })
-    , BLUE( {   0,   0, 171,   0 })
-    , GREEN( {   0, 171,   0,   0 })
-    , CYAN( {   0, 171, 171,   0 })
-    , RED( { 171,   0,   0,   0 })
-    , MAGENTA( { 171,   0, 171,   0 })
-    , BROWN( { 171,  87,   0,   0 })
-    , GREY( { 171, 171, 171,   0 })
-    , DARK_GREY( {  87,  87,  87,   0 })
-    , LIGHT_BLUE( {  87,  87, 255,   0 })
-    , LIGHT_GREEN( {  87, 255,  87,   0 })
-    , LIGHT_CYAN( {  87, 255, 255,   0 })
-    , LIGHT_RED( { 255,  87,  87,   0 })
-    , LIGHT_MAGENTA( { 255,  87, 255,   0 })
-    , YELLOW( { 255, 255,  87,   0 })
-    , WHITE( { 255, 255, 255,   0 })
-    , m_current_fg_color(GREY)
-    , m_current_bg_color(BLACK)
-    , m_term_width(term_width)
-    , m_term_height(term_height)
-    , m_is_scroll_region_active(false)
-    , m_top_margin(0)
-    , m_bottom_margin(0)
-    , m_cursor_x_position(0)
-    , m_cursor_y_position(0)
-    , m_is_scalling_surface(false)
-    //, m_is_utf8_output(false)
+    , BLACK(
+{
+    0,   0,   0,   0
+})
+, BLUE({   0,   0, 171,   0 })
+, GREEN({   0, 171,   0,   0 })
+, CYAN({   0, 171, 171,   0 })
+, RED({ 171,   0,   0,   0 })
+, MAGENTA({ 171,   0, 171,   0 })
+, BROWN({ 171,  87,   0,   0 })
+, GREY({ 171, 171, 171,   0 })
+, DARK_GREY({  87,  87,  87,   0 })
+, LIGHT_BLUE({  87,  87, 255,   0 })
+, LIGHT_GREEN({  87, 255,  87,   0 })
+, LIGHT_CYAN({  87, 255, 255,   0 })
+, LIGHT_RED({ 255,  87,  87,   0 })
+, LIGHT_MAGENTA({ 255,  87, 255,   0 })
+, YELLOW({ 255, 255,  87,   0 })
+, WHITE({ 255, 255, 255,   0 })
+, m_current_fg_color(GREY)
+, m_current_bg_color(BLACK)
+, m_term_width(term_width)
+, m_term_height(term_height)
+, m_is_scroll_region_active(false)
+, m_top_margin(0)
+, m_bottom_margin(0)
+, m_cursor_x_position(0)
+, m_cursor_y_position(0)
+, m_is_scalling_surface(false)
+//, m_is_utf8_output(false)
 {
     std::cout << "Renderer Created" << std::endl;
     // Startup Surface and Texture Creation
@@ -80,6 +83,7 @@ void Renderer::initSurfaceTextures()
 {
     // Main Screen Surface
     m_surface_manager->createSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
+
     if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_MAIN_SCREEN))
     {
         SDL_Log("initSurfaceTextures() surfaceExists SURFACE_MAIN_SCREEN: %s",
@@ -89,6 +93,7 @@ void Renderer::initSurfaceTextures()
 
     // Bottom Row of Main Screen Surface (Scrolling)
     m_surface_manager->createSurface(m_surface_manager->SURFACE_BOTTOM_ROW);
+
     if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_BOTTOM_ROW))
     {
         SDL_Log("initSurfaceTextures() surfaceExists SURFACE_BOTTOM_ROW: %s",
@@ -98,6 +103,7 @@ void Renderer::initSurfaceTextures()
 
     // Individual Character Cell Surface
     m_surface_manager->createSurface(m_surface_manager->SURFACE_CHARACTER);
+
     if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_CHARACTER))
     {
         SDL_Log("initSurfaceTextures() surfaceExists SURFACE_CHARACTER: %s",
@@ -107,6 +113,7 @@ void Renderer::initSurfaceTextures()
 
     // Individual Character Cell Cursor On
     m_surface_manager->createSurface(m_surface_manager->SURFACE_CURSOR_ON);
+
     if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_CURSOR_ON))
     {
         SDL_Log("initSurfaceTextures() surfaceExists SURFACE_CURSOR_ON: %s",
@@ -116,6 +123,7 @@ void Renderer::initSurfaceTextures()
 
     // Individual Character Cell Cursor Off
     m_surface_manager->createSurface(m_surface_manager->SURFACE_CURSOR_OFF);
+
     if(!m_surface_manager->surfaceExists(m_surface_manager->SURFACE_CURSOR_OFF))
     {
         SDL_Log("initSurfaceTextures() surfaceExists SURFACE_CURSOR_OFF: %s",
@@ -127,8 +135,9 @@ void Renderer::initSurfaceTextures()
     // Individual Character Cell Cursor Off
     m_surface_manager->createTexture(
         m_surface_manager->TEXTURE_MAIN_SCREEN,
-        m_surface_manager->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]->getSurface()
+        m_surface_manager->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]->getSurface()
     );
+
     if(!m_surface_manager->textureExists(m_surface_manager->TEXTURE_MAIN_SCREEN))
     {
         SDL_Log("initSurfaceTextures() textureExists TEXTURE_MAIN_SCREEN: %s",
@@ -196,6 +205,7 @@ void Renderer::calcBoxSize(SDL_Rect &rect,
         // Bottom Stationary ->> OK!
         rect.w = char_width + (floor((double)sourceX / char_width) * char_width) - rect.x; // back
     }
+
     if(sourceY < y)
     {
         // Bottom -> Down ->> OK!
@@ -265,6 +275,7 @@ void Renderer::pullSelectionBuffer(int x, int y)
 
     // Use coords to pull screen text directly from screen buffer.
     session_ptr session = m_weak_session.lock();
+
     if(session)
     {
         // Push the Text Buffer to the Clipboard.
@@ -301,7 +312,7 @@ void Renderer::renderSelectionScreen(int x, int y)
 
     // Get Handles to Surface and Textures
     SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]
                            ->getSurface();
 
     SDL_Texture *texture;
@@ -328,7 +339,7 @@ void Renderer::renderSelectionScreen(int x, int y)
     // from previous coordinates.
     m_window_manager->renderCopy(
         m_surface_manager
-        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->m_texture_list[m_surface_manager->TEXTURE_MAIN_SCREEN]
         ->getTexture(),
         &rect_source,
         &rect_dest
@@ -347,7 +358,7 @@ void Renderer::renderSelectionScreen(int x, int y)
         // Set Render Target to the Selection Texture.
         m_window_manager->setRenderTarget(
             m_surface_manager
-            ->m_textureList[m_surface_manager->TEXTURE_SELECTION]
+            ->m_texture_list[m_surface_manager->TEXTURE_SELECTION]
             ->getTexture()
         );
 
@@ -355,7 +366,7 @@ void Renderer::renderSelectionScreen(int x, int y)
         m_window_manager->renderClear();
 
         // Set the Color of the Selection Texture
-        m_window_manager->setRenderDrawColor(0, 50 , 50, 255);
+        m_window_manager->setRenderDrawColor(0, 50, 50, 255);
 
         // Can test if filling RECT is needed to speed this up after it's working!
         m_window_manager->renderFill(nullptr);
@@ -365,7 +376,7 @@ void Renderer::renderSelectionScreen(int x, int y)
     }
 
     texture = m_surface_manager
-              ->m_textureList[m_surface_manager->TEXTURE_SELECTION]
+              ->m_texture_list[m_surface_manager->TEXTURE_SELECTION]
               ->getTexture();
 
     // We need to Translate the Screen Width vs Rows and Width to
@@ -424,6 +435,7 @@ void Renderer::setScrollRegion(int top, int bot, int term_height)
         m_is_scroll_region_active = false;
         return;
     }
+
     // 0,0 is reset.
     if(top == 0 && bot == 0)
     {
@@ -438,8 +450,10 @@ void Renderer::setScrollRegion(int top, int bot, int term_height)
         {
             bot = term_height;
         }
+
         m_is_scroll_region_active = true;
     }
+
     // Set Scrolling Margins
     m_top_margin = top;
     m_bottom_margin = bot;
@@ -452,7 +466,7 @@ void Renderer::scrollRegionUp()
 {
     // Get handle to the Surface
     SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]
                            ->getSurface();
 
     int bpp = surface->format->BytesPerPixel;
@@ -461,13 +475,13 @@ void Renderer::scrollRegionUp()
     Uint8 *pixelLastRowPos = (Uint8 *)surface->pixels;
 
     // Move position to start
-    pixelTopPos += surface->w * (m_surface_manager->m_characterHeight * (m_top_margin -1)) * bpp;
+    pixelTopPos += surface->w * (m_surface_manager->m_character_height * (m_top_margin -1)) * bpp;
 
     // Start from One line below the Top Margin.
-    pixelNewPos += surface->w * (m_surface_manager->m_characterHeight * m_top_margin) * bpp;
+    pixelNewPos += surface->w * (m_surface_manager->m_character_height * m_top_margin) * bpp;
 
     // Jump to last line, we want to clear this out after we move everything up!
-    pixelLastRowPos +=  surface->w * (m_surface_manager->m_characterHeight * (m_bottom_margin -1)) * bpp;
+    pixelLastRowPos +=  surface->w * (m_surface_manager->m_character_height * (m_bottom_margin -1)) * bpp;
 
     // Lock the Surface to Modify Pixels
     m_surface_manager->lockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
@@ -476,10 +490,10 @@ void Renderer::scrollRegionUp()
     memmove(
         pixelTopPos,
         pixelNewPos,
-        (surface->w * (m_surface_manager->m_characterHeight * (m_bottom_margin - m_top_margin))) * bpp);
+        (surface->w * (m_surface_manager->m_character_height * (m_bottom_margin - m_top_margin))) * bpp);
 
     // clear the last line on the surface.
-    memset(pixelLastRowPos, 0, (surface->w * m_surface_manager->m_characterHeight) * bpp);
+    memset(pixelLastRowPos, 0, (surface->w * m_surface_manager->m_character_height) * bpp);
 
     // Unlock when modification is done.
     m_surface_manager->unlockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
@@ -487,7 +501,7 @@ void Renderer::scrollRegionUp()
     // Update Pixels in the Texture
     m_window_manager->updateTexture(
         m_surface_manager
-        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->m_texture_list[m_surface_manager->TEXTURE_MAIN_SCREEN]
         ->getTexture(),
         nullptr,
         surface
@@ -509,7 +523,7 @@ void Renderer::scrollScreenUp()
 
     // Get handle to the Surface
     SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]
                            ->getSurface();
 
     int bpp = surface->format->BytesPerPixel;
@@ -519,20 +533,20 @@ void Renderer::scrollScreenUp()
 
     // Move position to start of 2nd Line,
     // Then copying greater line down to previous.
-    pixelNewPos += (surface->w * m_surface_manager->m_characterHeight) * bpp;
+    pixelNewPos += (surface->w * m_surface_manager->m_character_height) * bpp;
 
     // Jump to last line, we want to clear this out after we move everything up!
-    pixelLastRowPos +=  surface->w * (m_surface_manager->m_characterHeight * (m_term_height - 1)) * bpp;
+    pixelLastRowPos +=  surface->w * (m_surface_manager->m_character_height * (m_term_height - 1)) * bpp;
 
     // Lock the Surface
     m_surface_manager->lockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
 
     // Move the Entire Screen Up a 1 Row of Characters.
     memmove(pixelOldPos, pixelNewPos,
-            (surface->w * (surface->h - m_surface_manager->m_characterHeight)) * bpp);
+            (surface->w * (surface->h - m_surface_manager->m_character_height)) * bpp);
 
     // clear the last line on the surface.
-    memset(pixelLastRowPos, 0, (surface->w * m_surface_manager->m_characterHeight) * bpp);
+    memset(pixelLastRowPos, 0, (surface->w * m_surface_manager->m_character_height) * bpp);
 
     // Unlock when modification is done.
     m_surface_manager->unlockSurface(m_surface_manager->SURFACE_MAIN_SCREEN);
@@ -540,7 +554,7 @@ void Renderer::scrollScreenUp()
     // Update Pixels in the Texture
     m_window_manager->updateTexture(
         m_surface_manager
-        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->m_texture_list[m_surface_manager->TEXTURE_MAIN_SCREEN]
         ->getTexture(),
         nullptr,
         surface
@@ -555,7 +569,7 @@ void Renderer::scrollScreenUp()
 void Renderer::clearScreenSurface()
 {
     SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]
                            ->getSurface();
 
     // Fill screen with current RGB Background colors.
@@ -568,7 +582,7 @@ void Renderer::clearScreenSurface()
     // Update the Texture Pixels
     m_window_manager->updateTexture(
         m_surface_manager
-        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->m_texture_list[m_surface_manager->TEXTURE_MAIN_SCREEN]
         ->getTexture(),
         nullptr,
         surface
@@ -597,6 +611,7 @@ void Renderer::renderClearLineScreen(int y, int start, int end)
         drawCharacterCell(i, y, 32); // 32 Space Character
         renderCharScreen(i, y);
     }
+
     m_current_bg_color = originalGB;
 }
 
@@ -614,6 +629,7 @@ void Renderer::renderClearLineAboveScreen(int y, int x)
     // Clear out entire lines Up The Screen the screen.
     // Fix with term variables later on.
     int startPosition = x;
+
     for(int j = y; (j+1) > 0; j--)
     {
         for(int i = startPosition; (i+1) > 0; i--)
@@ -622,9 +638,11 @@ void Renderer::renderClearLineAboveScreen(int y, int x)
             drawCharacterCell(i, j, 32); // 32 space character
             renderCharScreen(i, j);
         }
+
         // Reset to starting position for following lines.
         startPosition = m_term_width-1;
     }
+
     m_current_bg_color = originalGB;
 }
 
@@ -651,8 +669,10 @@ void Renderer::renderClearLineBelowScreen(int y, int x)
             drawCharacterCell(i, j, 32); // 32 space character
             renderCharScreen(i, j);
         }
+
         startPosition = 0;
     }
+
     m_current_bg_color = originalGB;
 }
 
@@ -669,23 +689,23 @@ void Renderer::renderDeleteCharScreen(int x, int y, int num)
     SDL_Rect dest;
 
     SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]
                            ->getSurface();
 
     // next we want to copy out for copy back.
-    pick.w = surface->w - ((x + num) * m_surface_manager->m_characterWidth);
-    pick.h = m_surface_manager->m_characterHeight;
-    pick.x = (x + num) * m_surface_manager->m_characterWidth;
-    pick.y = m_surface_manager->m_characterHeight * y;
+    pick.w = surface->w - ((x + num) * m_surface_manager->m_character_width);
+    pick.h = m_surface_manager->m_character_height;
+    pick.x = (x + num) * m_surface_manager->m_character_width;
+    pick.y = m_surface_manager->m_character_height * y;
 
     // destination
-    dest.w = surface->w - ((x + num) * m_surface_manager->m_characterWidth);
-    dest.h = m_surface_manager->m_characterHeight;
-    dest.x = x * m_surface_manager->m_characterWidth;
-    dest.y = m_surface_manager->m_characterHeight * y;
+    dest.w = surface->w - ((x + num) * m_surface_manager->m_character_width);
+    dest.h = m_surface_manager->m_character_height;
+    dest.x = x * m_surface_manager->m_character_width;
+    dest.y = m_surface_manager->m_character_height * y;
 
     // Move surface to Surface
-    if(SDL_BlitSurface(surface ,&pick, surface, &dest) < 0)
+    if(SDL_BlitSurface(surface,&pick, surface, &dest) < 0)
     {
         SDL_Log("renderDeleteCharScreen() SDL_BlitSurface bottomSurface: %s",
                 SDL_GetError());
@@ -715,28 +735,30 @@ void Renderer::renderBottomScreen()
 
     // Handles to the Surfaces
     SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]
                            ->getSurface();
 
     SDL_Surface *bottomSurface = m_surface_manager
-                                 ->m_surfaceList[m_surface_manager->SURFACE_BOTTOM_ROW]
+                                 ->m_surface_list[m_surface_manager->SURFACE_BOTTOM_ROW]
                                  ->getSurface();
 
     pick.w = surface->w;
-    pick.h = m_surface_manager->m_characterHeight;
+    pick.h = m_surface_manager->m_character_height;
     pick.x = 0;
+
     if(m_is_scroll_region_active)
-        pick.y = m_surface_manager->m_characterHeight * (m_bottom_margin-1);
+        pick.y = m_surface_manager->m_character_height * (m_bottom_margin-1);
     else
-        pick.y = m_surface_manager->m_characterHeight * (m_term_height-1);
+        pick.y = m_surface_manager->m_character_height * (m_term_height-1);
 
     rect.w = bottomSurface->w;
     rect.h = bottomSurface->h;
     rect.x = 0;
+
     if(m_is_scroll_region_active)
-        rect.y = m_surface_manager->m_characterHeight * (m_bottom_margin-1);
+        rect.y = m_surface_manager->m_character_height * (m_bottom_margin-1);
     else
-        rect.y = m_surface_manager->m_characterHeight * (m_term_height-1);
+        rect.y = m_surface_manager->m_character_height * (m_term_height-1);
 
     // Clear Surface
     m_surface_manager->clearSurface(m_surface_manager->SURFACE_BOTTOM_ROW);
@@ -751,7 +773,7 @@ void Renderer::renderBottomScreen()
     // Update Pixels in the Texture with the bottom row.
     m_window_manager->updateTexture(
         m_surface_manager
-        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->m_texture_list[m_surface_manager->TEXTURE_MAIN_SCREEN]
         ->getTexture(),
         &rect,
         bottomSurface
@@ -764,7 +786,7 @@ void Renderer::renderBottomScreen()
 void Renderer::renderScreen()
 {
     SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                           ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]
                            ->getSurface();
 
     // Get The Actual size of the Render/Window.
@@ -788,6 +810,7 @@ void Renderer::renderScreen()
 
     // Test Overide.
     m_is_scalling_surface = false;
+
     if(m_is_scalling_surface)
     {
         // Create Scaled
@@ -795,7 +818,7 @@ void Renderer::renderScreen()
 
         // Handle to Scaled.
         SDL_Surface *scaled = m_surface_manager
-                              ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCALED]
+                              ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCALED]
                               ->getSurface();
 
         std::cout << "surface w" << surface->w << std::endl;
@@ -814,7 +837,7 @@ void Renderer::renderScreen()
         // Update Pixels in the Texture with the bottom row.
         m_window_manager->updateTexture(
             m_surface_manager
-            ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+            ->m_texture_list[m_surface_manager->TEXTURE_MAIN_SCREEN]
             ->getTexture(),
             &rect_dest,
             scaled
@@ -825,7 +848,7 @@ void Renderer::renderScreen()
         // Update Pixels in the Texture with the bottom row.
         m_window_manager->updateTexture(
             m_surface_manager
-            ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+            ->m_texture_list[m_surface_manager->TEXTURE_MAIN_SCREEN]
             ->getTexture(),
             &rect_src,
             surface
@@ -843,22 +866,22 @@ void Renderer::renderCharScreen(int x, int y)
     SDL_Rect rect;
 
     SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_CHARACTER]
+                           ->m_surface_list[m_surface_manager->SURFACE_CHARACTER]
                            ->getSurface();
 
     rect.w = surface->w;
     rect.h = surface->h;
-    rect.x = x * m_surface_manager->m_characterWidth;
-    rect.y = y * m_surface_manager->m_characterHeight;
+    rect.x = x * m_surface_manager->m_character_width;
+    rect.y = y * m_surface_manager->m_character_height;
 
     // Update Pixels in the Texture with the character cell.
     m_window_manager->updateTexture(
         m_surface_manager
-        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->m_texture_list[m_surface_manager->TEXTURE_MAIN_SCREEN]
         ->getTexture(),
         &rect,
         m_surface_manager
-        ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+        ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]
         ->getSurface()
     );
 }
@@ -872,6 +895,7 @@ void Renderer::renderCursorOnScreen()
 
     // Grab handle from weak pointer.
     session_ptr session = m_weak_session.lock();
+
     if(session)
     {
         // Check if the position has changed, if so, then skip!
@@ -888,19 +912,19 @@ void Renderer::renderCursorOnScreen()
 
     // Handle to Cursor On Surface
     SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_CURSOR_ON]
+                           ->m_surface_list[m_surface_manager->SURFACE_CURSOR_ON]
                            ->getSurface();
 
     // Size of Each Character
     rect.w = surface->w;
     rect.h = surface->h;
-    rect.x = m_cursor_x_position * m_surface_manager->m_characterWidth;
-    rect.y = m_cursor_y_position * m_surface_manager->m_characterHeight;
+    rect.x = m_cursor_x_position * m_surface_manager->m_character_width;
+    rect.y = m_cursor_y_position * m_surface_manager->m_character_height;
 
     // Update Pixels in the Texture with the character cell.
     m_window_manager->updateTexture(
         m_surface_manager
-        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->m_texture_list[m_surface_manager->TEXTURE_MAIN_SCREEN]
         ->getTexture(),
         &rect,
         surface
@@ -916,6 +940,7 @@ void Renderer::renderCursorOffScreen()
 
     // Grab handle from weak pointer.
     session_ptr session = m_weak_session.lock();
+
     if(session)
     {
         // Check if the position has changed, if so, then skip!
@@ -934,19 +959,19 @@ void Renderer::renderCursorOffScreen()
 
     // Handle to Cursor Off Surface
     SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_CURSOR_OFF]
+                           ->m_surface_list[m_surface_manager->SURFACE_CURSOR_OFF]
                            ->getSurface();
 
     // Size of Each Character
     rect.w = surface->w;
     rect.h = surface->h;
-    rect.x = m_cursor_x_position * m_surface_manager->m_characterWidth;
-    rect.y = m_cursor_y_position * m_surface_manager->m_characterHeight;
+    rect.x = m_cursor_x_position * m_surface_manager->m_character_width;
+    rect.y = m_cursor_y_position * m_surface_manager->m_character_height;
 
     // Update Pixels in the Texture with the character cell.
     m_window_manager->updateTexture(
         m_surface_manager
-        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->m_texture_list[m_surface_manager->TEXTURE_MAIN_SCREEN]
         ->getTexture(),
         &rect,
         surface
@@ -994,7 +1019,7 @@ void Renderer::drawTextureScreen()
     // Copy Texture to Renderer
     m_window_manager->renderCopy(
         m_surface_manager
-        ->m_textureList[m_surface_manager->TEXTURE_MAIN_SCREEN]
+        ->m_texture_list[m_surface_manager->TEXTURE_MAIN_SCREEN]
         ->getTexture(),
         nullptr,
         &dest
@@ -1035,7 +1060,7 @@ int Renderer::compareSDL_Colors(SDL_Color &src, SDL_Color &dest)
 void Renderer::replaceColor(Uint32 foreground, Uint32 background)
 {
     SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_CHARACTER]
+                           ->m_surface_list[m_surface_manager->SURFACE_CHARACTER]
                            ->getSurface();
 
     // Foreground/Background of Original Bitmap Image for Replacement.
@@ -1054,6 +1079,7 @@ void Renderer::replaceColor(Uint32 foreground, Uint32 background)
 
     // Loop and replace foreground and Background colors.
     int count = surface->h * surface->w;
+
     for(int i = 0; i < count; i++, pixel += 4)
     {
         // more background in most cases check first.
@@ -1080,6 +1106,7 @@ void Renderer::setupCursorCharacter()
 {
     // Grab handle from weak pointer.
     session_ptr session = m_weak_session.lock();
+
     if(session && session->m_sequence_parser)
     {
         // If cursor is not active then don't waste processing.
@@ -1101,8 +1128,8 @@ void Renderer::setupCursorCharacter()
 
     // Transform The underscore to a Cursor.
     int asciicode = '_';
-    int char_width = m_surface_manager->m_characterWidth;
-    int char_height = m_surface_manager->m_characterHeight;
+    int char_width = m_surface_manager->m_character_width;
+    int char_height = m_surface_manager->m_character_height;
 
     // Quad for Char Cell in Bitmap
     // 32 Cols by 8 Rows.
@@ -1119,23 +1146,23 @@ void Renderer::setupCursorCharacter()
 
     // Handles to Surfaces, when using more than once per method.
     SDL_Surface *surfaceFont = m_surface_manager
-                               ->m_surfaceList[m_surface_manager->SURFACE_FONT]
+                               ->m_surface_list[m_surface_manager->SURFACE_FONT]
                                ->getSurface();
 
     SDL_Surface *surfaceMain = m_surface_manager
-                               ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                               ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]
                                ->getSurface();
 
     SDL_Surface *surfaceCharacter = m_surface_manager
-                                    ->m_surfaceList[m_surface_manager->SURFACE_CHARACTER]
+                                    ->m_surface_list[m_surface_manager->SURFACE_CHARACTER]
                                     ->getSurface();
 
     SDL_Surface *surfaceOn = m_surface_manager
-                             ->m_surfaceList[m_surface_manager->SURFACE_CURSOR_ON]
+                             ->m_surface_list[m_surface_manager->SURFACE_CURSOR_ON]
                              ->getSurface();
 
     SDL_Surface *surfaceOff = m_surface_manager
-                              ->m_surfaceList[m_surface_manager->SURFACE_CURSOR_OFF]
+                              ->m_surface_list[m_surface_manager->SURFACE_CURSOR_OFF]
                               ->getSurface();
 
     // Clear Surfaces
@@ -1162,7 +1189,7 @@ void Renderer::setupCursorCharacter()
     }
 
     // Grab Underscore Character from Font Serface, and overwrite the current character cell.
-    if(m_surface_manager->m_currentFont == "vga8x16.bmp")
+    if(m_surface_manager->m_current_font == "vga8x16.bmp")
     {
         cursor.x = 0;
         cursor.y = 13;
@@ -1206,19 +1233,19 @@ void Renderer::drawCharacterCell(int X, int Y, int ascii_code)
 
     // Quad for Char Cell in Bitmap
     // 32 Cols by 8 Rows.
-    pick.x = (ascii_code % 32) * m_surface_manager->m_characterWidth;
-    pick.y = round(ascii_code / 32) * m_surface_manager->m_characterHeight;
-    pick.w = m_surface_manager->m_characterWidth;
-    pick.h = m_surface_manager->m_characterHeight;
+    pick.x = (ascii_code % 32) * m_surface_manager->m_character_width;
+    pick.y = round(ascii_code / 32) * m_surface_manager->m_character_height;
+    pick.w = m_surface_manager->m_character_width;
+    pick.h = m_surface_manager->m_character_height;
 
     // Quad for Char Cell to Map to Screen
-    area.x = X * m_surface_manager->m_characterWidth;
-    area.y = Y * m_surface_manager->m_characterHeight;
-    area.w = m_surface_manager->m_characterWidth;
-    area.h = m_surface_manager->m_characterHeight;
+    area.x = X * m_surface_manager->m_character_width;
+    area.y = Y * m_surface_manager->m_character_height;
+    area.w = m_surface_manager->m_character_width;
+    area.h = m_surface_manager->m_character_height;
 
     SDL_Surface *surface = m_surface_manager
-                           ->m_surfaceList[m_surface_manager->SURFACE_CHARACTER]
+                           ->m_surface_list[m_surface_manager->SURFACE_CHARACTER]
                            ->getSurface();
 
     m_surface_manager->clearSurface(m_surface_manager->SURFACE_CHARACTER);
@@ -1226,7 +1253,7 @@ void Renderer::drawCharacterCell(int X, int Y, int ascii_code)
     // Copy from font surface to character surface.
     if(SDL_BlitSurface(
                 m_surface_manager
-                ->m_surfaceList[m_surface_manager->SURFACE_FONT]
+                ->m_surface_list[m_surface_manager->SURFACE_FONT]
                 ->getSurface(),
                 &pick,
                 surface,
@@ -1247,7 +1274,7 @@ void Renderer::drawCharacterCell(int X, int Y, int ascii_code)
                 surface,
                 nullptr,
                 m_surface_manager
-                ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]
                 ->getSurface(),
                 &area) < 0)
     {
@@ -1273,23 +1300,24 @@ void Renderer::drawString(int X, int Y, char text[])
     area.y = Y;
 
     int surface_width = m_surface_manager
-                        ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                        ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]
                         ->getSurface()->w;
 
     for(i = 0; i < (signed)strlen(text); i++)
     {
         asciiCode = std::char_traits<unsigned char>().to_int_type(text[i]);
         drawCharacterCell(
-            area.x / m_surface_manager->m_characterWidth,
-            area.y / m_surface_manager->m_characterHeight,
+            area.x / m_surface_manager->m_character_width,
+            area.y / m_surface_manager->m_character_height,
             asciiCode
         );
 
-        area.x += m_surface_manager->m_characterWidth;
+        area.x += m_surface_manager->m_character_width;
+
         if(area.x >= surface_width-5)
         {
             area.x = 0;
-            area.y += m_surface_manager->m_characterHeight;
+            area.y += m_surface_manager->m_character_height;
         }
     }
 }
@@ -1307,11 +1335,11 @@ void Renderer::drawCharSet(int X, int Y)
     SDL_Rect area;
     int i = 0;
     int asciiCode = 0;
-    area.x = X * m_surface_manager->m_characterWidth;
-    area.y = Y * m_surface_manager->m_characterHeight;
+    area.x = X * m_surface_manager->m_character_width;
+    area.y = Y * m_surface_manager->m_character_height;
 
     int surface_width = m_surface_manager
-                        ->m_surfaceList[m_surface_manager->SURFACE_MAIN_SCREEN]
+                        ->m_surface_list[m_surface_manager->SURFACE_MAIN_SCREEN]
                         ->getSurface()->w;
 
 
@@ -1319,21 +1347,24 @@ void Renderer::drawCharSet(int X, int Y)
     for(i = 1; i < 255; i++)
     {
         asciiCode = i;
+
         if(asciiCode == 0)
         {
             break;
         }
+
         drawCharacterCell(
-            area.x / m_surface_manager->m_characterWidth,
-            area.y / m_surface_manager->m_characterHeight,
+            area.x / m_surface_manager->m_character_width,
+            area.y / m_surface_manager->m_character_height,
             asciiCode
         );
-        area.x += m_surface_manager->m_characterWidth;
+        area.x += m_surface_manager->m_character_width;
+
         // Wrap
         if(area.x >= surface_width-5)
         {
             area.x = 0;
-            area.y += m_surface_manager->m_characterHeight;
+            area.y += m_surface_manager->m_character_height;
         }
     }
 }

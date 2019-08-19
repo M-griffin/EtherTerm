@@ -4,6 +4,9 @@
 #include "sequence_decoder.hpp"
 #include "session.hpp"
 #include "session_manager.hpp"
+#include "dialing_manager.hpp"
+#include "font_set.hpp"
+#include "static_methods.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -22,6 +25,7 @@ MenuManager::MenuManager(
     , m_sequence_decoder(decoder)
     , m_menu_function(decoder, program_path)
     , m_renderer(renderer)
+    , m_dialing_manager(new DialingManager(m_program_path))
     , m_lightbar_position(0)
     , m_directory_top_margin(1)
     , m_directory_bottom_margin(1)
@@ -365,11 +369,12 @@ std::vector<list_bar> MenuManager::buildDialList()
                         else if(strcmp(mci_code,"FO") == 0)
                         {
                             // Load the Font from the selected system
-                            FontSet font(
-                                m_renderer->m_surface_manager->getFontFromSet(
-                                    m_system_entries[current_system].font
-                                )
-                            );
+                            // TODO FontSet
+
+                            FontEntry font = m_renderer->m_surface_manager->getFontFromSet(
+                                                 m_system_entries[current_system].font);
+
+
                             // Replace with the Font name from XML.
                             std::string string_replace = font.name;
 
@@ -496,74 +501,12 @@ std::vector<list_bar> MenuManager::buildDialList()
  */
 bool MenuManager::readDialDirectory()
 {
-    //SystemConnection sysconn;
-    std::string path = StaticMethods::getAssetPath(m_program_path);
-    path.append("dialdirectory.xml");
+    dial_directory_ptr entries = m_dialing_manager->retrieveDialingDirectory();
 
-    /*
-    TiXmlDocument doc(path.c_str());
-
-    if(!doc.LoadFile())
-    {
-        std::cout << "Error Reading XML" << path << std::endl;
+    if(entries == nullptr || entries->system_entries.size() == 0)
         return false;
-    }
 
-    TiXmlHandle hDoc(&doc);
-    TiXmlElement* pElem;
-    TiXmlHandle hRoot(0);
-
-    // If vector already populated then clear to refresh it.
-    if(m_systemConnection.size() > 0)
-    {
-        m_systemConnection.clear();
-        std::vector<SystemConnection>().swap(m_systemConnection);
-    }
-
-    // block: EtherTerm
-    {
-        std::cout << "readDialDirectory - FirstChildElement" << std::endl;
-        pElem=hDoc.FirstChildElement().Element();
-
-        // should always have a valid root but handle gracefully if it does
-        if(!pElem)
-        {
-            std::cout << "readDialDirectory - EtherTerm Element not found!" << std::endl;
-            return false;
-        }
-
-        std::cout << "Root Value: " << pElem->Value() << std::endl;
-        // save this for later
-        hRoot=TiXmlHandle(pElem);
-    }
-    // block: Phone-book
-    {
-        //std::cout << "readDialDirectory - Phonebook" << std::endl;
-        pElem=hRoot.FirstChild("Phonebook").Element();
-        std::cout << "Phonebook Version: " << pElem->Attribute("version") << std::endl;
-    }
-    // block: BBS
-    {
-        //std::cout << "readDialDirectory - BBS" << std::endl;
-        pElem=hRoot.FirstChild("Phonebook").FirstChild().Element();
-
-        for(; pElem; pElem=pElem->NextSiblingElement())
-        {
-            sysconn.name = pElem->Attribute("name");
-            sysconn.ip = pElem->Attribute("ip");
-            pElem->QueryIntAttribute("port", &sysconn.port);
-            sysconn.protocol = pElem->Attribute("protocol");
-            sysconn.login = pElem->Attribute("login");
-            sysconn.password = pElem->Attribute("password");
-            sysconn.font = pElem->Attribute("font");
-            sysconn.keyMap = pElem->Attribute("keyMap");
-            sysconn.termType = pElem->Attribute("termType");
-            sysconn.termSize = pElem->Attribute("termSize");
-            // Add to Vector so we can parse in building the dialing directory.
-            m_systemConnection.push_back(sysconn);
-        }
-    }
-    */
+    m_system_entries.swap(entries->system_entries);
     std::cout << "readDialDirectory - Done" << std::endl;
     return true;
 }
@@ -574,49 +517,11 @@ bool MenuManager::readDialDirectory()
 void MenuManager::createDialDirectory()
 {
     // Create Default Phone Book.
-    std::string path = StaticMethods::getAssetPath(m_program_path);
-    path.append("dialdirectory.xml");
-    /*
-    TiXmlDocument doc;
-    TiXmlDeclaration * decl = new TiXmlDeclaration("1.0", "", "");
-    doc.LinkEndChild(decl);
+    //std::string path = StaticMethods::getAssetPath(m_program_path);
+    //path.append("dialdirectory.xml");
 
-    TiXmlElement * element = new TiXmlElement("EtherTerm");
-    doc.LinkEndChild(element);
+    // TODO add new creation
 
-    TiXmlElement * element2 = new TiXmlElement("Phonebook");
-    element->LinkEndChild(element2);
-    element2->SetAttribute("version", "1.1");
-
-    TiXmlElement * element3 = new TiXmlElement("BBS");
-    element2->LinkEndChild(element3);
-
-    element3->SetAttribute("name", "Haunting The Chapel");
-    element3->SetAttribute("ip", "htc.zapto.org");
-    element3->SetAttribute("port", "23");
-    element3->SetAttribute("protocol", "TELNET");
-    element3->SetAttribute("login", "");
-    element3->SetAttribute("password", "");
-    element3->SetAttribute("font", "vga8x16.bmp");
-    element3->SetAttribute("keyMap", "ANSI");
-    element3->SetAttribute("termType", "ANSI");
-    element3->SetAttribute("termSize", "80x25");
-
-    TiXmlElement *element4 = new TiXmlElement("BBS");
-    element2->LinkEndChild(element4);
-
-    element4->SetAttribute("name", "1984");
-    element4->SetAttribute("ip", "1984.ws");
-    element4->SetAttribute("port", "23");
-    element4->SetAttribute("protocol", "TELNET");
-    element4->SetAttribute("login", "");
-    element4->SetAttribute("password", "");
-    element4->SetAttribute("font", "vga8x16.bmp");
-    element4->SetAttribute("keyMap", "VT100");
-    element4->SetAttribute("termType", "ANSI");
-    element4->SetAttribute("termSize", "80x25");
-    doc.SaveFile(path.c_str());
-    */
 }
 
 /**
@@ -625,41 +530,10 @@ void MenuManager::createDialDirectory()
 void MenuManager::writeDialDirectory()
 {
     // Create Default Phone Book.
-    std::string path = StaticMethods::getAssetPath(m_program_path);
-    path.append("dialdirectory.xml");
+    //std::string path = StaticMethods::getAssetPath(m_program_path);
+    //path.append("dialdirectory.xml");
 
-    /*
-    TiXmlDocument doc;
-    TiXmlDeclaration *decl = new TiXmlDeclaration("1.0", "", "");
-    doc.LinkEndChild(decl);
-
-    TiXmlElement *root = new TiXmlElement("EtherTerm");
-    doc.LinkEndChild(root);
-
-    TiXmlElement *phonebook = new TiXmlElement("Phonebook");
-    root->LinkEndChild(phonebook);
-    phonebook->SetAttribute("version", "1.1");
-
-    // Loop and write out all System Connections
-    for(auto &it : m_systemConnection)
-    {
-        TiXmlElement *system = new TiXmlElement("BBS");
-        phonebook->LinkEndChild(system);
-
-        system->SetAttribute("name", it.name);
-        system->SetAttribute("ip", it.ip);
-        system->SetAttribute("port", it.port);
-        system->SetAttribute("protocol", it.protocol);
-        system->SetAttribute("login", it.login);
-        system->SetAttribute("password", it.password);
-        system->SetAttribute("font", it.font);
-        system->SetAttribute("keyMap", it.keyMap);
-        system->SetAttribute("termType", it.termType);
-        system->SetAttribute("termSize", it.termSize);
-    }
-
-    doc.SaveFile(path.c_str());
-    */
+    // TODO Add new entry
 }
 
 /**

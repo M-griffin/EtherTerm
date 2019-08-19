@@ -29,7 +29,7 @@ bool FontManager::validateFile()
         font_set->font_entries.push_back(entry);
 
         FontEntry entry2;
-        entry2.index = 0;
+        entry2.index = 1;
         entry2.name = "CP437 VGA SCALED";
         entry2.type = "bmp";
         entry2.width = 8;
@@ -39,7 +39,7 @@ bool FontManager::validateFile()
         font_set->font_entries.push_back(entry2);
 
         FontEntry entry3;
-        entry3.index = 0;
+        entry3.index = 2;
         entry3.name = "Amiga Topaz";
         entry3.type = "bmp";
         entry3.width = 8;
@@ -49,7 +49,7 @@ bool FontManager::validateFile()
         font_set->font_entries.push_back(entry3);
 
         FontEntry entry4;
-        entry4.index = 0;
+        entry4.index = 3;
         entry4.name = "Amiga Topaz 2";
         entry4.type = "bmp";
         entry4.width = 8;
@@ -59,7 +59,7 @@ bool FontManager::validateFile()
         font_set->font_entries.push_back(entry4);
 
         FontEntry entry5;
-        entry5.index = 0;
+        entry5.index = 4;
         entry5.name = "Amiga Topaz Plus";
         entry5.type = "bmp";
         entry5.width = 8;
@@ -69,7 +69,7 @@ bool FontManager::validateFile()
         font_set->font_entries.push_back(entry5);
 
         FontEntry entry6;
-        entry6.index = 0;
+        entry6.index = 5;
         entry6.name = "Amiga MicroKnight";
         entry6.type = "bmp";
         entry6.width = 8;
@@ -79,7 +79,7 @@ bool FontManager::validateFile()
         font_set->font_entries.push_back(entry6);
 
         FontEntry entry7;
-        entry7.index = 0;
+        entry7.index = 6;
         entry7.name = "Amiga MicroKnight Plus";
         entry7.type = "bmp";
         entry7.width = 8;
@@ -89,7 +89,7 @@ bool FontManager::validateFile()
         font_set->font_entries.push_back(entry7);
 
         FontEntry entry8;
-        entry8.index = 0;
+        entry8.index = 7;
         entry8.name = "Amiga Mo'soul";
         entry8.type = "bmp";
         entry8.width = 8;
@@ -99,7 +99,7 @@ bool FontManager::validateFile()
         font_set->font_entries.push_back(entry8);
 
         FontEntry entry9;
-        entry9.index = 0;
+        entry9.index = 8;
         entry9.name = "Amiga Pot Noodle";
         entry9.type = "bmp";
         entry9.width = 8;

@@ -54,12 +54,12 @@ public:
     {
         try
         {
-            if (m_socket_handle->isActive())
+            if(m_socket_handle->isActive())
             {
                 m_socket_handle->close();
             }
         }
-        catch (std::exception &ex)
+        catch(std::exception &ex)
         {
             std::cout << "tcp_connection shutdown() - Caught exception: " << ex.what();
         }
@@ -72,12 +72,12 @@ public:
     {
         try
         {
-            if (m_socket_handle->isActive())
+            if(m_socket_handle->isActive())
             {
                 m_socket_handle->close();
             }
         }
-        catch (std::exception &ex)
+        catch(std::exception &ex)
         {
             std::cout << "async_connection close() - Caught exception: " << ex.what();
         }
@@ -110,6 +110,30 @@ public:
     }
 
     /**
+     * @brief Case Insensitive Compare
+     * @param str1
+     * @param str2
+     * @return
+     */
+    bool iequals(const std::string& str1, const std::string& str2)
+    {
+        if(str1.size() != str2.size())
+        {
+            return false;
+        }
+
+        for(std::string::const_iterator c1 = str1.begin(), c2 = str2.begin(); c1 != str1.end(); ++c1, ++c2)
+        {
+            if(std::tolower(*c1) != std::tolower(*c2))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @brief Async Connection Callback for IOService Work
      * @param StringSequence - Host:Port
      * @param Callback - return error code and handles to new session
@@ -123,21 +147,25 @@ public:
         std::vector<unsigned char> place_holder;
         int service_type = SERVICE_TYPE_NONE;
 
-        if(protocol == "TELNET")
+        if(iequals(protocol,"TELNET"))
         {
             service_type = SERVICE_TYPE_CONNECT_TELNET;
         }
-        else if (protocol == "SSH")
+        else if(iequals(protocol,"SSH"))
         {
             service_type = SERVICE_TYPE_CONNECT_SSH;
         }
-        else if (protocol == "IRC")
+        else if(iequals(protocol,"IRC"))
         {
             service_type = SERVICE_TYPE_CONNECT_IRC;
         }
 
+        std::cout << "Insert ASYNC Connection: " << string_seq << " : " << protocol << " : " << service_type << std::endl;
 
-        m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handle, callback, service_type);
+        if(service_type != SERVICE_TYPE_NONE)
+        {
+            m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handle, callback, service_type);
+        }
     }
 
     socket_handler_ptr  m_socket_handle;

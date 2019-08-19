@@ -1,6 +1,7 @@
 #include "menu_function.hpp"
 #include "sequence_decoder.hpp"
 #include "menu_io.hpp"
+#include "static_methods.hpp"
 
 #include <iostream>
 #include <cstdio>
@@ -45,34 +46,6 @@ MenuFunction::~MenuFunction()
     std::map<std::string, int>().swap(m_command_index_function);
 }
 
-/*
- * Setup Menu Path
- */
-std::string MenuFunction::getProgramPath()
-{
-    std::string path = m_program_path;
-#ifdef _WIN32
-    path += "assets\\";
-#else
-    path += "assets/";
-#endif
-    return path;
-}
-
-/**
- * @brief Helper to append directory path
- */
-std::string MenuFunction::getDirectoryPath()
-{
-    // Create Default Phone Book.
-    std::string path = getProgramPath();
-#ifdef _WIN32
-    path.append("directory\\");
-#else
-    path.append("directory/");
-#endif
-    return path;
-}
 
 /*
  * Parse Helper for Menu's / Commands
@@ -86,14 +59,17 @@ void MenuFunction::dataParseHelper(std::string &temp)
 
     st1 = temp.find('"', 0);
     st2 = temp.find('"', st1+1);
+
     if(st1 != std::string::npos &&
             st2 != std::string::npos)
     {
         ++st1;
         temp1 = temp.substr(st1,st2);
         ct = st2 - st1;
+
         if(temp1.length() > ct)
             temp1.erase(ct,temp1.length());
+
         temp = temp1;
     }
     else
@@ -111,6 +87,7 @@ int MenuFunction::menuParseData(std::string &cfgdata)
     if(cfgdata[0] == '#') return false;
 
     id1 = cfgdata.find("MenuName ", 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
@@ -119,6 +96,7 @@ int MenuFunction::menuParseData(std::string &cfgdata)
     }
 
     id1 = cfgdata.find("Directive ", 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
@@ -127,6 +105,7 @@ int MenuFunction::menuParseData(std::string &cfgdata)
     }
 
     id1 = cfgdata.find("MenuPrompt ", 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
@@ -135,15 +114,19 @@ int MenuFunction::menuParseData(std::string &cfgdata)
     }
 
     id1 = cfgdata.find("Lightbar ", 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
+
         if(cfgdata == "TRUE")
             m_menu_record.is_lightbar = true;
         else
             m_menu_record.is_lightbar = false;
+
         return false;
     }
+
     return false;
 }
 
@@ -152,13 +135,14 @@ int MenuFunction::menuParseData(std::string &cfgdata)
  */
 int MenuFunction::menuReadData(const std::string &MenuName)
 {
-    std::string path = getDirectoryPath();
+    std::string path = StaticMethods::getDirectoryPath(m_program_path);
     path.append(MenuName);
     path.append(".menu");
 
     std::cout << "Read Menu: " << path << std::endl;
     std::ifstream iFS;
     iFS.open(path.c_str());
+
     if(!iFS.is_open())
     {
         std::cout << "Error: Unable to Read Menu: "
@@ -168,10 +152,12 @@ int MenuFunction::menuReadData(const std::string &MenuName)
     }
 
     std::string cfgdata;
+
     while(std::getline(iFS,cfgdata,'\n'))
     {
         menuParseData(cfgdata);
     }
+
     iFS.close();
     return true;
 }
@@ -192,6 +178,7 @@ void MenuFunction::commandsParse(std::string &cfgdata,
 
     sprintf(sText,"LDesc[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
@@ -201,6 +188,7 @@ void MenuFunction::commandsParse(std::string &cfgdata,
 
     sprintf(sText,"SDesc[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
@@ -210,6 +198,7 @@ void MenuFunction::commandsParse(std::string &cfgdata,
 
     sprintf(sText,"CKeys[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
@@ -219,6 +208,7 @@ void MenuFunction::commandsParse(std::string &cfgdata,
 
     sprintf(sText,"CmdKeys[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
@@ -228,6 +218,7 @@ void MenuFunction::commandsParse(std::string &cfgdata,
 
     sprintf(sText,"MString[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
@@ -237,6 +228,7 @@ void MenuFunction::commandsParse(std::string &cfgdata,
 
     sprintf(sText,"HiString[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
@@ -246,6 +238,7 @@ void MenuFunction::commandsParse(std::string &cfgdata,
 
     sprintf(sText,"LoString[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
@@ -255,6 +248,7 @@ void MenuFunction::commandsParse(std::string &cfgdata,
 
     sprintf(sText,"Xcoord[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
@@ -264,6 +258,7 @@ void MenuFunction::commandsParse(std::string &cfgdata,
 
     sprintf(sText,"Ycoord[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
@@ -273,13 +268,16 @@ void MenuFunction::commandsParse(std::string &cfgdata,
 
     sprintf(sText,"LBarCmd[%.03d]",idx);
     id1 = cfgdata.find(sText, 0);
+
     if(id1 != std::string::npos)
     {
         dataParseHelper(cfgdata);
+
         if(cfgdata == "TRUE")
             cmdRecord->is_lightbar = true;
         else
             cmdRecord->is_lightbar = false;
+
         return;
     }
 }
@@ -290,7 +288,7 @@ void MenuFunction::commandsParse(std::string &cfgdata,
 int MenuFunction::commandsExist(const std::string &MenuName, const int &idx)
 {
     //std::cout << "MenuFunction::cmdexist" << std::endl;
-    std::string path = getDirectoryPath();
+    std::string path = StaticMethods::getDirectoryPath(m_program_path);
     path.append(MenuName);
     path.append(".menu");
     int ret = false;
@@ -299,6 +297,7 @@ int MenuFunction::commandsExist(const std::string &MenuName, const int &idx)
     // Open file for reading and parsing.
     std::ifstream iFS2;
     iFS2.open(path.c_str());
+
     if(!iFS2.is_open())
     {
         //errlog((char *)"Couldn't Open Menu Command [cmdexist()]: %s\n", path.c_str());
@@ -309,14 +308,17 @@ int MenuFunction::commandsExist(const std::string &MenuName, const int &idx)
     sprintf(sText,"[CommandRec%.03d]",idx);
     std::string cfgdata;
     std::string::size_type id1 = 0;
+
     while(std::getline(iFS2, cfgdata, '\n'))
     {
         id1 = cfgdata.find(sText, 0);
-        if (id1 != std::string::npos)
+
+        if(id1 != std::string::npos)
         {
             ret = true;
         }
     }
+
     iFS2.close();
     return ret;
 }
@@ -329,10 +331,12 @@ int MenuFunction::commandsExist(const std::string &MenuName, const int &idx)
 int MenuFunction::commandsCount(const std::string &MenuName)
 {
     int  cnt = 0;
+
     while(commandsExist(MenuName, cnt))
     {
         ++cnt;
     }
+
     return cnt;
 }
 
@@ -341,17 +345,19 @@ int MenuFunction::commandsCount(const std::string &MenuName)
  */
 int MenuFunction::commandsReadData(const std::string &MenuName, const int &idx)
 {
-    std::string path = getDirectoryPath();
+    std::string path = StaticMethods::getDirectoryPath(m_program_path);
     path.append(MenuName);
     path.append(".menu");
 
     int ret = 0;
     ret = commandsExist(MenuName,idx);
+
     if(ret < 1) return false;
 
     // Else Read and Parse it
     std::ifstream iFS;
     iFS.open(path.c_str());
+
     if(!iFS.is_open())
     {
         //errlog((char *)"Couldn't Open Menu Commands: %s\n", path.c_str());
@@ -360,12 +366,15 @@ int MenuFunction::commandsReadData(const std::string &MenuName, const int &idx)
 
     CommandRecord cmdRecord;
     std::string cfgdata;
+
     for(;;)
     {
         std::getline(iFS, cfgdata, '\n');
         commandsParse(cfgdata, idx, &cmdRecord);
+
         if(iFS.eof()) break;
     }
+
     iFS.close();
 
     // Add to List of Commands.
@@ -379,6 +388,7 @@ int MenuFunction::commandsReadData(const std::string &MenuName, const int &idx)
 void MenuFunction::menuReadCommands()
 {
     int idx = 0;
+
     while(commandsReadData(m_curent_menu, idx))
     {
         ++idx;
@@ -426,12 +436,13 @@ void MenuFunction::menuStart(const std::string &currentMenu)
     // Setup the current Menu Passed.
     m_curent_menu = currentMenu;
 
-    std::string path = getDirectoryPath();
+    std::string path = StaticMethods::getDirectoryPath(m_program_path);
     path.append(m_curent_menu);
     path.append(".menu");
 
     FILE *fstr;
     fstr = fopen(path.c_str(),"rb+");
+
     if(!fstr)
     {
         m_isLoadNewMenu = false;
@@ -444,6 +455,7 @@ void MenuFunction::menuStart(const std::string &currentMenu)
 
     // Setup the Default Setting and And Clear Allocations.
     menuReload(); // Loading new Menu, Clear!
+
     if(!menuReadData(m_curent_menu))
     {
         std::cout << "Error: menuStart() - Unable to Read Current Menu "
@@ -451,6 +463,7 @@ void MenuFunction::menuStart(const std::string &currentMenu)
                   << std::endl;
         return;
     }
+
     m_num_commands = commandsCount(m_curent_menu);
 
     // Clear And Reload Menu Commands.
@@ -567,8 +580,10 @@ void MenuFunction::menuStart(const std::string &currentMenu)
         {
             return;
         }
+
         m_previous_menu = m_curent_menu;
     }
+
     m_output.clear();
 
     // Set the Sizes
@@ -606,6 +621,7 @@ void MenuFunction::menuStart(const std::string &currentMenu)
                 m_output += m_output_buffer;
             }
         }
+
         // Moves cursor to end of line during light-bars.
         sprintf(m_output_buffer,"\x1b[%i;79H",m_y_position);
         m_output += m_output_buffer;
@@ -616,6 +632,7 @@ void MenuFunction::menuStart(const std::string &currentMenu)
     {
         m_menu_io.sequenceToAnsi(m_output);
     }
+
     //Replace Messages Left...
     m_output.clear();
     m_output = m_menu_record.menu_prompt;
@@ -628,6 +645,7 @@ void MenuFunction::menuStart(const std::string &currentMenu)
                 (char *)m_menu_record.menu_prompt.c_str());
         m_output = m_output_buffer;
     }
+
     if(m_output.size() > 1)
     {
         m_menu_io.sequenceToAnsi(m_output);
@@ -662,6 +680,7 @@ void MenuFunction::menuLightBars(char *returnParameters,
         if(inputSequence.size() > 1)
         {
             m_second_sequence = inputSequence[2];
+
             // Handle Hardware Input Sequences
             if(m_second_sequence == '0')
             {
@@ -670,16 +689,19 @@ void MenuFunction::menuLightBars(char *returnParameters,
         }
         else
             m_second_sequence = '\0';
+
         m_is_escape_sequence = true;
     }
     else
     {
         m_is_escape_sequence = false;
     }
+
     m_output.clear();
 
     ////errlog2("menu_bars() 23 .0 ");
     m_commands_executed  = 0;
+
     if(m_is_escape_sequence)
     {
         // Input Key is Escaped Meaning Arrow Keys
@@ -786,6 +808,7 @@ void MenuFunction::menuLightBars(char *returnParameters,
             if(m_commands_executed == 0)
             {
                 returnParameters[0] = m_second_sequence;
+
                 // Translate to Terminal ESC Keys
                 if(m_second_sequence == '0')
                     m_second_sequence = inputSequence[3];
@@ -809,8 +832,10 @@ void MenuFunction::menuLightBars(char *returnParameters,
                 sprintf(m_output_buffer,"\x1b[%i;%iH%s",m_y_position,m_x_position,
                         (char *)m_command_record[m_command_index[m_choice]].inactive_string.c_str());
                 m_output += m_output_buffer;
+
                 if(m_choice == 0) m_choice = m_num_lightbar_commands-1;
                 else --m_choice;
+
                 m_x_position = m_command_record[m_command_index[m_choice]].x_coord;
                 m_y_position = m_command_record[m_command_index[m_choice]].y_coord;
                 sprintf(m_output_buffer,"\x1b[%i;%iH%s\x1b[%i;79H",m_y_position,m_x_position,
@@ -825,8 +850,10 @@ void MenuFunction::menuLightBars(char *returnParameters,
                 sprintf(m_output_buffer,"\x1b[%i;%iH%s",m_y_position,m_x_position,
                         (char *)m_command_record[m_command_index[m_choice]].inactive_string.c_str());
                 m_output += m_output_buffer;
+
                 if(m_choice == m_num_lightbar_commands-1) m_choice = 0;
                 else ++m_choice;
+
                 m_x_position = m_command_record[m_command_index[m_choice]].x_coord;
                 m_y_position = m_command_record[m_command_index[m_choice]].y_coord;
                 sprintf(m_output_buffer,"\x1b[%i;%iH%s\x1b[%i;79H",m_y_position,m_x_position,
@@ -843,6 +870,7 @@ void MenuFunction::menuLightBars(char *returnParameters,
             if((int)m_sequence == 10)
             {
                 m_commands_executed = 0;
+
                 // Here Loop through and execute stacked Commands
                 for(int ckey = 0; ckey != m_num_commands; ckey++)
                 {
@@ -859,6 +887,7 @@ void MenuFunction::menuLightBars(char *returnParameters,
                         strcpy(returnParameters,(const char*)m_command_record[ckey].command.c_str());
                     }
                 }
+
                 if(m_commands_executed > 0)
                 {
                     return;
@@ -868,6 +897,7 @@ void MenuFunction::menuLightBars(char *returnParameters,
             else
             {
                 m_commands_executed = 0;     // Normal Key Inputted, if Match's
+
                 for(int ckey = 0; ckey != m_num_commands; ckey++)
                 {
                     // Loop and Run Stacked Commands.
@@ -891,6 +921,7 @@ void MenuFunction::menuLightBars(char *returnParameters,
                     }
                 }
             }
+
             // Executed == 0, Then Key Pressed was not valid!, and no stacked commands to loop :)
             if(m_commands_executed > 0)
             {
@@ -907,6 +938,7 @@ void MenuFunction::menuLightBars(char *returnParameters,
         {
             // Only Execute [ENTER] on Light-bars!
             m_commands_executed = 0;
+
             // Here Loop through and execute stacked Commands
             for(int ckey = 0; ckey != m_num_commands; ckey++)
             {
@@ -917,6 +949,7 @@ void MenuFunction::menuLightBars(char *returnParameters,
                     strcpy(returnParameters,(const char*)m_command_record[ckey].command.c_str());
                 }
             }
+
             // Executed Return Pass-through or Normal Key!
             if(m_commands_executed > 0)
             {
@@ -927,6 +960,7 @@ void MenuFunction::menuLightBars(char *returnParameters,
         {
             // Check for ENTER CKEY!
             m_commands_executed = 0;
+
             // Here Loop through and execute stacked Commands
             for(int ckey = 0; ckey != m_num_commands; ckey++)
             {
@@ -937,6 +971,7 @@ void MenuFunction::menuLightBars(char *returnParameters,
                     strcpy(returnParameters,(const char*)m_command_record[ckey].command.c_str());
                 }
             }
+
             if(m_commands_executed > 0)
             {
                 return;
@@ -946,6 +981,7 @@ void MenuFunction::menuLightBars(char *returnParameters,
         else
         {
             m_commands_executed = 0;      // Normal Key Inputted, if Match's
+
             for(int ckey = 0; ckey != m_num_commands; ckey++)
             {
                 // Loop and Run Stacked Commands.
@@ -967,6 +1003,7 @@ void MenuFunction::menuLightBars(char *returnParameters,
                     strcpy(returnParameters,(const char*)m_command_record[ckey].command.c_str());
                 }
             }
+
             // Executed == 0, Then Key Pressed was not valid!, and no stacked commands to loop :)
             if(m_commands_executed > 0)
             {
@@ -994,6 +1031,7 @@ void MenuFunction::menuProcess(char *returnParameters,
         menuReload();
         return;
     }
+
     // Startup the Lightbar System.
     menuLightBars(returnParameters, inputSequence);
 }
@@ -1009,7 +1047,7 @@ void MenuFunction::menuDoCommands(CommandRecord *cmdr)
 
     switch(c1)
     {
-            // Message Reader Return right away
+        // Message Reader Return right away
         case '!' :
             // These are Pass-through Menu Commands.
             break;
@@ -1035,6 +1073,7 @@ void MenuFunction::menuDoCommands(CommandRecord *cmdr)
 
                 case '!' : // Return to Original Menu from GoSub Menu.
                     if(m_gosub_menu == "") break;
+
                     m_curent_menu.clear();
                     m_curent_menu = m_gosub_menu;
                     m_isLoadNewMenu = true;
@@ -1048,9 +1087,10 @@ void MenuFunction::menuDoCommands(CommandRecord *cmdr)
                 default  : // None Found!
                     break;
             }
+
             break;
 
-            // None Found!
+        // None Found!
         default  :
             break;
     }

@@ -1,5 +1,8 @@
 #include "surface_manager.hpp"
 #include "window_manager.hpp"
+#include "font_manager.hpp"
+#include "font_set.hpp"
+#include "static_methods.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -10,24 +13,24 @@
 
 SurfaceManager::SurfaceManager(window_manager_ptr &window_manager, const std::string &program_path)
     : m_weak_window_manager(window_manager)
-    , m_programPath(program_path)
-    , m_currentFont("vga8x16.bmp")
-    , m_previousFont("")
+    , m_program_path(program_path)
+    , m_current_font("vga8x16.bmp")
+    , m_previous_font("")
       // Initialize Color Masks.
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    , m_redMask(0xff000000)
-    , m_greenMask(0x00ff0000)
-    , m_blueMask(0x0000ff00)
-    , m_alphaMask(0x000000ff)
+    , m_red_mask(0xff000000)
+    , m_green_mask(0x00ff0000)
+    , m_blue_mask(0x0000ff00)
+    , m_alpha_mask(0x000000ff)
 #else
-    , m_redMask(0x000000ff)
-    , m_greenMask(0x0000ff00)
-    , m_blueMask(0x00ff0000)
-    , m_alphaMask(0xff000000)
+    , m_red_mask(0x000000ff)
+    , m_green_mask(0x0000ff00)
+    , m_blue_mask(0x00ff0000)
+    , m_alpha_mask(0xff000000)
 #endif
-    , m_surfaceBits(32)
-    , m_characterWidth(8)
-    , m_characterHeight(16)
+    , m_surface_bits(32)
+    , m_character_width(8)
+    , m_character_height(16)
 {
     std::cout << "SurfaceManager Created!" << std::endl;
 }
@@ -35,43 +38,12 @@ SurfaceManager::SurfaceManager(window_manager_ptr &window_manager, const std::st
 SurfaceManager::~SurfaceManager()
 {
     std::cout << "~SurfaceManager" << std::endl;
-    // Clear All Fonts.
-    std::vector<FontSet>().swap(m_fontSet);
 
     // Clear All Surfaces
-    std::unordered_map<int, surface_ptr>().swap(m_surfaceList);
+    std::unordered_map<int, surface_ptr>().swap(m_surface_list);
 
     // Clear All Textures
-    std::unordered_map<int, texture_ptr>().swap(m_textureList);
-}
-
-/**
- * @brief Helper to append program path
- */
-std::string SurfaceManager::getProgramPath()
-{
-    std::string path = m_programPath;
-#ifdef _WIN32
-    path.append("assets\\");
-#else
-    path.append("assets/");
-#endif
-    return path;
-}
-
-/**
- * @brief Helper to append font path
- */
-std::string SurfaceManager::getFontPath()
-{
-    // Create Default Phone Book.
-    std::string path = getProgramPath();
-#ifdef _WIN32
-    path.append("font\\");
-#else
-    path.append("font/");
-#endif
-    return path;
+    std::unordered_map<int, texture_ptr>().swap(m_texture_list);
 }
 
 
@@ -82,7 +54,7 @@ std::string SurfaceManager::getFontPath()
  */
 void SurfaceManager::addSurface(int value, surface_ptr surface)
 {
-    m_surfaceList.insert(std::make_pair(value, surface));
+    m_surface_list.insert(std::make_pair(value, surface));
 }
 
 /**
@@ -91,11 +63,11 @@ void SurfaceManager::addSurface(int value, surface_ptr surface)
  */
 void SurfaceManager::delSurface(int value)
 {
-    auto it = m_surfaceList.find(value);
+    auto it = m_surface_list.find(value);
 
-    if(it != m_surfaceList.end())
+    if(it != m_surface_list.end())
     {
-        m_surfaceList.erase(it);
+        m_surface_list.erase(it);
     }
 }
 
@@ -105,9 +77,9 @@ void SurfaceManager::delSurface(int value)
  */
 bool SurfaceManager::surfaceExists(int value)
 {
-    auto it = m_surfaceList.find(value);
+    auto it = m_surface_list.find(value);
 
-    if(it != m_surfaceList.end())
+    if(it != m_surface_list.end())
     {
         return true;
     }
@@ -122,7 +94,7 @@ bool SurfaceManager::surfaceExists(int value)
  */
 void SurfaceManager::addTexture(int value, texture_ptr texture)
 {
-    m_textureList.insert(std::make_pair(value, texture));
+    m_texture_list.insert(std::make_pair(value, texture));
 }
 
 /**
@@ -131,11 +103,11 @@ void SurfaceManager::addTexture(int value, texture_ptr texture)
  */
 void SurfaceManager::delTexture(int value)
 {
-    auto it = m_textureList.find(value);
+    auto it = m_texture_list.find(value);
 
-    if(it != m_textureList.end())
+    if(it != m_texture_list.end())
     {
-        m_textureList.erase(it);
+        m_texture_list.erase(it);
     }
 }
 
@@ -145,9 +117,9 @@ void SurfaceManager::delTexture(int value)
  */
 bool SurfaceManager::textureExists(int value)
 {
-    auto it = m_textureList.find(value);
+    auto it = m_texture_list.find(value);
 
-    if(it != m_textureList.end())
+    if(it != m_texture_list.end())
     {
         return true;
     }
@@ -161,8 +133,8 @@ bool SurfaceManager::textureExists(int value)
  */
 void SurfaceManager::setCurrentFont(const std::string &font)
 {
-    m_previousFont = m_currentFont;
-    m_currentFont = font;
+    m_previous_font = m_current_font;
+    m_current_font = font;
 }
 
 /**
@@ -171,7 +143,7 @@ void SurfaceManager::setCurrentFont(const std::string &font)
  */
 std::string SurfaceManager::getCurrentFont()
 {
-    return m_currentFont;
+    return m_current_font;
 }
 
 /**
@@ -180,7 +152,7 @@ std::string SurfaceManager::getCurrentFont()
  */
 bool SurfaceManager::didFontChange()
 {
-    return (m_currentFont != m_previousFont);
+    return (m_current_font != m_previous_font);
 }
 
 
@@ -190,72 +162,10 @@ bool SurfaceManager::didFontChange()
  */
 bool SurfaceManager::readFontSets()
 {
-    /*
-    FontSet font_set;
-    std::string path = getProgramPath();
-    path.append("fontsets.xml");
 
-    TiXmlDocument doc(path.c_str());
+    font_manager_ptr font_manager(new FontManager(m_program_path));
+    m_font_set = font_manager->retrieveFontSet();
 
-    if(!doc.LoadFile())
-    {
-        std::cout << "readFontSets() Error Reading: " << path << std::endl;
-        return false;
-    }
-
-    TiXmlHandle hDoc(&doc);
-    TiXmlElement* pElem;
-    TiXmlHandle hRoot(0);
-
-    // If vector already populated then clear to refresh it.
-    if(m_fontSet.size() > 0)
-    {
-        m_fontSet.clear();
-        std::vector<FontSet>().swap(m_fontSet);
-    }
-
-    // block: EtherTerm
-    {
-        std::cout << "readFontConfiguration - FirstChildElement" << std::endl;
-        pElem=hDoc.FirstChildElement().Element();
-
-        // should always have a valid root but handle gracefully if it does
-        if(!pElem)
-        {
-            std::cout << "readFontConfiguration - EtherTerm Element not found!" << std::endl;
-            return false;
-        }
-
-        std::cout << "Root Value: " << pElem->Value() << std::endl;
-        // save this for later
-        hRoot=TiXmlHandle(pElem);
-    }
-    // block: Fontset
-    {
-        //std::cout << "readDialDirectory - Phonebook" << std::endl;
-        pElem=hRoot.FirstChild("Fontset").Element();
-        std::cout << "Fontset Version: " << pElem->Attribute("version") << std::endl;
-    }
-    // block: Font
-    {
-        //std::cout << "readDialDirectory - BBS" << std::endl;
-        pElem=hRoot.FirstChild("Fontset").FirstChild().Element();
-
-        for(; pElem; pElem=pElem->NextSiblingElement())
-        {
-            font_set.name = pElem->Attribute("name");
-            font_set.type = pElem->Attribute("type");
-            pElem->QueryIntAttribute("width", &font_set.width);
-            pElem->QueryIntAttribute("height", &font_set.height);
-            font_set.filename = pElem->Attribute("filename");
-            font_set.sequence = pElem->Attribute("sequence");
-
-            // Add to Vector so we can parse
-            m_fontSet.push_back(font_set);
-        }
-    }
-    std::cout << "readFontConfiguration - Done" << std::endl;
-    */
     return true;
 }
 
@@ -264,19 +174,20 @@ bool SurfaceManager::readFontSets()
  * @param value
  * @return
  */
-FontSet SurfaceManager::getFontFromSet(const std::string &value)
+FontEntry SurfaceManager::getFontFromSet(const std::string &value)
 {
-    FontSet font_set;
+    FontEntry entry;
+    entry.index = -1;
 
-    for(FontSet f : m_fontSet)
+    for(FontEntry f : m_font_set->font_entries)
     {
         if(f.filename == value)
         {
-            font_set = f;
+            return f;
         }
     }
 
-    return font_set;
+    return entry;
 }
 
 /**
@@ -288,7 +199,7 @@ bool SurfaceManager::loadFont()
 {
     bool is_loaded = false;
 
-    if(m_fontSet.size() == 0)
+    if(m_font_set->font_entries.size() == 0)
     {
         is_loaded = readFontSets();
 
@@ -302,9 +213,10 @@ bool SurfaceManager::loadFont()
         is_loaded = false;
     }
 
-    FontSet font(getFontFromSet(m_currentFont));
+    std::cout << "m_font_set->font_entries.size(): " << m_font_set->font_entries.size() << std::endl;
+    FontEntry font = getFontFromSet(m_current_font);
 
-    if(font.filename != m_currentFont)
+    if(font.index == -1 || font.filename != m_current_font)
     {
         std::cout << "Error, unable to load front from set!" << std::endl;
         assert(false);
@@ -328,8 +240,8 @@ bool SurfaceManager::loadFont()
          * 80x25 by calculating width and height in pixels 8x16 = 640x400.
          */
         // Set the character dimenions
-        m_characterWidth = font.width;
-        m_characterHeight = font.height;
+        m_character_width = font.width;
+        m_character_height = font.height;
     }
 
     return is_loaded;
@@ -342,8 +254,8 @@ bool SurfaceManager::loadFont()
  */
 bool SurfaceManager::loadBitmapFontImage()
 {
-    std::string path = getFontPath();
-    path.append(m_currentFont);
+    std::string path = StaticMethods::getFontPath(m_program_path);
+    path.append(m_current_font);
 
     std::cout << "loading Font -> : " << path << std::endl;
 
@@ -391,8 +303,8 @@ bool SurfaceManager::loadBitmapFontImage()
            drawTextureScreen();
        }
 
-       m_previousFont = m_currentFont; // Current to Previous
-       m_currentFont  = fontName;    // New to Current.
+       m_previous_font = m_current_font; // Current to Previous
+       m_current_font  = fontName;    // New to Current.
        return m_cachedSurface != nullptr;*/
 }
 
@@ -509,9 +421,9 @@ void SurfaceManager::createTexture(int textureType, SDL_Surface *surface)
  */
 void SurfaceManager::clearSurface(int value)
 {
-    auto it = m_surfaceList.find(value);
+    auto it = m_surface_list.find(value);
 
-    if(it != m_surfaceList.end())
+    if(it != m_surface_list.end())
     {
         (*it).second->clear();
     }
@@ -567,8 +479,8 @@ void SurfaceManager::createSurface(int surfaceType)
                 new Surfaces(
                     SDL_CreateRGBSurface(
                         SDL_SWSURFACE,
-                        m_characterWidth, m_characterHeight, m_surfaceBits,
-                        m_redMask, m_greenMask, m_blueMask, m_alphaMask
+                        m_character_width, m_character_height, m_surface_bits,
+                        m_red_mask, m_green_mask, m_blue_mask, m_alpha_mask
                     )
                 )
             );
@@ -601,8 +513,8 @@ void SurfaceManager::createSurface(int surfaceType)
                     new Surfaces(
                         SDL_CreateRGBSurface(
                             SDL_SWSURFACE,
-                            window->getWindowWidth(), window->getWindowHeight(), m_surfaceBits,
-                            m_redMask, m_greenMask, m_blueMask, m_alphaMask
+                            window->getWindowWidth(), window->getWindowHeight(), m_surface_bits,
+                            m_red_mask, m_green_mask, m_blue_mask, m_alpha_mask
                         )
                     )
                 );
@@ -642,8 +554,8 @@ void SurfaceManager::createSurface(int surfaceType)
                 new Surfaces(
                     SDL_CreateRGBSurface(
                         SDL_SWSURFACE,
-                        screenWidth, screenHeight, m_surfaceBits,
-                        m_redMask, m_greenMask, m_blueMask, m_alphaMask
+                        screenWidth, screenHeight, m_surface_bits,
+                        m_red_mask, m_green_mask, m_blue_mask, m_alpha_mask
                     )
                 )
             );
@@ -673,8 +585,8 @@ void SurfaceManager::createSurface(int surfaceType)
                 new Surfaces(
                     SDL_CreateRGBSurface(
                         SDL_SWSURFACE,
-                        m_surfaceList[SURFACE_MAIN_SCREEN]->getSurface()->w, m_characterHeight, m_surfaceBits,
-                        m_redMask, m_greenMask, m_blueMask, m_alphaMask
+                        m_surface_list[SURFACE_MAIN_SCREEN]->getSurface()->w, m_character_height, m_surface_bits,
+                        m_red_mask, m_green_mask, m_blue_mask, m_alpha_mask
                     )
                 )
             );
@@ -693,9 +605,9 @@ void SurfaceManager::createSurface(int surfaceType)
  */
 void SurfaceManager::lockSurface(int surfaceType)
 {
-    if(SDL_MUSTLOCK(m_surfaceList[surfaceType]->getSurface()))
+    if(SDL_MUSTLOCK(m_surface_list[surfaceType]->getSurface()))
     {
-        if(SDL_LockSurface(m_surfaceList[surfaceType]->getSurface()) < 0)
+        if(SDL_LockSurface(m_surface_list[surfaceType]->getSurface()) < 0)
         {
             SDL_Log("lockSurface(): %s", SDL_GetError());
             assert(false);
@@ -708,9 +620,9 @@ void SurfaceManager::lockSurface(int surfaceType)
  */
 void SurfaceManager::unlockSurface(int surfaceType)
 {
-    if(SDL_MUSTLOCK(m_surfaceList[surfaceType]->getSurface()))
+    if(SDL_MUSTLOCK(m_surface_list[surfaceType]->getSurface()))
     {
-        SDL_UnlockSurface(m_surfaceList[surfaceType]->getSurface());
+        SDL_UnlockSurface(m_surface_list[surfaceType]->getSurface());
     }
 }
 
@@ -720,14 +632,14 @@ void SurfaceManager::unlockSurface(int surfaceType)
 void SurfaceManager::fillSurfaceColor(int surfaceType, SDL_Rect *rect, SDL_Color *color)
 {
 
-    //SDL_LockSurface(m_surfaceList[surfaceType]->getSurface());
+    //SDL_LockSurface(m_surface_list[surfaceType]->getSurface());
 
     // Fill screen with current RGB Background colors.
     if(SDL_FillRect(
-                m_surfaceList[surfaceType]->getSurface(),
+                m_surface_list[surfaceType]->getSurface(),
                 rect,
                 SDL_MapRGBA(
-                    m_surfaceList[surfaceType]->getSurface()->format,
+                    m_surface_list[surfaceType]->getSurface()->format,
                     color->r,
                     color->g,
                     color->b,
@@ -738,5 +650,5 @@ void SurfaceManager::fillSurfaceColor(int surfaceType, SDL_Rect *rect, SDL_Color
         assert(false);
     }
 
-    //SDL_UnlockSurface(m_surfaceList[surfaceType]->getSurface());
+    //SDL_UnlockSurface(m_surface_list[surfaceType]->getSurface());
 }

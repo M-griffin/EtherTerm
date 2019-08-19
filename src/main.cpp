@@ -10,6 +10,7 @@
 
 #include "interface.hpp"
 #include "dialing_manager.hpp"
+#include "font_manager.hpp"
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -62,6 +63,15 @@ bool startup(std::string &program_path)
 
     // Turn off, might make a toggle for this later on.
     SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+
+    // Validate Font Set here, if doesn't exist create default entries.
+    font_manager_ptr font_manager(new FontManager(program_path));
+
+    if(!font_manager->validateFile())
+    {
+        std::cout << "Font Set Validation has failed. " << std::endl;
+        success = false;
+    }
 
     // Validate Dialing Directory here, if doesn't exist create default with an entry.
     dial_manager_ptr dial_manager(new DialingManager(program_path));

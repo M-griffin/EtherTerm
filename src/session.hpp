@@ -167,6 +167,7 @@ public:
      */
     void createConnection(std::string connection_string, std::string protocol)
     {
+        std::cout <<  "m_connection->async_connect. " << connection_string << " " << protocol << std::endl;
         m_connection->async_connect(connection_string,
                                     protocol,
                                     std::bind(
@@ -237,6 +238,30 @@ public:
     }
 
     /**
+     * @brief Case Insensitive Compare
+     * @param str1
+     * @param str2
+     * @return
+     */
+    bool iequals(const std::string& str1, const std::string& str2)
+    {
+        if(str1.size() != str2.size())
+        {
+            return false;
+        }
+
+        for(std::string::const_iterator c1 = str1.begin(), c2 = str2.begin(); c1 != str1.end(); ++c1, ++c2)
+        {
+            if(std::tolower(*c1) != std::tolower(*c2))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @brief Callback after data received. handles telnet options
      * Then parses out normal text data from client to server.
      * @param error
@@ -258,8 +283,7 @@ public:
             {
                 // Parse incoming data, send through decoder
                 //std::string incoming_data = m_raw_data;
-
-                if(m_system_entry->protocol == "TELNET")
+                if(iequals(m_system_entry->protocol, "TELNET"))
                 {
                     // Handle Telnet option parsing from incoming data.
                     // Returns Test and ESC Sequence, All Options are Responsed to in the Manager.
@@ -301,7 +325,7 @@ public:
                         std::cout << "Error: m_telnet_manager inaccessable!" << std::endl;
                     }
                 }
-                else if(m_system_entry->protocol == "IRC")
+                else if(iequals(m_system_entry->protocol, "IRC"))
                 {
                     std::string incoming_data = "";
 

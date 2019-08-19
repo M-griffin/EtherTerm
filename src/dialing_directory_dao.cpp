@@ -2,6 +2,7 @@
 #include "dialing_directory.hpp"
 #include "static_methods.hpp"
 
+#include <iostream>
 #include <cstdio>
 #include <fstream>
 #include <string>
@@ -135,7 +136,7 @@ dial_directory_ptr DialingDirectoryDao::loadDialingDirectory()
 
         if(node.size() == 0)
         {
-            std::cout << m_filename << " is empty!" << std::endl;
+            std::cout << path << " is empty!" << std::endl;
             return nullptr;
         }
 
@@ -161,12 +162,12 @@ dial_directory_ptr DialingDirectoryDao::loadDialingDirectory()
     }
     catch(YAML::Exception &ex)
     {
-        std::cout << "YAML::LoadFile " << m_filename << " " << ex.what() << " Missing required field maybe."
+        std::cout << "YAML::LoadFile " << path << " " << ex.what() << " Missing required field maybe."
                   << std::endl;
     }
     catch(std::exception &ex)
     {
-        std::cout << "Unexpected YAML::LoadFile " << m_filename << " " << ex.what() << std::endl;
+        std::cout << "Unexpected YAML::LoadFile " << path << " " << ex.what() << std::endl;
     }
 
     return nullptr;

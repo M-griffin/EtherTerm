@@ -71,6 +71,21 @@ public:
         return path;
     }
 
-};
 
+    /**
+     * @brief Helper to append font path
+     */
+    static std::string getFontPath(std::string program_path)
+    {
+        // Create Default Phone Book.
+        std::string path = getAssetPath(program_path);
+#ifdef _WIN32
+        path.append("font\\");
+#else
+        path.append("font/");
+#endif
+        return path;
+    }
+
+};
 #endif // STATIC_METHODS_HPP

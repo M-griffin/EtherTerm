@@ -70,11 +70,11 @@ bool FontSetDao::saveFontSet(font_set_ptr font_set)
         out << YAML::Value << YAML::BeginMap;
         out << YAML::Key << "index" << YAML::Value << opt.index;
         out << YAML::Key << "name" << YAML::Value << opt.name;
+        out << YAML::Key << "type" << YAML::Value << opt.type;
         out << YAML::Key << "width" << YAML::Value << opt.width;
         out << YAML::Key << "height" << YAML::Value << opt.height;
         out << YAML::Key << "filename" << YAML::Value << opt.filename;
         out << YAML::Key << "sequence" << YAML::Value << opt.sequence;
-
         out << YAML::EndMap;
     }
 
@@ -132,7 +132,7 @@ font_set_ptr FontSetDao::loadFontSet()
 
         if(node.size() == 0)
         {
-            std::cout << m_filename << " is empty!" << std::endl;
+            std::cout << path << " is empty!" << std::endl;
             return nullptr;
         }
 
@@ -158,12 +158,12 @@ font_set_ptr FontSetDao::loadFontSet()
     }
     catch(YAML::Exception &ex)
     {
-        std::cout << "YAML::LoadFile " << m_filename << " " << ex.what() << " Missing required field maybe."
+        std::cout << "YAML::LoadFile " << path << " " << ex.what() << " Missing required field maybe."
                   << std::endl;
     }
     catch(std::exception &ex)
     {
-        std::cout << "Unexpected YAML::LoadFile " << m_filename << " " << ex.what() << std::endl;
+        std::cout << "Unexpected YAML::LoadFile " << path << " " << ex.what() << std::endl;
     }
 
     return nullptr;

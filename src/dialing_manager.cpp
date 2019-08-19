@@ -44,3 +44,8 @@ bool DialingManager::validateFile()
 
     return true;
 }
+
+dial_directory_ptr DialingManager::retrieveDialingDirectory()
+{
+    return (m_dial_directory_dao->loadDialingDirectory());
+}
