@@ -205,6 +205,30 @@ public:
     }
 
     /**
+     * @brief Case Insensitive Compare
+     * @param str1
+     * @param str2
+     * @return
+     */
+    bool iequals(const std::string& str1, const std::string& str2)
+    {
+        if(str1.size() != str2.size())
+        {
+            return false;
+        }
+
+        for(std::string::const_iterator c1 = str1.begin(), c2 = str2.begin(); c1 != str1.end(); ++c1, ++c2)
+        {
+            if(std::tolower(*c1) != std::tolower(*c2))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @brief Spawn Connection Sessions
      *        Connection Sessions handle their own IO
      */
@@ -263,7 +287,7 @@ public:
         new_session->m_sequence_parser->setCursorActive(true);
 
         // IRC setup scrolling region
-        if(system_entry->protocol == "IRC")
+        if(iequals(system_entry->protocol,"IRC"))
         {
             new_session->createIrcManager();
             new_session->m_irc_manager->startUp();
@@ -276,7 +300,7 @@ public:
 
         // TODO Change this to WriteSequence and use vector, incase passwords or others has colons
         // That could casue issues on string split!
-        if(system_entry->protocol == "SSH")
+        if(iequals(system_entry->protocol,"SSH"))
         {
             connection_string.append(":");
             connection_string.append(system_entry->login);
