@@ -31,12 +31,14 @@ void MenuIO::rightSpacing(std::string &str, const int &space)   // Pad Right
     if(space == 0) return;
 
     int s = str.size();
+
     // if Line > Space, Erase to Make it match!
     if(s >= space)
     {
         str.erase(space, s - space);
         return;
     }
+
     for(int i = 0; i < (space-s); i++)
         str += ' ';
 }
@@ -51,6 +53,7 @@ void MenuIO::leftSpacing(std::string &str, const int &space)   // Pad Left
     if(space == 0) return;
 
     int s = str.size();
+
     // if Line > Space, Erase to Make it match!
     if(s > space)
     {
@@ -58,6 +61,7 @@ void MenuIO::leftSpacing(std::string &str, const int &space)   // Pad Left
         str.erase(0, s - space);
         return;
     }
+
     for(int i = 0; i < (space-s); i++)
         str.insert(0, 1, ' ');
 }
@@ -84,6 +88,7 @@ void MenuIO::inputField(std::string &text, int &len)
     bool isColorOverRide = false; //found input color
 
     stringSize = text.size()-1;
+
     if(len == 0)
     {
         return;
@@ -91,6 +96,7 @@ void MenuIO::inputField(std::string &text, int &len)
 
     // Override Input Length for ANSI
     position = text.find("|IN", 0);
+
     if(position != std::string::npos)
     {
         // Make sure we don't go past the bounds
@@ -106,6 +112,7 @@ void MenuIO::inputField(std::string &text, int &len)
                 sTmp[1] = text[position+4];
                 text.erase(position, 5);
                 tempLength = atoi(sTmp);
+
                 if((signed)tempLength < len)
                     len = tempLength; // Set new Length
             }
@@ -118,6 +125,7 @@ void MenuIO::inputField(std::string &text, int &len)
 
     // Override Foreground/Background Input Field Colors
     position = text.find("|FB",0);
+
     if(position != std::string::npos)
     {
         // (Unit Test Notes)
@@ -127,6 +135,7 @@ void MenuIO::inputField(std::string &text, int &len)
 
         memset(&sTmp, 0, 3);
         memset(&sTmp2, 0, 3);
+
         // Make sure we don't go past the bounds
         if(position+6 <= stringSize)
         {
@@ -437,54 +446,71 @@ void MenuIO::foregroundColorSequence(char *data, int fg)
         case 0:
             strcat(data, "x[0;30m");
             break;
+
         case 1:
             strcat(data, "x[0;34m");
             break;
+
         case 2:
             strcat(data, "x[0;32m");
             break;
+
         case 3:
             strcat(data, "x[0;36m");
             break;
+
         case 4:
             strcat(data, "x[0;31m");
             break;
+
         case 5:
             strcat(data, "x[0;35m");
             break;
+
         case 6:
             strcat(data, "x[0;33m");
             break;
+
         case 7:
             strcat(data, "x[0;37m");
             break;
+
         case 8:
             strcat(data, "x[1;30m");
             break;
+
         case 9:
             strcat(data, "x[1;34m");
             break;
+
         case 10:
             strcat(data, "x[1;32m");
             break;
+
         case 11:
             strcat(data, "x[1;36m");
             break;
+
         case 12:
             strcat(data, "x[1;31m");
             break;
+
         case 13:
             strcat(data, "x[1;35m");
             break;
+
         case 14:
             strcat(data, "x[1;33m");
             break;
+
         case 15:
             strcat(data, "x[1;37m");
             break;
+
         default :
             break;
     }
+
     data[0] = '\x1b';
 }
 
@@ -500,34 +526,44 @@ void MenuIO::backgroundColorSequence(char *data, int bg)
         case 16:
             strcat(data, "x[40m");
             break;
+
         case 17:
             strcat(data, "x[44m");
             break;
+
         case 18:
             strcat(data, "x[42m");
             break;
+
         case 19:
             strcat(data, "x[46m");
             break;
+
         case 20:
             strcat(data, "x[41m");
             break;
+
         case 21:
             strcat(data, "x[45m");
             break;
+
         case 22:
             strcat(data, "x[43m");
             break;
+
         case 23:
             strcat(data, "x[47m");
             break;
-            // Default to none.
+
+        // Default to none.
         case 24:
             strcat(data, "x[0m");
             break;
+
         default :
             break;
     }
+
     data[0] = '\x1b';
 }
 
@@ -550,13 +586,16 @@ void MenuIO::sequenceToAnsi(const std::string &sequence)
     while(id1 != std::string::npos)
     {
         id1 = data_string.find("|", id1);
+
         if(id1 != std::string::npos && id1+2 < data_string.size())
         {
             memset(&pipe_sequence,0,sizeof(pipe_sequence));
             memset(&esc_sequence,0,sizeof(esc_sequence));
             pipe_sequence[0] = data_string[id1+1];  // Get First # after Pipe
             pipe_sequence[1] = data_string[id1+2];  // Get Second Number After Pipe
+
             if(pipe_sequence[0] == '\0' || pipe_sequence[0] == '\r' || pipe_sequence[0] == EOF) break;
+
             if(pipe_sequence[1] == '\0' || pipe_sequence[1] == '\r' || pipe_sequence[0] == EOF) break;
 
             //std::cout << "\r\n*** pipe_sequence: " << pipe_sequence << std::endl;
@@ -651,8 +690,10 @@ void MenuIO::sequenceToAnsi(const std::string &sequence)
         {
             break;
         }
+
         id1 = data_string.find("|",id1);
     }
+
     m_sequence_decoder->decodeEscSequenceData(data_string);
 }
 
@@ -673,19 +714,23 @@ void MenuIO::displayMenuAnsi(const std::string &file_name)
     std::string buff;
     FILE *fp;
     int sequence = 0;
+
     if((fp = fopen(path.c_str(), "r+")) ==  nullptr)
     {
         std::cout << "MenuIO displayAnsiFile(): not found: "
                   << std::endl << path << std::endl;
         return;
     }
+
     do
     {
         sequence = getc(fp);
+
         if(sequence != EOF)
             buff += sequence;
     }
     while(sequence != EOF);
+
     fclose(fp);
 
     // Send to the Sequence Manager.

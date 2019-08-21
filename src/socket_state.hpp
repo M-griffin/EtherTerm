@@ -41,6 +41,7 @@ public:
     virtual int pollSocket() = 0;
     virtual bool onEnter() = 0;
     virtual bool onExit() = 0;
+    virtual int getSocketInstance() = 0;
 
     std::string m_host;
     int         m_port;
@@ -77,6 +78,7 @@ public:
     virtual int pollSocket();
     virtual bool onEnter();
     virtual bool onExit();
+    virtual int getSocketInstance();
 
 private:
 
@@ -113,6 +115,7 @@ public:
     virtual int pollSocket();
     virtual bool onEnter();
     virtual bool onExit();
+    virtual int getSocketInstance();
 
 private:
 
@@ -154,6 +157,7 @@ public:
     virtual int pollSocket();
     virtual bool onEnter();
     virtual bool onExit();
+    virtual int getSocketInstance();
 
 private:
 
@@ -197,6 +201,7 @@ public:
     virtual int pollSocket();
     virtual bool onEnter();
     virtual bool onExit();
+    virtual int getSocketInstance();
 
     // Specific Functions for SSH
     int verify_knownhost();

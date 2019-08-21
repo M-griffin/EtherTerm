@@ -19,23 +19,10 @@ class WindowManager;
 typedef std::shared_ptr<WindowManager> window_manager_ptr;
 typedef std::weak_ptr<WindowManager> window_manager_weak_ptr;
 
-/**
- * @class FontSet
- * @author Michael Griffin
- * @date 1/5/2016
- * @file surface_manager.hpp
- * @brief Connection data pulled from XML
- */
-typedef struct FontSet
-{
-    std::string name;
-    std::string type;
-    int         width;
-    int         height;
-    std::string filename;
-    std::string sequence;
+class FontSet;
+typedef std::shared_ptr<FontSet> font_set_ptr;
 
-} FontSet;
+class FontEntry;
 
 /**
  * @class SurfaceManager
@@ -53,16 +40,16 @@ public:
     // Handle to Current Window
     window_manager_weak_ptr  m_weak_window_manager;
 
-    std::string    m_programPath;
-    std::string    m_currentFont;
-    std::string    m_previousFont;
+    std::string    m_program_path;
+    std::string    m_current_font;
+    std::string    m_previous_font;
 
     // Holds list of all fonts in their parameters.
-    std::vector<FontSet> m_fontSet;
+    font_set_ptr   m_font_set;
 
     // Surface List for easier Management.
-    std::unordered_map<int, surface_ptr> m_surfaceList;
-    std::unordered_map<int, texture_ptr> m_textureList;
+    std::unordered_map<int, surface_ptr> m_surface_list;
+    std::unordered_map<int, texture_ptr> m_texture_list;
 
     // Handle Surface Alias
     enum
@@ -84,14 +71,14 @@ public:
         TEXTURE_HILIGHT
     };
 
-    Uint32 m_redMask,
-           m_greenMask,
-           m_blueMask,
-           m_alphaMask;
+    Uint32 m_red_mask,
+           m_green_mask,
+           m_blue_mask,
+           m_alpha_mask;
 
-    int m_surfaceBits;
-    int m_characterWidth;
-    int m_characterHeight;
+    int m_surface_bits;
+    int m_character_width;
+    int m_character_height;
 
     /**
      * @brief Helper for Program Path
@@ -170,7 +157,7 @@ public:
      * @param value
      * @return
      */
-    FontSet getFontFromSet(const std::string &value);
+    FontEntry getFontFromSet(const std::string &value);
 
     /**
      * @brief Loads Fonts

@@ -26,6 +26,7 @@
 #include <cerrno>
 #include <iostream>
 
+
 /*
  * Start of SSH_Socket Derived Class (SSH)
  */
@@ -63,8 +64,34 @@ int SSH_Socket::recvSocket(char *message)
         }
     }
     
-    std::cout << "recvSocket" << " message: " << message <<  std::endl;
+    // Debugging.
+    //std::cout << "recvSocket" << " message: " << message <<  std::endl;
+    /*
+    std::cout << std::endl;
+    strcat(message, "\0");
     
+    std::string out = "\"";
+    for (int i = 0; i < strlen(message); i++)
+    {
+        //std::cout << " CHAR [" << (message[i] == '\x08' ? 'B' : message[i]) << " - " << static_cast<int>(message[i]) << "]  "<<std::flush;
+        //if (i % 4 == 0)
+        //    std::cout << std::endl;
+        if (message[i] == '\x1b')
+            out += "\\x1b";           
+        else if (message[i] == '\b')
+            out += "\\0x08";
+        else if (message[i] == '\r')
+            out += "\\r";
+        else if (message[i] == '\n')
+            out += "\\n";
+        else
+            out += message[i];
+        //std::cout << "\"" << (message[i] == '\x1b' ?         
+    }
+    
+    //out += "\"";
+    //std::cout << out << std::endl;
+    */
     return result;
 }
 
@@ -301,7 +328,7 @@ int SSH_Socket::verify_knownhost()
             std::cout << "Could not find known host file." << std::endl;
             std::cout << "If you accept the host key here, the file will be"
                       << "automatically created." << std::endl;
-#ifndef __clang__					  
+#if __GNUC__ >= 6                    
             [[gnu::fallthrough]]; // c++11 and c++14
 #endif
 
@@ -570,4 +597,16 @@ int SSH_Socket::authenticate_console()
 
     std::cout << " *** SSH Authenticate Completed." << std::endl;
     return rc;
+}
+
+
+/**
+ * @brief Return Socket Instance for Duplication
+ * @return 
+ */
+int SSH_Socket::getSocketInstance()
+{
+    // Not currently tested or setup for SSH!
+    // m_ssh_channel
+    return 0; //m_tcp_socket->channel;
 }

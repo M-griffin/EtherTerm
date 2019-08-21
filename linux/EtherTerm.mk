@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Michae Griffin
-Date                   :=11/07/19
+Date                   :=18/08/19
 CodeLitePath           :="/home/merc/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -39,8 +39,8 @@ LinkOptions            :=
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch).. $(IncludeSwitch)../src 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)pthread $(LibrarySwitch)ssh 
-ArLibs                 :=  "SDL2main" "SDL2" "pthread" "libssh" 
+Libs                   := $(LibrarySwitch)SDL2main $(LibrarySwitch)SDL2 $(LibrarySwitch)pthread $(LibrarySwitch)ssh $(LibrarySwitch)yaml-cpp 
+ArLibs                 :=  "SDL2main" "SDL2" "pthread" "libssh" "yaml-cpp" 
 LibPath                := $(LibraryPathSwitch). 
 
 ##
@@ -50,7 +50,7 @@ LibPath                := $(LibraryPathSwitch).
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS :=  -g -O0 -pedantic -W -std=c++11 -Wall  $(Preprocessors)
+CXXFLAGS :=  -g -O0 -pedantic -W -std=c++11 -Wall $(Preprocessors)
 CFLAGS   :=  -g -O0 -pedantic -W -std=c++11 -Wall  $(Preprocessors)
 ASFLAGS  := 
 AS       := /usr/bin/as
@@ -61,9 +61,9 @@ AS       := /usr/bin/as
 ##
 CodeLiteDir:=/usr/share/codelite
 Objects0=$(IntermediateDirectory)/src_input_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_link_list.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_main.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_config.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_function.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_menu_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_protocol.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_renderer.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_screen_buffer.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_sequence_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_telnet_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_tinystr.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_tinyxml.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_tinyxmlerror.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_tinyxmlparser.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_window_manager.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_telnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_irc_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_irc.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnetselect.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnetUDP.cpp$(ObjectSuffix) \
-	
+	$(IntermediateDirectory)/src_sequence_decoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_sequence_parser.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_surface_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_telnet_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_window_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_io_service.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_handler.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_ssh.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_telnet.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/src_irc_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_socket_irc.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_dialing_directory_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_dialing_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_font_manager.cpp$(ObjectSuffix) $(IntermediateDirectory)/src_font_set_dao.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnetselect.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/SDL2_net_SDLnetTCP.cpp$(ObjectSuffix) $(IntermediateDirectory)/SDL2_net_SDLnetUDP.cpp$(ObjectSuffix) 
 
 
 
@@ -84,9 +84,7 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 PostBuild:
 	@echo Executing Post Build commands ...
 	sed -i 's+../src/+../src/+' EtherTerm.mk
-	sed -i 's+../src/+../src/+' EtherTerm.mk
 	
-	sed -i 's+EtherTerm/linux+EtherTerm/linux+' EtherTerm.mk
 	sed -i 's+EtherTerm/linux+EtherTerm/linux+' EtherTerm.mk
 	@echo Done
 
@@ -223,38 +221,6 @@ $(IntermediateDirectory)/src_telnet_manager.cpp$(DependSuffix): ../src/telnet_ma
 $(IntermediateDirectory)/src_telnet_manager.cpp$(PreprocessSuffix): ../src/telnet_manager.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_telnet_manager.cpp$(PreprocessSuffix) "../src/telnet_manager.cpp"
 
-$(IntermediateDirectory)/src_tinystr.cpp$(ObjectSuffix): ../src/tinystr.cpp $(IntermediateDirectory)/src_tinystr.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/tinystr.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_tinystr.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_tinystr.cpp$(DependSuffix): ../src/tinystr.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_tinystr.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_tinystr.cpp$(DependSuffix) -MM "../src/tinystr.cpp"
-
-$(IntermediateDirectory)/src_tinystr.cpp$(PreprocessSuffix): ../src/tinystr.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_tinystr.cpp$(PreprocessSuffix) "../src/tinystr.cpp"
-
-$(IntermediateDirectory)/src_tinyxml.cpp$(ObjectSuffix): ../src/tinyxml.cpp $(IntermediateDirectory)/src_tinyxml.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/tinyxml.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_tinyxml.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_tinyxml.cpp$(DependSuffix): ../src/tinyxml.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_tinyxml.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_tinyxml.cpp$(DependSuffix) -MM "../src/tinyxml.cpp"
-
-$(IntermediateDirectory)/src_tinyxml.cpp$(PreprocessSuffix): ../src/tinyxml.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_tinyxml.cpp$(PreprocessSuffix) "../src/tinyxml.cpp"
-
-$(IntermediateDirectory)/src_tinyxmlerror.cpp$(ObjectSuffix): ../src/tinyxmlerror.cpp $(IntermediateDirectory)/src_tinyxmlerror.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/tinyxmlerror.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_tinyxmlerror.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_tinyxmlerror.cpp$(DependSuffix): ../src/tinyxmlerror.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_tinyxmlerror.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_tinyxmlerror.cpp$(DependSuffix) -MM "../src/tinyxmlerror.cpp"
-
-$(IntermediateDirectory)/src_tinyxmlerror.cpp$(PreprocessSuffix): ../src/tinyxmlerror.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_tinyxmlerror.cpp$(PreprocessSuffix) "../src/tinyxmlerror.cpp"
-
-$(IntermediateDirectory)/src_tinyxmlparser.cpp$(ObjectSuffix): ../src/tinyxmlparser.cpp $(IntermediateDirectory)/src_tinyxmlparser.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/tinyxmlparser.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_tinyxmlparser.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/src_tinyxmlparser.cpp$(DependSuffix): ../src/tinyxmlparser.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_tinyxmlparser.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_tinyxmlparser.cpp$(DependSuffix) -MM "../src/tinyxmlparser.cpp"
-
-$(IntermediateDirectory)/src_tinyxmlparser.cpp$(PreprocessSuffix): ../src/tinyxmlparser.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_tinyxmlparser.cpp$(PreprocessSuffix) "../src/tinyxmlparser.cpp"
-
 $(IntermediateDirectory)/src_window_manager.cpp$(ObjectSuffix): ../src/window_manager.cpp $(IntermediateDirectory)/src_window_manager.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/window_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_window_manager.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/src_window_manager.cpp$(DependSuffix): ../src/window_manager.cpp
@@ -310,6 +276,54 @@ $(IntermediateDirectory)/src_socket_irc.cpp$(DependSuffix): ../src/socket_irc.cp
 
 $(IntermediateDirectory)/src_socket_irc.cpp$(PreprocessSuffix): ../src/socket_irc.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_socket_irc.cpp$(PreprocessSuffix) "../src/socket_irc.cpp"
+
+$(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix): ../src/session_io.cpp $(IntermediateDirectory)/src_session_io.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/session_io.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_session_io.cpp$(DependSuffix): ../src/session_io.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_session_io.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_session_io.cpp$(DependSuffix) -MM "../src/session_io.cpp"
+
+$(IntermediateDirectory)/src_session_io.cpp$(PreprocessSuffix): ../src/session_io.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_session_io.cpp$(PreprocessSuffix) "../src/session_io.cpp"
+
+$(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix): ../src/common_io.cpp $(IntermediateDirectory)/src_common_io.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/common_io.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_common_io.cpp$(DependSuffix): ../src/common_io.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_common_io.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_common_io.cpp$(DependSuffix) -MM "../src/common_io.cpp"
+
+$(IntermediateDirectory)/src_common_io.cpp$(PreprocessSuffix): ../src/common_io.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_common_io.cpp$(PreprocessSuffix) "../src/common_io.cpp"
+
+$(IntermediateDirectory)/src_dialing_directory_dao.cpp$(ObjectSuffix): ../src/dialing_directory_dao.cpp $(IntermediateDirectory)/src_dialing_directory_dao.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/dialing_directory_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_dialing_directory_dao.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_dialing_directory_dao.cpp$(DependSuffix): ../src/dialing_directory_dao.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_dialing_directory_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_dialing_directory_dao.cpp$(DependSuffix) -MM "../src/dialing_directory_dao.cpp"
+
+$(IntermediateDirectory)/src_dialing_directory_dao.cpp$(PreprocessSuffix): ../src/dialing_directory_dao.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_dialing_directory_dao.cpp$(PreprocessSuffix) "../src/dialing_directory_dao.cpp"
+
+$(IntermediateDirectory)/src_dialing_manager.cpp$(ObjectSuffix): ../src/dialing_manager.cpp $(IntermediateDirectory)/src_dialing_manager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/dialing_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_dialing_manager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_dialing_manager.cpp$(DependSuffix): ../src/dialing_manager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_dialing_manager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_dialing_manager.cpp$(DependSuffix) -MM "../src/dialing_manager.cpp"
+
+$(IntermediateDirectory)/src_dialing_manager.cpp$(PreprocessSuffix): ../src/dialing_manager.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_dialing_manager.cpp$(PreprocessSuffix) "../src/dialing_manager.cpp"
+
+$(IntermediateDirectory)/src_font_manager.cpp$(ObjectSuffix): ../src/font_manager.cpp $(IntermediateDirectory)/src_font_manager.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/font_manager.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_font_manager.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_font_manager.cpp$(DependSuffix): ../src/font_manager.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_font_manager.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_font_manager.cpp$(DependSuffix) -MM "../src/font_manager.cpp"
+
+$(IntermediateDirectory)/src_font_manager.cpp$(PreprocessSuffix): ../src/font_manager.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_font_manager.cpp$(PreprocessSuffix) "../src/font_manager.cpp"
+
+$(IntermediateDirectory)/src_font_set_dao.cpp$(ObjectSuffix): ../src/font_set_dao.cpp $(IntermediateDirectory)/src_font_set_dao.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/font_set_dao.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/src_font_set_dao.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/src_font_set_dao.cpp$(DependSuffix): ../src/font_set_dao.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/src_font_set_dao.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/src_font_set_dao.cpp$(DependSuffix) -MM "../src/font_set_dao.cpp"
+
+$(IntermediateDirectory)/src_font_set_dao.cpp$(PreprocessSuffix): ../src/font_set_dao.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/src_font_set_dao.cpp$(PreprocessSuffix) "../src/font_set_dao.cpp"
 
 $(IntermediateDirectory)/SDL2_net_SDLnet.cpp$(ObjectSuffix): ../src/SDL2_net/SDLnet.cpp $(IntermediateDirectory)/SDL2_net_SDLnet.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "../src/SDL2_net/SDLnet.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SDL2_net_SDLnet.cpp$(ObjectSuffix) $(IncludePath)

@@ -17,11 +17,41 @@
  }]]]>
     </Plugin>
   </Plugins>
+  <Reconciliation>
+    <Regexes/>
+    <Excludepaths/>
+    <Ignorefiles/>
+    <Extensions>
+      <![CDATA[cpp;c;h;hpp;xrc;wxcp;fbp]]>
+    </Extensions>
+    <Topleveldir>../win32</Topleveldir>
+  </Reconciliation>
   <Description/>
   <Dependencies/>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="src">
+    <File Name="../src/font_manager.cpp"/>
+    <File Name="../src/font_manager.hpp"/>
+    <File Name="../src/font_set_dao.cpp"/>
+    <File Name="../src/font_set_dao.hpp"/>
+    <File Name="../src/font_set.hpp"/>
+    <File Name="../src/dialing_manager.cpp"/>
+    <File Name="../src/dialing_manager.hpp"/>
+    <File Name="../src/static_methods.hpp"/>
+    <File Name="../src/dialing_directory_dao.cpp"/>
+    <File Name="../src/dialing_directory_dao.hpp"/>
+    <File Name="../src/dialing_directory.hpp"/>
+    <VirtualDirectory Name="UtfCpp">
+      <File Name="../src/UtfCpp/utf8.h"/>
+      <VirtualDirectory Name="utf8">
+        <File Name="../src/UtfCpp/utf8/unchecked.h"/>
+        <File Name="../src/UtfCpp/utf8/core.h"/>
+        <File Name="../src/UtfCpp/utf8/checked.h"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+    <File Name="../src/common_io.hpp"/>
+    <File Name="../src/common_io.cpp"/>
+    <File Name="../src/session_io.hpp"/>
+    <File Name="../src/session_io.cpp"/>
     <VirtualDirectory Name="SDL2_net">
       <File Name="../src/SDL2_net/SDLnetUDP.cpp"/>
       <File Name="../src/SDL2_net/SDLnetTCP.cpp"/>
@@ -69,12 +99,6 @@
     <File Name="../src/telnet_manager.cpp"/>
     <File Name="../src/telnet_manager.hpp"/>
     <File Name="../src/texture.hpp"/>
-    <File Name="../src/tinystr.cpp"/>
-    <File Name="../src/tinystr.hpp"/>
-    <File Name="../src/tinyxml.cpp"/>
-    <File Name="../src/tinyxml.hpp"/>
-    <File Name="../src/tinyxmlerror.cpp"/>
-    <File Name="../src/tinyxmlparser.cpp"/>
     <File Name="../src/window_manager.cpp"/>
     <File Name="../src/window_manager.hpp"/>
     <File Name="../src/socket_handler.cpp"/>
@@ -87,6 +111,8 @@
     <File Name="../src/safe_vector.hpp"/>
     <File Name="../src/async_connection.hpp"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -102,18 +128,19 @@
         <IncludePath Value="."/>
         <IncludePath Value=".."/>
         <IncludePath Value="../src"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include/SDL2"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/include/SDL2"/>
+        <IncludePath Value="F:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include/SDL2"/>
+        <IncludePath Value="F:/Users/Blue/Downloads/SDL2-2.0.5/i686-w64-mingw32/include"/>
         <IncludePath Value="C:/OpenSSL-Win32/include"/>
-        <IncludePath Value="C:/Users/Blue/Downloads/libssh-0.7.2/include"/>
+        <IncludePath Value="F:/Users/Blue/Downloads/libssh-0.7.2/include"/>
+        <IncludePath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
-        <LibraryPath Value="C:/Users/Blue/Downloads/SDL2_net-devel-2.0.0-mingw/SDL2_net-2.0.0/i686-w64-mingw32/lib"/>
+        <LibraryPath Value="mingw32/lib"/>
         <LibraryPath Value="C:/libz-1.2.7-1-mingw32-dev/lib"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/MinGW"/>
         <LibraryPath Value="C:/OpenSSL-Win32/lib/"/>
-        <LibraryPath Value="C:/Users/Blue/Downloads/libssh-0.7.2\lib"/>
+        <LibraryPath Value="F:/Users/Blue/Downloads/libssh-0.7.2\lib"/>
+        <LibraryPath Value="C:/Users/Blue/Documents/GitHub/yaml-cpp/build"/>
         <Library Value="mingw32"/>
         <Library Value="SDL2main"/>
         <Library Value="SDL2"/>
@@ -123,6 +150,7 @@
         <Library Value="libeay32.a"/>
         <Library Value="libssh"/>
         <Library Value="libiphlpapi.a"/>
+        <Library Value="yaml-cpp.dll"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
@@ -136,7 +164,11 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild/>
-      <PostBuild/>
+      <PostBuild>
+        <Command Enabled="yes">'C:\Program Files (x86)\GnuWin32\bin\sed.exe' -i 's+C:/Users/Blue/Desktop/EtherTerm/src+../src/+' $(ProjectPath)\EtherTerm.mk</Command>
+        <Command Enabled="yes"/>
+        <Command Enabled="yes">'C:\Program Files (x86)\GnuWin32\bin\sed.exe' -i 's+C:/Users/Blue/Desktop/EtherTerm/win32+./EtherTerm/win32+' $(ProjectPath)\EtherTerm.mk</Command>
+      </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
         <CleanCommand/>

@@ -58,12 +58,6 @@
     <File Name="../src/telnet_manager.cpp"/>
     <File Name="../src/telnet_manager.hpp"/>
     <File Name="../src/texture.hpp"/>
-    <File Name="../src/tinystr.cpp"/>
-    <File Name="../src/tinystr.hpp"/>
-    <File Name="../src/tinyxml.cpp"/>
-    <File Name="../src/tinyxml.hpp"/>
-    <File Name="../src/tinyxmlerror.cpp"/>
-    <File Name="../src/tinyxmlparser.cpp"/>
     <File Name="../src/window_manager.cpp"/>
     <File Name="../src/window_manager.hpp"/>
     <File Name="../src/io_service.cpp"/>
@@ -85,6 +79,29 @@
       <File Name="../src/SDL2_net/SDLnetUDP.cpp"/>
     </VirtualDirectory>
     <File Name="../src/socket_irc.cpp"/>
+    <VirtualDirectory Name="UtfCpp">
+      <File Name="../src/UtfCpp/utf8.h"/>
+      <VirtualDirectory Name="utf8">
+        <File Name="../src/UtfCpp/utf8/checked.h"/>
+        <File Name="../src/UtfCpp/utf8/core.h"/>
+        <File Name="../src/UtfCpp/utf8/unchecked.h"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+    <File Name="../src/session_io.cpp"/>
+    <File Name="../src/session_io.hpp"/>
+    <File Name="../src/common_io.cpp"/>
+    <File Name="../src/common_io.hpp"/>
+    <File Name="../src/dialing_directory.hpp"/>
+    <File Name="../src/dialing_directory_dao.cpp"/>
+    <File Name="../src/dialing_directory_dao.hpp"/>
+    <File Name="../src/dialing_manager.cpp"/>
+    <File Name="../src/dialing_manager.hpp"/>
+    <File Name="../src/static_methods.hpp"/>
+    <File Name="../src/font_manager.cpp"/>
+    <File Name="../src/font_manager.hpp"/>
+    <File Name="../src/font_set.hpp"/>
+    <File Name="../src/font_set_dao.cpp"/>
+    <File Name="../src/font_set_dao.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -97,7 +114,7 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" C_Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall" C_Options="-g;-O0;-pedantic;-W;-std=c++11;-Wall;" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value=".."/>
         <IncludePath Value="../src"/>
@@ -107,6 +124,7 @@
         <Library Value="SDL2"/>
         <Library Value="pthread"/>
         <Library Value="libssh"/>
+        <Library Value="yaml-cpp"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
@@ -121,11 +139,9 @@
       <PreBuild/>
       <PostBuild>
         <Command Enabled="no"># Remove Path from Source Files and use current Working Folder</Command>
-        <Command Enabled="yes">sed -i 's+/home/blue/code/EtherTerm/src/+../src/+' EtherTerm.mk</Command>
         <Command Enabled="yes">sed -i 's+/home/merc/code/EtherTerm/src/+../src/+' EtherTerm.mk</Command>
         <Command Enabled="yes"/>
         <Command Enabled="no"># Remove Path from Project Workspace</Command>
-        <Command Enabled="yes">sed -i 's+/home/blue/code/EtherTerm/linux+EtherTerm/linux+' EtherTerm.mk</Command>
         <Command Enabled="yes">sed -i 's+/home/merc/code/EtherTerm/linux+EtherTerm/linux+' EtherTerm.mk</Command>
       </PostBuild>
       <CustomBuild Enabled="no">

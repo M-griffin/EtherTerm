@@ -10,6 +10,21 @@
 #include <time.h>
 
 /**
+ * @class _TCPsocket
+ * @author Michael Griffin
+ * @date 07/04/2018
+ * @file socket_telnet.cpp
+ * @brief Pulled from SDLnetTCP needed to access socket channel.
+ */
+struct _TCPsocket {
+    int ready;
+    SOCKET channel;
+    IPaddress remoteAddress;
+    IPaddress localAddress;
+    int sflag;
+};
+
+/**
  * Start of IRC_Socket Derived Class
  *
  * send a string buffer over a TCP socket with error checking 
@@ -139,4 +154,13 @@ bool IRC_Socket::onExit()
 
     m_socket_set = nullptr;
     return true;
+}
+
+/**
+ * @brief Return Socket Instance for Duplication
+ * @return 
+ */
+int IRC_Socket::getSocketInstance()
+{
+    return m_tcp_socket->channel;
 }

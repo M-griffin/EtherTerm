@@ -22,6 +22,16 @@
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <VirtualDirectory Name="src">
+    <File Name="../src/font_set_dao.hpp"/>
+    <File Name="../src/font_set_dao.cpp"/>
+    <File Name="../src/font_set.hpp"/>
+    <File Name="../src/font_manager.hpp"/>
+    <File Name="../src/font_manager.cpp"/>
+    <File Name="../src/dialing_manager.hpp"/>
+    <File Name="../src/dialing_manager.cpp"/>
+    <File Name="../src/dialing_directory_dao.hpp"/>
+    <File Name="../src/dialing_directory_dao.cpp"/>
+    <File Name="../src/dialing_directory.hpp"/>
     <File Name="../src/input_handler.cpp"/>
     <File Name="../src/input_handler.hpp"/>
     <File Name="../src/interface.hpp"/>
@@ -58,12 +68,6 @@
     <File Name="../src/telnet_manager.cpp"/>
     <File Name="../src/telnet_manager.hpp"/>
     <File Name="../src/texture.hpp"/>
-    <File Name="../src/tinystr.cpp"/>
-    <File Name="../src/tinystr.hpp"/>
-    <File Name="../src/tinyxml.cpp"/>
-    <File Name="../src/tinyxml.hpp"/>
-    <File Name="../src/tinyxmlerror.cpp"/>
-    <File Name="../src/tinyxmlparser.cpp"/>
     <File Name="../src/window_manager.cpp"/>
     <File Name="../src/window_manager.hpp"/>
     <File Name="../src/io_service.cpp"/>
@@ -85,6 +89,18 @@
       <File Name="../src/SDL2_net/SDLnetTCP.cpp"/>
       <File Name="../src/SDL2_net/SDLnetUDP.cpp"/>
     </VirtualDirectory>
+    <VirtualDirectory Name="UtfCpp">
+      <File Name="../src/UtfCpp/utf8.h"/>
+      <VirtualDirectory Name="utf8">
+        <File Name="../src/UtfCpp/utf8/checked.h"/>
+        <File Name="../src/UtfCpp/utf8/core.h"/>
+        <File Name="../src/UtfCpp/utf8/unchecked.h"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+    <File Name="../src/common_io.cpp"/>
+    <File Name="../src/common_io.hpp"/>
+    <File Name="../src/session_io.cpp"/>
+    <File Name="../src/session_io.hpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -111,6 +127,7 @@
         <Library Value="SDL2"/>
         <Library Value="pthread"/>
         <Library Value="libssh"/>
+        <Library Value="yaml-cpp"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>

@@ -1,82 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Session Name="C:\Users\Blue\Desktop\EtherTerm\win32\EtherTerm.workspace">
-  <int Value="9" Name="m_selectedTab"/>
+  <int Value="1" Name="m_selectedTab"/>
   <wxString Value="C:\Users\Blue\Desktop\EtherTerm\win32\EtherTerm.workspace" Name="m_workspaceName"/>
   <TabInfoArray Name="TabInfoArray">
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\irc_manager.hpp" Name="FileName"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\main.cpp" Name="FileName"/>
+      <int Value="62" Name="FirstVisibleLine"/>
+      <int Value="79" Name="CurrentLine"/>
+      <wxArrayString Name="Bookmarks"/>
+      <IntVector Name="CollapsedFolds"/>
+    </TabInfo>
+    <TabInfo>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\dialing_manager.hpp" Name="FileName"/>
       <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="15" Name="CurrentLine"/>
+      <int Value="26" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\irc_manager.cpp" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="11" Name="CurrentLine"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\dialing_manager.cpp" Name="FileName"/>
+      <int Value="24" Name="FirstVisibleLine"/>
+      <int Value="26" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\session.hpp" Name="FileName"/>
-      <int Value="701" Name="FirstVisibleLine"/>
-      <int Value="379" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks">
-        <wxString Value="65:7"/>
-        <wxString Value="199:7"/>
-        <wxString Value="415:7"/>
-        <wxString Value="595:7"/>
-        <wxString Value="617:7"/>
-        <wxString Value="720:7"/>
-      </wxArrayString>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\io_service.cpp" Name="FileName"/>
-      <int Value="234" Name="FirstVisibleLine"/>
-      <int Value="259" Name="CurrentLine"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\menu_function.cpp" Name="FileName"/>
+      <int Value="153" Name="FirstVisibleLine"/>
+      <int Value="155" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
     <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\socket_handler.cpp" Name="FileName"/>
-      <int Value="1" Name="FirstVisibleLine"/>
-      <int Value="1" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\async_connection.hpp" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="4" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\socket_telnet.cpp" Name="FileName"/>
-      <int Value="87" Name="FirstVisibleLine"/>
-      <int Value="109" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\socket_irc.cpp" Name="FileName"/>
-      <int Value="0" Name="FirstVisibleLine"/>
-      <int Value="0" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\socket_state.hpp" Name="FileName"/>
-      <int Value="121" Name="FirstVisibleLine"/>
-      <int Value="1" Name="CurrentLine"/>
-      <wxArrayString Name="Bookmarks"/>
-      <IntVector Name="CollapsedFolds"/>
-    </TabInfo>
-    <TabInfo>
-      <wxString Value="C:\Users\Blue\Downloads\SDL2_net-devel-2.0.0-mingw\SDL2_net-2.0.0\i686-w64-mingw32\include\SDL2\SDL_net.h" Name="FileName"/>
-      <int Value="139" Name="FirstVisibleLine"/>
-      <int Value="140" Name="CurrentLine"/>
+      <wxString Value="C:\Users\Blue\Desktop\EtherTerm\src\dialing_directory_dao.cpp" Name="FileName"/>
+      <int Value="15" Name="FirstVisibleLine"/>
+      <int Value="34" Name="CurrentLine"/>
       <wxArrayString Name="Bookmarks"/>
       <IntVector Name="CollapsedFolds"/>
     </TabInfo>
@@ -84,4 +42,5 @@
   <SerializedObject Name="m_breakpoints">
     <long Value="0" Name="Count"/>
   </SerializedObject>
+  <wxString Value="*.c;*.cpp;*.cxx;*.cc;*.h;*.hpp;*.inc;*.mm;*.m;*.xrc;*.xml;*.json;*.sql;*.txt;*.plist;CMakeLists.txt;*.rc;*.iss" Name="m_findInFilesMask"/>
 </Session>

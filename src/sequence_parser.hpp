@@ -39,13 +39,13 @@ public:
     const  char ESC   = '\x1b';
 #define MAX_PARAMS  10
 
-    // Control Sequence Terminators
+// Control Sequence Terminators
 #define CURSOR_UP             'A'
 #define CURSOR_DOWN           'B'
 #define CURSOR_FORWARD        'C'
-#define CURSOR_BACKWARD       'D'
+#define CURSOR_BACKWARD       'D' 
 #define CURSOR_NEXT_LINE      'E'   // XTERM
-#define CURSOR_PREV_LIVE      'F'   // XTERM
+#define CURSOR_PREV_LINE      'F'   // XTERM
 #define CURSOR_X_POSITION     'G'   // XTERM
 #define CURSOR_POSITION       'H'
 
@@ -53,8 +53,9 @@ public:
 #define ERASE_TO_EOL          'K'
 #define DELETE_CHARACTER      'P'   // Erase Character(2)
 
+#define TERMINAL_ATTRIBUTES   'c'   // 0 emit “\x1b[?1;0c”, indicating "VT101 with No Options".
 #define REPEAT_CHARACTER      'b'   // Repeat preceding character
-#define LINE_POS_ABSOLUTE     'd'   // Line Position Absolute [row] (default = [1,column]) (VPA).
+#define LINE_POS_ABSOLUTE     'd'   // Vert Line Position Absolute [row] (default = [1,column]) (VPA).
 #define CURSOR_POSITION_ALT   'f'   // equivalent to 'H'
 #define SET_MODE              'h'   // Line Wraparound ?7h
 #define SCROLL_REGION         'r'   // ESC[#;#r
@@ -64,6 +65,15 @@ public:
 #define SET_GRAPHICS_MODE     'm'
 #define ANSI_DETECTION        'n'   // ESC[6n
 #define SET_KEYBOARD_STRINGS  'p'
+
+// Control ESCD, ESCM, ESCN
+#define CTRL_SEQUENCE         '['
+#define CTRL_DOWN             'D'   // Control
+#define CTRL_NEWLINE          'E'   // Control
+#define CTRL_PREV_LINE        'M'   // Control
+#define CTRL_G2_CHAR_SET      'N'   // G2 Character Set
+#define CTRL_G3_CHAR_SET      'O'   // G3 Character Set
+
 
     /* Extra Notes.
     ESC [ 7 ; col h Enables line wrapping at column position. If col (1-based)
@@ -121,6 +131,11 @@ public:
      * @param buffer
      */
     void textInput(const std::string &buffer);
+
+    /**
+     * @brief Handle Screen Position and Display Erase 7/8 Bit Control Sequences.
+     */
+    void sequenceControlCursorAndDisplay();
 
     /**
      * @brief Handle Screen Position and Display Erase

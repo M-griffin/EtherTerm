@@ -95,15 +95,10 @@ void Protocol::executeProtocols()
 #ifdef _WIN32
     WSAPROTOCOL_INFO pri;
 
-// TODO REWORK
-
-// Work out getting the actual socket handle here..
-// Not priority just yet.
-
-//    WSADuplicateSocket(conn->socket().native(), GetCurrentProcessId(), &pri);
+    WSADuplicateSocket(conn->socket()->getSocketHandle(), GetCurrentProcessId(), &pri);
     m_socket_duplicate = WSASocket(pri.iAddressFamily, pri.iSocketType, pri.iProtocol, &pri, 0, 0);
 #else
-//    m_socket_duplicate = dup(conn->socket());
+    m_socket_duplicate = dup(conn->socket()->getSocketHandle());
 #endif
 
     if (m_socket_duplicate < 1)

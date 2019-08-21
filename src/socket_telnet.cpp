@@ -9,6 +9,23 @@
 #include <cerrno>
 #include <time.h>
 
+/**
+ * @class _TCPsocket
+ * @author Michael Griffin
+ * @date 07/04/2018
+ * @file socket_telnet.cpp
+ * @brief Pulled from SDLnetTCP needed to access socket channel.
+ */
+struct _TCPsocket
+{
+    int ready;
+    SOCKET channel;
+    IPaddress remoteAddress;
+    IPaddress localAddress;
+    int sflag;
+};
+
+
 /*
  * Start of SDL_Socket Derived Class (TELNET)
  */
@@ -47,7 +64,7 @@ int SDL_Socket::recvSocket(char *message)
         }
         message[result] = 0;
     }
-    
+
     return result;
 }
 
@@ -140,4 +157,13 @@ bool SDL_Socket::onExit()
 
     m_socket_set = nullptr;
     return true;
+}
+
+/**
+ * @brief Return Socket Instance for Duplication
+ * @return
+ */
+int SDL_Socket::getSocketInstance()
+{
+    return m_tcp_socket->channel;
 }

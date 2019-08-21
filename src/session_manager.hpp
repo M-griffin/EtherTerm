@@ -12,8 +12,8 @@
 class Session;
 typedef std::shared_ptr<Session> session_ptr;
 
-class SystemConnection;
-typedef std::shared_ptr<SystemConnection> system_connection_ptr;
+class SystemEntry;
+typedef std::shared_ptr<SystemEntry> system_entry_ptr;
 
 /**
  * @class SessionManager
@@ -75,7 +75,7 @@ public:
     bool m_is_system_disconnected;
 
     // Queue of new connections to spawn.
-    SafeQueue<system_connection_ptr> m_new_connections;
+    SafeQueue<system_entry_ptr> m_new_connections;
 
     // Handle to Sessions
     std::set<session_ptr> m_sessions;

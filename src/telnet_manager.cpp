@@ -47,16 +47,16 @@ std::string TelnetManager::parseIncomingData(const std::vector<unsigned char> &m
 // Debugging, write all data received to file
 //    std::fstream sout;
 //    sout.open( "stream_output.txt", std::ios_base::out | std::ios_base::app );
-    
+
 
     // Make sure buffer isn't empty
-    if (msg_buffer.size() == 0)
+    if(msg_buffer.size() == 0)
     {
         return "";
     }
 
     // Loop through data for IAC Telnet Commands (Unsigned Characters)
-    for (auto c : msg_buffer)
+    for(auto c : msg_buffer)
     {
         // for debugging server output, mainly esc sequence
         // and output that might mess up screens when needed.
@@ -72,10 +72,11 @@ std::string TelnetManager::parseIncomingData(const std::vector<unsigned char> &m
         }
         else
             std::cout << c << std::flush;
+
 #endif
 
 //        sout << c << std::flush;
-        
+
 
         try
         {
@@ -98,17 +99,19 @@ std::string TelnetManager::parseIncomingData(const std::vector<unsigned char> &m
         {
             continue;
         }
+
         // Append to buffer
         output += ch;
     }
 
 //    sout.close();
-    
+
     // If available, push Data through ANSI Passer then Screen.
     if(output.size() > 0)
     {
         return output;
     }
+
     output.erase();
     return "";
 }
@@ -124,13 +127,17 @@ unsigned char TelnetManager::telnetOptionAcknowledge(unsigned char cmd)
     {
         case DO:
             return WILL;
+
         case DONT:
             return WONT;
+
         case WILL:
             return DO;
+
         case WONT:
             return DONT;
     }
+
     return 0;
 }
 
@@ -145,13 +152,17 @@ unsigned char TelnetManager::telnetOptionDeny(unsigned char cmd)
     {
         case DO:
             return WONT;
+
         case DONT:
             return WILL;
+
         case WILL:
             return DONT;
+
         case WONT:
             return DO;
     }
+
     return 0;
 }
 
@@ -161,6 +172,7 @@ unsigned char TelnetManager::telnetOptionDeny(unsigned char cmd)
 void TelnetManager::telnetOptionNawsReply()
 {
     session_ptr session = m_weak_session.lock();
+
     if(session)
     {
         std::stringstream stm;
@@ -217,10 +229,11 @@ void TelnetManager::telnetOptionNawsReply()
 void TelnetManager::telnetOptionTerminalTypeReply()
 {
     session_ptr session = m_weak_session.lock();
+
     if(session)
     {
         // Grab the Terminal Type, make sure we send lowercase.
-        std::string terminal = session->m_system_connection->termType;
+        std::string terminal = session->m_system_entry->term_type;
         std::transform(terminal.begin(), terminal.end(), terminal.begin(), ::tolower);
 
         std::cout << "TermType: " << terminal << std::endl;
@@ -257,6 +270,7 @@ void TelnetManager::telnetOptionTerminalTypeReply()
 void TelnetManager::telnetSendIAC(unsigned char command, unsigned char option)
 {
     session_ptr session = m_weak_session.lock();
+
     if(session)
     {
         std::stringstream stm;
@@ -290,8 +304,9 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
     // TEL-OPT Parser
     switch(m_teloptStage)
     {
-            // Find IAC
+        // Find IAC
         case 0:
+
             // Check first Char in Fresh Sequence
             if(c != IAC)
             {
@@ -302,14 +317,15 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
             {
                 m_teloptStage++;
             }
+
             break;
 
-            // Find Command
+        // Find Command
         case 1:
             if(c == IAC)
             {
                 // If binary, then we expect double IAC for actual characer
-                if (m_is_active_bin)
+                if(m_is_active_bin)
                 {
                     std::cout << "\r\n Got double IAC w/ Binary!!\r\n" << std::endl;
                     m_teloptStage = 0;
@@ -326,11 +342,12 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                     break;
                 }
             }
+
             if(c != IAC)
             {
                 switch(c)
                 {
-                        // Catch Pass-through commands.
+                    // Catch Pass-through commands.
                     case GA:    //     249        /* you may reverse the line */
                     case EL:    //     248        /* erase the current line */
                     case EC:    //     247        /* erase the current character */
@@ -357,11 +374,13 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                         break;
                 }
             }
+
             break;
 
-            // Find Option
+        // Find Option
         case 2:
             m_teloptStage = 0;
+
             // Catch if were getting Invalid Commands.
             if(TELCMD_OK(m_teloptCommand))
                 std::cout << "[IAC] [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
@@ -372,11 +391,13 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                 m_teloptStage = 0;
                 break;
             }
+
             switch(m_teloptCommand)
             {
-                    // No responses needed, just stuff these.
+                // No responses needed, just stuff these.
                 case DONT:
                     std::cout << "[IAC] RECEIVED DONT [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+
                     switch(c)
                     {
                         case IAC :
@@ -384,8 +405,9 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                             break;
 
                         default:
+
                             // Only Response Once, if we've already received this, then ignore it a second time!
-                            if (!checkActive(m_teloptCommand))
+                            if(!checkActive(m_teloptCommand))
                             {
                                 std::cout << "[IAC] DONT -> WONT [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                                 telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
@@ -394,42 +416,48 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                                 // Only Response once to Don't!
                                 addActive(m_teloptCommand);
                             }
+
                             break;
                     }
+
                     break;
 
                 case DO: // Replies WILL / WON'T
                     std::cout << "[IAC] RECEIVED DO [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+
                     switch(c)
                     {
                         case TELOPT_ECHO:
-                            if (!m_isECHOCompleted)
+                            if(!m_isECHOCompleted)
                             {
                                 std::cout << "[IAC] DO TELOPT_ECHO [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                                 telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
                                 m_is_active_echo = false;
                                 m_isECHOCompleted = false;
                             }
+
                             break;
 
                         case TELOPT_BINARY:
-                            if (!m_isBINCompleted)
+                            if(!m_isBINCompleted)
                             {
                                 std::cout << "[IAC] DO TELOPT_BINARY [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                                 telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
                                 m_isBINCompleted = true;
                                 m_is_active_bin = true;
                             }
+
                             break;
 
                         case TELOPT_SGA:
-                            if (!m_isSGACompleted)
+                            if(!m_isSGACompleted)
                             {
                                 std::cout << "[IAC] DO TELOPT_SGA [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                                 telnetSendIAC(telnetOptionAcknowledge(m_teloptCommand),c);
                                 m_isSGACompleted = true;
                                 m_is_active_sga = true;
                             }
+
                             break;
 
                         case TELOPT_TTYPE:
@@ -444,30 +472,35 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                             telnetOptionNawsReply();
                             m_is_active_naws = true;
                             break;
-                            /*
-                            case IAC :
-                                printf("\r\n [DO - INCORRECT IAC Received, resetting.] \r\n");
-                                stage = 1;
-                                return 255;
-                            */
+
+                        /*
+                        case IAC :
+                            printf("\r\n [DO - INCORRECT IAC Received, resetting.] \r\n");
+                            stage = 1;
+                            return 255;
+                        */
 
                         default:
+
                             // Only Response Once, if we've already received this, then ignore it a second time!
-                            if (!checkActive(m_teloptCommand))
+                            if(!checkActive(m_teloptCommand))
                             {
                                 std::cout << "[IAC] DO -> WONT [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                                 telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
                                 addActive(m_teloptCommand);
                             }
+
                             break;
                     }
+
                     m_teloptStage = 0;
                     break;
 
-                    // WILL means the Server Will DO IT!
-                    // We reply Fine, do it!
+                // WILL means the Server Will DO IT!
+                // We reply Fine, do it!
                 case WILL: // Replies DO And DONT
                     std::cout << "[IAC] RECEIVED WILL [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+
                     // Don't response to WILL Requests.
                     switch(c)
                     {
@@ -479,6 +512,7 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                                 m_is_active_echo = false;
                                 m_isECHOCompleted = true;
                             }
+
                             break;
 
                         case TELOPT_BINARY :
@@ -489,6 +523,7 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                                 m_is_active_bin = true;
                                 m_isBINCompleted = true;
                             }
+
                             break;
 
                         case TELOPT_SGA :
@@ -499,22 +534,27 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                                 m_is_active_sga = true;
                                 m_isSGACompleted = true;
                             }
+
                             break;
-                            /*
-                            case IAC :
-                                stage = 1;
-                                return 255;
-                            */
+
+                        /*
+                        case IAC :
+                            stage = 1;
+                            return 255;
+                        */
                         default :
+
                             // Only Response Once, if we've already received this, then ignore it a second time!
-                            if (!checkActive(m_teloptCommand))
+                            if(!checkActive(m_teloptCommand))
                             {
                                 std::cout << "[IAC] WILL -> DONT [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
                                 telnetSendIAC(telnetOptionDeny(m_teloptCommand),c);
                                 addActive(m_teloptCommand);
                             }
+
                             break;
                     }
+
                     m_teloptStage = 0;
                     break;
 
@@ -526,9 +566,10 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                     m_teloptStage = 0;
                     break;
 
-                    // Start of Sub Negotiations and Stages 3 - 4
+                // Start of Sub Negotiations and Stages 3 - 4
                 case SB: // 250
                     std::cout << "[IAC] TELNET_STATE_SB [" << (int)m_teloptCommand << "] [" << (int)c << "]" << std::endl;
+
                     if(c == TELOPT_TTYPE)
                     {
                         m_currentOption = c;
@@ -540,6 +581,7 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                         // Invalid, reset back.
                         m_teloptStage = 0;
                     }
+
                     break;
 
                 default:
@@ -548,10 +590,12 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                     m_teloptStage = 0;
                     break;
             }
+
             break;
 
         case 3:
             std::cout << "--> STAGE 3 [" << (int)c << "]" << std::endl;
+
             //Options will be 1 After SB
             //IAC SB TTYPE SEND IAC SE
             switch(m_currentOption)
@@ -564,9 +608,11 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                     }
                     else
                         m_teloptStage = 0;
+
                     break;
 
                 default:
+
                     //printf("\r\n [Stage 3 - unregistered stuff it] - %i, %i \r\n",opt, c);
                     if(c == SE)
                     {
@@ -578,13 +624,16 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                         // reset
                         m_teloptStage = 0;
                     }
+
                     break;
             }
+
             break;
 
-            // Only Gets here on TTYPE Sub-Negotiation.
+        // Only Gets here on TTYPE Sub-Negotiation.
         case 4:
             std::cout << "--> STAGE 4 [" << (int)c << "]" << std::endl;
+
             switch(c)
             {
                 case IAC:
@@ -599,6 +648,7 @@ unsigned char TelnetManager::telnetOptionParse(unsigned char c)
                     m_teloptStage = 0;
                     break;
             }
+
             break;
     }
 

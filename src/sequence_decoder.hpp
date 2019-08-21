@@ -108,6 +108,11 @@ private:
     void processSequenceLevel2();
 
     /**
+     * @brief This Handle Control Charaters
+     */
+    void processSequenceLevel3();
+
+    /**
      * @brief Handle SyncTerm Font Change Sequences
      */
     void handleFontChangeSequences();
@@ -116,12 +121,6 @@ private:
      * @brief Decode and Validate Escapce Sequences.
      */
     void validateSequence();
-
-public:
-    /**
-     * @brief Reset the Sequence Parser to refresh the screen
-     */
-    void resetParser();
 
 };
 

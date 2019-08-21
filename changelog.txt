@@ -1,11 +1,33 @@
 
-Change Log 0.4.7 - 2019-07-10
-- Fixed Posix issue with missing SOCKET definition on some linux builds
+
+Change Log 0.4.10 - 2019-08-21
+- Refactored Dialing Directory XML and FontSets to Yaml
+- FontSets are regenerated automatically and 
+  The Dialing Directory will detect if the XML already exists and convert
+  it to the new Yaml file format.  If none exists it will generate a default entry.
+- This is more an update release to get all project file updated back in sync
+  There are several things that need to be rewritten or finished in the Dialing Directory
+  for creating and managing new systems.  This alone with better SSH support will be 
+  updated.  right now you have to put a login and password in the SystemEntry to use SSH
+  Input fields and configuration are high on the list to get worked on next.
+  After this more updates to transfer protocols.
+  
+Change Log 0.4.9 - 2019-07-11
+- Fixed Issues - Most likely long standing with Posix/*nix systems and the dialing 
+  directory not displaying correctly. This was fixed in 0.4.9-alpha Branch but was 
+  never merged back to Master, So making a few updates until 0.4.10-alpha is ready.
+
+Change Log 0.4.7 - 2019-07-10 - Merge to Master
+- Fixed Posix issue with missing SOCKET definition on some Linux builds
 - Added new PostBuild to cleanup of Makefiles to remove my develop paths to make it
   easier to build from the command line.  This will now automatically clean when i build the project
-  so when code changes are commited the Makefiles will be already cleaned.
+  so when code changes are committed the Makefiles will be already cleaned.
   NOTE, i don't have FreeBSD and OSX VM's working right now, so those projects will be updated lateron.
 - Fixed Display bug in Posix with Dialing Directory and MCI Code Off-Sets
+
+Change Log 0.4.7 - 2018-04-07
+- Re-Added Back Protocol for testing downloads. WIP.
+- Added back pulling screen size 80x25, 80x50 etc.. from Dialing Directory.
 
 Change Log 0.4.6 - 2017-12-29
 - Include SDL2_net into project, added custom fix for SO_KEEPALIVE so idle
