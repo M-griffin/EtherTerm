@@ -43,8 +43,6 @@ MenuManager::~MenuManager()
     std::vector<SystemEntry>().swap(m_system_entries);
 }
 
-
-
 /**
  * @brief Reads in ANSI file into Buffer Only for Parsing.
  * @param file_name

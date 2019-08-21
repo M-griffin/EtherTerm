@@ -76,6 +76,12 @@ bool startup(std::string &program_path)
     // Validate Dialing Directory here, if doesn't exist create default with an entry.
     dial_manager_ptr dial_manager(new DialingManager(program_path));
 
+    // Check for Previous XML File, if Exists convert to new YAML File.
+    if(dial_manager->previousXmlFileExists())
+    {
+        dial_manager->convertXmltoYaml();
+    }
+
     if(!dial_manager->validateFile())
     {
         std::cout << "Dialing Directory Validation has failed. " << std::endl;
