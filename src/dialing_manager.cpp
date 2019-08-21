@@ -162,7 +162,7 @@ void DialingManager::convertXmltoYaml()
 
     ifs.close();
 
-    if(!m_dial_directory_dao->saveDialingDirectory(dial_directory))
+    if(dial_directory->system_entries.size() > 0 && !m_dial_directory_dao->saveDialingDirectory(dial_directory))
     {
         return;
     }
