@@ -22,6 +22,16 @@
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
   <VirtualDirectory Name="src">
+    <File Name="../src/font_set.hpp"/>
+    <File Name="../src/font_set_dao.hpp"/>
+    <File Name="../src/font_set_dao.cpp"/>
+    <File Name="../src/font_manager.hpp"/>
+    <File Name="../src/font_manager.cpp"/>
+    <File Name="../src/dialing_manager.hpp"/>
+    <File Name="../src/dialing_manager.cpp"/>
+    <File Name="../src/dialing_directory.hpp"/>
+    <File Name="../src/dialing_directory_dao.hpp"/>
+    <File Name="../src/dialing_directory_dao.cpp"/>
     <File Name="../src/input_handler.cpp"/>
     <File Name="../src/input_handler.hpp"/>
     <File Name="../src/interface.hpp"/>
@@ -83,14 +93,6 @@
     <File Name="../src/common_io.hpp"/>
     <File Name="../src/session_io.cpp"/>
     <File Name="../src/session_io.hpp"/>
-    <VirtualDirectory Name="TinyXml">
-      <File Name="../src/TinyXml/tinystr.cpp"/>
-      <File Name="../src/TinyXml/tinystr.hpp"/>
-      <File Name="../src/TinyXml/tinyxml.cpp"/>
-      <File Name="../src/TinyXml/tinyxml.hpp"/>
-      <File Name="../src/TinyXml/tinyxmlerror.cpp"/>
-      <File Name="../src/TinyXml/tinyxmlparser.cpp"/>
-    </VirtualDirectory>
     <VirtualDirectory Name="UtfCpp">
       <File Name="../src/UtfCpp/utf8.h"/>
       <VirtualDirectory Name="utf8">
@@ -118,16 +120,19 @@
         <IncludePath Value="/usr/local/opt/sdl2/include"/>
         <IncludePath Value="/usr/local/opt/sdl2/include/SDL2"/>
         <IncludePath Value="/usr/local/opt/libssh/include"/>
+        <IncludePath Value="/usr/local/opt/yaml-cpp/include"/>
       </Compiler>
       <Linker Options="" Required="yes">
         <LibraryPath Value="."/>
         <LibraryPath Value=".."/>
         <LibraryPath Value="/usr/local/opt/sdl2/lib"/>
         <LibraryPath Value="/usr/local/opt/libssh/lib"/>
+        <LibraryPath Value="/usr/local/opt/yaml-cpp/lib"/>
         <Library Value="SDL2main"/>
         <Library Value="SDL2"/>
         <Library Value="pthread"/>
         <Library Value="libssh"/>
+        <Library Value="yaml-cpp"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="yes" IsEnabled="yes"/>
