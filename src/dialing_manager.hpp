@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <regex>
+#include <sstream>
 
 class DialingDirectory;
 typedef std::shared_ptr<DialingDirectory> dial_directory_ptr;
