@@ -7,7 +7,7 @@
 ===============
 You can follow the latest updates and work in the following branches:
 
-- ``master`` - current release branch at 0.4.10-alpha
+- ``master`` - current release branch at 0.4.11-alpha
 
 
 .. contents:: Table of Contents
@@ -103,6 +103,8 @@ To add new systems or remove, you must edit the ``assets/dialdirectory.xml`` fil
 
 Download Windows (Demo Previews)
 =========
+
+- `Windows 0.4.11 (Latest) Preview <https://drive.google.com/file/d/1PA09I1TuVIFL5fCh_RBY15Z_gn8_yTZg/view?usp=sharing>`_
 
 - `Windows 0.4.10 (Latest) Preview <https://drive.google.com/file/d/1_YJXR0TOjlJi6tm_pOq2DmgwxScC7hI6/view?usp=sharing>`_
 
