@@ -17,6 +17,7 @@
 #include "irc_manager.hpp"
 #include "safe_queue.hpp"
 #include "protocol.hpp"
+#include "session_io.hpp"
 
 //#include <chrono>
 #include <fstream>
@@ -129,6 +130,9 @@ public:
         {
             std::cout << "Fontset Created!" << std::endl;
         }
+
+        // Used only for Parsing PIPE Colors Translations.
+        m_session_io.reset(new SessionIO(shared_from_this()));
     }
 
     /**
@@ -294,6 +298,14 @@ public:
                         if(!m_is_transfer)
                         {
                             parsed_data = m_telnet_manager->parseIncomingData(m_in_data_vector);
+
+                            // Translate Pipe colors for older System to ANSI Sequences
+                            // Some older systems don't support this, and just display them
+                            // Lets up it a notch and translate it for them.
+                            if(m_system_entry->use_pipe_colors)
+                            {
+                                parsed_data = m_session_io->pipeColors2ansi(parsed_data);
+                            }
                         }
                         else
                         {
@@ -789,6 +801,9 @@ public:
 
     // IRC Manager for Line and Command Parsing
     irc_manager_ptr          m_irc_manager;
+
+    // Session IO for PIPE setup
+    session_io_ptr           m_session_io;
 
     bool                     m_is_connected;
     bool                     m_is_leaving;

@@ -10,7 +10,7 @@
 #include <cassert>
 
 // Setup the file version for the dialing directory file.
-const std::string DialingDirectory::FILE_VERSION = "1.0.0";
+const std::string DialingDirectory::FILE_VERSION = "1.0.1";
 
 DialingDirectoryDao::DialingDirectoryDao(std::string path)
     : m_dial_directory(new DialingDirectory())
@@ -79,6 +79,7 @@ bool DialingDirectoryDao::saveDialingDirectory(dial_directory_ptr dialing_direct
         out << YAML::Key << "key_map" << YAML::Value << opt.key_map;
         out << YAML::Key << "term_type" << YAML::Value << opt.term_type;
         out << YAML::Key << "term_size" << YAML::Value << opt.term_size;
+        out << YAML::Key << "use_pipe_colors" << YAML::Value << opt.use_pipe_colors;
         out << YAML::EndMap;
     }
 

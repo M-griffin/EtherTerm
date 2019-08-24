@@ -1,4 +1,9 @@
 
+Change Log 0.4.11 - 2019-08-23
+- Added new use_pipe_color flag to the dialing directory.  This translates PIPE Color Codes
+  that are displayed, yet not translated by older BBS Systems.  This will do the work so that 
+  Message and other text on older BBS Software can look as nice as modern software without 
+  ugly pipe codes displaying everywhere.
 
 Change Log 0.4.10 - 2019-08-21
 - Refactored Dialing Directory XML and FontSets to Yaml

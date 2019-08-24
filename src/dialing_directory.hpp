@@ -33,6 +33,7 @@ public:
     std::string key_map;
     std::string term_type;
     std::string term_size;
+    bool        use_pipe_colors;
 
     explicit SystemEntry()
         : index(-1)
@@ -46,6 +47,7 @@ public:
         , key_map("ANSI")
         , term_type("ANSI")
         , term_size("80x25")
+        , use_pipe_colors(false)
     { }
 
     ~SystemEntry() { }
@@ -109,6 +111,7 @@ struct convert<SystemEntry>
         node["key_map"]          = rhs.key_map;
         node["term_type"]        = rhs.term_type;
         node["term_size"]        = rhs.term_size;
+        node["use_pipe_colors"]  = rhs.use_pipe_colors;
 
         return node;
     }
@@ -132,6 +135,7 @@ struct convert<SystemEntry>
         rhs.key_map         = node["key_map"].as<std::string>();
         rhs.term_type       = node["term_type"].as<std::string>();
         rhs.term_size       = node["term_size"].as<std::string>();
+        rhs.use_pipe_colors = node["use_pipe_colors"].as<bool>();
 
         return true;
     }
@@ -174,6 +178,7 @@ struct convert<DialingDirectory>
             system["key_map"]          = sys.key_map;
             system["term_type"]        = sys.term_type;
             system["term_size"]        = sys.term_size;
+            system["use_pipe_colors"]  = sys.use_pipe_colors;
 
             node["system_entry"].push_back(sys);
         }

@@ -155,6 +155,7 @@ void DialingManager::convertXmltoYaml()
             entry.key_map = key_map;
             entry.term_type = term_type;
             entry.term_size = term_size;
+            entry.use_pipe_colors = false;
 
             dial_directory->system_entries.push_back(entry);
         }
@@ -198,6 +199,7 @@ bool DialingManager::validateFile()
         entry.key_map = "VT100";
         entry.term_type = "ANSI";
         entry.term_size = "80x25";
+        entry.use_pipe_colors = "false";
 
         dial_directory->system_entries.push_back(entry);
 
