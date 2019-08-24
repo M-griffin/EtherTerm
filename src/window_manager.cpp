@@ -62,6 +62,7 @@ WindowManager::~WindowManager()
         SDL_DestroyWindow(m_window);
         m_window = nullptr;
     }
+
     std::cout << "done" << std::endl;
 }
 
@@ -114,12 +115,15 @@ void WindowManager::setTextureFilter(int value)
         case 0: // None
             m_hint_vSync = "0";
             break;
+
         case 1: // Linear
             m_hint_vSync = "1";
             break;
+
         case 2: // Bi-linear
             m_hint_vSync = "2";
             break;
+
         default:
             m_hint_vSync = "0";
             break;
@@ -152,6 +156,7 @@ void WindowManager::createHints()
         SDL_Log("SurfaceManager::init() SDL_SetHint SDL_HINT_RENDER_VSYNC: %s",
                 SDL_GetError());
     }
+
     /*
      * 0 or nearest = nearest pixel sampling
      * 1 or linear  = linear filtering       (supported by OpenGL and Direct3D)
@@ -162,6 +167,7 @@ void WindowManager::createHints()
         SDL_Log("SurfaceManager::init() SDL_SetHint SDL_HINT_RENDER_SCALE_QUALITY: %s",
                 SDL_GetError());
     }
+
     /*
      * 0 disable 3D acceleration
      * 1 enable 3D acceleration, using the default renderer
@@ -191,6 +197,7 @@ void WindowManager::createRenderer()
                      m_window,
                      -1,
                      SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+
     if(!m_renderer)
     {
         SDL_Log("createRenderer globalRenderer: %s",
@@ -245,7 +252,7 @@ bool WindowManager::createWindow(bool fullScreen)
     // create window in in full screen or windowed mode.
     if(fullScreen)
     {
-        m_window = SDL_CreateWindow("EtherTerm 0.4.10 Alpha Demo - Full Screen",
+        m_window = SDL_CreateWindow("EtherTerm 0.4.11 Alpha Demo - Full Screen",
                                     (m_position_placement % 2 == 0) ? SDL_WINDOWPOS_CENTERED : display_width,
                                     (m_position_placement % 2 == 0) ? SDL_WINDOWPOS_CENTERED : display_height,
                                     m_width,
@@ -261,12 +268,13 @@ bool WindowManager::createWindow(bool fullScreen)
     }
     else
     {
-        m_window = SDL_CreateWindow("EtherTerm 0.4.10 Alpha Demo - Windowed",
+        m_window = SDL_CreateWindow("EtherTerm 0.4.11 Alpha Demo - Windowed",
                                     (m_position_placement % 2 == 0) ? SDL_WINDOWPOS_CENTERED : display_width,
                                     (m_position_placement % 2 == 0) ? SDL_WINDOWPOS_CENTERED : display_height,
                                     m_width,
                                     m_height,
                                     SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+
         if(!m_window) // window init success
         {
             SDL_Log("Terminal::restartWindowSize() SDL_CreateWindow globalWindow: %s",
@@ -278,7 +286,7 @@ bool WindowManager::createWindow(bool fullScreen)
     // Set the Window ID
     m_window_id = SDL_GetWindowID(m_window);
 
-    std::string title = "EtherTerm 0.4.10 Alpha Demo w/ Multiple Windows - Window ID: ";
+    std::string title = "EtherTerm 0.4.11 Alpha Demo w/ Multiple Windows - Window ID: ";
     title.append(std::to_string(m_window_id));
     SDL_SetWindowTitle(m_window, title.c_str());
 
@@ -320,7 +328,7 @@ void WindowManager::renderClear()
  */
 void WindowManager::setRenderDrawColor(Uint32 R, Uint32 G, Uint32 B, Uint32 A)
 {
-    if(SDL_SetRenderDrawColor(m_renderer, R, G , B, A) < 0)
+    if(SDL_SetRenderDrawColor(m_renderer, R, G, B, A) < 0)
     {
         SDL_Log("setRendererDrawColor(): %s", SDL_GetError());
     }

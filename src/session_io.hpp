@@ -146,6 +146,13 @@ public:
     std::string pipe2ansi(const std::string &sequence);
 
     /**
+     * @brief Converts MCI Color Sequences to Ansi screen output. {One off for Old DOS Systems that don't parse PIPE CODES
+     * @param sequence
+     * @return
+     */
+    std::string pipeColors2ansi(const std::string &sequence);
+
+    /**
      * @brief Converts MCI Sequences to Code Maps for Multiple Parses of same string data
      * @param sequence
      * @return
@@ -165,7 +172,7 @@ public:
      * @return
      */
     std::vector<MapType> pipe2promptFormatCodeMap(const std::string &sequence);
-   
+
     /**
      * @brief Checks a String if it matches the expression passed.
      * @param sequence
@@ -213,6 +220,8 @@ public:
                                         "([%]{2}[\\w]+[.]{1}[\\w]{3})|([%]{1}[A-Z]{2})|"
                                         "([%]{1}[0-9]{2})"
                                        };
+
+    const std::string COLOR_EXPRESSION = {"([|]{1}[0-9]{2})"};
 
     const std::string MID_EXPRESSION = {"([|]{1}[A-Z]{1}[0-9]{1,2})|([|]{1}[A-Z]{2})"};
 
