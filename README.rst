@@ -7,9 +7,8 @@
 ===============
 You can follow the latest updates and work in the following branches:
 
-- ``master`` - current release branch at 0.4.7-alpha
-- ``feature/0.4.9-alpha`` - various rewrite and testing, stable development branch
-- ``feature/0.4.10-alpha`` - new develop, not stable yet and under going code rewrite.
+- ``master`` - current release branch at 0.4.10-alpha
+
 
 .. contents:: Table of Contents
    :depth: 3
@@ -105,7 +104,9 @@ To add new systems or remove, you must edit the ``assets/dialdirectory.xml`` fil
 Download Windows (Demo Previews)
 =========
 
-- `Windows 0.4.6 (Latest) Preview <https://drive.google.com/file/d/1FT94kn7UY1EZ_qy5ICbTqCj2-Dwm290N/view?usp=sharing>`_
+- `Windows 0.4.10 (Latest) Preview <https://drive.google.com/file/d/1_YJXR0TOjlJi6tm_pOq2DmgwxScC7hI6/view?usp=sharing>`_
+
+- `Windows 0.4.6 Preview <https://drive.google.com/file/d/1FT94kn7UY1EZ_qy5ICbTqCj2-Dwm290N/view?usp=sharing>`_
 
 - `Windows 0.3.1 Preview <https://drive.google.com/file/d/0ByPPRlSSb7N-dGpGXzV0a3VIN2c/view?usp=sharing>`_
 
@@ -121,8 +122,8 @@ Building (Windows, Linux, BSD, OSX)
 Generally, the following libraries must be installed:
 
 - sdl2 
-- sdl2_net (Master Branch Only)
 - libssh (Requires OpenSSL, Zlib)
+- yaml-cpp
 
 As well as a recent version of gnu/gcc providing g++, or clang.
 ``GCC/G++ version 5.x and above are required along with -std=c++11``
