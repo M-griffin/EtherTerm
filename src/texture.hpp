@@ -33,17 +33,20 @@ public:
     ~Textures()
     {
         std::cout << "~A Texture was removed!" << std::endl;
-        if (m_texture)
+
+        if(m_texture)
             SDL_DestroyTexture(m_texture);
+
         m_texture = nullptr;
     }
 
     SDL_Texture *getTexture()
     {
-        if (!m_texture)
+        if(!m_texture)
         {
             SDL_Log("Texture is null!");
         }
+
         return m_texture;
     }
 

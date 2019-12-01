@@ -28,7 +28,7 @@ LinkList::~LinkList()
  * @brief Copy text from link lists to <vector> buffer
  * @param listbar
  */
- void LinkList::getVectorList(std::vector<list_bar> listbar)
+void LinkList::getVectorList(std::vector<list_bar> listbar)
 {
     // Swap passed with Global
     m_listing.swap(listbar);
@@ -47,11 +47,12 @@ std::string LinkList::drawVectorList(unsigned long page, unsigned long list)
     m_current_page = page;
 
     // Calculate Box Size and Total Pages
-    if (m_bottom_margin == 0 && m_top_margin == 0)
+    if(m_bottom_margin == 0 && m_top_margin == 0)
     {
         std::cout << "Error: LinkList Margins not set!" << std::endl;
         return "";
     }
+
     int boxsize = m_bottom_margin - m_top_margin; // Fist Get Box Size
     m_total_lines = m_listing.size();
     m_total_pages = m_total_lines / boxsize;
@@ -60,6 +61,7 @@ std::string LinkList::drawVectorList(unsigned long page, unsigned long list)
     {
         ++m_total_pages;
     }
+
     if(m_total_lines <= boxsize)
         m_total_pages = 1;
 
@@ -84,20 +86,21 @@ std::string LinkList::drawVectorList(unsigned long page, unsigned long list)
         {
             m_current_selection = m_top_margin+i-1; // Get current place in box to display.
             sprintf(capture, "\x1b[%i;%iH%s", m_top_margin+i-1, 1,
-                (char *)m_listing[((boxsize*m_current_page)+i)-1]
+                    (char *)m_listing[((boxsize*m_current_page)+i)-1]
                     .inactive_lightbar.c_str());
         }
         else
         {
             sprintf(capture, "\x1b[%i;%iH%s", m_top_margin+i-1, 1,
-                (char *)m_listing[((boxsize*m_current_page)+i)-1]
+                    (char *)m_listing[((boxsize*m_current_page)+i)-1]
                     .active_lightbar.c_str());
         }
+
         stringBuilder += capture;
     }
+
     // Write out Box.
     sprintf(capture, "\x1b[%i;%iH", m_current_row+m_top_margin-1, 1);
     stringBuilder += capture;
     return stringBuilder;
 }
-

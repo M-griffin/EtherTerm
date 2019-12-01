@@ -21,8 +21,11 @@ public:
     // Default for Object Creation Reused!
     ScreenPixel()
         : m_character_sequence()
-        , m_foreground( {255, 255, 255, 0})
-        , m_background( {0, 0, 0, 0})
+        , m_foreground(
+    {
+        255, 255, 255, 0
+    })
+    , m_background({0, 0, 0, 0})
     { }
 
     // Not used at this time!

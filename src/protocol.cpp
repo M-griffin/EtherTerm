@@ -86,6 +86,7 @@ bool Protocol::isWinNT()
 void Protocol::executeProtocols()
 {
     connection_ptr conn = m_weak_connection.lock();
+
     if(!conn)
     {
         std::cout << "Error, no handle to connection!" << std::endl;
@@ -101,7 +102,7 @@ void Protocol::executeProtocols()
     m_socket_duplicate = dup(conn->socket()->getSocketHandle());
 #endif
 
-    if (m_socket_duplicate < 1)
+    if(m_socket_duplicate < 1)
     {
         std::cout << "Error, unable to duplicate socket handle." << std::endl;
         return;
@@ -213,6 +214,7 @@ void Protocol::executeProcess(int socket_descriptor)
     while(1)
     {
         GetExitCodeProcess(pi.hProcess, &exit);      //while the process is running
+
         if(exit != STILL_ACTIVE)
         {
             std::cout << "Exiting Protocol" << std::endl;
@@ -221,13 +223,15 @@ void Protocol::executeProcess(int socket_descriptor)
             CloseHandle(pi.hProcess);
 
             session_ptr session = m_weak_session.lock();
-            if (session)
+
+            if(session)
             {
                 // Reset the socket and read waiting data refresh.
 // To Impliment
 //              session->m_is_transfer = false;
                 session->waitForSocketData();
             }
+
             break;
         }
 

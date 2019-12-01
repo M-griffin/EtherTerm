@@ -53,7 +53,7 @@ void IrcManager::handleLineRead(std::string &data)
     std::string::size_type index = 0;
     index = data.find_last_of('\r', 0);
 
-    if (index != std::string::npos && index != data.size() && index < data.size())
+    if(index != std::string::npos && index != data.size() && index < data.size())
     {
         std::cout << "* CR not last char in string!" << std::endl;
 
@@ -81,21 +81,24 @@ void IrcManager::handleLineRead(std::string &data)
     }
 
 
-    if (data_to_process.size() > 0)
+    if(data_to_process.size() > 0)
     {
         session_ptr session = m_weak_session.lock();
-        if (session)
+
+        if(session)
         {
-            std::stringstream is( data_to_process );
+            std::stringstream is(data_to_process);
             std::string line;
-            while( std::getline( is, line, '\r' ) )
+
+            while(std::getline(is, line, '\r'))
             {
                 //std::cout << "line: " << line << std::endl;
 
                 std::string::size_type ping_index = 0;
                 ping_index = line.find("PING", 0);
+
                 // Check for Ping/Pong Response.
-                if (ping_index != std::string::npos && ping_index == 0)
+                if(ping_index != std::string::npos && ping_index == 0)
                 {
                     std::string key = line.substr(6);
                     std::cout << "key: " << key << std::endl;
@@ -110,7 +113,8 @@ void IrcManager::handleLineRead(std::string &data)
                     // split text on : and setup initial line prefix of -.  Lets add date/time stamp.
                     std::string::size_type colon_pos = 0;
                     colon_pos = line.find(":", 1);
-                    if (colon_pos != std::string::npos)
+
+                    if(colon_pos != std::string::npos)
                     {
                         // Setup Structure for parsing.
                         ctrl_message_ptr ctrl_message(new ControlMessage());
@@ -150,7 +154,8 @@ void IrcManager::handleLineRead(std::string &data)
 void IrcManager::prepareOut(std::string &message)
 {
     session_ptr session = m_weak_session.lock();
-    if (session)
+
+    if(session)
     {
         // Each Line should start at the boottom of screen and scroll up.
         std::string prefix = "\x1b[s\x1b[" + std::to_string(session->m_term_height - 3) + ";" +
@@ -183,7 +188,7 @@ void IrcManager::onNotice(std::string &)
 void IrcManager::parseControlMessage(ctrl_message_ptr &ctrl_message)
 {
     //std::string::size_type index = 0;
-    if (ctrl_message->m_control.find("NOTICE *", 0) != std::string::npos)
+    if(ctrl_message->m_control.find("NOTICE *", 0) != std::string::npos)
         onNotice(ctrl_message->m_message);
 
 }
@@ -195,7 +200,8 @@ void IrcManager::parseControlMessage(ctrl_message_ptr &ctrl_message)
 void IrcManager::startUp()
 {
     session_ptr session = m_weak_session.lock();
-    if (session)
+
+    if(session)
     {
         // Setup Scroll Region
         std::string sequence = setScrollRegion();
@@ -224,11 +230,13 @@ std::string IrcManager::setScrollRegion()
     // Setup Scroll Region
     std::string sequence = "\x1b[0;40 D";
     session_ptr session = m_weak_session.lock();
-    if (session)
+
+    if(session)
     {
         std::string scroll_region = "\x1b[1;" + std::to_string(session->m_term_height - 3) + "r";
         sequence += scroll_region;
     }
+
     return sequence;
 }
 
@@ -240,12 +248,14 @@ std::string IrcManager::drawStatusBar()
 {
     std::string status_bar = "";
     session_ptr session = m_weak_session.lock();
-    if (session)
+
+    if(session)
     {
         status_bar = "\x1b[" + std::to_string(session->m_term_height - 2) + ";1H";
         status_bar.append("|20|15--] Status Bar [--");
         status_bar.append(80 - 18, 0x20);
     }
+
     return status_bar;
 }
 
@@ -257,10 +267,12 @@ std::string IrcManager::moveToUserPrompt()
 {
     std::string prompt = "";
     session_ptr session = m_weak_session.lock();
-    if (session)
+
+    if(session)
     {
         prompt = "\x1b[" + std::to_string(session->m_term_height - 1) + ";1H";
     }
+
     return prompt;
 }
 
@@ -287,7 +299,8 @@ void IrcManager::clearUserPrompt()
     std::string sequence = m_session_io->pipe2ansi(clear);
 
     session_ptr session = m_weak_session.lock();
-    if (session)
+
+    if(session)
         session->m_sequence_decoder->decodeEscSequenceData(sequence);
 }
 
@@ -318,7 +331,8 @@ void IrcManager::handleUserInput(const std::string &input)
             std::cout << "baseProcessDeliverNewLine (key): " << key << std::endl;
             // String is completed after ENTER, sent to Server!
             session_ptr session = m_weak_session.lock();
-            if (session)
+
+            if(session)
             {
                 // Clean Input Field
                 clearUserPrompt();
@@ -333,11 +347,12 @@ void IrcManager::handleUserInput(const std::string &input)
     {
         // Send back the single input received to show client key presses.
         // Only if return data shows a processed key returned.
-        if (result != "empty")
+        if(result != "empty")
         {
             // Send to Terminal to draw user input by keypress.
             session_ptr session = m_weak_session.lock();
-            if (session)
+
+            if(session)
             {
                 std::string output = "|07" + result;
                 std::string sequence = m_session_io->pipe2ansi(output);

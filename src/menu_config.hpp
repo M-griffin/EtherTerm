@@ -51,4 +51,3 @@ public:
 };
 
 #endif // MENUSYSTEMCONFIG_HPP
-

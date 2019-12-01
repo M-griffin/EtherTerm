@@ -43,7 +43,7 @@ public:
 #define CURSOR_UP             'A'
 #define CURSOR_DOWN           'B'
 #define CURSOR_FORWARD        'C'
-#define CURSOR_BACKWARD       'D' 
+#define CURSOR_BACKWARD       'D'
 #define CURSOR_NEXT_LINE      'E'   // XTERM
 #define CURSOR_PREV_LINE      'F'   // XTERM
 #define CURSOR_X_POSITION     'G'   // XTERM

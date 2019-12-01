@@ -34,8 +34,9 @@ public:
     session_io_ptr   m_session_io;
 
     typedef std::vector<std::string> vec_string;
-    
-    typedef struct ControlMessage {
+
+    typedef struct ControlMessage
+    {
         std::string m_control;
         std::string m_message;
     } ControlMessage;
@@ -76,7 +77,7 @@ public:
         vec_string          m_user_history_text;
         bool                m_is_active;
     };
-    
+
     typedef std::shared_ptr<IrcChannel> channel_ptr;
 
     std::vector<channel_ptr> m_channels;
@@ -96,9 +97,9 @@ public:
 
 
     std::string getTimeStamp();
-    void handleLineRead(std::string &data);    
+    void handleLineRead(std::string &data);
     void parseControlMessage(ctrl_message_ptr &ctrl_message);
-    
+
     /**
      * @brief Irc Manager Setup
      */
@@ -108,8 +109,8 @@ public:
     std::string drawStatusBar();
     std::string moveToUserPrompt();
     std::string drawUserPrompt();
-    
-    void clearUserPrompt();        
+
+    void clearUserPrompt();
     void handleUserInput(const std::string &input);
 
 };

@@ -74,7 +74,7 @@ public:
     session_weak_ptr     m_weak_session;
     connection_wptr      m_weak_connection;
     std::string          m_program_path;
-    
+
     // Duplicate Socket Handle
     int                  m_socket_duplicate;
 };

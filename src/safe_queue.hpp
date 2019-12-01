@@ -22,39 +22,43 @@ public:
         , m() // Mutex
         , c() // Control
     {}
-    
+
     // Default copy Constructor.
     SafeQueue(const SafeQueue&) = delete;
 
     // Copy Constructor (Overridden with MOVE)
     SafeQueue& operator=(SafeQueue& other)
     {
-        if (this != &other)
+        if(this != &other)
         {
             std::lock_guard<std::mutex> lock(m);
+
             //std::cout << "Copy construct" << std::endl;
-            if (!&other.isEmpty())
+            if(!&other.isEmpty())
             {
                 q = other.q;
                 m = other.m;
                 c = other.c;
             }
         }
+
         return *this;
     }
 
     // Move Constructor.
     SafeQueue& operator=(SafeQueue&& other)
     {
-        if (this != &other)
+        if(this != &other)
         {
             std::lock_guard<std::mutex> lock(m);
+
             //std::cout << "Move construct" << std::endl;
-            if (!other.is_empty())
+            if(!other.is_empty())
             {
                 q.swap(other.q);
             }
         }
+
         return *this;
     }
 
@@ -76,10 +80,12 @@ public:
     T dequeue(void)
     {
         std::unique_lock<std::mutex> lock(m);
+
         while(q.empty())
         {
             c.wait(lock);
         }
+
         T val = q.front();
         q.pop();
         return val;

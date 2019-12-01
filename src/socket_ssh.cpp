@@ -36,9 +36,11 @@
 int SSH_Socket::sendSocket(unsigned char *buffer, Uint32 len)
 {
     Uint32 result = 0;
-    if (m_is_socket_active)
+
+    if(m_is_socket_active)
     {
         result = ssh_channel_write(m_ssh_channel, buffer, len);
+
         if(result < strlen((char *)buffer))
         {
             std::cout << "Error: ssh_channel_write_nonblocking" << std::endl;
@@ -46,6 +48,7 @@ int SSH_Socket::sendSocket(unsigned char *buffer, Uint32 len)
             return SSH_ERROR; // or Zero.
         }
     }
+
     return(result);
 }
 
@@ -53,9 +56,11 @@ int SSH_Socket::sendSocket(unsigned char *buffer, Uint32 len)
 int SSH_Socket::recvSocket(char *message)
 {
     int result = 0;
-    if (m_is_socket_active)
+
+    if(m_is_socket_active)
     {
         result = ssh_channel_read_nonblocking(m_ssh_channel, message, 8192, 0);
+
         if(result < 0)
         {
             std::cout << "Error: ssh_channel_read_nonblocking" << std::endl;
@@ -63,13 +68,13 @@ int SSH_Socket::recvSocket(char *message)
             return SSH_ERROR;
         }
     }
-    
+
     // Debugging.
     //std::cout << "recvSocket" << " message: " << message <<  std::endl;
     /*
     std::cout << std::endl;
     strcat(message, "\0");
-    
+
     std::string out = "\"";
     for (int i = 0; i < strlen(message); i++)
     {
@@ -77,7 +82,7 @@ int SSH_Socket::recvSocket(char *message)
         //if (i % 4 == 0)
         //    std::cout << std::endl;
         if (message[i] == '\x1b')
-            out += "\\x1b";           
+            out += "\\x1b";
         else if (message[i] == '\b')
             out += "\\0x08";
         else if (message[i] == '\r')
@@ -86,9 +91,9 @@ int SSH_Socket::recvSocket(char *message)
             out += "\\n";
         else
             out += message[i];
-        //std::cout << "\"" << (message[i] == '\x1b' ?         
+        //std::cout << "\"" << (message[i] == '\x1b' ?
     }
-    
+
     //out += "\"";
     //std::cout << out << std::endl;
     */
@@ -98,7 +103,8 @@ int SSH_Socket::recvSocket(char *message)
 int SSH_Socket::pollSocket()
 {
     int num_ready = 0;
-    if (m_is_socket_active)
+
+    if(m_is_socket_active)
     {
         if(m_ssh_channel && ssh_channel_is_open(m_ssh_channel) && ssh_channel_poll(m_ssh_channel, 0) > 0)
         {
@@ -114,6 +120,7 @@ int SSH_Socket::pollSocket()
             m_is_socket_active = false;
         }
     }
+
     return num_ready;
 }
 
@@ -125,6 +132,7 @@ bool SSH_Socket::onEnter()
 
     // Setup new SSH Shell
     m_ssh_session = ssh_new();
+
     if(m_ssh_session == nullptr)
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
@@ -159,6 +167,7 @@ bool SSH_Socket::onEnter()
 
     // SSH Connect
     rc = ssh_connect(m_ssh_session);
+
     if(rc != SSH_OK)
     {
         std::cout << "Error: ssh_connect: " << m_host
@@ -173,6 +182,7 @@ bool SSH_Socket::onEnter()
 
     // Verify Server is a known host.
     rc = verify_knownhost();
+
     if(rc < 0)
     {
         std::cout << "Error: verify_knownhost: " << m_host
@@ -187,6 +197,7 @@ bool SSH_Socket::onEnter()
 
     //if ((ssh_userauth_password(session, NULL, password) == SSH_AUTH_SUCCESS)
     rc = authenticate_console();
+
     if(rc != SSH_AUTH_SUCCESS)
     {
         std::cout << "Error: authenticate: " << m_host
@@ -198,6 +209,7 @@ bool SSH_Socket::onEnter()
 
     // Setup Channel for Socket Communications
     m_ssh_channel = ssh_channel_new(m_ssh_session);
+
     if(m_ssh_channel == nullptr)
     {
         std::cout << "Error: ssh_channel_new: " << m_host
@@ -209,6 +221,7 @@ bool SSH_Socket::onEnter()
 
     // Open A shell Session
     rc = ssh_channel_open_session(m_ssh_channel);
+
     if(rc != SSH_OK)
     {
         std::cout << "Error: ssh_channel_open_session: " << m_host
@@ -259,23 +272,28 @@ bool SSH_Socket::onEnter()
 bool SSH_Socket::onExit()
 {
     std::cout << "SSH releasing channel" << std::endl;
+
     if(m_ssh_channel)
     {
-        if (m_is_socket_active)
+        if(m_is_socket_active)
         {
             ssh_channel_send_eof(m_ssh_channel);
         }
+
         ssh_channel_close(m_ssh_channel);
         ssh_channel_free(m_ssh_channel);
         m_ssh_channel = nullptr;
     }
+
     std::cout << "SSH releasing session" << std::endl;
+
     if(m_ssh_session)
     {
         ssh_disconnect(m_ssh_session);
         ssh_free(m_ssh_session);
         m_ssh_session = nullptr;
     }
+
     return true;
 }
 
@@ -292,6 +310,7 @@ int SSH_Socket::verify_knownhost()
     int rc;
 
     rc = ssh_get_publickey(m_ssh_session, &srv_pubkey);
+
     if(rc < 0)
     {
         return -1;
@@ -299,6 +318,7 @@ int SSH_Socket::verify_knownhost()
 
     rc = ssh_get_publickey_hash(srv_pubkey, SSH_PUBLICKEY_HASH_SHA1, &hash, &hlen);
     ssh_key_free(srv_pubkey);
+
     if(rc < 0)
     {
         return -1;
@@ -328,7 +348,7 @@ int SSH_Socket::verify_knownhost()
             std::cout << "Could not find known host file." << std::endl;
             std::cout << "If you accept the host key here, the file will be"
                       << "automatically created." << std::endl;
-#if __GNUC__ >= 6                    
+#if __GNUC__ >= 6
             [[gnu::fallthrough]]; // c++11 and c++14
 #endif
 
@@ -358,6 +378,7 @@ int SSH_Socket::verify_knownhost()
                 free(hash);
                 return -1;
             }
+
             break;
 
         case SSH_SERVER_ERROR:
@@ -365,6 +386,7 @@ int SSH_Socket::verify_knownhost()
             free(hash);
             return -1;
     }
+
     free(hash);
     return 0;
 }
@@ -436,18 +458,22 @@ int SSH_Socket::authenticate_console()
 
     // Try to authenticate
     rc = ssh_userauth_none(m_ssh_session, nullptr);
+
     switch(rc)
     {
         case SSH_AUTH_ERROR:   //some error happened during authentication
             std::cout << "ssh_userauth_none SSH_AUTH_ERROR!" << std::endl;
             error();
             return rc;
+
         case SSH_AUTH_DENIED:  //no key matched
             std::cout << "ssh_userauth_none SSH_AUTH_DENIED!" << std::endl;
             break;
+
         case SSH_AUTH_SUCCESS: //you are now authenticated
             std::cout << "ssh_userauth_none SSH_AUTH_SUCCESS!" << std::endl;
             break;
+
         case SSH_AUTH_PARTIAL:
             //some key matched but you still have
             //to provide an other mean of authentication (like a password).
@@ -459,6 +485,7 @@ int SSH_Socket::authenticate_console()
 
     // Get a list of excepted Auth Sessions server wants.
     method = ssh_auth_list(m_ssh_session);
+
     while(rc != SSH_AUTH_SUCCESS && failureCounter < 20)
     {
         /*
@@ -478,28 +505,34 @@ int SSH_Socket::authenticate_console()
         if(method & SSH_AUTH_METHOD_PUBLICKEY)
         {
             rc = ssh_userauth_autopubkey(m_ssh_session, nullptr);
+
             switch(rc)
             {
                 case SSH_AUTH_ERROR:   //some serious error happened during authentication
                     std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_ERROR!" << std::endl;
                     error();
                     return rc;
+
                 case SSH_AUTH_DENIED:  //no key matched
                     std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_DENIED!" << std::endl;
                     ++failureCounter;
                     break;
+
                 case SSH_AUTH_SUCCESS: //you are now authenticated
                     std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_SUCCESS!" << std::endl;
                     break;
+
                 case SSH_AUTH_PARTIAL:
                     // some key matched but you still have
                     // to provide an other mean of authentication (like a password).
                     std::cout << "SSH_AUTH_METHOD_PUBLICKEY - SSH_AUTH_PARTIAL!" << std::endl;
                     ++failureCounter;
                     break;
+
                 default:
                     break;
             }
+
             /*
             // Validate with specific public key file
             rc = ssh_userauth_try_publickey(session, NULL, "pubkey.pub");
@@ -535,22 +568,27 @@ int SSH_Socket::authenticate_console()
                     std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_ERROR!" << std::endl;
                     error();
                     return rc;
+
                 case SSH_AUTH_DENIED:  //no key matched
                     std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_DENIED!" << std::endl;
                     ++failureCounter;
                     break;
+
                 case SSH_AUTH_SUCCESS: //you are now authenticated
                     std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_SUCCESS!" << std::endl;
                     break;
+
                 case SSH_AUTH_PARTIAL: //some key matched but you still have to
                     //provide an other mean of authentication (like a password).
                     std::cout << "SSH_AUTH_METHOD_INTERACTIVE - SSH_AUTH_PARTIAL!" << std::endl;
                     ++failureCounter;
                     break;
+
                 default:
                     break;
             }
         }
+
         /*
         if (ssh_getpass("Password: ", password, sizeof(password), 0, 0) < 0)
         {
@@ -560,35 +598,42 @@ int SSH_Socket::authenticate_console()
         // Try to authenticate with password
         if(method & SSH_AUTH_METHOD_PASSWORD)
         {
-            if (m_password != "")
+            if(m_password != "")
             {
                 std::cout << "*** manual login *** " << std::endl;
                 rc = ssh_userauth_password(m_ssh_session, m_user_id.c_str(), m_password.c_str());
+
                 switch(rc)
                 {
                     case SSH_AUTH_ERROR:   //some serious error happened during authentication
                         std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_ERROR!" << std::endl;
                         error();
                         return rc;
+
                     case SSH_AUTH_DENIED:  //no key matched
                         std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_DENIED!" << std::endl;
                         ++failureCounter;
                         break;
+
                     case SSH_AUTH_SUCCESS: //you are now authenticated
                         std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_SUCCESS!" << std::endl;
                         break;
+
                     case SSH_AUTH_PARTIAL: //some key matched but you still have to
                         // provide an other mean of authentication (like a password).
                         std::cout << "SSH_AUTH_METHOD_PASSWORD - SSH_AUTH_PARTIAL!" << std::endl;
                         ++failureCounter;
                         break;
+
                     default:
                         break;
                 }
             }
         }
     }
+
     banner = ssh_get_issue_banner(m_ssh_session);
+
     if(banner)
     {
         std::cout << banner << std::endl;
@@ -602,7 +647,7 @@ int SSH_Socket::authenticate_console()
 
 /**
  * @brief Return Socket Instance for Duplication
- * @return 
+ * @return
  */
 int SSH_Socket::getSocketInstance()
 {

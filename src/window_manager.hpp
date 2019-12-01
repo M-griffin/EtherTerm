@@ -43,7 +43,10 @@ public:
      */
     void setWindowHeight(int value);
 
-    int getWindowHeight() const { return m_height; }
+    int getWindowHeight() const
+    {
+        return m_height;
+    }
 
     /**
      * @brief Override default Window Width
@@ -51,7 +54,10 @@ public:
      */
     void setWindowWidth(int value);
 
-    int getWindowWidth() const { return m_width; }
+    int getWindowWidth() const
+    {
+        return m_width;
+    }
 
     /**
      * @brief Toggle Vertical Sync with GPU
@@ -74,7 +80,10 @@ public:
     /**
      * @brief Check if the Currnet window is active
      */
-    bool isActiveWindow() const { return m_is_active_window; }
+    bool isActiveWindow() const
+    {
+        return m_is_active_window;
+    }
 
     /**
      * @brief sets if the current window is active.

@@ -108,6 +108,7 @@ public:
         {
             //std::cout << option << " found" << std::endl;
         }
+
         return true;
     }
 

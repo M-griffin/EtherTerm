@@ -46,12 +46,13 @@ public:
     // Then it's moved and cleared.
     bool getInputSequence(std::string &sequence)
     {
-        if (!m_inputSequence.empty())
+        if(!m_inputSequence.empty())
         {
             sequence = std::move(m_inputSequence);
             m_inputSequence.erase();
             return true;
         }
+
         return false;
     }
 
