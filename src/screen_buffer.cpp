@@ -65,6 +65,7 @@ void ScreenBuffer::setScreenBuffer(unsigned char my_sequence,
         std::cout << "Exception setScreenBuffer: " << e.what() << std::endl;
         std::cout << "Server sent data that exceeds screen dimensions." << std::endl;
     }
+
     // Clear for next sequences.
     m_sequence_buffer.m_character_sequence.erase();
 }
@@ -93,6 +94,7 @@ void ScreenBuffer::scrollScreenBuffer()
     {
         std::cout << "Exception scrollScreenBuffer: " << e.what() << std::endl;
     }
+
     // Readd The last Line back to the buffer.
     m_screen_buffer.resize(m_term_height * m_term_width);
 }
@@ -125,6 +127,7 @@ void ScreenBuffer::clearScreenBufferRange(int start, int end)
                       << e.what() << std::endl;
         }
     }
+
     // Debugging
     //getScreenBufferText();
 }
@@ -194,6 +197,7 @@ void ScreenBuffer::bufferToClipboard(
                 std::cout << "Exception bufferToClipboard: " << e.what() << std::endl;
             }
         }
+
         // Add Newline at the end of each row.
         textBuffer += "\r\n";
 
@@ -201,7 +205,7 @@ void ScreenBuffer::bufferToClipboard(
         startPosition += m_term_width;
         endPosition   += m_term_width;
     }
+
     // Copy Resulting text to the Clipboard.
     SDL_SetClipboardText(textBuffer.c_str());
 }
-

@@ -8,14 +8,16 @@
 
 // maximum size of telnet sub-negotiation string, allowing for a fairly
 // large value for NEW_ENVIRON.
-enum {
+enum
+{
     SB_MAXLEN = 65534
 };
 
 /**
  * Telnet Commands
  */
-enum {
+enum
+{
     IAC     = 255,        // interpret as command:
     DONT    = 254,        // you are not to use option
     DO      = 253,        // please, you use option
@@ -61,7 +63,8 @@ extern const char *telcmds[];
 /**
  * Telnet Options
  */
-enum {
+enum
+{
     TELOPT_BINARY         =  0,    // 8-bit data path
     TELOPT_ECHO           =  1,    // echo
     TELOPT_RCP            =  2,    // prepare to reconnect
@@ -143,7 +146,8 @@ const char *telopts[NTELOPTS+1] =
 #endif
 
 // sub-option qualifiers
-enum {
+enum
+{
     TELQUAL_IS         = 0,    // option is...
     TELQUAL_SEND       = 1,    // send option
     TELQUAL_INFO       = 2,    // ENVIRON: informational version of IS
@@ -151,7 +155,8 @@ enum {
     TELQUAL_NAME       = 3     // AUTHENTICATION: client version of IS
 };
 
-enum {
+enum
+{
     LFLOW_OFF          = 0,    // Disable remote flow control
     LFLOW_ON           = 1,    // Enable remote flow control
     LFLOW_RESTART_ANY  = 2,    // Restart output on any char
@@ -159,7 +164,8 @@ enum {
 };
 
 // LINE-MODE sub-options
-enum {
+enum
+{
     LM_MODE          = 1,
     LM_FORWARDMASK   = 2,
     LM_SLC           = 3,
@@ -172,7 +178,8 @@ enum {
 };
 
 // Not part of protocol, but needed to simplify things...
-enum {
+enum
+{
     MODE_FLOW        = 0x0100,
     MODE_ECHO        = 0x0200,
     MODE_INBIN       = 0x0400,
@@ -180,7 +187,8 @@ enum {
     MODE_FORCE       = 0x1000
 };
 
-enum {
+enum
+{
     SLC_SYNCH   = 1,
     SLC_BRK     = 2,
     SLC_IP      = 3,
@@ -238,7 +246,8 @@ extern char *slc_names[];
 #define    SLC_NAME_OK(x)    ((unsigned int)(x) <= NSLC)
 #define    SLC_NAME(x)    slc_names[x]
 
-enum {
+enum
+{
     SLC_NOSUPPORT    = 0,
     SLC_CANTCHANGE   = 1,
     SLC_VARIABLE     = 2,
@@ -254,7 +263,8 @@ enum {
     SLC_FLUSHOUT     = 0x20
 };
 
-enum {
+enum
+{
     OLD_ENV_VAR      = 1,
     OLD_ENV_VALUE    = 0,
     NEW_ENV_VAR      = 0,
@@ -264,7 +274,8 @@ enum {
 };
 
 //AUTHENTICATION suboptions
-enum {
+enum
+{
 //Who is authenticating who ...
     AUTH_WHO_CLIENT         = 0,    // Client authenticating server
     AUTH_WHO_SERVER         = 1,    // Server authenticating client
@@ -305,7 +316,8 @@ extern const char *authtype_names[];
 #define    AUTHTYPE_NAME(x)    authtype_names[x]
 
 // ENCRYPTION sub-options
-enum {
+enum
+{
     ENCRYPT_IS          = 0,    // I pick encryption type ...
     ENCRYPT_SUPPORT     = 1,    // I support encryption types ...
     ENCRYPT_REPLY       = 2,    // Initial setup response
@@ -346,4 +358,3 @@ extern const char *enctype_names[];
 #define    ENCTYPE_NAME(x)        enctype_names[x]
 
 #endif // TELNET_HPP
-

@@ -40,7 +40,7 @@ void SessionManager::leave(session_ptr session)
         // Start Session Shutdown Sequence, give time for sync and clean exit.
         session->m_is_shutdown = true;
         std::this_thread::sleep_for(std::chrono::milliseconds(40));
-        
+
         // If session is connected, we need to disconnect it first
         if(session->m_connection)
         {
@@ -57,7 +57,7 @@ void SessionManager::leave(session_ptr session)
         // Mark that a system has disconnect to reset window focus
         m_is_system_disconnected = true;
     }
-    catch (std::exception &ex)
+    catch(std::exception &ex)
     {
         std::cout << "SessionManager::leave() - Caught Exception on shutdown: " << ex.what();
     }
@@ -69,16 +69,17 @@ void SessionManager::leave(session_ptr session)
 void SessionManager::grabNewWindowFocus()
 {
     // If a system hasn't diconnected then return;
-    if (!m_is_system_disconnected)
+    if(!m_is_system_disconnected)
     {
         return;
     }
 
     // Only reset focus if there are no active windows!
     bool found_active_window = false;
-    for (auto it = m_sessions.begin(); it != m_sessions.end(); ++it)
+
+    for(auto it = m_sessions.begin(); it != m_sessions.end(); ++it)
     {
-        if ((*it)->m_window_manager->isActiveWindow())
+        if((*it)->m_window_manager->isActiveWindow())
         {
             found_active_window = true;
         }
@@ -86,13 +87,13 @@ void SessionManager::grabNewWindowFocus()
 
     // A Window closed, and there is no active window.
     // Reset to first session as long as it exists.
-    if (!found_active_window && m_sessions.begin() != m_sessions.end())
+    if(!found_active_window && m_sessions.begin() != m_sessions.end())
     {
         std::cout << "No Active Window, resetting Focus to first available window" << std::endl;
         auto session = m_sessions.begin();
         (*session)->m_window_manager->grabWindow();
     }
-  
+
     // Reset for next system detected.
     m_is_system_disconnected = false;
 }
@@ -116,16 +117,17 @@ void SessionManager::update()
     // Becasue disconnects can happen in a thread, we need to double check
     // If a session was poped off in the middle of the Iteration
     std::string::size_type num_sessions = m_sessions.size();
+
     for(auto it = m_sessions.begin(); it != m_sessions.end(); ++it)
     {
         // Make sure handle is valid once we call it.
-        if (num_sessions != m_sessions.size() || (*it)->m_is_shutdown)
+        if(num_sessions != m_sessions.size() || (*it)->m_is_shutdown)
         {
             return;
         }
 
         // Run Session Update for Session and Event Processing.
-        (*it)->update();        
+        (*it)->update();
     }
 }
 

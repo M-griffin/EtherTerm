@@ -16,13 +16,13 @@
 SequenceParser::SequenceParser(renderer_ptr renderer, connection_ptr connection)
     : m_renderer(renderer)
     , m_connection(connection)
-    // Init Screen Buffer
+      // Init Screen Buffer
     , m_screen_buffer(
-        m_renderer->m_term_width,
-        m_renderer->m_term_height
-    )
+          m_renderer->m_term_width,
+          m_renderer->m_term_height
+      )
     , m_preceeding_sequence('\0')
-    //, m_max_x_position(0)
+      //, m_max_x_position(0)
     , m_saved_cursor_x(1)
     , m_saved_cursor_y(1)
     , m_saved_attribute(0)
@@ -78,7 +78,7 @@ void SequenceParser::scrollScreenUp(bool render_bottom_row)
 {
 
     // Draws the Current last line before moving the screen up!
-    if (render_bottom_row)
+    if(render_bottom_row)
     {
         // Surface to Texture of Bottom Row.
         m_renderer->renderBottomScreen();
@@ -100,6 +100,7 @@ void SequenceParser::textInput(const std::string &buffer)
 
     // Loop text and parse screen formatting.
     unsigned char next_sequence;
+
     for(std::string::size_type i = 0; i < buffer.size(); i++)
     {
         // Grab the Sequence translate to unsigned char.
@@ -127,7 +128,7 @@ void SequenceParser::textInput(const std::string &buffer)
         // Debugging!
         //std::cout << "sequence: " << sequence << " "
         //  << static_cast<int>(sequence) << std::endl;
-        
+
         // Char 12 is the same as Clear Screen. lets handle it.
         if(static_cast<int>(sequence) == 12)
         {
@@ -147,6 +148,7 @@ void SequenceParser::textInput(const std::string &buffer)
             {
                 --m_screen_buffer.m_x_position;
             }
+
             continue;
         }
 
@@ -201,6 +203,7 @@ void SequenceParser::textInput(const std::string &buffer)
                     m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
                 }
             }
+
             //printf("\r\n xpos %i, ypos %i \r\n",m_screen_buffer.m_x_position, m_screen_buffer.m_y_position);
             continue;
         }
@@ -217,12 +220,14 @@ void SequenceParser::textInput(const std::string &buffer)
             }
 
             m_screen_buffer.m_x_position = 1;
+
             // Add back for ?7h handling on different TERM WIDTHS
             if(!m_is_line_wrapped)
             {
                 //screen_buff.color_sequence += "\x1b[40m";
                 //screenbuffer('\r');
             }
+
             continue;
         }
         else if(sequence == '\n')
@@ -246,6 +251,7 @@ void SequenceParser::textInput(const std::string &buffer)
                 //screen_buff.color_sequence += "\x1b[40m";
                 //screenbuffer('\r');
             }
+
             // Check here if we need to scroll the screen.
             if(m_screen_buffer.m_y_position > m_renderer->m_term_height ||
                     (m_renderer->m_is_scroll_region_active &&
@@ -276,6 +282,7 @@ void SequenceParser::textInput(const std::string &buffer)
                     m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
                 }
             }
+
             continue;
         }
 
@@ -291,6 +298,7 @@ void SequenceParser::textInput(const std::string &buffer)
                 ++m_screen_buffer.m_y_position;
             }
         }
+
         // A little more tricky now if were pushing text pass the bottom margin
         //from the scroll region or just x/y coordinates text like status bar
         //outside scroll region we don't want to scroll in this case.
@@ -316,6 +324,7 @@ void SequenceParser::textInput(const std::string &buffer)
                     m_is_cleared_the_screen = false;
 
                     m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
+
                     // Reset to beginning of line.
                     if(m_screen_buffer.m_x_position > m_renderer->m_term_width)
                     {
@@ -346,6 +355,7 @@ void SequenceParser::textInput(const std::string &buffer)
                     {
                         m_screen_buffer.m_x_position = 1;
                     }
+
                     m_screen_buffer.m_y_position = m_renderer->m_bottom_margin;
                 }
                 else if(m_screen_buffer.m_y_position > m_renderer->m_term_height)
@@ -355,6 +365,7 @@ void SequenceParser::textInput(const std::string &buffer)
                 }
             }
         }
+
         //printf(" \r\n XY: %i,%i ",m_screen_buffer.m_x_position, m_screen_buffer.m_y_position);
         // Render Char Screen Position 0 Based from 1 Based.
         m_renderer->drawCharacterCell(
@@ -381,15 +392,15 @@ void SequenceParser::textInput(const std::string &buffer)
         // down and left so the next sequence is ready .. and ESC[C to push forward
         // will be set.
         ++m_screen_buffer.m_x_position;
-        
+
         // TODO,  VT100 / Posix leaves cursor on col 81 till next text char comes in to wrap!
         // Otherwise, telnet ANSI, when hitting the 81, will move down and 1st position for next char to start
         // Which is AUTO ESC[?7h, grrr
         // Posix will continure to allow ESC sequence(s) for moving the cusor back to do more stuff after writing
         // to the 80th column, this would be different of ESC[?7h or not!  check into this more.
-        
+
         // This is a mix, some ANSI screen are not setting the code for this properly!
-        if (m_screen_buffer.m_x_position == 81 && m_is_line_wrapped) 
+        if(m_screen_buffer.m_x_position == 81 && m_is_line_wrapped)
         {
             m_screen_buffer.m_x_position = 1;
             ++m_screen_buffer.m_y_position;
@@ -405,40 +416,44 @@ void SequenceParser::sequenceControlCursorAndDisplay()
     switch(m_parameters[0])
     {
         case CTRL_DOWN:        //       'D'   // Control
+
             // This should also scroll down the screen keeping same X position
             if(m_screen_buffer.m_y_position < m_renderer->m_term_height)
-            {                    
+            {
                 ++m_screen_buffer.m_y_position;
             }
+
             break;
-        
+
         case CTRL_NEWLINE:     //       'E'   // Control
             // Scroll screen up and make new lines This is more a Form Feed.
             // Test input should handle scrolling the screen on the next input.
             //++m_screen_buffer.m_y_position;
             //m_screen_buffer.m_x_position = 1;
-            
+
             // Use Text parse casue it has scrolling all setup.
             textInput("\r\n");
             break;
-        
+
         case CTRL_PREV_LINE:   //       'M'   // Control
+
             // Up, this should scroll the screen up, NOT YET IMPLIMENTED, stop at top!
             // Keeping same X position
             if(m_screen_buffer.m_y_position > 1)
             {
                 --m_screen_buffer.m_y_position;
             }
+
             break;
-        
+
         case CTRL_G2_CHAR_SET: //       'N'   // G2 Character Set
             // not supported yet, but pass through
             break;
-        
+
         case CTRL_G3_CHAR_SET: //       'O'   // G3 Character Set
             // not supported yet, but pass through
             break;
-            
+
         default:
             break;
     }
@@ -452,8 +467,9 @@ void SequenceParser::sequenceCursorAndDisplay()
     // Switch on Sequence Terminator
     switch(m_parameters[0])
     {
-            // WIP
+        // WIP
         case DELETE_CHARACTER:  // ESC[P
+
             // Deletes the character at the current position by shifting all characters
             // from the current column + p1 left to the current column.  Opened blanks
             // at the end of the line are filled with the current attribute.
@@ -466,9 +482,11 @@ void SequenceParser::sequenceCursorAndDisplay()
                 );
                 break;
             }
+
             if(m_parameters.size() == 2)  // Erase current position, move left x
             {
-                if (m_parameters[1] == 0) m_parameters[1] = 1;
+                if(m_parameters[1] == 0) m_parameters[1] = 1;
+
                 m_renderer->renderDeleteCharScreen(
                     m_screen_buffer.m_x_position -1,
                     m_screen_buffer.m_y_position -1,
@@ -476,9 +494,11 @@ void SequenceParser::sequenceCursorAndDisplay()
                 );
                 break;
             }
+
             break;
 
         case REPEAT_CHARACTER: // ESC[b
+
             // Repeat the preceding graphic character P s times (REP).
             if(m_parameters.size() == 1)  // Repeat Once.
             {
@@ -486,16 +506,20 @@ void SequenceParser::sequenceCursorAndDisplay()
                 textInput(string_builder);
                 break;
             }
+
             if(m_parameters.size() == 2)
             {
-                if (m_parameters[1] == 0) m_parameters[1] = 1;
+                if(m_parameters[1] == 0) m_parameters[1] = 1;
+
                 std::string string_builder(m_parameters[1], (char)m_preceeding_sequence);
                 textInput(string_builder);
                 break;
             }
+
             break;
 
         case LINE_POS_ABSOLUTE: // ESC[d
+
             // Line Position Absolute [row] (default = [1,column]) (VPA).
             if(m_parameters.size() == 1)  // Repeat Once.
             {
@@ -503,17 +527,21 @@ void SequenceParser::sequenceCursorAndDisplay()
                 m_screen_buffer.m_y_position = 1;
                 break;
             }
+
             if(m_parameters.size() == 2)
             {
-                if (m_parameters[1] == 0) m_parameters[1] = 1;
+                if(m_parameters[1] == 0) m_parameters[1] = 1;
+
                 m_screen_buffer.m_x_position = 1;
                 m_screen_buffer.m_y_position = m_parameters[1];
                 break;
             }
+
             break;
 
         case CURSOR_POSITION:
         case CURSOR_POSITION_ALT:
+
             //printf("\r\n CURSOR_POSITION: p = %i,  param[0] = %i param[1] = %i \r\n", p,  param[0], param[1]);
             if(m_parameters.size() == 1)
             {
@@ -522,9 +550,11 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else if(m_parameters.size() == 2)
             {
-                if (m_parameters[1] == 0) m_parameters[1] = 1;
+                if(m_parameters[1] == 0) m_parameters[1] = 1;
+
                 m_screen_buffer.m_y_position = m_parameters[1];
                 m_screen_buffer.m_x_position = 1;
+
                 if(m_screen_buffer.m_y_position > m_renderer->m_term_height)
                 {
                     m_screen_buffer.m_y_position = m_renderer->m_term_height;
@@ -538,8 +568,10 @@ void SequenceParser::sequenceCursorAndDisplay()
             // Empty is sent as -1
             else if(m_parameters.size() == 3 && m_parameters[1] == -1)
             {
-                if (m_parameters[2] == 0) m_parameters[2] = 1;
+                if(m_parameters[2] == 0) m_parameters[2] = 1;
+
                 m_screen_buffer.m_x_position = m_parameters[2];
+
                 if(m_screen_buffer.m_x_position > m_renderer->m_term_width)
                 {
                     m_screen_buffer.m_x_position = m_renderer->m_term_width;
@@ -547,9 +579,10 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else
             {
-                if (m_parameters[1] == 0) m_parameters[1] = 1;
-                if (m_parameters[2] == 0) m_parameters[2] = 1;
-                
+                if(m_parameters[1] == 0) m_parameters[1] = 1;
+
+                if(m_parameters[2] == 0) m_parameters[2] = 1;
+
                 m_screen_buffer.m_y_position = m_parameters[1];
                 m_screen_buffer.m_x_position = m_parameters[2];
 
@@ -571,6 +604,7 @@ void SequenceParser::sequenceCursorAndDisplay()
                     m_screen_buffer.m_x_position = 1;
                 }
             }
+
             break;
 
         case SCROLL_REGION:
@@ -579,11 +613,13 @@ void SequenceParser::sequenceCursorAndDisplay()
                 // Reset to Full Screen.
                 m_renderer->setScrollRegion(0, 0, m_renderer->m_term_height);
             }
+
             if(m_parameters.size() == 3)
             {
-                if (m_parameters[1] == 0) m_parameters[1] = 1;
-                if (m_parameters[2] == 0) m_parameters[2] = 1;
-                
+                if(m_parameters[1] == 0) m_parameters[1] = 1;
+
+                if(m_parameters[2] == 0) m_parameters[2] = 1;
+
                 // Enable scrolling from row1 to row2
                 // Move the cursor to the home position
                 m_renderer->setScrollRegion(
@@ -594,6 +630,7 @@ void SequenceParser::sequenceCursorAndDisplay()
                 m_screen_buffer.m_x_position = 1;
                 m_screen_buffer.m_y_position = 1;
             }
+
             break;
 
         // Cursor up an begging of previous line.
@@ -604,19 +641,23 @@ void SequenceParser::sequenceCursorAndDisplay()
                 {
                     --m_screen_buffer.m_y_position;
                 }
+
                 m_screen_buffer.m_x_position = 1;
             }
             else
             {
                 m_screen_buffer.m_y_position -= m_parameters[1];
+
                 if(m_screen_buffer.m_y_position < 1)
                 {
                     m_screen_buffer.m_y_position = 1;
                 }
+
                 m_screen_buffer.m_x_position = 1;
             }
+
             break;
-        
+
         case CURSOR_UP:
             if(m_parameters.size() == 1)
             {
@@ -627,13 +668,16 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else
             {
-                if (m_parameters[1] == 0) m_parameters[1] = 1;
+                if(m_parameters[1] == 0) m_parameters[1] = 1;
+
                 m_screen_buffer.m_y_position -= m_parameters[1];
+
                 if(m_screen_buffer.m_y_position < 1)
                 {
                     m_screen_buffer.m_y_position = 1;
                 }
             }
+
             break;
 
         // Next Lile is like CRLF down then beggining.
@@ -648,16 +692,20 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else
             {
-                if (m_parameters[1] == 0) m_parameters[1] = 1;
+                if(m_parameters[1] == 0) m_parameters[1] = 1;
+
                 m_screen_buffer.m_y_position += m_parameters[1];
+
                 if(m_screen_buffer.m_y_position > m_renderer->m_term_height)
                 {
                     m_screen_buffer.m_y_position = m_renderer->m_term_height;
                 }
+
                 m_screen_buffer.m_x_position = 1;
             }
+
             break;
-            
+
         case CURSOR_DOWN:
             if(m_parameters.size() == 1)
             {
@@ -668,13 +716,16 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else
             {
-                if (m_parameters[1] == 0) m_parameters[1] = 1;
+                if(m_parameters[1] == 0) m_parameters[1] = 1;
+
                 m_screen_buffer.m_y_position += m_parameters[1];
+
                 if(m_screen_buffer.m_y_position > m_renderer->m_term_height)
                 {
                     m_screen_buffer.m_y_position = m_renderer->m_term_height;
                 }
             }
+
             break;
 
         case CURSOR_FORWARD:
@@ -682,6 +733,7 @@ void SequenceParser::sequenceCursorAndDisplay()
             {
                 //if (m_screen_buffer.m_x_position < characters_per_line)
                 ++m_screen_buffer.m_x_position;
+
                 if(m_screen_buffer.m_x_position > m_renderer->m_term_width)
                 {
                     //m_screen_buffer.m_x_position -= m_renderer->m_term_width;
@@ -691,8 +743,10 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else
             {
-                if (m_parameters[1] == 0) m_parameters[1] = 1; 
+                if(m_parameters[1] == 0) m_parameters[1] = 1;
+
                 m_screen_buffer.m_x_position += m_parameters[1];
+
                 // Some programs push ESC[C past the end
                 // of the line and expect us to loop and move
                 // Down Automatically.
@@ -703,6 +757,7 @@ void SequenceParser::sequenceCursorAndDisplay()
                     m_screen_buffer.m_x_position = m_renderer->m_term_width;
                 }
             }
+
             break;
 
         case CURSOR_BACKWARD:
@@ -715,78 +770,87 @@ void SequenceParser::sequenceCursorAndDisplay()
             }
             else if(m_parameters.size() == 2)
             {
-                if (m_parameters[1] == 0) m_parameters[1] = 1; 
+                if(m_parameters[1] == 0) m_parameters[1] = 1;
+
                 m_screen_buffer.m_x_position -= m_parameters[1];
+
                 if(m_screen_buffer.m_x_position < 1)
                 {
                     m_screen_buffer.m_x_position = 1;
                 }
             }
             // Font Switch Handling.
-            else if (m_parameters.size() == 3)
+            else if(m_parameters.size() == 3)
             {
                 // Check for Font Changing Sequences here.
-                for (int i : m_parameters)
+                for(int i : m_parameters)
                 {
                     std::cout << "ESC m_param[ " << i << " ] " << std::endl;
                 }
+
                 // Default CP437 VGA
                 // "\x1b[0;0 D"
-                if (m_parameters[1] == 0 && m_parameters[2] == 0)
+                if(m_parameters[1] == 0 && m_parameters[2] == 0)
                 {
                     std::cout << std::endl << "Switched to CP437 Font" << std::endl;
 
                     m_renderer->m_surface_manager->setCurrentFont("vga8x16.bmp");
-                    if (m_renderer->m_surface_manager->didFontChange())
+
+                    if(m_renderer->m_surface_manager->didFontChange())
                     {
                         m_renderer->m_surface_manager->loadBitmapFontImage();
                     }
                 }
                 //37 - P0T NOoDLE (Amiga)
                 // "\x1b[0;37 D"
-                else if (m_parameters[1] == 0 && m_parameters[2] == 37)
+                else if(m_parameters[1] == 0 && m_parameters[2] == 37)
                 {
                     std::cout << std::endl << "Switched to Pot-Noodle Font" << std::endl;
                     m_renderer->m_surface_manager->setCurrentFont("potNoodle-8x16.bmp");
-                    if (m_renderer->m_surface_manager->didFontChange())
+
+                    if(m_renderer->m_surface_manager->didFontChange())
                     {
                         m_renderer->m_surface_manager->loadBitmapFontImage();
                     }
                 }
                 //38 - mO'sOul (Amiga)
                 // "\x1b[0;38 D"
-                else if (m_parameters[1] == 0 && m_parameters[2] == 38)
+                else if(m_parameters[1] == 0 && m_parameters[2] == 38)
                 {
                     std::cout << std::endl << "Switched to mO'sOul Font" << std::endl;
                     m_renderer->m_surface_manager->setCurrentFont("mo'soul-8x16.bmp");
-                    if (m_renderer->m_surface_manager->didFontChange())
+
+                    if(m_renderer->m_surface_manager->didFontChange())
                     {
                         m_renderer->m_surface_manager->loadBitmapFontImage();
                     }
                 }
                 //39 - MicroKnight (Amiga)
                 //"\x1b[0;39 D"
-                else if (m_parameters[1] == 0 && m_parameters[2] == 39)
+                else if(m_parameters[1] == 0 && m_parameters[2] == 39)
                 {
                     std::cout << std::endl << "Switched to Micro-Knight+ Font" << std::endl;
                     m_renderer->m_surface_manager->setCurrentFont("microKnightPlus-8x16.bmp");
-                    if (m_renderer->m_surface_manager->didFontChange())
+
+                    if(m_renderer->m_surface_manager->didFontChange())
                     {
                         m_renderer->m_surface_manager->loadBitmapFontImage();
                     }
                 }
                 //40 - Topaz (Amiga)
                 // \x1b[0;40 D
-                else if (m_parameters[1] == 0 && m_parameters[2] == 40)
+                else if(m_parameters[1] == 0 && m_parameters[2] == 40)
                 {
                     std::cout << std::endl << "Switched to Topaz+ Font" << std::endl;
                     m_renderer->m_surface_manager->setCurrentFont("topazPlus-8x16.bmp");
-                    if (m_renderer->m_surface_manager->didFontChange())
+
+                    if(m_renderer->m_surface_manager->didFontChange())
                     {
                         m_renderer->m_surface_manager->loadBitmapFontImage();
                     }
                 }
             }
+
             break;
 
         case SAVE_CURSOR_POS:
@@ -812,8 +876,10 @@ void SequenceParser::sequenceCursorAndDisplay()
                 m_screen_buffer.m_x_position = 1;
             else
             {
-                if (m_parameters[1] == 0) m_parameters[1] = 1; 
+                if(m_parameters[1] == 0) m_parameters[1] = 1;
+
                 m_screen_buffer.m_x_position = m_parameters[1];
+
                 if(m_screen_buffer.m_x_position < 1)
                 {
                     m_screen_buffer.m_x_position = 1;
@@ -823,9 +889,11 @@ void SequenceParser::sequenceCursorAndDisplay()
                     m_screen_buffer.m_x_position = m_renderer->m_term_width;
                 }
             }
+
             break;
 
         case ERASE_DISPLAY:
+
             // Erase Current Line and Below. ESC[J
             if(m_parameters.size() == 1)
             {
@@ -835,6 +903,7 @@ void SequenceParser::sequenceCursorAndDisplay()
                 );
                 break;
             }
+
             // Erase Current Line and Below. ESC[0J
             if(m_parameters.size() == 2 && m_parameters[1] == 0)
             {
@@ -844,6 +913,7 @@ void SequenceParser::sequenceCursorAndDisplay()
                 );
                 break;
             }
+
             // Erase Current Line and Above.
             if(m_parameters.size() == 2 && m_parameters[1] == 1)
             {
@@ -853,6 +923,7 @@ void SequenceParser::sequenceCursorAndDisplay()
                 );
                 break;
             }
+
             // Clear Entire Screen. ESC[2J
             if(m_parameters.size() == 2 && m_parameters[1] == 2)
             {
@@ -865,9 +936,11 @@ void SequenceParser::sequenceCursorAndDisplay()
                 m_screen_buffer.m_y_position = 1;
                 break;
             }
+
             break;
 
         case ERASE_TO_EOL:
+
             // Handle Rendering from 1 Based to 0 Based so Subtract 1.
             if(m_parameters.size() == 1)  // Cursor to End of line
             {
@@ -908,6 +981,7 @@ void SequenceParser::sequenceCursorAndDisplay()
 
                 m_screen_buffer.clearScreenBufferRange(0, m_renderer->m_term_width);
             }
+
             break;
 
         default :
@@ -973,6 +1047,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                         case 1: // BOLD_ON (increase intensity)
                             m_prev_color_attribute = 1;
                             m_color_attribute = 1;
+
                             //std::cout << "Color_Attribute: " << color_attribute << endl;
                             // If current color is dark, flip it to light.
                             if(m_renderer->compareSDL_Colors(m_renderer->m_current_fg_color, m_renderer->BLACK))
@@ -991,6 +1066,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                 m_renderer->m_current_fg_color = m_renderer->LIGHT_CYAN;
                             else if(m_renderer->compareSDL_Colors(m_renderer->m_current_fg_color, m_renderer->GREY))
                                 m_renderer->m_current_fg_color = m_renderer->WHITE;
+
                             break;
 
                         case 2: // FAINT (decreased intensity) (Not widely used).
@@ -1073,7 +1149,7 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             m_current_color += "29";
                             break;
 
-                            // Foreground Colors
+                        // Foreground Colors
                         case 30: // FG_BLACK
                             switch(m_color_attribute)
                             {
@@ -1082,41 +1158,50 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->BLACK;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->DARK_GREY;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->BLACK;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->BLACK;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->DARK_GREY;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->BLACK;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_fg_color = m_renderer->DARK_GREY;
                                     break;
                             }
+
                             break;
 
                         case 31: // FG_RED
@@ -1127,44 +1212,54 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->RED;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->LIGHT_RED;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->RED;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->RED;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->LIGHT_RED;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->RED;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_fg_color = m_renderer->LIGHT_RED;
                                     break;
                             }
+
                             break;
 
                         case 32: // FG_GREEN
+
                             //current_color += "32";
                             switch(m_color_attribute)
                             {
@@ -1173,41 +1268,50 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->GREEN;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->LIGHT_GREEN;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->GREEN;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->GREEN;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->LIGHT_GREEN;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->GREEN;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_fg_color = m_renderer->LIGHT_GREEN;
                                     break;
                             }
+
                             break;
 
                         case 33: // FG_YELLOW
@@ -1218,41 +1322,50 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->BROWN;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->YELLOW;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->BROWN;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->BROWN;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->YELLOW;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->BROWN;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_fg_color = m_renderer->YELLOW;
                                     break;
                             }
+
                             break;
 
                         case 34: // FG_BLUE
@@ -1263,41 +1376,50 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->BLUE;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->LIGHT_BLUE;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->BLUE;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->BLUE;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->LIGHT_BLUE;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->BLUE;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_fg_color = m_renderer->LIGHT_BLUE;
                                     break;
                             }
+
                             break;
 
                         case 35: // FG_MAGENTA
@@ -1308,41 +1430,50 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->MAGENTA;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->LIGHT_MAGENTA;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->MAGENTA;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->MAGENTA;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->LIGHT_MAGENTA;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->MAGENTA;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_fg_color = m_renderer->LIGHT_MAGENTA;
                                     break;
                             }
+
                             break;
 
                         case 36: // FG_CYAN
@@ -1353,41 +1484,50 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->CYAN;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->LIGHT_CYAN;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->CYAN;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->CYAN;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->LIGHT_CYAN;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->CYAN;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_fg_color = m_renderer->LIGHT_CYAN;
                                     break;
                             }
+
                             break;
 
                         case 37: // FG_WHITE
@@ -1398,44 +1538,53 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->GREY;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->WHITE;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->GREY;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
                                         case 0:
                                             m_renderer->m_current_bg_color = m_renderer->GREY;
                                             break;
+
                                         case 1:
                                             m_renderer->m_current_bg_color = m_renderer->WHITE;
                                             break;
+
                                         default:
                                             m_renderer->m_current_bg_color = m_renderer->GREY;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_fg_color = m_renderer->WHITE;
                                     break;
                             }
+
                             break;
 
-                            // Background Colors
+                        // Background Colors
                         case 40: // BG_BLACK
                             switch(m_color_attribute)
                             {
@@ -1444,33 +1593,38 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLACK; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->DARKGREY; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLACK; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->DARKGREY; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->DARK_GREY;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLACK; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->DARKGREY; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLACK; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->DARKGREY; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->BLACK;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_bg_color = m_renderer->BLACK;
                                     break;
                             }
+
                             break;
 
                         case 41: // BG_RED
@@ -1481,33 +1635,38 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->RED; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTRED; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->RED; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTRED; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->LIGHT_RED;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->RED; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTRED; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->RED; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTRED; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->RED;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_bg_color = m_renderer->RED;
                                     break;
                             }
+
                             break;
 
                         case 42: // BG_GREEN
@@ -1518,33 +1677,38 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREEN; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTGREEN; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREEN; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTGREEN; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->LIGHT_GREEN;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREEN; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTGREEN; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREEN; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTGREEN; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->GREEN;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_bg_color = m_renderer->GREEN;
                                     break;
                             }
+
                             break;
 
                         case 43: // BG_YELLOW
@@ -1555,33 +1719,38 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BROWN; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->YELLOW; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BROWN; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->YELLOW; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->YELLOW;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BROWN; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->YELLOW; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BROWN; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->YELLOW; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->BROWN;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_bg_color = m_renderer->BROWN;
                                     break;
                             }
+
                             break;
 
                         case 44: // BG_BLUE
@@ -1592,33 +1761,38 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLUE; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTBLUE; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLUE; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTBLUE; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->LIGHT_BLUE;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLUE; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTBLUE; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->BLUE; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTBLUE; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->BLUE;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_bg_color = m_renderer->BLUE;
                                     break;
                             }
+
                             break;
 
                         case 45: // BG_MAGENTA
@@ -1631,30 +1805,34 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                 case BLINK_ON:
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->MAGENTA; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTMAGENTA; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->MAGENTA; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTMAGENTA; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->LIGHT_MAGENTA;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->MAGENTA; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTMAGENTA; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->MAGENTA; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTMAGENTA; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->MAGENTA;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_bg_color = m_renderer->MAGENTA;
                                     break;
                             }
+
                             break;
 
                         case 46: // BG_CYAN
@@ -1665,33 +1843,38 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->CYAN; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTCYAN; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->CYAN; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTCYAN; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->LIGHT_CYAN;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->CYAN; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTCYAN; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->CYAN; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->LIGHTCYAN; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->CYAN;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_bg_color = m_renderer->CYAN;
                                     break;
                             }
+
                             break;
 
                         case 47: // BG_WHITE
@@ -1702,33 +1885,38 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                                     break;
 
                                 case BLINK_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREY; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->WHITE; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREY; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->WHITE; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->WHITE;
                                             break;
                                     }
+
                                     break;
 
                                 case REVERSE_VIDEO_ON:
+
                                     // Flip to FG = BG, and BG = FG
                                     switch(m_prev_color_attribute)
                                     {
-                                            //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREY; break;
-                                            //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->WHITE; break;
+                                        //case 0:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->GREY; break;
+                                        //case 1:  TheTerm::Instance()->currentFGColor = TheTerm::Instance()->WHITE; break;
                                         default:
                                             m_renderer->m_current_fg_color = m_renderer->GREY;
                                             break;
                                     }
+
                                     break;
 
                                 default:
                                     m_renderer->m_current_bg_color = m_renderer->GREY;
                                     break;
                             }
+
                             break;
 
                         default :
@@ -1737,9 +1925,11 @@ void SequenceParser::sequenceGraphicsModeDisplay()
                             break;
                     } // End Switch
                 } // End For
+
                 //current_color += "m";
                 //screen_buff.color_sequence += current_color;
             } // End Else
+
             break;
 
         default:
@@ -1753,13 +1943,14 @@ void SequenceParser::sequenceGraphicsModeDisplay()
 void SequenceParser::sequenceResetAndResponses()
 {
     switch(m_parameters[0])
-    {        
+    {
         case TERMINAL_ATTRIBUTES: // ESC[0c
             std::cout << "TERMINAL_ATTRIBUTES 1: " <<  m_parameters.size() << std::endl;
             std::cout << "TERMINAL_ATTRIBUTES 2 : " <<  m_parameters[0] << " " << m_parameters[1] << std::endl;
-            if (m_parameters.size() == 2 && m_parameters[0] == 'c' && m_parameters[1] == 0)
+
+            if(m_parameters.size() == 2 && m_parameters[0] == 'c' && m_parameters[1] == 0)
             {
-                std::cout << "TERMINAL_IDENTITY 3: " <<  m_parameters[2] << std::endl;                
+                std::cout << "TERMINAL_IDENTITY 3: " <<  m_parameters[2] << std::endl;
                 std::stringstream stm;
                 std::string       buf;
 
@@ -1769,7 +1960,8 @@ void SequenceParser::sequenceResetAndResponses()
 
                 // Grab an instance of the session and socket connection.
                 session_ptr session = m_renderer->m_weak_session.lock();
-                if (session)
+
+                if(session)
                 {
                     if(session->m_connection->is_open() && session->m_is_connected)
                     {
@@ -1781,8 +1973,9 @@ void SequenceParser::sequenceResetAndResponses()
                     }
                 }
             }
+
             break;
-        
+
         case SET_MODE: // [?h
             if(m_parameters.size() == 3 && m_parameters[1] == '?')
             {
@@ -1793,15 +1986,18 @@ void SequenceParser::sequenceResetAndResponses()
                         //std::cout << "Wraparound Mode" << std::endl;
                         m_is_line_wrapped = true;
                         break;
+
                     case 25:
                         // Show Cursor (DECTCEM).
                         m_is_cursor_shown = true;
                         //std::cout << "Cursor Shown" << std::endl;
                         break;
+
                     default:
                         break;
                 }
             }
+
             break;
 
         case RESET_MODE: // [?l
@@ -1814,15 +2010,18 @@ void SequenceParser::sequenceResetAndResponses()
                         m_is_line_wrapped = false;
                         //std::cout << "Wraparound Mode Disabled" << std::endl;
                         break;
+
                     case 25:
                         // Hide Cursor (DECTCEM).
                         m_is_cursor_shown = false;
                         //std::cout << "Cursor hidden" << std::endl;
                         break;
+
                     default:
                         break;
                 }
             }
+
             break;
 
         case SET_KEYBOARD_STRINGS:
@@ -1830,11 +2029,12 @@ void SequenceParser::sequenceResetAndResponses()
             // Ingored!
             break;
 
-            // Response for ESC[6n reply to Server with x/y position sequence.
+        // Response for ESC[6n reply to Server with x/y position sequence.
         case ANSI_DETECTION:
             if(m_parameters.size() > 0 && m_parameters[1] == 6)
             {
                 int current_y_position = 0;
+
                 // Make sure we don't respond with size larger then our
                 // Current Screen, Some BBS's use this response to determine
                 // When to send a pause prompt.
@@ -1859,7 +2059,8 @@ void SequenceParser::sequenceResetAndResponses()
 
                 // Grab an instance of the session and socket connection.
                 session_ptr session = m_renderer->m_weak_session.lock();
-                if (session)
+
+                if(session)
                 {
                     if(session->m_connection->is_open() && session->m_is_connected)
                     {
@@ -1871,6 +2072,7 @@ void SequenceParser::sequenceResetAndResponses()
                     }
                 }
             }
+
             break;
 
         default:
@@ -1903,18 +2105,18 @@ void SequenceParser::sequenceInput(std::vector<int> &sequenceParameters)
         case CTRL_SEQUENCE: // '['
             // Handle Character set conversions
             m_parameters.erase(m_parameters.begin());
-            
+
             switch(m_parameters[0])
             {
-                    // Catch Character Set Switching that is not supported
-                    // just yet, pass through these sequences.
+                // Catch Character Set Switching that is not supported
+                // just yet, pass through these sequences.
                 case '%':
                 case '(':
                 case ')':
                     std::cout << "CharSet Change: "
                               << m_parameters[1] << std::endl;
                     return;
-                    
+
                 default:
                     break;
             }
@@ -1943,7 +2145,7 @@ void SequenceParser::sequenceInput(std::vector<int> &sequenceParameters)
                     sequenceCursorAndDisplay();
                     std::vector<int>().swap(m_parameters);
                     return;
-                    
+
                 default :
                     break;
             }
@@ -1956,7 +2158,7 @@ void SequenceParser::sequenceInput(std::vector<int> &sequenceParameters)
                     sequenceGraphicsModeDisplay();
                     std::vector<int>().swap(m_parameters);
                     return;
-                    
+
                 default:
                     break;
             }
@@ -1972,15 +2174,16 @@ void SequenceParser::sequenceInput(std::vector<int> &sequenceParameters)
                     sequenceResetAndResponses();
                     std::vector<int>().swap(m_parameters);
                     return;
-                    
+
                 default:
                     break;
             }
+
             break;
 
         // Else Handle Control Sequences
         default:
-            switch(m_parameters[0]) 
+            switch(m_parameters[0])
             {
                 case CTRL_DOWN:        //       'D'   // Control
                 case CTRL_NEWLINE:     //       'E'   // Control
@@ -1989,13 +2192,14 @@ void SequenceParser::sequenceInput(std::vector<int> &sequenceParameters)
                 case CTRL_G3_CHAR_SET: //       'O'   // G3 Character Set
                     sequenceControlCursorAndDisplay();
                     std::vector<int>().swap(m_parameters);
-                    return;                
-                    
-                default: 
+                    return;
+
+                default:
                     break;
             }
-            break;        
-        
+
+            break;
+
     }
 
     // Free and Clear!

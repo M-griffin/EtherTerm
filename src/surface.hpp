@@ -28,17 +28,20 @@ public:
     ~Surfaces()
     {
         std::cout << "~A Surface was Removed!" << std::endl;
-        if (m_surface)
+
+        if(m_surface)
             SDL_FreeSurface(m_surface);
+
         m_surface = nullptr;
     }
 
     SDL_Surface *getSurface()
     {
-        if (!m_surface)
+        if(!m_surface)
         {
             SDL_Log("Surface is null!");
         }
+
         return m_surface;
     }
 
@@ -48,16 +51,19 @@ public:
      */
     bool convert()
     {
-        if (!m_is_converted)
+        if(!m_is_converted)
         {
             m_surface = SDL_ConvertSurfaceFormat(m_surface, SDL_PIXELFORMAT_ARGB8888, 0);
+
             if(!m_surface)
             {
                 SDL_Log("Unable to Convert Surface");
                 return false;
             }
+
             m_is_converted = true;
         }
+
         return true;
     }
 
