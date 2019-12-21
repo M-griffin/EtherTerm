@@ -1,7 +1,7 @@
 
 
 .. image:: http://htc.zapto.org:8090/job/EtherTerm/badge/icon?png
-    :target: https://htc.zapto.org:8090/job/EtherTerm/
+    :target: http://htc.zapto.org:8090/job/EtherTerm/
 
 4.0 Demo Branch is now the latest branch work in progress with a rewrite and reintegration of SSH.
 ===============
