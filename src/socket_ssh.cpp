@@ -303,11 +303,11 @@ int SSH_Socket::verify_knownhost()
     int state;
     size_t hlen;
     unsigned char *hash = nullptr;
-    char *hexa;
+    char *hexa = nullptr;
 
     state = ssh_is_server_known(m_ssh_session);
     ssh_key srv_pubkey;
-    int rc;
+    int rc = 0;   /* Assume success */
 
     rc = ssh_get_publickey(m_ssh_session, &srv_pubkey);
 
@@ -321,7 +321,8 @@ int SSH_Socket::verify_knownhost()
 
     if(rc < 0)
     {
-        return -1;
+        rc = -1;
+        goto quit;
     }
 
     switch(state)
@@ -333,16 +334,16 @@ int SSH_Socket::verify_knownhost()
             std::cout << "Host key for server changed: it is now" << std::endl;
             ssh_print_hexa("Public key hash", hash, hlen);
             std::cout << "For security reasons, connection will be stopped" << std::endl;
-            free(hash);
-            return -1;
+            rc = -1;
+            break;
 
         case SSH_SERVER_FOUND_OTHER:
             std::cout << "The host key for this server was not found but an other"
                       << "type of key exists." << std::endl;
             std::cout << "An attacker might change the default server key to"
                       << "confuse your client into thinking the key does not exist" << std::endl;
-            free(hash);
-            return -1;
+            rc = -1;
+            break;
 
         case SSH_SERVER_FILE_NOT_FOUND:
             std::cout << "Could not find known host file." << std::endl;
@@ -358,37 +359,36 @@ int SSH_Socket::verify_knownhost()
             //Do you trust the host key?\n");
             std::cout << "The server is unknown. Adding Key." << std::endl;
             std::cout << "Public key hash: " << hexa << std::endl;
-            free(hexa);
-
+          
             /*
             if (fgets(buf, sizeof(buf), stdin) == NULL)
             {
-                free(hash);
-                return -1;
+                rc = -1;
             }
             if (strncasecmp(buf, "yes", 3) != 0)
             {
-                free(hash);
-                return -1;
+                rc = -1;
             }
             */
             if(ssh_write_knownhost(m_ssh_session) < 0)
             {
                 std::cout << "Error: " << strerror(errno) << std::endl;
-                free(hash);
-                return -1;
+                rc = -1;
             }
-
             break;
 
         case SSH_SERVER_ERROR:
             std::cout << "Error: " << ssh_get_error(m_ssh_session) << std::endl;
-            free(hash);
-            return -1;
+            rc = -1;
     }
 
-    free(hash);
-    return 0;
+quit:
+   if (hexa)
+      ssh_string_free_char(hexa);
+
+    if (hash)
+       ssh_clean_pubkey_hash(&hash);
+    return rc;
 }
 
 /*
