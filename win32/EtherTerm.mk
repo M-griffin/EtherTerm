@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Blue
-Date                   :=01/12/2019
+Date                   :=10/12/2020
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/MinGW-5.1.0/mingw32/bin/g++.exe
 SharedObjectLinkerName :=C:/MinGW-5.1.0/mingw32/bin/g++.exe -shared -fPIC
@@ -88,6 +88,7 @@ PostBuild:
 	'C:\Program Files (x86)\GnuWin32\bin\sed.exe' -i 's+../src/+../src/+' C:\Users\Blue\Desktop\EtherTerm\win32\EtherTerm.mk
 	
 	'C:\Program Files (x86)\GnuWin32\bin\sed.exe' -i 's+./EtherTerm/win32+./EtherTerm/win32+' C:\Users\Blue\Desktop\EtherTerm\win32\EtherTerm.mk
+	del /Q sed*
 	@echo Done
 
 MakeIntermediateDirs:

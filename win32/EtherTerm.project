@@ -168,6 +168,7 @@
         <Command Enabled="yes">'C:\Program Files (x86)\GnuWin32\bin\sed.exe' -i 's+C:/Users/Blue/Desktop/EtherTerm/src+../src/+' $(ProjectPath)\EtherTerm.mk</Command>
         <Command Enabled="yes"/>
         <Command Enabled="yes">'C:\Program Files (x86)\GnuWin32\bin\sed.exe' -i 's+C:/Users/Blue/Desktop/EtherTerm/win32+./EtherTerm/win32+' $(ProjectPath)\EtherTerm.mk</Command>
+        <Command Enabled="yes">del /Q sed*</Command>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
