@@ -1,6 +1,8 @@
 #ifndef DIALING_DIRECTORY_HPP
 #define DIALING_DIRECTORY_HPP
 
+#include "system_entry.hpp"
+
 #include <memory>
 #include <fstream>
 #include <string>
@@ -9,49 +11,6 @@
 
 #include <yaml-cpp/yaml.h>
 
-
-/**
- * @class SystemEntry
- * @author Michael Griffin
- * @date 07/08/2019
- * @file dial_directory.hpp
- * @brief System Entry in the Dialing Directory in YAML
- */
-class SystemEntry
-{
-
-public:
-
-    int         index;
-    std::string name;
-    std::string ip;
-    int         port;
-    std::string protocol;
-    std::string login;
-    std::string password;
-    std::string font;
-    std::string key_map;
-    std::string term_type;
-    std::string term_size;
-    bool        use_pipe_colors;
-
-    explicit SystemEntry()
-        : index(-1)
-        , name("A New System")
-        , ip("localhost")
-        , port(23)
-        , protocol("TELNET")
-        , login("")
-        , password("")
-        , font("vga8x16.bmp")
-        , key_map("ANSI")
-        , term_type("ANSI")
-        , term_size("80x25")
-        , use_pipe_colors(false)
-    { }
-
-    ~SystemEntry() { }
-};
 
 /**
  * @class DialingDirectory
@@ -82,64 +41,6 @@ public:
 
 namespace YAML
 {
-/**
- * @class convert
- * @author Michael Griffin
- * @date 07/08/2019
- * @file dialing_directory.hpp
- * @brief SystemEntry convert for SystemEntry Class
- */
-template<>
-struct convert<SystemEntry>
-{
-    /**
-     * @brief Overide for encoding the SystemEntry Class
-     * @param rhs
-     * @return
-     */
-    static Node encode(const SystemEntry &rhs)
-    {
-        Node node;
-        node["index"]            = rhs.index;
-        node["name"]             = rhs.name;
-        node["ip"]               = rhs.ip;
-        node["port"]             = rhs.port;
-        node["protocol"]         = rhs.protocol;
-        node["login"]            = rhs.login;
-        node["password"]         = rhs.password;
-        node["font"]             = rhs.font;
-        node["key_map"]          = rhs.key_map;
-        node["term_type"]        = rhs.term_type;
-        node["term_size"]        = rhs.term_size;
-        node["use_pipe_colors"]  = rhs.use_pipe_colors;
-
-        return node;
-    }
-
-    /**
-     * @brief Overide for the Load from File
-     * @param node
-     * @param rhs
-     * @return
-     */
-    static bool decode(const Node& node, SystemEntry& rhs)
-    {
-        rhs.index           = node["index"].as<int>();
-        rhs.name            = node["name"].as<std::string>();
-        rhs.ip              = node["ip"].as<std::string>();
-        rhs.port            = node["port"].as<int>();
-        rhs.protocol        = node["protocol"].as<std::string>();
-        rhs.login           = node["login"].as<std::string>();
-        rhs.password        = node["password"].as<std::string>();
-        rhs.font            = node["font"].as<std::string>();
-        rhs.key_map         = node["key_map"].as<std::string>();
-        rhs.term_type       = node["term_type"].as<std::string>();
-        rhs.term_size       = node["term_size"].as<std::string>();
-        rhs.use_pipe_colors = node["use_pipe_colors"].as<bool>();
-
-        return true;
-    }
-};
 
 /**
  * @class convert
@@ -216,7 +117,6 @@ struct convert<DialingDirectory>
 
 }
 
-typedef std::shared_ptr<SystemEntry> system_entry_ptr;
 typedef std::shared_ptr<DialingDirectory> dial_directory_ptr;
 
 #endif // DIALING_DIRECTORY_HPP

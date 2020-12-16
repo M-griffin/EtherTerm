@@ -180,7 +180,10 @@ void DialingManager::convertXmltoYaml()
 
 }
 
-
+/**
+ * @brief Verify Files Exists, if not generate initial entry
+ * @return
+ */
 bool DialingManager::validateFile()
 {
     if(!m_dial_directory_dao->fileExists())
@@ -216,6 +219,10 @@ bool DialingManager::validateFile()
     return true;
 }
 
+/**
+ * @brief Retrieve Dialing Directory
+ * @return
+ */
 dial_directory_ptr DialingManager::retrieveDialingDirectory()
 {
     return (m_dial_directory_dao->loadDialingDirectory());

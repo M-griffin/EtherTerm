@@ -7,6 +7,7 @@
 #include "dialing_manager.hpp"
 #include "font_set.hpp"
 #include "static_methods.hpp"
+#include "common_io.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -22,8 +23,9 @@ MenuManager::MenuManager(
 )
     : m_program_path(program_path)
     , m_menu_config(program_path)
+    , m_common_io(new CommonIO())
     , m_sequence_decoder(decoder)
-    , m_menu_function(decoder, program_path)
+    , m_menu_function(decoder, program_path, m_common_io)
     , m_renderer(renderer)
     , m_dialing_manager(new DialingManager(m_program_path))
     , m_lightbar_position(0)
@@ -109,6 +111,7 @@ void MenuManager::parseHeader(std::string file_name)
 
 /**
  * @brief Read in and Parse, Setup Margins for Directory listing
+ * This is used for Theme Loading.
  */
 void MenuManager::readDirectoryListing()
 {
@@ -156,11 +159,11 @@ bool MenuManager::changeTheme(int index)
  */
 std::string MenuManager::padString(const std::string &value, const std::string &justify, int padding)
 {
-    std::string string_replace = value;
+    std::string string_replace = "";
 
     if(justify == "LEFT")
     {
-        m_menu_function.m_menu_io.leftSpacing(string_replace, padding);
+        string_replace = m_common_io->leftPadding(value, padding);
         std::replace(
             string_replace.begin(),
             string_replace.end(),
@@ -169,7 +172,7 @@ std::string MenuManager::padString(const std::string &value, const std::string &
     }
     else if(justify == "RIGHT")
     {
-        m_menu_function.m_menu_io.rightSpacing(string_replace, padding);
+        string_replace = m_common_io->rightPadding(value, padding);
         std::replace(
             string_replace.begin(),
             string_replace.end(),
@@ -179,6 +182,29 @@ std::string MenuManager::padString(const std::string &value, const std::string &
 
     return string_replace;
 }
+
+/**
+ * @brief Padding Setup Helper Method
+ * @param string
+ * @param padding
+ * @param use_left_padding
+ * @param use_right_padding
+ */
+void MenuManager::setupPadding(std::string &string_replace, int padding, bool &use_left_padding, bool &use_right_padding)
+{
+
+    if(use_left_padding)
+    {
+        string_replace = m_common_io->leftPadding(string_replace, padding);
+        use_left_padding = false;
+    }
+    else if(use_right_padding)
+    {
+        string_replace = m_common_io->rightPadding(string_replace, padding);
+        use_right_padding = false;
+    }
+}
+
 
 /**
  * @brief Build the List of Systems to Display Lightbars.
@@ -351,17 +377,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                             std::string string_replace =
                                 m_system_entries[current_system].name;
 
-                            if(is_left_padding)
-                            {
-                                m_menu_function.m_menu_io.leftSpacing(string_replace, padding);
-                                is_left_padding = false;
-                            }
-                            else if(is_right_padding)
-                            {
-                                m_menu_function.m_menu_io.rightSpacing(string_replace, padding);
-                                is_right_padding = false;
-                            }
-
+                            setupPadding(string_replace, padding, is_left_padding, is_right_padding);
                             string_builder += string_replace;
                         }
                         else if(strcmp(mci_code,"FO") == 0)
@@ -376,17 +392,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                             // Replace with the Font name from XML.
                             std::string string_replace = font.name;
 
-                            if(is_left_padding)
-                            {
-                                m_menu_function.m_menu_io.leftSpacing(string_replace, padding);
-                                is_left_padding = false;
-                            }
-                            else if(is_right_padding)
-                            {
-                                m_menu_function.m_menu_io.rightSpacing(string_replace, padding);
-                                is_right_padding = false;
-                            }
-
+                            setupPadding(string_replace, padding, is_left_padding, is_right_padding);
                             string_builder += string_replace;
                         }
                         else if(strcmp(mci_code,"PO") == 0)
@@ -395,17 +401,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                                     m_system_entries[current_system].port);
                             std::string string_replace = temp2;
 
-                            if(is_left_padding)
-                            {
-                                m_menu_function.m_menu_io.leftSpacing(string_replace, padding);
-                                is_left_padding = false;
-                            }
-                            else if(is_right_padding)
-                            {
-                                m_menu_function.m_menu_io.rightSpacing(string_replace, padding);
-                                is_right_padding = false;
-                            }
-
+                            setupPadding(string_replace, padding, is_left_padding, is_right_padding);
                             string_builder += string_replace;
                         }
                         else if(strcmp(mci_code,"PR") == 0)
@@ -413,17 +409,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                             std::string string_replace =
                                 m_system_entries[current_system].protocol;
 
-                            if(is_left_padding)
-                            {
-                                m_menu_function.m_menu_io.leftSpacing(string_replace, padding);
-                                is_left_padding = false;
-                            }
-                            else if(is_right_padding)
-                            {
-                                m_menu_function.m_menu_io.rightSpacing(string_replace, padding);
-                                is_right_padding = false;
-                            }
-
+                            setupPadding(string_replace, padding, is_left_padding, is_right_padding);
                             string_builder += string_replace;
                         }
                         else if(strcmp(mci_code,"KM") == 0)
@@ -431,17 +417,7 @@ std::vector<list_bar> MenuManager::buildDialList()
                             std::string string_replace =
                                 m_system_entries[current_system].key_map;
 
-                            if(is_left_padding)
-                            {
-                                m_menu_function.m_menu_io.leftSpacing(string_replace, padding);
-                                is_left_padding = false;
-                            }
-                            else if(is_right_padding)
-                            {
-                                m_menu_function.m_menu_io.rightSpacing(string_replace, padding);
-                                is_right_padding = false;
-                            }
-
+                            setupPadding(string_replace, padding, is_left_padding, is_right_padding);
                             string_builder += string_replace;
                         }
                         else
@@ -514,12 +490,6 @@ bool MenuManager::readDialDirectory()
  */
 void MenuManager::createDialDirectory()
 {
-    // Create Default Phone Book.
-    //std::string path = StaticMethods::getAssetPath(m_program_path);
-    //path.append("dialdirectory.xml");
-
-    // TODO add new creation
-
 }
 
 /**
@@ -527,11 +497,6 @@ void MenuManager::createDialDirectory()
  */
 void MenuManager::writeDialDirectory()
 {
-    // Create Default Phone Book.
-    //std::string path = StaticMethods::getAssetPath(m_program_path);
-    //path.append("dialdirectory.xml");
-
-    // TODO Add new entry
 }
 
 /**

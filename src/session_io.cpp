@@ -199,23 +199,23 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
 {
     // Setup the leadoff, if it's first time, then print it out
     // Other if empty or follow-up calls to inputfield field skip it!
-    static bool is_leadoff = true;
+    static bool is_input_leadoff = true;
 
     if(leadoff.size() == 0)
     {
-        is_leadoff = false;
+        is_input_leadoff = false;
     }
 
     // Display Leadoff of field.. ie.. 'Mail to: Mercyful Name'
     // put the name in the field.
-    if(is_leadoff)
+    if(is_input_leadoff)
     {
         session_ptr session = m_weak_session.lock();
 
         if(session)
             session->deliver(leadoff);
 
-        is_leadoff = false;
+        is_input_leadoff = false;
     }
 
     std::string string_data = m_common_io.getLine(character_buffer, length, leadoff, hidden);
@@ -230,7 +230,7 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
             if(esc_sequence.size() == 0 && character_buffer[0] == '\0')
             {
                 //std::cout << "ESC -> Field Input aborted!" << std::endl;
-                is_leadoff = true;    // Reset for next run
+                is_input_leadoff = true;
                 esc_sequence.erase();
                 string_data.erase();
                 return "aborted";
@@ -240,9 +240,8 @@ std::string SessionIO::getInputField(const std::string &character_buffer,
         else if((string_data[0] == '\n' && string_data.size() == 1) || character_buffer[0] == '\n')
         {
             result = m_common_io.getInputBuffer();
-            //std::cout << "Field: " << result << std::endl;
             string_data.erase();
-            is_leadoff = true;    // Reset for next run
+            is_input_leadoff = true;
             return "\n";
         }
         // Updates on Keypresses.

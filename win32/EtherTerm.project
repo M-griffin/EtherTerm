@@ -29,6 +29,9 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../src/link_list.hpp"/>
+    <File Name="../src/system_entry.hpp"/>
+    <File Name="../src/common_methods.hpp"/>
     <File Name="../src/font_manager.cpp"/>
     <File Name="../src/font_manager.hpp"/>
     <File Name="../src/font_set_dao.cpp"/>
@@ -50,8 +53,8 @@
     </VirtualDirectory>
     <File Name="../src/common_io.hpp"/>
     <File Name="../src/common_io.cpp"/>
-    <File Name="../src/session_io.hpp"/>
-    <File Name="../src/session_io.cpp"/>
+    <File Name="../src/session_io.hpp" ExcludeProjConfig=""/>
+    <File Name="../src/session_io.cpp" ExcludeProjConfig=""/>
     <VirtualDirectory Name="SDL2_net">
       <File Name="../src/SDL2_net/SDLnetUDP.cpp"/>
       <File Name="../src/SDL2_net/SDLnetTCP.cpp"/>
@@ -67,7 +70,6 @@
     <File Name="../src/input_handler.hpp"/>
     <File Name="../src/interface.hpp"/>
     <File Name="../src/link_list.cpp"/>
-    <File Name="../src/link_list.hpp"/>
     <File Name="../src/main.cpp"/>
     <File Name="../src/menu_config.cpp"/>
     <File Name="../src/menu_config.hpp"/>

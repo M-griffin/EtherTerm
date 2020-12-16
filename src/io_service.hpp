@@ -2,6 +2,7 @@
 #define IO_SERVICE_HPP
 
 #include "safe_vector.hpp"
+#include "common_methods.hpp"
 
 #include <functional>
 #include <sstream>
@@ -29,6 +30,7 @@ const int SERVICE_TYPE_CONNECT_IRC    = 5;
  * @brief Handle Async Socket Read/Write and function Callback on results.
  */
 class IOService
+    : BaseCommon
 {
 
 public:
@@ -136,26 +138,6 @@ public:
 
     void run();
     void stop();
-
-    /**
-     * @brief String Split for Hostname : Port on Async Connects
-     * @param s
-     * @param delimiter
-     * @return
-     */
-    std::vector<std::string> split(const std::string& s, char delimiter)
-    {
-        std::vector<std::string> tokens;
-        std::string token;
-        std::istringstream tokenStream(s);
-
-        while(std::getline(tokenStream, token, delimiter))
-        {
-            tokens.push_back(token);
-        }
-
-        return tokens;
-    }
 
     SafeVector<service_base_ptr>  m_service_list;
     bool                          m_is_active;

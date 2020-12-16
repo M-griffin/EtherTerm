@@ -1,4 +1,6 @@
 #include "common_io.hpp"
+#include "common_methods.hpp"
+
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -87,21 +89,6 @@ wchar_t CP437_TABLE[] =
     L'\u00F7', L'\u2248', L'\u00B0', L'\u2219', L'\u00B7', L'\u221A',
     L'\u207F', L'\u00B2', L'\u25A0', L'\u00A0'
 };
-
-
-/**
- * @brief Appends Path Seperator depending on environment.
- * @param path
- * @return
- */
-void CommonIO::pathAppend(std::string &path)
-{
-#ifdef _WIN32
-    path.append("\\");
-#else
-    path.append("/");
-#endif
-}
 
 
 /**
@@ -906,23 +893,6 @@ std::string CommonIO::getLine(const std::string &line,    // Parsed Char input i
     return "empty"; // ""
 }
 
-
-/**
- * @brief Helper Method to display bool as string.
- * @param value
- * @return
- */
-std::string CommonIO::boolAlpha(bool value)
-{
-    if(value)
-    {
-        return "True";
-    }
-
-    return "False";
-}
-
-
 /**
  * @brief Parse / Replace MCI String from given string.
  * @param AnsiString
@@ -945,4 +915,138 @@ void CommonIO::parseLocalMCI(std::string &AnsiString, const std::string &mcicode
         }
     }
     while(id1 != std::string::npos);
+}
+
+
+/**
+ * @brief Foreground ESC Sequence Translation
+ * @param data
+ * @param fg
+ */
+void CommonIO::foregroundColorSequence(char *data, int fg)
+{
+    switch(fg)
+    {
+        case 0:
+            strcat(data, "x[0;30m");
+            break;
+
+        case 1:
+            strcat(data, "x[0;34m");
+            break;
+
+        case 2:
+            strcat(data, "x[0;32m");
+            break;
+
+        case 3:
+            strcat(data, "x[0;36m");
+            break;
+
+        case 4:
+            strcat(data, "x[0;31m");
+            break;
+
+        case 5:
+            strcat(data, "x[0;35m");
+            break;
+
+        case 6:
+            strcat(data, "x[0;33m");
+            break;
+
+        case 7:
+            strcat(data, "x[0;37m");
+            break;
+
+        case 8:
+            strcat(data, "x[1;30m");
+            break;
+
+        case 9:
+            strcat(data, "x[1;34m");
+            break;
+
+        case 10:
+            strcat(data, "x[1;32m");
+            break;
+
+        case 11:
+            strcat(data, "x[1;36m");
+            break;
+
+        case 12:
+            strcat(data, "x[1;31m");
+            break;
+
+        case 13:
+            strcat(data, "x[1;35m");
+            break;
+
+        case 14:
+            strcat(data, "x[1;33m");
+            break;
+
+        case 15:
+            strcat(data, "x[1;37m");
+            break;
+
+        default :
+            break;
+    }
+
+    data[0] = '\x1b';
+}
+
+/**
+ * @brief Background ESC Sequence Translation
+ * @param data
+ * @param bg
+ */
+void CommonIO::backgroundColorSequence(char *data, int bg)
+{
+    switch(bg)
+    {
+        case 16:
+            strcat(data, "x[40m");
+            break;
+
+        case 17:
+            strcat(data, "x[44m");
+            break;
+
+        case 18:
+            strcat(data, "x[42m");
+            break;
+
+        case 19:
+            strcat(data, "x[46m");
+            break;
+
+        case 20:
+            strcat(data, "x[41m");
+            break;
+
+        case 21:
+            strcat(data, "x[45m");
+            break;
+
+        case 22:
+            strcat(data, "x[43m");
+            break;
+
+        case 23:
+            strcat(data, "x[47m");
+            break;
+
+        // Default to none.
+        case 24:
+            strcat(data, "x[0m");
+            break;
+
+        default :
+            break;
+    }
+
+    data[0] = '\x1b';
 }

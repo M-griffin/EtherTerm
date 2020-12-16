@@ -3,6 +3,7 @@
 
 #include "menu_io.hpp"
 #include "sequence_decoder.hpp"
+#include "common_methods.hpp"
 
 #include <string>
 #include <vector>
@@ -46,6 +47,10 @@ typedef struct CommandRecord
 
 } CommandRecord;
 
+// Forward Decleration
+class CommonIO;
+typedef std::shared_ptr<CommonIO> common_io_ptr;
+
 /**
  * @class MenuFunction
  * @author Michael Griffin
@@ -54,11 +59,12 @@ typedef struct CommandRecord
  * @brief Handle Internal Menu Commands and Lightbar processing.
  */
 class MenuFunction
+    : BaseCommon
 {
 public:
 
     // This needs access from ie Title Scan Class.
-    MenuFunction(sequence_decoder_ptr &decoder, const std::string &program_path);
+    MenuFunction(sequence_decoder_ptr &decoder, const std::string &program_path, common_io_ptr &comon_io);
     ~MenuFunction();
 
     std::string          m_program_path;
@@ -82,8 +88,7 @@ public:
     bool m_is_escape_sequence;       // Is Input key Escaped char, or Normal Key
     bool m_is_system_active;         // System Exit
 
-    char m_menu_path[255];
-    char m_output_buffer[1024];      // Holds Formatted Light-bar Data
+    std::string m_menu_path;
 
     std::string m_curent_menu;       // Current Menu
     std::string m_previous_menu;     // Previous Menu

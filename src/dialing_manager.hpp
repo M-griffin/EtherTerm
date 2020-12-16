@@ -1,6 +1,8 @@
 #ifndef DIALING_MANAGER_HPP
 #define DIALING_MANAGER_HPP
 
+#include "common_methods.hpp"
+
 #include <string>
 #include <memory>
 #include <regex>
@@ -20,23 +22,11 @@ typedef std::shared_ptr<DialingDirectoryDao> dial_directory_dao_ptr;
  * @brief Manages The Dialing Direction Creation, And Updates
  */
 class DialingManager
+    : BaseCommon
 {
 public:
     DialingManager(std::string path);
     ~DialingManager();
-
-    /**
-     * @brief Template for String to Integer.
-     * @param Text
-     * @return
-     */
-    template <typename T>
-    T stringToNumber(const std::string &Text)
-    {
-        std::istringstream ss(Text);
-        T result;
-        return ss >> result ? result : 0;
-    }
 
     bool previousXmlFileExists();
     std::string searchForRegexMatch(std::string str_data, std::regex re);
@@ -47,7 +37,7 @@ public:
 private:
 
     dial_directory_dao_ptr m_dial_directory_dao;
-    std::string m_program_path;
+    std::string            m_program_path;
 };
 
 typedef std::shared_ptr<DialingManager> dial_manager_ptr;

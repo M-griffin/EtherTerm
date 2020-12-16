@@ -87,5 +87,35 @@ public:
         return path;
     }
 
+
+    /*
+     * Setup Downloads Path
+     */
+    static std::string getDownloadPath(std::string program_path)
+    {
+        std::string path = getAssetPath(program_path);
+#ifdef _WIN32
+        path += "downloads\\";
+#else
+        path += "downloads/";
+#endif
+        return path;
+    }
+
+
+    /**
+     * @brief Helper to append protocol path
+     */
+    static std::string getProtocolPath(std::string program_path)
+    {
+        std::string path = getAssetPath(program_path);
+#ifdef _WIN32
+        path.append("protocol\\");
+#else
+        path.append("protocol/");
+#endif
+        return path;
+    }
+
 };
 #endif // STATIC_METHODS_HPP

@@ -1,4 +1,5 @@
 #include "menu_config.hpp"
+#include "static_methods.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -22,35 +23,6 @@ MenuConfig::~MenuConfig()
     std::cout << "~MenuConfig" << std::endl;
 }
 
-/*
- * Path Helper Function
- */
-std::string MenuConfig::getProgramPath()
-{
-    std::string path = m_program_path;
-#ifdef _WIN32
-    path.append("assets\\");
-#else
-    path.append("assets/");
-#endif
-    return path;
-}
-
-
-/**
- * @brief Helper to append directory path
- */
-std::string MenuConfig::getDirectoryPath()
-{
-    // Create Default Phone Book.
-    std::string path = getProgramPath();
-#ifdef _WIN32
-    path.append("directory\\");
-#else
-    path.append("directory/");
-#endif
-    return path;
-}
 
 /**
  * Start of Dial-directory INI Class
@@ -74,7 +46,7 @@ bool MenuConfig::ddirectory_exists(std::string filename)
  */
 void MenuConfig::ddirectory_create()
 {
-    std::string path = getDirectoryPath();
+    std::string path = StaticMethods::getDirectoryPath(m_program_path);
     path += m_ini_name;
     std::ofstream outStream2;
     outStream2.open(path.c_str(), std::ofstream::out | std::ofstream::trunc);
@@ -199,7 +171,7 @@ void MenuConfig::ddirectory_check(std::string &cfgdata)
  */
 bool MenuConfig::ddirectory_parse(int index)
 {
-    std::string path = getDirectoryPath();
+    std::string path = StaticMethods::getDirectoryPath(m_program_path);
 
     if(index == 0)
     {

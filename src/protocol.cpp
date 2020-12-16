@@ -4,6 +4,7 @@
 #include "async_connection.hpp"
 #include "message_queue.hpp"
 #include "session.hpp"
+#include "static_methods.hpp"
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -15,52 +16,6 @@
 #include <memory>
 #include <chrono>
 #include <thread>
-
-
-/*
- * Setup Assets Path
- */
-std::string Protocol::getProgramPath()
-{
-    std::string path = m_program_path;
-#ifdef _WIN32
-    path += "assets\\";
-#else
-    path += "assets/";
-#endif
-    return path;
-}
-
-
-/*
- * Setup Downloads Path
- */
-std::string Protocol::getDownloadPath()
-{
-    std::string path = m_program_path;
-#ifdef _WIN32
-    path += "downloads\\";
-#else
-    path += "downloads/";
-#endif
-    return path;
-}
-
-
-/**
- * @brief Helper to append protocol path
- */
-std::string Protocol::getProtocolPath()
-{
-    // Create Default Phone Book.
-    std::string path = getProgramPath();
-#ifdef _WIN32
-    path.append("protocol\\");
-#else
-    path.append("protocol/");
-#endif
-    return path;
-}
 
 
 /**
@@ -85,9 +40,9 @@ bool Protocol::isWinNT()
  */
 void Protocol::executeProtocols()
 {
-    connection_ptr conn = m_weak_connection.lock();
+    connection_ptr connection = m_weak_connection.lock();
 
-    if(!conn)
+    if(!connection)
     {
         std::cout << "Error, no handle to connection!" << std::endl;
         return;
@@ -96,10 +51,10 @@ void Protocol::executeProtocols()
 #ifdef _WIN32
     WSAPROTOCOL_INFO pri;
 
-    WSADuplicateSocket(conn->socket()->getSocketHandle(), GetCurrentProcessId(), &pri);
+    WSADuplicateSocket(connection->socket()->getSocketHandle(), GetCurrentProcessId(), &pri);
     m_socket_duplicate = WSASocket(pri.iAddressFamily, pri.iSocketType, pri.iProtocol, &pri, 0, 0);
 #else
-    m_socket_duplicate = dup(conn->socket()->getSocketHandle());
+    m_socket_duplicate = dup(connection->socket()->getSocketHandle());
 #endif
 
     if(m_socket_duplicate < 1)
@@ -173,13 +128,11 @@ void Protocol::executeProcess(int socket_descriptor)
 
     //char app_spawn[] = "C:\\Windows\\System32\\cmd.exe"; // Program to execute on command line.
     std::string path = "cmd /c \"";
-    //std::string path = "";
-    path.append(getProtocolPath());
+    path.append(StaticMethods::getProtocolPath(m_program_path));
     path.append("sexyz.exe ");
-    //path.append("sexyz.exe ");
     path.append(std::to_string(socket_descriptor));
     path.append(" rz ");
-    path.append(getDownloadPath());
+    path.append(StaticMethods::getDownloadPath(m_program_path));
     path.append("\" & pause");
 
     // Kickoff external process.
@@ -188,7 +141,7 @@ void Protocol::executeProcess(int socket_descriptor)
     //spawn the child process
     if(!CreateProcess(NULL, (char *)path.c_str(),
                       NULL, NULL, true, CREATE_NEW_CONSOLE,
-                      NULL, (char *)getProtocolPath().c_str(),
+                      NULL, (char *)StaticMethods::getProtocolPath(m_program_path).c_str(),
                       &si, &pi))
     {
         std::cout << "CreateProcess child failed" << std::endl;

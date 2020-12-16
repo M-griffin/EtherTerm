@@ -3,6 +3,7 @@
 
 #include "io_service.hpp"
 #include "socket_handler.hpp"
+#include "common_methods.hpp"
 
 #include <memory>
 
@@ -14,6 +15,7 @@
  * @brief Handles Shared Sockets Async Requests to IOService.
  */
 class async_connection
+    : BaseCommon
 {
 public:
 
@@ -107,30 +109,6 @@ public:
         // nullptr can't be passed as reference for vector
         std::vector<unsigned char> place_holder;
         m_io_service.addAsyncJob(place_holder, string_seq, m_socket_handle, callback, SERVICE_TYPE_WRITE);
-    }
-
-    /**
-     * @brief Case Insensitive Compare
-     * @param str1
-     * @param str2
-     * @return
-     */
-    bool iequals(const std::string& str1, const std::string& str2)
-    {
-        if(str1.size() != str2.size())
-        {
-            return false;
-        }
-
-        for(std::string::const_iterator c1 = str1.begin(), c2 = str2.begin(); c1 != str1.end(); ++c1, ++c2)
-        {
-            if(std::tolower(*c1) != std::tolower(*c2))
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**

@@ -42,8 +42,7 @@ void LinkList::getVectorList(std::vector<list_bar> listbar)
  */
 std::string LinkList::drawVectorList(unsigned long page, unsigned long list)
 {
-    std::string stringBuilder;
-    char capture[200]= {0};
+    std::string string_builder = "";
     m_current_page = page;
 
     // Calculate Box Size and Total Pages
@@ -70,8 +69,7 @@ std::string LinkList::drawVectorList(unsigned long page, unsigned long list)
         //Now clear the box First
         for(int t = 0; t < boxsize; t++)
         {
-            sprintf(capture, "\x1b[%i;%iH\x1b[K", (m_top_margin)+t, 1);
-            stringBuilder += capture;
+            string_builder += stdStringFormat("\x1b[%i;%iH\x1b[K", (m_top_margin)+t, 1);
         }
     }
 
@@ -84,23 +82,26 @@ std::string LinkList::drawVectorList(unsigned long page, unsigned long list)
         // If Area has new message rotate output to new light bars.
         if((signed)list+1 == (boxsize*m_current_page)+i)
         {
-            m_current_selection = m_top_margin+i-1; // Get current place in box to display.
-            sprintf(capture, "\x1b[%i;%iH%s", m_top_margin+i-1, 1,
-                    (char *)m_listing[((boxsize*m_current_page)+i)-1]
-                    .inactive_lightbar.c_str());
+            // Get current "active" row in box to display.
+            m_current_selection = m_top_margin+i-1;
+
+            string_builder += stdStringFormat("\x1b[%i;%iH%s",
+                                              m_top_margin+i-1,
+                                              1,
+                                              (char *)m_listing[((boxsize*m_current_page)+i)-1]
+                                              .inactive_lightbar.c_str());
         }
         else
         {
-            sprintf(capture, "\x1b[%i;%iH%s", m_top_margin+i-1, 1,
-                    (char *)m_listing[((boxsize*m_current_page)+i)-1]
-                    .active_lightbar.c_str());
+            string_builder += stdStringFormat("\x1b[%i;%iH%s",
+                                              m_top_margin+i-1,
+                                              1,
+                                              (char *)m_listing[((boxsize*m_current_page)+i)-1]
+                                              .active_lightbar.c_str());
         }
-
-        stringBuilder += capture;
     }
 
     // Write out Box.
-    sprintf(capture, "\x1b[%i;%iH", m_current_row+m_top_margin-1, 1);
-    stringBuilder += capture;
-    return stringBuilder;
+    string_builder += stdStringFormat("\x1b[%i;%iH", m_current_row+m_top_margin-1, 1);
+    return string_builder;
 }

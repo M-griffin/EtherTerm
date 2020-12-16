@@ -114,7 +114,7 @@ void IOService::run()
                 // Get host and port from string.
                 // This would better as a vector<std::string> for the sequqnce,
                 // More versitile.!
-                std::vector<std::string> ip_address = split(job_work->getStringSequence(), ':');
+                std::vector<std::string> ip_address = stringSplit(job_work->getStringSequence(), ':');
                 bool is_success = false;
 
                 std::string address = ip_address.at(0);
@@ -158,7 +158,7 @@ void IOService::run()
                 // Get host and port from string.
                 // This would better as a vector<std::string> for the sequqnce,
                 // More versitile.!
-                std::vector<std::string> ip_address = split(job_work->getStringSequence(), ':');
+                std::vector<std::string> ip_address = stringSplit(job_work->getStringSequence(), ':');
                 std::cout << "ip_address: " << ip_address.size();
                 bool is_success = false;
 
@@ -203,7 +203,7 @@ void IOService::run()
                 // Get host and port from string.
                 // This would better as a vector<std::string> for the sequqnce,
                 // More versitile.!
-                std::vector<std::string> ip_address = split(job_work->getStringSequence(), ':');
+                std::vector<std::string> ip_address = stringSplit(job_work->getStringSequence(), ':');
                 bool is_success = false;
 
                 if(ip_address.size() > 1)

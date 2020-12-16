@@ -18,16 +18,16 @@ public:
     MessageQueue() {}
     ~MessageQueue()
     {
-        std::vector<int>().swap(m_queueParams);
+        std::vector<int>().swap(m_queue_params);
         m_text.erase();
     }
 
-    std::vector<int> m_queueParams;
+    std::vector<int> m_queue_params;
     std::string m_text;
 
     void clear()
     {
-        std::vector<int>().swap(m_queueParams);
+        std::vector<int>().swap(m_queue_params);
         m_text.erase();
     }
 };

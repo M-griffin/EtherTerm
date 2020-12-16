@@ -12,6 +12,10 @@ FontManager::~FontManager()
 {
 }
 
+/**
+ * @brief Verify File Exists, If not Generate default Entries
+ * @return
+ */
 bool FontManager::validateFile()
 {
     if(!m_font_set_dao->fileExists())
@@ -122,6 +126,10 @@ bool FontManager::validateFile()
     return true;
 }
 
+/**
+ * @brief Retrieve Font Sets from File
+ * @return
+ */
 font_set_ptr FontManager::retrieveFontSet()
 {
     return (m_font_set_dao->loadFontSet());

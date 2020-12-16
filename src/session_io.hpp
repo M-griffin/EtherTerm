@@ -232,4 +232,4 @@ public:
 
 typedef std::shared_ptr<SessionIO> session_io_ptr;
 
-#endif // MENU_IO_HPP
+#endif

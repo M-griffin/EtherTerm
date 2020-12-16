@@ -7,8 +7,8 @@
 #include "socket_handler.hpp"
 #include "dialing_directory.hpp"
 #include "io_service.hpp"
+#include "common_methods.hpp"
 
-#include <sstream>
 #include <iostream>
 #include <thread>
 #include <set>
@@ -25,6 +25,7 @@
  *        Async IO in separate threads for Sockets.
  */
 class Interface
+    : BaseCommon
 {
 public:
 
@@ -170,19 +171,6 @@ public:
     }
 
     /**
-     * @brief Template for String to Integer.
-     * @param Text
-     * @return
-     */
-    template <typename T>
-    T stringToNumber(const std::string &Text)
-    {
-        std::istringstream ss(Text);
-        T result;
-        return ss >> result ? result : 0;
-    }
-
-    /**
      * @brief Parses the SystemConnection and Sets Hight and Width
      * @param height
      * @param width
@@ -204,29 +192,7 @@ public:
         }
     }
 
-    /**
-     * @brief Case Insensitive Compare
-     * @param str1
-     * @param str2
-     * @return
-     */
-    bool iequals(const std::string& str1, const std::string& str2)
-    {
-        if(str1.size() != str2.size())
-        {
-            return false;
-        }
 
-        for(std::string::const_iterator c1 = str1.begin(), c2 = str2.begin(); c1 != str1.end(); ++c1, ++c2)
-        {
-            if(std::tolower(*c1) != std::tolower(*c2))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     /**
      * @brief Spawn Connection Sessions

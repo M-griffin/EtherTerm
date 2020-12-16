@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <memory>
 #include <stdint.h>
 
 /**
@@ -155,13 +156,6 @@ public:
     }
 
     /**
-     * @brief Appends Path Seperator depending on environment.
-     * @param path
-     * @return
-     */
-    void pathAppend(std::string &path);
-
-    /**
      * String Lengh counting actual characters not bytes
      * This is for mixed ASCII And UTF-8 Strings.
      */
@@ -256,13 +250,6 @@ public:
 
 
     /**
-    * @brief Helper Method to display bool as string.
-    * @param value
-    * @return
-    */
-    std::string boolAlpha(bool value);
-
-    /**
      * @brief Parse / Replace MCI String from given string.
      * @param AnsiString
      * @param mcicode
@@ -270,18 +257,8 @@ public:
      */
     void parseLocalMCI(std::string &AnsiString, const std::string &mcicode, const std::string &replacement);
 
-    /**
-     * @brief Template search quick find
-     * @param element
-     * @param container
-     * @return
-     */
-    template<class Element, class Container>
-    bool in_array(const Element &element, const Container &container)
-    {
-        return std::find(std::begin(container), std::end(container), element)
-               != std::end(container);
-    }
+    void foregroundColorSequence(char *data, int fg);
+    void backgroundColorSequence(char *data, int bg);
 
 private:
 
@@ -301,4 +278,8 @@ private:
     // Parameterized ESC Sequcnes Translations.
     std::map<std::string, std::string> m_sequence_map;
 };
+
+
+typedef std::shared_ptr<CommonIO> common_io_ptr;
+
 #endif

@@ -2,6 +2,7 @@
 #include "sequence_decoder.hpp"
 #include "menu_io.hpp"
 #include "static_methods.hpp"
+#include "common_io.hpp"
 
 #include <iostream>
 #include <cstdio>
@@ -12,10 +13,10 @@
 #include <string>
 #include <fstream>
 
-MenuFunction::MenuFunction(sequence_decoder_ptr &decoder, const std::string &program_path)
+MenuFunction::MenuFunction(sequence_decoder_ptr &decoder, const std::string &program_path, common_io_ptr &comon_io)
     : m_program_path(program_path)
     , m_sequence_decoder(decoder)
-    , m_menu_io(decoder, program_path)
+    , m_menu_io(decoder, program_path, comon_io)
     , m_num_commands(0)
     , m_commands_executed(0)
     , m_first_commands_executed(0)
@@ -33,9 +34,6 @@ MenuFunction::MenuFunction(sequence_decoder_ptr &decoder, const std::string &pro
     , m_isLoadNewMenu(true)
 {
     std::cout << "MenuFunction Created!" << std::endl;
-    strcpy(m_menu_path, "");
-    strcpy(m_output_buffer, "");
-
 }
 
 MenuFunction::~MenuFunction()
@@ -170,14 +168,14 @@ void MenuFunction::commandsParse(std::string &cfgdata,
                                  CommandRecord *cmdRecord)
 {
     std::string::size_type id1 = 0;
-    char sText[200] = {0};
+    std::string search_string;
 
     // Discards any Configure lines with the # Character
     if(cfgdata[0] == '#')
         return;
 
-    sprintf(sText,"LDesc[%.03d]",idx);
-    id1 = cfgdata.find(sText, 0);
+    search_string = stdStringFormat("LDesc[%.03d]",idx);
+    id1 = cfgdata.find(search_string.c_str(), 0);
 
     if(id1 != std::string::npos)
     {
@@ -186,8 +184,8 @@ void MenuFunction::commandsParse(std::string &cfgdata,
         return;
     }
 
-    sprintf(sText,"SDesc[%.03d]",idx);
-    id1 = cfgdata.find(sText, 0);
+    search_string = stdStringFormat("SDesc[%.03d]",idx);
+    id1 = cfgdata.find(search_string.c_str(), 0);
 
     if(id1 != std::string::npos)
     {
@@ -196,8 +194,8 @@ void MenuFunction::commandsParse(std::string &cfgdata,
         return;
     }
 
-    sprintf(sText,"CKeys[%.03d]",idx);
-    id1 = cfgdata.find(sText, 0);
+    search_string = stdStringFormat("CKeys[%.03d]",idx);
+    id1 = cfgdata.find(search_string.c_str(), 0);
 
     if(id1 != std::string::npos)
     {
@@ -206,8 +204,8 @@ void MenuFunction::commandsParse(std::string &cfgdata,
         return;
     }
 
-    sprintf(sText,"CmdKeys[%.03d]",idx);
-    id1 = cfgdata.find(sText, 0);
+    search_string = stdStringFormat("CmdKeys[%.03d]",idx);
+    id1 = cfgdata.find(search_string.c_str(), 0);
 
     if(id1 != std::string::npos)
     {
@@ -216,8 +214,8 @@ void MenuFunction::commandsParse(std::string &cfgdata,
         return;
     }
 
-    sprintf(sText,"MString[%.03d]",idx);
-    id1 = cfgdata.find(sText, 0);
+    search_string = stdStringFormat("MString[%.03d]",idx);
+    id1 = cfgdata.find(search_string.c_str(), 0);
 
     if(id1 != std::string::npos)
     {
@@ -226,8 +224,8 @@ void MenuFunction::commandsParse(std::string &cfgdata,
         return;
     }
 
-    sprintf(sText,"HiString[%.03d]",idx);
-    id1 = cfgdata.find(sText, 0);
+    search_string = stdStringFormat("HiString[%.03d]",idx);
+    id1 = cfgdata.find(search_string.c_str(), 0);
 
     if(id1 != std::string::npos)
     {
@@ -236,8 +234,8 @@ void MenuFunction::commandsParse(std::string &cfgdata,
         return;
     }
 
-    sprintf(sText,"LoString[%.03d]",idx);
-    id1 = cfgdata.find(sText, 0);
+    search_string = stdStringFormat("LoString[%.03d]",idx);
+    id1 = cfgdata.find(search_string.c_str(), 0);
 
     if(id1 != std::string::npos)
     {
@@ -246,8 +244,8 @@ void MenuFunction::commandsParse(std::string &cfgdata,
         return;
     }
 
-    sprintf(sText,"Xcoord[%.03d]",idx);
-    id1 = cfgdata.find(sText, 0);
+    search_string = stdStringFormat("Xcoord[%.03d]",idx);
+    id1 = cfgdata.find(search_string.c_str(), 0);
 
     if(id1 != std::string::npos)
     {
@@ -256,8 +254,8 @@ void MenuFunction::commandsParse(std::string &cfgdata,
         return;
     }
 
-    sprintf(sText,"Ycoord[%.03d]",idx);
-    id1 = cfgdata.find(sText, 0);
+    search_string = stdStringFormat("Ycoord[%.03d]",idx);
+    id1 = cfgdata.find(search_string.c_str(), 0);
 
     if(id1 != std::string::npos)
     {
@@ -266,8 +264,8 @@ void MenuFunction::commandsParse(std::string &cfgdata,
         return;
     }
 
-    sprintf(sText,"LBarCmd[%.03d]",idx);
-    id1 = cfgdata.find(sText, 0);
+    search_string = stdStringFormat("LBarCmd[%.03d]",idx);
+    id1 = cfgdata.find(search_string.c_str(), 0);
 
     if(id1 != std::string::npos)
     {
@@ -292,7 +290,6 @@ int MenuFunction::commandsExist(const std::string &MenuName, const int &idx)
     path.append(MenuName);
     path.append(".menu");
     int ret = false;
-    char sText[200]= {0};
 
     // Open file for reading and parsing.
     std::ifstream iFS2;
@@ -305,17 +302,19 @@ int MenuFunction::commandsExist(const std::string &MenuName, const int &idx)
     }
 
     // Loop Through and Find the The Command
-    sprintf(sText,"[CommandRec%.03d]",idx);
+    std::string search_string = stdStringFormat("[CommandRec%.03d]",idx);
+
     std::string cfgdata;
     std::string::size_type id1 = 0;
 
     while(std::getline(iFS2, cfgdata, '\n'))
     {
-        id1 = cfgdata.find(sText, 0);
+        id1 = cfgdata.find(search_string.c_str(), 0);
 
         if(id1 != std::string::npos)
         {
             ret = true;
+            break;
         }
     }
 
@@ -400,18 +399,19 @@ void MenuFunction::menuReadCommands()
  */
 void MenuFunction::menuReload()
 {
-    m_x_position          = 1;   // Holds X Coord
-    m_y_position          = 1;   // Holds Y Coord
-    m_num_commands        = 0;   // Number of Commands.
+    m_x_position            = 1;   // Holds X Coord
+    m_y_position            = 1;   // Holds Y Coord
+    m_num_commands          = 0;   // Number of Commands.
     m_num_lightbar_commands = 0;   // Holds Light-bar # of choices
     m_num_esc_commands      = 0;   // Number of ESC Commands.
 
-    m_sequence  = '\0';
-    m_second_sequence = '\0';                 // Hold Input / Light-bar Key
-    m_is_escape_sequence = false;              // Is Input key Escaped char, or Normal Key
-    memset(&m_output_buffer,0,sizeof(m_output_buffer));  // Holds Formatted Light-bar Data
-    m_output.erase();                        // Buffer for writing all light-bars at the same time
-    m_commands_executed = 0;                  // Test's for hot keys commands executed, if non pass through loop
+    m_sequence              = '\0';
+    m_second_sequence       = '\0';   // Hold Input / Light-bar Key
+    m_is_escape_sequence    = false;  // Is Input key Escaped char, or Normal Key
+
+    m_output.erase();                 // Buffer for writing all light-bars at the same time
+    m_commands_executed = 0;          // Test's for hot keys commands executed, if non pass through loop
+
     // This is so scrolling isn't killed with invalid menu input!
     m_first_commands_executed = 0;
 
@@ -430,7 +430,7 @@ void MenuFunction::menuStart(const std::string &currentMenu)
     if(m_previous_menu == currentMenu)
     {
         m_isLoadNewMenu = false;
-        return ;
+        return;
     }
 
     // Setup the current Menu Passed.
@@ -608,23 +608,20 @@ void MenuFunction::menuStart(const std::string &currentMenu)
             {
                 m_x_position = m_command_record[m_command_index[rep]].x_coord;
                 m_y_position = m_command_record[m_command_index[rep]].y_coord;
-                sprintf(m_output_buffer,"\x1b[%i;%iH%s",m_y_position,m_x_position,
-                        (char *)m_command_record[m_command_index[rep]].inactive_string.c_str());
-                m_output += m_output_buffer;
+                m_output += stdStringFormat("\x1b[%i;%iH%s",m_y_position,m_x_position,
+                                            (char *)m_command_record[m_command_index[rep]].inactive_string.c_str());
             }
             else
             {
                 m_x_position = m_command_record[m_command_index[rep]].x_coord;
                 m_y_position = m_command_record[m_command_index[rep]].y_coord;
-                sprintf(m_output_buffer,"\x1b[%i;%iH%s",m_y_position,m_x_position,
-                        (char *)m_command_record[m_command_index[rep]].active_string.c_str());
-                m_output += m_output_buffer;
+                m_output += stdStringFormat("\x1b[%i;%iH%s",m_y_position,m_x_position,
+                                            (char *)m_command_record[m_command_index[rep]].active_string.c_str());
             }
         }
 
         // Moves cursor to end of line during light-bars.
-        sprintf(m_output_buffer,"\x1b[%i;79H",m_y_position);
-        m_output += m_output_buffer;
+        m_output += stdStringFormat("\x1b[%i;79H",m_y_position);
         m_menu_io.sequenceToAnsi(m_output);
     }
     // Not Light-bars, print out menu ANSI.
@@ -641,9 +638,8 @@ void MenuFunction::menuStart(const std::string &currentMenu)
     if(m_num_lightbar_commands > 0)
     {
         m_x_position = 1;
-        sprintf(m_output_buffer,"\x1b[%i;%iH%s",m_y_position,m_x_position,
-                (char *)m_menu_record.menu_prompt.c_str());
-        m_output = m_output_buffer;
+        m_output += stdStringFormat("\x1b[%i;%iH%s",m_y_position,m_x_position,
+                                    (char *)m_menu_record.menu_prompt.c_str());
     }
 
     if(m_output.size() > 1)
@@ -829,36 +825,34 @@ void MenuFunction::menuLightBars(char *returnParameters,
             {
                 m_x_position = m_command_record[m_command_index[m_choice]].x_coord;
                 m_y_position = m_command_record[m_command_index[m_choice]].y_coord;
-                sprintf(m_output_buffer,"\x1b[%i;%iH%s",m_y_position,m_x_position,
-                        (char *)m_command_record[m_command_index[m_choice]].inactive_string.c_str());
-                m_output += m_output_buffer;
+                m_output += stdStringFormat("\x1b[%i;%iH%s",m_y_position,m_x_position,
+                                            (char *)m_command_record[m_command_index[m_choice]].inactive_string.c_str());
 
                 if(m_choice == 0) m_choice = m_num_lightbar_commands-1;
                 else --m_choice;
 
                 m_x_position = m_command_record[m_command_index[m_choice]].x_coord;
                 m_y_position = m_command_record[m_command_index[m_choice]].y_coord;
-                sprintf(m_output_buffer,"\x1b[%i;%iH%s\x1b[%i;79H",m_y_position,m_x_position,
-                        (char *)m_command_record[m_command_index[m_choice]].active_string.c_str(),m_y_position);
-                m_output += m_output_buffer;
+                m_output += stdStringFormat("\x1b[%i;%iH%s\x1b[%i;79H",m_y_position,m_x_position,
+                                            (char *)m_command_record[m_command_index[m_choice]].active_string.c_str(),m_y_position);
+
                 m_menu_io.sequenceToAnsi(m_output);
             }
             else if(m_second_sequence == 'C' && m_commands_executed == 0)
             {
                 m_x_position = m_command_record[m_command_index[m_choice]].x_coord;
                 m_y_position = m_command_record[m_command_index[m_choice]].y_coord;
-                sprintf(m_output_buffer,"\x1b[%i;%iH%s",m_y_position,m_x_position,
-                        (char *)m_command_record[m_command_index[m_choice]].inactive_string.c_str());
-                m_output += m_output_buffer;
+                m_output += stdStringFormat("\x1b[%i;%iH%s",m_y_position,m_x_position,
+                                            (char *)m_command_record[m_command_index[m_choice]].inactive_string.c_str());
 
                 if(m_choice == m_num_lightbar_commands-1) m_choice = 0;
                 else ++m_choice;
 
                 m_x_position = m_command_record[m_command_index[m_choice]].x_coord;
                 m_y_position = m_command_record[m_command_index[m_choice]].y_coord;
-                sprintf(m_output_buffer,"\x1b[%i;%iH%s\x1b[%i;79H",m_y_position,m_x_position,
-                        (char *)m_command_record[m_command_index[m_choice]].active_string.c_str(),m_y_position);
-                m_output += m_output_buffer;
+                m_output += stdStringFormat("\x1b[%i;%iH%s\x1b[%i;79H",m_y_position,m_x_position,
+                                            (char *)m_command_record[m_command_index[m_choice]].active_string.c_str(),m_y_position);
+
                 m_menu_io.sequenceToAnsi(m_output);
             }
 

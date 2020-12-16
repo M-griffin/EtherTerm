@@ -252,7 +252,7 @@ bool WindowManager::createWindow(bool fullScreen)
     // create window in in full screen or windowed mode.
     if(fullScreen)
     {
-        m_window = SDL_CreateWindow("EtherTerm 0.4.11 Alpha Demo - Full Screen",
+        m_window = SDL_CreateWindow("EtherTerm 0.5.0 Alpha Demo - Full Screen",
                                     (m_position_placement % 2 == 0) ? SDL_WINDOWPOS_CENTERED : display_width,
                                     (m_position_placement % 2 == 0) ? SDL_WINDOWPOS_CENTERED : display_height,
                                     m_width,
@@ -268,7 +268,7 @@ bool WindowManager::createWindow(bool fullScreen)
     }
     else
     {
-        m_window = SDL_CreateWindow("EtherTerm 0.4.11 Alpha Demo - Windowed",
+        m_window = SDL_CreateWindow("EtherTerm 0.5.0 Alpha Demo - Windowed",
                                     (m_position_placement % 2 == 0) ? SDL_WINDOWPOS_CENTERED : display_width,
                                     (m_position_placement % 2 == 0) ? SDL_WINDOWPOS_CENTERED : display_height,
                                     m_width,
@@ -286,7 +286,7 @@ bool WindowManager::createWindow(bool fullScreen)
     // Set the Window ID
     m_window_id = SDL_GetWindowID(m_window);
 
-    std::string title = "EtherTerm 0.4.11 Alpha Demo w/ Multiple Windows - Window ID: ";
+    std::string title = "EtherTerm 0.5.0 Alpha Demo | ";
     title.append(std::to_string(m_window_id));
     SDL_SetWindowTitle(m_window, title.c_str());
 

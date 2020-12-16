@@ -24,6 +24,8 @@ typedef std::shared_ptr<DialingManager> dial_manager_ptr;
 class SystemEntry;
 typedef std::shared_ptr<SystemEntry> system_entry_ptr;
 
+class CommonIO;
+typedef std::shared_ptr<CommonIO> common_io_ptr;
 
 /**
  * @class MenuManager
@@ -46,6 +48,7 @@ public:
 
     std::string          m_program_path;
     MenuConfig           m_menu_config;
+    common_io_ptr        m_common_io;
 
     sequence_decoder_ptr m_sequence_decoder;
     MenuFunction         m_menu_function;
@@ -92,6 +95,8 @@ public:
 
     // Handles Returned Menu Command From Selection.
     int  handleMenuActions(const std::string &input_sequence);
+
+    void setupPadding(std::string &string_replace, int padding, bool &use_left_padding, bool &use_right_padding);
 
 };
 

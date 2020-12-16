@@ -18,8 +18,8 @@
 #include "safe_queue.hpp"
 #include "protocol.hpp"
 #include "session_io.hpp"
+#include "common_methods.hpp"
 
-//#include <chrono>
 #include <fstream>
 #include <memory>
 #include <thread>
@@ -40,6 +40,7 @@ typedef std::weak_ptr<Session> session_weak_ptr;
  */
 class Session
     : public std::enable_shared_from_this<Session>
+    , private BaseCommon
 {
 public:
 
@@ -118,7 +119,7 @@ public:
         m_sequence_decoder.reset(new SequenceDecoder(shared_from_this()));
 
         m_protocol.reset(new Protocol(shared_from_this(), m_connection, m_program_path));
-        // On creation, load a list of Available Font Sets XML
+        // On creation, load a list of Available Font Sets
         bool is_loaded = m_surface_manager->readFontSets();
 
         if(!is_loaded)
@@ -239,30 +240,6 @@ public:
         {
             std::cout << "waitForSocketData: Lost Connection." << std::endl;
         }
-    }
-
-    /**
-     * @brief Case Insensitive Compare
-     * @param str1
-     * @param str2
-     * @return
-     */
-    bool iequals(const std::string& str1, const std::string& str2)
-    {
-        if(str1.size() != str2.size())
-        {
-            return false;
-        }
-
-        for(std::string::const_iterator c1 = str1.begin(), c2 = str2.begin(); c1 != str1.end(); ++c1, ++c2)
-        {
-            if(std::tolower(*c1) != std::tolower(*c2))
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -500,6 +477,8 @@ public:
                 m_sequence_decoder
             )
         );
+
+        // Register Session as Dialing Directory
         m_is_dial_directory = true;
 
         // Startup the Dialing Directory Sequence, and display initial screen
@@ -631,9 +610,9 @@ public:
             if(msgQueue.m_text.empty())
             {
                 // Make Sure Vector is not Empty!
-                if(msgQueue.m_queueParams.size() > 0)
+                if(msgQueue.m_queue_params.size() > 0)
                 {
-                    m_sequence_parser->sequenceInput(msgQueue.m_queueParams);
+                    m_sequence_parser->sequenceInput(msgQueue.m_queue_params);
                 }
             }
             else

@@ -1311,7 +1311,7 @@ void SequenceDecoder::decodeEscSequenceData(std::string &input_string)
                  * Build Message Queue Broken Down Sequences
                  */
             {
-                m_message_queue.m_queueParams.swap(m_sequence_params);
+                m_message_queue.m_queue_params.swap(m_sequence_params);
 
                 // Queue the Data back to the Session
                 if(!sessionQueue())

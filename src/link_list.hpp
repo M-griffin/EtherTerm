@@ -1,6 +1,8 @@
 #ifndef __LINKLIST_H
 #define __LINKLIST_H
 
+#include "common_methods.hpp"
+
 #include <vector>
 #include <string>
 
@@ -26,6 +28,7 @@ typedef struct list_bar
  * @brief Manage Lightbar pages and position changes.
  */
 class LinkList
+    : BaseCommon
 {
 
 public:

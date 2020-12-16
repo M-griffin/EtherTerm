@@ -1,8 +1,16 @@
 #ifndef MENUIO_HPP
 #define MENUIO_HPP
 
-#include "sequence_decoder.hpp"
+#include <common_methods.hpp>
 #include <string>
+#include <memory>
+
+class SequenceDecoder;
+typedef std::shared_ptr<SequenceDecoder> sequence_decoder_ptr;
+
+class CommonIO;
+typedef std::shared_ptr<CommonIO> common_io_ptr;
+
 
 /**
  * @class MenuIO
@@ -13,60 +21,15 @@
  * NOTES: Need to Rewrite GetLine() for pass through
  */
 class MenuIO
+    : BaseCommon
 {
 public:
-    MenuIO(sequence_decoder_ptr &decoder, const std::string &program_path);
+    MenuIO(sequence_decoder_ptr &decoder, const std::string &program_path, common_io_ptr &common_io);
     ~MenuIO();
 
     sequence_decoder_ptr m_sequence_decoder;
     std::string          m_program_path;
-
-    /**
-     * @brief Right string padding
-     * @param str
-     * @param space
-     */
-    void rightSpacing(std::string &str, const int &space);
-
-    /**
-     * @brief Left String Padding.
-     * @param str
-     * @param space
-     */
-    void leftSpacing(std::string &str, const int &space);
-
-    /**
-     * @brief Setup Text Input Fields
-     * @param text
-     * @param len
-     */
-    void inputField(std::string &text, int &len);
-
-    /**
-     * @brief Gets a Line of Input (DISABLED, NEEDS REWRITE!)
-     * @param line
-     * @param length
-     * @param leadoff
-     * @param hid
-     */
-    void getLine(char *line,             // Returns Input into Line
-                 int   length,           // Max Input Length of String
-                 char *leadoff = 0,      // Data to Display in Default String {Optional}
-                 int   hid     = false); // If input is Echoed as hidden      {Optional}
-
-    /**
-     * @brief Foreground ESC Sequence Translation
-     * @param data
-     * @param fg
-     */
-    void foregroundColorSequence(char *data, int fg);
-
-    /**
-     * @brief Background ESC Sequence Translation
-     * @param data
-     * @param bg
-     */
-    void backgroundColorSequence(char *data, int bg);
+    common_io_ptr        m_common_io;
 
     /**
      * @brief Parses MCI and PIPE Codes to ANSI Sequences
