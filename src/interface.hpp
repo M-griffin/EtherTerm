@@ -49,13 +49,22 @@ public:
         // Start up worker thread of ASIO. We want socket communications in a separate thread.
         // We only spawn a single thread for IO_Service on start up
         m_thread = create_thread();
+
+        if(m_thread.joinable())
+        {
+            m_thread.detach();
+        }
     }
 
     ~Interface()
     {
         std::cout << "~Interface" << std::endl;
         m_io_service.stop();
-        m_thread.join();
+
+        if(m_thread.joinable())
+        {
+            m_thread.join();
+        }
     }
 
     /**

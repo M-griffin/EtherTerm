@@ -63,9 +63,13 @@ void Protocol::executeProtocols()
         return;
     }
 
-    // Execute Thread for File Transfer
-    std::thread t([=] { executeProcess(m_socket_duplicate); });
-    t.detach();
+    // Execute Thread for File Transfer - should maybe add a class thread to make it re-joinable when completed.
+    std::thread transfer_thread([=] { executeProcess(m_socket_duplicate); });
+
+    if(transfer_thread.joinable())
+    {
+        transfer_thread.detach();
+    }
 }
 
 
@@ -164,7 +168,9 @@ void Protocol::executeProcess(int socket_descriptor)
 //    unsigned char tmpbuf[RCVBUFSIZE];
 
     // While process is active!!
-    while(1)
+    session_ptr session;
+
+    while(!session->m_is_shutdown)
     {
         GetExitCodeProcess(pi.hProcess, &exit);      //while the process is running
 
