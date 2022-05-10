@@ -52,6 +52,7 @@ MenuFunction::~MenuFunction()
  */
 void MenuFunction::menuReset()
 {
+    std::cout << "DEBUG: menuReset()" << std::endl;
     m_x_position            = 1;   // Holds X Coord
     m_y_position            = 1;   // Holds Y Coord
     m_num_lightbar_commands = 0;   // Holds Light-bar # of choices
@@ -79,6 +80,8 @@ void MenuFunction::menuReset()
  */
 void MenuFunction::menuStart(const std::string &currentMenu)
 {
+    std::cout << "DEBUG: menuStart()" << std::endl;
+
     // Don't reload if menu hasn't changed.
     if(m_previous_menu == currentMenu)
     {
@@ -104,12 +107,13 @@ void MenuFunction::menuStart(const std::string &currentMenu)
     if(mnuDao.fileExists())
     {
         // Reset the Smart Pointer on menu load.
+        std::cout << " ### loading menu: " << path << " " << m_curent_menu << std::endl;
         mnuDao.loadMenu();
         m_isLoadNewMenu = true;
     }
     else
     {
-        std::cout << "Error: loading menu: " << path << " " << m_curent_menu << std::endl;
+        std::cout << " ### Error: loading menu: " << path << " " << m_curent_menu << std::endl;
         m_isLoadNewMenu = false;
         return;
     }
@@ -236,6 +240,7 @@ void MenuFunction::menuStart(const std::string &currentMenu)
  */
 void MenuFunction::menuClearObjects()
 {
+    std::cout << "DEBUG: menuClearObjects()" << std::endl;
     std::vector<int>().swap(m_command_index);
     std::map<std::string, MenuOption>().swap(m_command_index_function);
 }
@@ -248,6 +253,7 @@ void MenuFunction::menuClearObjects()
  */
 std::string MenuFunction::checkForEscapeCommandSequence(std::string value)
 {
+    std::cout << "DEBUG: checkForEscapeCommandSequence()" << std::endl;
     auto it = m_command_index_function.find(value.c_str());
 
     if(it != m_command_index_function.end())
@@ -272,6 +278,7 @@ std::string MenuFunction::checkForEscapeCommandSequence(std::string value)
 void MenuFunction::menuLightBars(char *returnParameters,
                                  const std::string &inputSequence)
 {
+    std::cout << "DEBUG: menuLightBars()" << std::endl;
     //std::cout << "Menu Bars Input received: " << inputSequence << std::endl;
     m_sequence = inputSequence[0];
 
@@ -584,6 +591,7 @@ void MenuFunction::menuProcess(char *returnParameters,
                                const std::string &inputSequence,
                                int area)
 {
+    std::cout << "DEBUG: menuProcess()" << std::endl;
     m_starting_position = area;
     strcpy(returnParameters, "");
 
@@ -604,6 +612,7 @@ void MenuFunction::menuProcess(char *returnParameters,
  */
 void MenuFunction::menuDoCommands(MenuOption &option)
 {
+    std::cout << "DEBUG: menuDoCommands()" << std::endl;
     unsigned char c1 = option.command[0];
     unsigned char c2 = option.command[1];
 
