@@ -8,8 +8,8 @@ pipeline {
         sh '''sed -i 's+/home/blue/code/EtherTerm/src/+../src/+' linux/EtherTerm.mk'''
         sh '''sed -i 's+/home/merc/code/EtherTerm/src/+../src/+' linux/EtherTerm.mk'''
         dir ('linux') {
-          sh 'make -f Makefile clean'
-          sh 'make -f Makefile -j3'
+          sh 'make -f linux/EtherTerm.mk clean'
+          sh 'make -f linux/EtherTerm.mk -j3'
         }
       }
     }
